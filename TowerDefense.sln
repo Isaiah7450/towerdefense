@@ -5,6 +5,22 @@ VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TowerDefense", "TowerDefense\TowerDefense.vcxproj", "{009A1C2C-A489-465A-BBD5-FE76FCB7C974}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BA3FA894-364C-4332-BC40-51481AE318B2}"
+	ProjectSection(SolutionItems) = preProject
+		tower_defense.ruleset = tower_defense.ruleset
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "resources", "resources", "{308FB7E4-E440-4F0B-8C87-C0FCE6718B8B}"
+	ProjectSection(SolutionItems) = preProject
+		resources\enemies.xml = resources\enemies.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "schemas", "schemas", "{E2B4411F-4B91-40BA-AED8-7F1F11F31D85}"
+	ProjectSection(SolutionItems) = preProject
+		resources\schemas\data_schema.xsd = resources\schemas\data_schema.xsd
+		resources\schemas\enemy_schema.xsd = resources\schemas\enemy_schema.xsd
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -24,6 +40,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{308FB7E4-E440-4F0B-8C87-C0FCE6718B8B} = {BA3FA894-364C-4332-BC40-51481AE318B2}
+		{E2B4411F-4B91-40BA-AED8-7F1F11F31D85} = {308FB7E4-E440-4F0B-8C87-C0FCE6718B8B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B3CC6B65-E070-4B37-81D4-FEEC6107CE30}
