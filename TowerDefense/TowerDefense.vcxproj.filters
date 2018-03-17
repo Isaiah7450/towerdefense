@@ -27,6 +27,9 @@
     <ClInclude Include="globals.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\graphics.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">
@@ -40,5 +43,12 @@
     <ClCompile Include="graphics\graphics_DX.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\graphics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="graphics\vertex_shader.hlsl" />
+    <FxCompile Include="graphics\pixel_shader.hlsl" />
   </ItemGroup>
 </Project>
