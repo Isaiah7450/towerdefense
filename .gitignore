@@ -3,6 +3,7 @@ bin/*
 */doc/**/
 */obj/**/
 .vs/**/
+documentation/**/
 Uploads/*.*
 Uploads/**/
 TowerDefense2D/**/Backup/
@@ -12,6 +13,7 @@ install/**/
 */doc/**/*.*
 */obj/**/*.*
 .vs/**/*.*
+documentation/*.*
 
 # File Types
 *.suo
