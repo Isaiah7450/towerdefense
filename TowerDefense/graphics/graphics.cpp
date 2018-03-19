@@ -12,7 +12,7 @@
 #include "./graphics_DX.hpp"
 
 namespace hoffman::isaiah {
-	namespace graphics::DX {
+	namespace graphics {
 		Renderer::Renderer(std::shared_ptr<DX::DeviceResources> dev_res) :
 			device_resources {dev_res} {
 		}
@@ -20,7 +20,6 @@ namespace hoffman::isaiah {
 		void Renderer::createDeviceDependentResources() {
 			try {
 				this->createShaders();
-				this->createCube();
 			}
 			catch (const std::wstring& e) {
 				MessageBox(nullptr, e.c_str(), L"Error", MB_OK);
@@ -80,54 +79,6 @@ namespace hoffman::isaiah {
 			hr = device->CreateBuffer(&cb_desc, nullptr, &this->constant_buffer);
 			if (FAILED(hr)) {
 				winapi::handleWindowsError(L"Constant buffer creation");
-			}
-		}
-
-		void Renderer::createCube() {
-			ID3D11Device* device = this->device_resources->getDevice();
-			// Create cube geometry
-			VertexPositionColor cube_vertices[] = {
-				{DirectX::XMFLOAT3 {-0.5f, -0.5f, -0.5f}, DirectX::XMFLOAT3 {0.f, 0.f, 0.f},},
-				{DirectX::XMFLOAT3 {-0.5f, -0.5f, 0.5f}, DirectX::XMFLOAT3 {0.f, 0.f, 1.f},},
-				{DirectX::XMFLOAT3 {-0.5f, 0.5f, -0.5f}, DirectX::XMFLOAT3 {0.f, 1.f, 0.f},},
-				{DirectX::XMFLOAT3 {-0.5f, 0.5f, 0.5f}, DirectX::XMFLOAT3 {0.f, 1.f, 1.f},},
-				{DirectX::XMFLOAT3 {0.5f, -0.5f, -0.5f}, DirectX::XMFLOAT3 {1.f, 0.f, 0.f},},
-				{DirectX::XMFLOAT3 {0.5f, -0.5f, 0.5f}, DirectX::XMFLOAT3 {1.f, 0.f, 1.f},},
-				{DirectX::XMFLOAT3 {0.5f, 0.5f, -0.5f}, DirectX::XMFLOAT3 {1.f, 1.f, 0.f},},
-				{DirectX::XMFLOAT3 {0.5f, 0.5f, 0.5f}, DirectX::XMFLOAT3 {1.f, 1.f, 1.f},}
-			};
-			// Create vertex buffer
-			CD3D11_BUFFER_DESC v_desc {sizeof(cube_vertices), D3D11_BIND_VERTEX_BUFFER};
-			D3D11_SUBRESOURCE_DATA v_data;
-			ZeroMemory(&v_data, sizeof(D3D11_SUBRESOURCE_DATA));
-			v_data.pSysMem = cube_vertices;
-			v_data.SysMemPitch = 0;
-			v_data.SysMemSlicePitch = 0;
-			HRESULT hr = device->CreateBuffer(&v_desc, &v_data, &this->vertex_buffer);
-			if (FAILED(hr)) {
-				winapi::handleWindowsError(L"Vertex buffer creation");
-			}
-			// Create index buffer
-			unsigned short cube_indices[] = {
-				0, 2, 1, // -x
-				1, 2, 3,
-				4, 5, 6, // +x
-				5, 7, 6,
-				0, 1, 5, // -y
-				0, 5, 4,
-				2, 6, 7, // +y
-				2, 7, 3,
-				0, 4, 6, // -z
-				0, 6, 2,
-				1, 3, 7, // +z
-				1, 7, 5
-			};
-			this->index_count = ARRAYSIZE(cube_indices);
-			CD3D11_BUFFER_DESC i_desc {sizeof(cube_indices), D3D11_BIND_INDEX_BUFFER};
-			D3D11_SUBRESOURCE_DATA i_data {cube_indices, 0, 0};
-			hr = device->CreateBuffer(&i_desc, &i_data, &this->index_buffer);
-			if (FAILED(hr)) {
-				winapi::handleWindowsError(L"Index buffer creation");
 			}
 		}
 

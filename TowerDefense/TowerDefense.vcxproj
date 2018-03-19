@@ -147,6 +147,7 @@
     <ClInclude Include="globals.hpp" />
     <ClInclude Include="graphics\graphics.hpp" />
     <ClInclude Include="graphics\graphics_DX.hpp" />
+    <ClInclude Include="graphics\shapes.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="targetver.hpp" />
   </ItemGroup>
@@ -156,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="graphics\graphics.cpp" />
     <ClCompile Include="graphics\graphics_DX.cpp" />
+    <ClCompile Include="graphics\shapes.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>

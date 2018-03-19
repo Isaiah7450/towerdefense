@@ -42,7 +42,7 @@ namespace hoffman::isaiah {
 		};
 	}
 
-	namespace graphics::DX {
+	namespace graphics {
 		// For use with COM pointers
 		template <typename T>
 		void SafeRelease(T** ppT) {
@@ -51,7 +51,9 @@ namespace hoffman::isaiah {
 				*ppT = nullptr;
 			}
 		}
+	}
 
+	namespace graphics::DX {
 		/// <summary>Stores the Direct3D device resources.</summary>
 		class DeviceResources {
 		public:

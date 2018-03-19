@@ -28,7 +28,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	UNREFERENCED_PARAMETER(lpCmdLine);
 	auto my_window = ih::winapi::MainWindow {hInstance, nCmdShow};
 	auto my_d3d_resources = std::make_shared<ih::graphics::DX::DeviceResources>(my_window.getHWND());
-	auto my_renderer = std::make_unique<ih::graphics::DX::Renderer>(my_d3d_resources);
+	auto my_renderer = std::make_unique<ih::graphics::Renderer>(my_d3d_resources);
 	my_renderer->createDeviceDependentResources();
 	my_renderer->createWindowSizeDependentResources();
 	// Message Loop

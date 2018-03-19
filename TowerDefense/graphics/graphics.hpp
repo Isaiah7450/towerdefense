@@ -9,8 +9,7 @@
 #include "./graphics_DX.hpp"
 
 namespace hoffman::isaiah {
-	namespace graphics::DX {
-
+	namespace graphics {
 		/// <summary>Class used to render a scene.</summary>
 		class Renderer {
 		public:
@@ -37,8 +36,6 @@ namespace hoffman::isaiah {
 		protected:
 			/// <summary>Creates and loads necessary shaders.</summary>
 			void createShaders();
-			/// <summary>Creates the actual cube.</summary>
-			void createCube();
 			/// <summary>Updates the current view and perspective in response to a window view change.</summary>
 			void createViewAndPerspective();
 		private:
@@ -63,7 +60,7 @@ namespace hoffman::isaiah {
 			};
 
 			/// <summary>Shared pointer to the Direct3D device resources.</summary>
-			std::shared_ptr<DeviceResources> device_resources;
+			std::shared_ptr<DX::DeviceResources> device_resources;
 			/// <summary>Pointer to the vertex shader.</summary>
 			ID3D11VertexShader* vertex_shader {nullptr};
 			/// <summary>Pointer to the input layout.</summary>
