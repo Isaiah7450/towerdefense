@@ -144,10 +144,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="game\my_game.hpp" />
     <ClInclude Include="globals.hpp" />
     <ClInclude Include="graphics\graphics.hpp" />
     <ClInclude Include="graphics\graphics_DX.hpp" />
     <ClInclude Include="graphics\shapes.hpp" />
+    <ClInclude Include="main.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="targetver.hpp" />
   </ItemGroup>

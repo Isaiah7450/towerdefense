@@ -3,45 +3,12 @@
 // File Created: March 13, 2018
 #include "../targetver.hpp"
 #include <Windows.h>
-#include <d3d11.h>
+#include <d2d1.h>
 #include <string>
 
-#pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "d2d1.lib")
 
 namespace hoffman::isaiah {
-	namespace winapi {
-		[[noreturn]] void handleWindowsError(std::wstring lpszFunction);
-
-		class MainWindow {
-		public:
-			/// <summary>Creates a new main window.</summary>
-			/// <param name="h_inst">The hInstance parameter given by the WinMain function.</param>
-			/// <param name="nCmdShow">The nCmdShow parameter given by the WinMain function.</param>
-			MainWindow(HINSTANCE h_inst, int nCmdShow);
-			/// <summary>Return's the name of the window.</summary>
-			constexpr static const wchar_t* getWindowName() noexcept {
-				return MainWindow::window_name;
-			}
-			static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-			// Getters
-			HWND getHWND() const noexcept {
-				return this->hwnd;
-			}
-		private:
-			/// <summary>The handle to the application instance.</summary>
-			HINSTANCE h_instance;
-			/// <summary>The handle to the window.</summary>
-			HWND hwnd {nullptr};
-			/// <summary>The handle to the window's menu.</summary>
-			HMENU h_menu {nullptr};
-			/// <summary>The current window dimensions.</summary>
-			RECT rc {};
-			// The class name
-			static constexpr const wchar_t* class_name {L"my_game"};
-			static constexpr const wchar_t* window_name {L"Isaiah's tower defense game"};
-		};
-	}
-
 	namespace graphics {
 		// For use with COM pointers
 		template <typename T>
@@ -54,83 +21,56 @@ namespace hoffman::isaiah {
 	}
 
 	namespace graphics::DX {
-		/// <summary>Stores the Direct3D device resources.</summary>
-		class DeviceResources {
+		/// <summary>Class that stores resources for 2D graphics (and text).</summary>
+		class DeviceResources2D {
 		public:
-			/// <summary>Initializes the Direct3D device resources.</summary>
-			/// <param name="hwnd">Handle to the main window.</param>
-			DeviceResources(HWND hwnd);
-			// I couldn't get _com_ptr_t to work nor the header <wrl.h> to work,
-			// so this will have to suffice.
-			// I considered std::unique_ptr or std::shared_ptr, but I'm not sure
-			// if those work well with COM objects.
-			// The main thing to watch for is having multiple references to the
-			// same object --> for the most part, this class "owns" the resources
-			// freed by this class's destructor.
-			/// <summary>Releases COM resources used by the program.</summary>
-			~DeviceResources() noexcept {
-				SafeRelease(&this->depth_stencil_view);
-				SafeRelease(&this->depth_stencil);
-				SafeRelease(&this->swap_chain);
-				SafeRelease(&this->dxgi_device);
-				SafeRelease(&this->device_context);
-				SafeRelease(&this->device);
+			/// <summary>Default constructor that does nothing.</summary>
+			DeviceResources2D() noexcept = default;
+			/// <summary>Releases all COM resources owned by this class.</summary>
+			~DeviceResources2D() noexcept {
+				this->discardDeviceResources();
+				SafeRelease(&this->factory);
 			}
-			/// <summary>Creates the swap chain and additional basic Direct3D device resources.</summary>
-			void createWindowResources(HWND hwnd);
-			/// <summary>Presents the scene on the primary surface.</summary>
-			void present() const {
-				this->swap_chain->Present(1, 0);
+			/// <summary>Creates resources that are independent of the underlying devices.</summary>
+			void createDeviceIndependentResources();
+			/// <summary>Create resources that are dependent upon the underlying device.</summary>
+			/// <param name="hwnd">Handle to the window that the resources are associated with.</param>
+			/// <returns>A value indicating whether or not the resources were successfully created.</returns>
+			HRESULT createDeviceResources(HWND hwnd);
+			/// <summary>Releases the rendering target and associated brushes that are device-dependent resources.</summary>
+			void discardDeviceResources() noexcept {
+				SafeRelease(&this->text_brush);
+				SafeRelease(&this->fill_brush);
+				SafeRelease(&this->outline_brush);
+				SafeRelease(&this->render_target);
 			}
+
 			// Getters
-			ID3D11Device* getDevice() const noexcept {
-				return this->device;
-			}
-			ID3D11DeviceContext* getDeviceContext() const noexcept {
-				return this->device_context;
-			}
-			ID3D11RenderTargetView* getRenderTargetView() const noexcept {
+			// (I plan on performing non-constant actions on these
+			// returns, so these getters are not marked constant.)
+			ID2D1HwndRenderTarget* getRenderTarget() noexcept {
 				return this->render_target;
 			}
-			ID3D11DepthStencilView* getDepthStencilView() const noexcept {
-				return this->depth_stencil_view;
+			ID2D1SolidColorBrush* getOutlineBrush() noexcept {
+				return this->outline_brush;
 			}
-			/// <returns>The current aspect ratio.</returns>
-			float getAspectRatio() const noexcept {
-				return static_cast<float>(this->back_buffer_desc.Width) /
-					static_cast<float>(this->back_buffer_desc.Height);
+			ID2D1SolidColorBrush* getFillBrush() noexcept {
+				return this->fill_brush;
 			}
-		protected:
-			// (This function is automatically called by the constructor alongside
-			// createWindowResources())
-			// (Also note that if this function or createWindowResources() fails,
-			// the entire program will be terminated.)
-			/// <summary>Creates the initial Direct3D device resources.</summary>
-			void createDeviceResources();
+			ID2D1SolidColorBrush* getTextBrush() noexcept {
+				return this->text_brush;
+			}
 		private:
-			// Fields
-			/// <summary>Pointer to the Direct3D device.</summary>
-			ID3D11Device* device {nullptr};
-			/// <summary>Pointer to the Direct3D device context.</summary>
-			ID3D11DeviceContext* device_context {nullptr};
-			/// <summary>The current feature level of the program.</summary>
-			D3D_FEATURE_LEVEL feature_level {};
-			/// <summary>The DXGI device object to use in other factories, such as Direct2D.</summary>
-			IDXGIDevice1* dxgi_device {nullptr};
-			/// <summary>Pointer to the Direct3D swap chain.</summary>
-			IDXGISwapChain* swap_chain {nullptr};
-			/// <summary>Pointer to the back buffer list.</summary>
-			ID3D11Texture2D* back_buffer {nullptr};
-			/// <summary>Pointer to the Direct3D render target view.</summary>
-			ID3D11RenderTargetView* render_target {nullptr};
-			/// <summary>The description of the back buffer.</summary>
-			D3D11_TEXTURE2D_DESC back_buffer_desc {};
-			/// <summary>Pointer to the depth-stencil buffer.</summary>
-			ID3D11Texture2D* depth_stencil {nullptr};
-			/// <summary>Pointer to the depth-stencil buffer view.</summary>
-			ID3D11DepthStencilView* depth_stencil_view {nullptr};
-			/// <summary>The current viewport dimensions.</summary>
-			D3D11_VIEWPORT viewport {};
+			/// <summary>Pointer to the Direct2D factory.</summary>
+			ID2D1Factory* factory {nullptr};
+			/// <summary>Pointer to the Direct2D rendering target.</summary>
+			ID2D1HwndRenderTarget* render_target {nullptr};
+			/// <summary>Pointer to the Direct2D brush used for outlining shapes.</summary>
+			ID2D1SolidColorBrush* outline_brush {nullptr};
+			/// <summary>Pointer to the Direct2D brush used for filling shapes.</summary>
+			ID2D1SolidColorBrush* fill_brush {nullptr};
+			/// <summary>Pointer to the Direct2D brush used for text.</summary>
+			ID2D1SolidColorBrush* text_brush {nullptr};
 		};
 	}
 }
