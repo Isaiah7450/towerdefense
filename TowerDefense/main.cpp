@@ -113,13 +113,6 @@ namespace hoffman::isaiah {
 			// Show window
 			ShowWindow(this->hwnd, n_cmd_show);
 			UpdateWindow(this->hwnd);
-			// Test input/output of grids
-			std::wofstream output_file {L"test.txt"};
-			ih::pathfinding::Grid my_grid {0, 0, 2, 2};
-			output_file << my_grid;
-			output_file.close();
-			std::wifstream input_file {L"test.txt"};
-			input_file >> my_grid;
 			// Message Loop
 			MSG msg;
 			bool keep_looping = true;
