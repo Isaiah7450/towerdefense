@@ -150,6 +150,8 @@
     <ClInclude Include="graphics\graphics_DX.hpp" />
     <ClInclude Include="graphics\shapes.hpp" />
     <ClInclude Include="main.hpp" />
+    <ClInclude Include="pathfinding\graph_node.hpp" />
+    <ClInclude Include="pathfinding\grid.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="targetver.hpp" />
   </ItemGroup>
@@ -161,6 +163,8 @@
     <ClCompile Include="graphics\graphics_DX.cpp" />
     <ClCompile Include="graphics\shapes.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="pathfinding\graph_node.cpp" />
+    <ClCompile Include="pathfinding\grid.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="graphics\pixel_shader.hlsl">

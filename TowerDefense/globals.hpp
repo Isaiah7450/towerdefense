@@ -21,7 +21,9 @@ namespace hoffman::isaiah {
 		extern int screen_width;
 		/// <summary>The screen resolution height.</summary>
 		extern int screen_height;
+		/// <summary>The width of the game grid.</summary>
 		extern int grid_width;
+		/// <summary>The height of the game grid.</summary>
 		extern int grid_height;
 	}
 }

@@ -39,6 +39,12 @@
     <ClInclude Include="game\my_game.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="pathfinding\graph_node.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pathfinding\grid.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">
@@ -56,6 +62,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="graphics\shapes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pathfinding\graph_node.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pathfinding\grid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
