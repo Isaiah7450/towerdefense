@@ -12,9 +12,14 @@ using namespace std::literals::string_literals;
 namespace hoffman::isaiah {
 	namespace pathfinding {
 		std::wistream& operator>>(std::wistream& is, Grid& graph) {
-			// First, read in the width and height of the grid
+			// It is important to clear any nodes that may already be
+			// in the graph!
+			graph.nodes.clear();
+			graph.start_node = nullptr;
+			graph.goal_node = nullptr;
+			// First, read in the number of rows and columns of the grid
 			// and set the global variables appropriately
-			is >> graphics::grid_width >> graphics::grid_height;
+			is >> graphics::grid_height >> graphics::grid_width;
 			// Next, read the contents of the grid
 			for (int i = 0; i < graphics::grid_height; ++i) {
 				std::vector<GraphNode> new_row {};
@@ -23,6 +28,7 @@ namespace hoffman::isaiah {
 					is >> w;
 					new_row.emplace_back(j, i, w);
 				}
+				graph.nodes.emplace_back(new_row);
 			}
 			// Check that we read the required number of nodes
 			if (graph.getWidth() != graphics::grid_width ||
@@ -46,7 +52,7 @@ namespace hoffman::isaiah {
 				throw std::runtime_error {"Cannot output a graph that lacks a starting and ending location."};
 			}
 			// Width and height
-			os << graph.getWidth() << L" " << graph.getHeight() << L"\n";
+			os << graph.getRows() << L" " << graph.getColumns() << L"\n";
 			// Output grid contents
 			for (int i = 0; i < graph.getRows(); ++i) {
 				for (int j = 0; j < graph.getColumns(); ++j) {
