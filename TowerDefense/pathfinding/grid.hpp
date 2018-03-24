@@ -3,6 +3,7 @@
 // File Created: March 24, 2018
 #include <iosfwd>
 #include <vector>
+#include <initializer_list>
 #include "./../globals.hpp"
 #include "./graph_node.hpp"
 
@@ -11,32 +12,55 @@ namespace hoffman::isaiah {
 		/// <summary>Class representing a rectangular graph of nodes.</summary>
 		class Grid {
 		public:
-			/// <summary>Creates an empty grid with a height and width
-			/// specified by the global psuedo-constants grid_width and
-			/// grid_height in the graphics namespace.</summary>
+			/// <summary>Creates an empty grid with grid_width columns and grid_height rows.
+			/// (Those numbers are global psuedo-constants.)</summary>
 			Grid() :
+				Grid(graphics::grid_height, graphics::grid_width) {
+			}
+			/// <summary>Creates an empty grid with the specified width and height.</summary>
+			/// <param name="rows">The number of rows in the grid.</param>
+			/// <param name="cols">The number of columns in the grid.</param>
+			Grid(int rows, int cols) :
 				nodes {} {
+				// Store values (for drawing purposes)
+				graphics::grid_height = rows;
+				graphics::grid_width = cols;
 				// Reset the grid nodes
-				for (int i = 0; i < graphics::grid_height; ++i) {
+				for (int i = 0; i < rows; ++i) {
 					std::vector<GraphNode> new_row {};
-					for (int j = 0; j < graphics::grid_width; ++j) {
-						new_row.emplace_back(j, i, 1);
+					for (int j = 0; j < cols; ++j) {
+						new_row.emplace_back(j, i, 0);
 					}
 					this->nodes.emplace_back(new_row);
 				}
 			}
-			/// <summary>Constructor that also initializes the start
-			/// and end nodes in addition to initializing the grid.</summary>
-			/// <param name="start_x">The starting node's x-coordinate.</param>
-			/// <param name="start_y">The starting node's y-coordinate.</param>
-			/// <param name="goal_x">The destination node's x-coordinate.</param>
-			/// <param name="goal_y">The destination node's y-coordinate.</param>
-			Grid(int start_x, int start_y, int goal_x, int goal_y) :
-				Grid::Grid() {
-				this->start_node = &this->getNode(start_x, start_y);
-				this->goal_node = &this->getNode(goal_x, goal_y);
+			/// <summary>Constructor that creates a new grid based on the given data.</summary>
+			/// <param name="start_x">The starting node's x-coordinate. (Use -1 for nullptr.)</param>
+			/// <param name="start_y">The starting node's y-coordinate. (Use -1 for nullptr.)</param>
+			/// <param name="goal_x">The destination node's x-coordinate. (Use -1 for nullptr.)</param>
+			/// <param name="goal_y">The destination node's y-coordinate. (Use -1 for nullptr.)</param>
+			/// <param name="node_weights">The weights of the nodes to store in the grid.</param>
+			Grid(int start_x, int start_y, int goal_x, int goal_y,
+				std::initializer_list<std::initializer_list<int>> node_weights) :
+				nodes {} {
+				int i = 0, j = 0;
+				for (auto& my_row_weights : node_weights) {
+					std::vector<GraphNode> new_row {};
+					j = 0;
+					for (auto& my_weight : my_row_weights) {
+						new_row.emplace_back(j, i, my_weight);
+						++j;
+					}
+					this->nodes.emplace_back(new_row);
+					++i;
+				}
+				if (start_x >= 0 && start_y >= 0 && goal_x >= 0 && goal_y >= 0) {
+					this->start_node = &this->getNode(start_x, start_y);
+					this->goal_node = &this->getNode(goal_x, goal_y);
+				}
 			}
 			/// <summary>Constructs the graph from data stored in a file.</summary>
+			/// <param name="is">Input file containing the graph data to load.</param>
 			Grid(std::wistream& is) :
 				nodes {} {
 				// Defer to input operator
@@ -82,6 +106,13 @@ namespace hoffman::isaiah {
 			int getColumns() const noexcept {
 				return this->getWidth();
 			}
+			/// <param name="gx">The x-coordinate of the node to find the neighbors of.</param>
+			/// <param name="gy">The y-coordinate of the node to find the neighbors of.</param>
+			/// <param name="filter_graph">Another graph that provides additional information
+			/// about nodes whose values are different from the original terrain values.</param>
+			/// <param name="include_diag">Set this to true if diagonal movement is allowed.</param>
+			/// <returns>A list of constant pointers to nodes that neighbor the specified node.</returns>
+			std::vector<const GraphNode*> getNeighbors(int gx, int gy, const Grid& filter_graph, bool include_diag) const;
 			// Input/Output
 			friend std::wostream& operator<<(std::wostream& os, const Grid& graph);
 			friend std::wistream& operator>>(std::wistream& is, Grid& graph);

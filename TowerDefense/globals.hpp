@@ -4,6 +4,15 @@
 #include <string>
 
 namespace hoffman::isaiah {
+	namespace math {
+		// Constexpr functions
+		// Obtains the absolute value of a number
+		template <typename T>
+		constexpr T get_abs(T val) noexcept {
+			return val >= 0 ? val : -val;
+		}
+	}
+
 	namespace winapi {
 		// Global constants
 		constexpr const auto main_class_name {"my_game"};

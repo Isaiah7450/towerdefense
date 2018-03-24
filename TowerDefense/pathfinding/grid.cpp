@@ -67,5 +67,43 @@ namespace hoffman::isaiah {
 				<< graph.getGoalNode()->getGameX() << L" "
 				<< graph.getGoalNode()->getGameY() << L"\n";
 		}
+
+		std::vector<const GraphNode*> Grid::getNeighbors(int gx, int gy, const Grid& filter_graph, bool include_diag) const {
+#if defined(DEBUG) || defined(_DEBUG)
+			// Worthwhile check but may be a bit costly considering
+			// how much this function will be called
+			if (this->getWidth() != filter_graph.getWidth()
+				|| this->getHeight() != filter_graph.getHeight()) {
+				throw std::invalid_argument {"Both the terrain map and the filter graph "
+					"should have the same dimensions."};
+			}
+#endif // DEBUG or _DEBUG
+			std::vector<const GraphNode*> my_neighbors {};
+			// Loop bounds
+			const int min_dx = gx > 0 ? -1 : 0;
+			const int max_dx = (gx < this->getWidth() - 1) ? 1 : 0;
+			const int min_dy = gy > 0 ? -1 : 0;
+			const int max_dy = (gy < this->getHeight() - 1) ? 1 : 0;
+			// Find neighbors --> Maybe algorithm provides a way to do this cleaner?
+			for (int dx = min_dx; dx <= max_dx; ++dx) {
+				for (int dy = min_dy; dy <= max_dy; ++dy) {
+					// So a very simple (as well as flexible) way of resolving the terrain graph
+					// (this graph) and the filter graph is to simply add the filter graph's
+					// node's weight to the terrain graph's node's weight.
+					if ((include_diag || dx == 0 || dy == 0) && !(dx == dy && dx == 0)) {
+						const auto* terrain_node = &this->getNode(gx + dx, gy + dy);
+						const auto* filter_node = &filter_graph.getNode(gx + dx, gy + dy);
+						auto total_weight = terrain_node->getWeight() + filter_node->getWeight();
+						if (total_weight < GraphNode::blocked_space_weight
+							|| terrain_node == this->getStartNode()
+							|| terrain_node == this->getGoalNode()) {
+							my_neighbors.push_back(terrain_node);
+						}
+					}
+				} // End inner for
+			} // End outer for
+			// Return set of neighbors
+			return my_neighbors;
+		}
 	}
 }
