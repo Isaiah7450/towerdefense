@@ -2,6 +2,7 @@
 bin/*
 */doc/**/
 */obj/**/
+obj/*
 .vs/**/
 documentation/**/
 Uploads/*.*
@@ -14,6 +15,7 @@ install/**/
 */obj/**/*.*
 .vs/**/*.*
 documentation/*.*
+*/stdafx.*
 
 # File Types
 *.suo
