@@ -11,7 +11,7 @@ namespace hoffman::isaiah {
 	namespace graphics::DX {
 		void DeviceResources2D::createDeviceIndependentResources() {
 			// Create Direct2D factory
-			HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, &this->factory);
+			HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &this->factory);
 			if (FAILED(hr)) {
 				winapi::handleWindowsError(L"Creation of Direct2D factory");
 			}
@@ -25,7 +25,8 @@ namespace hoffman::isaiah {
 				GetClientRect(hwnd, &rc);
 				D2D1_SIZE_U size = D2D1::SizeU(rc.right - rc.left, rc.bottom - rc.top);
 				// Create Direct2D render target
-				hr = this->factory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(),
+				hr = this->factory->CreateHwndRenderTarget(D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_DEFAULT,
+					D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED)),
 					D2D1::HwndRenderTargetProperties(hwnd, size), &this->render_target);
 				// Create brushes
 				const D2D1::ColorF color_black {0.0f, 0.0f, 0.0f, 1.0f};
