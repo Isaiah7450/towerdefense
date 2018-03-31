@@ -3,10 +3,13 @@
 #include "./../targetver.hpp"
 #include <Windows.h>
 #include <Windowsx.h>
+#include <Shobjidl.h>
 #include "./../resource.h"
 #include <process.h>
 #include <string>
 #include <utility>
+#include <iostream>
+#include <fstream>
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 #include "./../main.hpp"
@@ -16,6 +19,8 @@
 #include "./../pathfinding/pathfinder.hpp"
 #include "./../game/my_game.hpp"
 #include "./editor.hpp"
+
+using namespace std::literals::string_literals;
 
 namespace hoffman::isaiah {
 	namespace terrain_editor {
@@ -108,12 +113,75 @@ namespace hoffman::isaiah {
 					case WM_COMMAND:
 					{
 						switch (msg.wParam) {
+						case ID_TE_FILE_NEW_MAP:
+							this->map_name += L"1";
+							break;
+						case ID_TE_FILE_OPEN_MAP:
+						{
+							/*
+							// CoCreate (whatever that is) the File Open Dialog object
+							IFileDialog* open_dialog = nullptr;
+							HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER,
+								IID_PPV_ARGS(&open_dialog));
+							if (FAILED(hr)) {
+								MessageBox(this->hwnd, L"TE Thread: Open dialog box creation failed!", TerrainEditor::window_name,
+									MB_OK);
+								break;
+							}
+							// Create an event handling object and hook it to the dialog
+							IFileDialogEvents* file_dialog_events = nullptr;
+							hr = CDialogEventHandler_CreateInstance(IID_PPV_ARGS(&file_dialog_events));
+							*/
+							break;
+						}
+						case ID_TE_FILE_SAVE_MAP:
+						{
+							// Open save files
+							std::wofstream ground_save_file {L"./resources/graphs/ground_"s + this->map_name};
+							std::wofstream air_save_file {L"./resources/graphs/air_"s + this->map_name};
+							if (!ground_save_file.good() || !air_save_file.good()) {
+								MessageBox(this->hwnd, L"TE Thread: Could not save map!", this->window_name, MB_OK);
+								break;
+							}
+							// Output maps to save files
+							ground_save_file << this->getTerrainGraph(false);
+							air_save_file << this->getTerrainGraph(true);
+							break;
+						}
+						case ID_TE_FILE_SAVE_MAP_AS:
+							break;
+						case ID_TE_FILE_QUIT:
+							PostQuitMessage(0);
+							break;
+						case ID_TE_ACTIONS_REVERT_TO_SAVE:
+						{
+							// Open save files
+							std::wifstream ground_save_file {L"./resources/graphs/ground_"s + this->map_name};
+							std::wifstream air_save_file {L"./resources/graphs/air_"s + this->map_name};
+							auto ground_grid {std::make_unique<pathfinding::Grid>(ground_save_file)};
+							auto air_grid {std::make_unique<pathfinding::Grid>(air_save_file)};
+							this->getMap().resetOtherGraphs();
+							this->getMap().setTerrainGraphs(std::move(ground_grid), std::move(air_grid));
+							break;
+						}
 						case ID_TE_ACTIONS_SET_GROUND_START:
 						case ID_TE_ACTIONS_SET_AIR_START:
 						case ID_TE_ACTIONS_SET_GROUND_END:
 						case ID_TE_ACTIONS_SET_AIR_END:
 							this->selected_terrain_modifier = msg.wParam;
 							this->terrain_modifier_active = true;
+							break;
+						case ID_TE_ACTIONS_INCREASE_WEIGHTS:
+							++this->terrain_weights_adjust;
+							if (this->terrain_weights_adjust > 9) {
+								this->terrain_weights_adjust = 9;
+							}
+							break;
+						case ID_TE_ACTIONS_DECREASE_WEIGHTS:
+							--this->terrain_weights_adjust;
+							if (this->terrain_weights_adjust < 0) {
+								this->terrain_weights_adjust = 0;
+							}
 							break;
 						case ID_TE_TERRAIN_TYPES_NONE:
 						case ID_TE_TERRAIN_TYPES_GRASS:
@@ -212,6 +280,9 @@ namespace hoffman::isaiah {
 								default:
 									break;
 								}
+								// Apply terrain weight adjustment
+								selected_gnode.setWeight(selected_gnode.getWeight() + this->terrain_weights_adjust);
+								selected_anode.setWeight(selected_anode.getWeight() + this->terrain_weights_adjust);
 							}
 						} // End outer for
 						if (this->terrain_modifier_active) {
@@ -220,15 +291,19 @@ namespace hoffman::isaiah {
 							switch (this->selected_terrain_modifier) {
 							case ID_TE_ACTIONS_SET_GROUND_START:
 								this->getTerrainGraph(false).setStartNode(this->start_gx, this->start_gy);
+								this->getTerrainGraph(false).getNode(this->start_gx, this->start_gy).setBlockage(false);
 								break;
 							case ID_TE_ACTIONS_SET_AIR_START:
 								this->getTerrainGraph(true).setStartNode(this->start_gx, this->start_gy);
+								this->getTerrainGraph(true).getNode(this->start_gx, this->start_gy).setBlockage(false);
 								break;
 							case ID_TE_ACTIONS_SET_GROUND_END:
 								this->getTerrainGraph(false).setGoalNode(this->start_gx, this->start_gy);
+								this->getTerrainGraph(false).getNode(this->start_gx, this->start_gy).setBlockage(false);
 								break;
 							case ID_TE_ACTIONS_SET_AIR_END:
 								this->getTerrainGraph(true).setGoalNode(this->start_gx, this->start_gy);
+								this->getTerrainGraph(true).getNode(this->start_gx, this->start_gy).setBlockage(false);
 								break;
 							default:
 								break;

@@ -209,7 +209,26 @@ namespace hoffman::isaiah {
 			pathfinding::Grid& getInfluenceGraph(bool get_air_graph) noexcept {
 				return get_air_graph ? *this->air_influence_graph : *this->ground_influence_graph;
 			}
-
+			// Setters
+			/// <summary>Sets the given graphs as the current ground and air terrain graphs.</summary>
+			/// <param name="gt_graph">The new graph to store as the ground terrain graph.</param>
+			/// <param name="at_graph">The new graph to store as the air terrain graph.</param>
+			void setTerrainGraphs(std::unique_ptr<pathfinding::Grid> gt_graph, std::unique_ptr<pathfinding::Grid> at_graph) {
+				this->ground_terrain_graph.swap(gt_graph);
+				this->air_terrain_graph.swap(at_graph);
+			}
+			/// <summary>Resets the non-terrain graphs to their initial state.</summary>
+			void resetOtherGraphs() {
+				// With any luck, this will work properly
+				auto ptr_gf_graph = std::make_unique<pathfinding::Grid>();
+				auto ptr_af_graph = std::make_unique<pathfinding::Grid>();
+				auto ptr_gi_graph = std::make_unique<pathfinding::Grid>();
+				auto ptr_ai_graph = std::make_unique<pathfinding::Grid>();
+				this->ground_filter_graph.swap(ptr_gf_graph);
+				this->air_filter_graph.swap(ptr_af_graph);
+				this->ground_influence_graph.swap(ptr_gi_graph);
+				this->air_influence_graph.swap(ptr_ai_graph);
+			}
 		private:
 			/// <summary>Graph that contains information about the basic terrain weights
 			/// of each grid square for ground units.</summary>

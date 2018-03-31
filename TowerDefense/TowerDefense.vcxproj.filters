@@ -54,6 +54,9 @@
     <ClInclude Include="terrain\editor.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\file_dialogs.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">

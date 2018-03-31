@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClInclude Include="game\my_game.hpp" />
     <ClInclude Include="globals.hpp" />
+    <ClInclude Include="graphics\file_dialogs.hpp" />
     <ClInclude Include="graphics\graphics.hpp" />
     <ClInclude Include="graphics\graphics_DX.hpp" />
     <ClInclude Include="graphics\shapes.hpp" />

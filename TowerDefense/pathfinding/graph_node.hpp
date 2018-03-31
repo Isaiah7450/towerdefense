@@ -39,11 +39,21 @@ namespace hoffman::isaiah {
 			/// <param name="block_space">Set this to true if the node should be blocked.</param>
 			void setBlockage(bool block_space) noexcept {
 				if (block_space && !this->isBlocked()) {
-					this->previous_weight = this->weight;
+					if (this->getWeight() < GraphNode::blocked_space_weight) {
+						this->previous_weight = this->getWeight();
+					}
+					else {
+						this->previous_weight = 1;
+					}
 					this->weight = GraphNode::blocked_space_weight;
 				}
 				else if (!block_space && this->isBlocked()) {
-					this->weight = this->previous_weight;
+					if (this->previous_weight < GraphNode::blocked_space_weight) {
+						this->weight = this->previous_weight;
+					}
+					else {
+						this->weight = 1;
+					}
 					this->previous_weight = GraphNode::blocked_space_weight;
 				}
 				// Otherwise, nothing happens

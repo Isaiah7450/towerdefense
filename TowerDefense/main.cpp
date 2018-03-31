@@ -170,8 +170,8 @@ namespace hoffman::isaiah {
 			// Create renderer
 			auto my_renderer = std::make_unique<graphics::Renderer2D>(my_resources);
 			// Create game state
-			constexpr const auto ground_terrain_filename = L"./resources/graphs/ground_terrain_graph.txt";
-			constexpr const auto air_terrain_filename = L"./resources/graphs/air_terrain_graph.txt";
+			constexpr const auto ground_terrain_filename = L"./resources/graphs/ground_graph.txt";
+			constexpr const auto air_terrain_filename = L"./resources/graphs/air_graph.txt";
 			std::wifstream ground_terrain_file {ground_terrain_filename};
 			std::wifstream air_terrain_file {air_terrain_filename};
 			if (!ground_terrain_file.good() || !air_terrain_file.good()) {

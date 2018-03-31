@@ -3,6 +3,7 @@
 // File Created: March 29, 2018
 #include "./../targetver.hpp"
 #include <Windows.h>
+#include <string>
 #include "./../globals.hpp"
 #include "./../pathfinding/grid.hpp"
 #include "./../pathfinding/pathfinder.hpp"
@@ -59,6 +60,8 @@ namespace hoffman::isaiah {
 			int selected_terrain_modifier {0};
 			/// <summary>Controls whether or not the terrain modifier is applied to a square.</summary>
 			bool terrain_modifier_active {false};
+			/// <summary>The amount to add to the default terrain weights for each terrain.</summary>
+			int terrain_weights_adjust {0};
 			/// <summary>Stores the starting x-position of the mouse.</summary>
 			int start_gx {-1};
 			/// <summary>Stores the starting y-position of the mouse.</summary>
@@ -67,6 +70,8 @@ namespace hoffman::isaiah {
 			int end_gx {-1};
 			/// <summary>Stores the ending y-position of the mouse.</summary>
 			int end_gy {-1};
+			/// <summary>Stores the current name used when saving the map.</summary>
+			std::wstring map_name {L"graph.txt"};
 			// The window's class
 			static constexpr auto class_name {L"terrain_editor_window"};
 			// The window's name
