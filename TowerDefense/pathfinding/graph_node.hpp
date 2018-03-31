@@ -1,6 +1,9 @@
 #pragma once
 // File Author: Isaiah Hoffman
 // File Created: March 23, 2018
+#include "./../globals.hpp"
+#include "./../ih_math.hpp"
+
 namespace hoffman::isaiah {
 	namespace pathfinding {
 		/// <summary>Class that represents a graph node. (Primarily for grid-based graphs,
@@ -71,43 +74,104 @@ namespace hoffman::isaiah {
 		/// <summary>Class that represents a node used by a pathfinder to find optimal paths.</summary>
 		class PathFinderNode {
 		public:
-			PathFinderNode(GraphNode me_node, PathFinderNode* my_parent_node, int j_cost) noexcept :
+			PathFinderNode(const GraphNode* me_node, const PathFinderNode* my_parent_node, const GraphNode* my_goal_node,
+				HeuristicStrategies h_strat, double j_cost, double h_modifier = 1.0) noexcept :
 				parent_node {my_parent_node},
 				graph_node {me_node},
 				j {j_cost} {
+				double multiplier = 1.0;
 				if (this->parent_node) {
-					this->g = this->parent_node->f;
+					this->g = this->parent_node->g;
+					int dx = math::get_abs(this->getGameX() - this->parent_node->getGameX());
+					int dy = math::get_abs(this->getGameY() - this->parent_node->getGameY());
+					if (dx != 0 && dy != 0) {
+						// Diagonal movement
+						multiplier = math::get_sqrt(2);
+					}
+					// Prefer points on a horizontal line to the goal
+					if (dy == 0) {
+						this->g += 0.05;
+					}
 				}
-				this->g += this->getGraphNode().getWeight();
+				// Add movement cost
+				this->g += this->getGraphNode().getWeight() * multiplier;
+				this->calculateHeuristic(my_goal_node, h_strat, h_modifier);
 				this->f = this->g + this->h + this->j;
 			}
 			// Getters
+			const PathFinderNode* getParentNode() const noexcept {
+				return this->parent_node;
+			}
 			const GraphNode& getGraphNode() const noexcept {
-				return this->graph_node;
+				return *this->graph_node;
+			}
+			int getGameX() const noexcept {
+				return this->graph_node->getGameX();
+			}
+			int getGameY() const noexcept {
+				return this->graph_node->getGameY();
+			}
+			double getF() const noexcept {
+				return this->f;
 			}
 			// Setters
 			/// <summary>Sets the path costs to get from some starting node to a goal node
 			/// while passing through this node.</summary>
-			void setPathCosts(int g_cost, int h_cost, int j_cost) noexcept {
+			void setPathCosts(double g_cost, double h_cost, double j_cost) noexcept {
 				this->g = g_cost;
 				this->h = h_cost;
 				this->j = j_cost;
 				this->f = this->g + this->h + this->j;
 			}
+		protected:
+			/// <summary>Calculates the h score of this node using the provided strategy.</summary>
+			/// <param name="my_goal_node">The destination one is trying to reach.</param>
+			/// <param name="strat">The strategy being used to estimate the distance to the goal.</param>
+			/// <param name="h_modifier">A value that can be adjusted to increase/decrease the heuristic.
+			/// Higher heuristic values result in faster processing but less optimal paths.</param>
+			void calculateHeuristic(const GraphNode* my_goal_node, HeuristicStrategies strat, double h_modifier = 1.0) {
+				const int dx = math::get_abs(this->getGameX() - my_goal_node->getGameX());
+				const int dy = math::get_abs(this->getGameY() - my_goal_node->getGameY());
+				switch (strat) {
+				case HeuristicStrategies::Euclidean:
+					// Basically the distance formula for the shortest distance
+					// between any two points (d = sqrt((x2 - x1)^2 + (y2 - y1)^2))
+					// The only problem is that one cannot move in all directions in this game
+					// so using Euclidean distances actually wastes time!
+					this->h = math::get_sqrt(dx * dx + dy * dy) * h_modifier;
+					break;
+				case HeuristicStrategies::Diagonal:
+					// Diagonal shortcut which is generally used
+					// when one can move in 8 directions.
+					this->h = ((dx + dy) + (math::get_sqrt(2) - 2) * math::get_min(dx, dy)) * h_modifier;
+					break;
+				case HeuristicStrategies::Max_Dx_Dy:
+					// A variant on diagonal shortcut where the cost of moving diagonally is
+					// the same as the cost of moving horizontally/vertically.
+					this->h = math::get_max(dx, dy) * h_modifier;
+					break;
+				case HeuristicStrategies::Manhattan:
+				default:
+					// Default behavior is to use Manhattan which is
+					// generally used when one can travel only in the 4 cardinal directions.
+					this->h = (dx + dy) * h_modifier;
+					break;
+				}
+			}
 		private:
 			/// <summary>This node's parent node or nullptr if this node does not have a parent node.</summary>
-			PathFinderNode* parent_node;
+			const PathFinderNode* parent_node;
 			/// <summary>The graph node represented by this pathfinding node.</summary>
-			GraphNode graph_node;
+			const GraphNode* graph_node;
 			/// <summary>The estimated total cost of reaching some destination node from some starting node.
 			/// Note that f = g + h + j.</summary>
-			int f {0};
+			double f {0};
 			/// <summary>The exact cost of reaching this location from some starting node.</summary>
-			int g {0};
+			double g {0};
 			/// <summary>The estimated movement cost of reaching some destination node from this starting node.</summary>
-			int h {0};
+			double h {0};
 			/// <summary>This value is used to discourage certain paths that may be dangerous.</summary>
-			int j;
+			double j;
 		};
 	}
 }
