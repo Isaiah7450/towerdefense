@@ -93,11 +93,12 @@
       <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;X:\CPP\Games\TowerDefense\TowerDefense;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
+      <AdditionalOptions>/constexpr:steps9999999 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;$(SolutionDir)obj\$(PlatformTarget)_$(Configuration)_TowerDefense\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>graph_node.obj;grid.obj;main.obj;graphics.obj;graphics_DX.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>graph_node.obj;grid.obj;main.obj;graphics.obj;graphics_DX.obj;my_game.obj;editor.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -106,11 +107,12 @@
       <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;X:\CPP\Games\TowerDefense\TowerDefense;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
+      <AdditionalOptions>/constexpr:steps9999999 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;$(SolutionDir)obj\$(PlatformTarget)_$(Configuration)_TowerDefense\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>graph_node.obj;grid.obj;main.obj;graphics.obj;graphics_DX.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>graph_node.obj;grid.obj;main.obj;graphics.obj;graphics_DX.obj;my_game.obj;editor.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -120,13 +122,14 @@
       <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;X:\CPP\Games\TowerDefense\TowerDefense;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
+      <AdditionalOptions>/constexpr:steps9999999 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;$(SolutionDir)obj\$(PlatformTarget)_$(Configuration)_TowerDefense\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>graph_node.obj;grid.obj;main.obj;graphics.obj;graphics_DX.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>graph_node.obj;grid.obj;main.obj;graphics.obj;graphics_DX.obj;my_game.obj;editor.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -136,13 +139,14 @@
       <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;X:\CPP\Games\TowerDefense\TowerDefense;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
+      <AdditionalOptions>/constexpr:steps9999999 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;$(SolutionDir)obj\$(PlatformTarget)_$(Configuration)_TowerDefense\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>graph_node.obj;grid.obj;main.obj;graphics.obj;graphics_DX.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>graph_node.obj;grid.obj;main.obj;graphics.obj;graphics_DX.obj;my_game.obj;editor.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

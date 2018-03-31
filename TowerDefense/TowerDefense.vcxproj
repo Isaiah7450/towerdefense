@@ -105,6 +105,7 @@
     <ClCompile>
       <EnablePREfast>true</EnablePREfast>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <AdditionalOptions>/constexpr:steps9999999 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -115,6 +116,7 @@
     <ClCompile>
       <EnablePREfast>true</EnablePREfast>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <AdditionalOptions>/constexpr:steps9999999 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -122,6 +124,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <EnablePREfast>true</EnablePREfast>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <AdditionalOptions>/constexpr:steps9999999 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -134,6 +137,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <EnablePREfast>true</EnablePREfast>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <AdditionalOptions>/constexpr:steps9999999 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -148,21 +152,27 @@
     <ClInclude Include="graphics\graphics_DX.hpp" />
     <ClInclude Include="graphics\shapes.hpp" />
     <ClInclude Include="main.hpp" />
+    <ClInclude Include="ih_math.hpp" />
     <ClInclude Include="pathfinding\graph_node.hpp" />
     <ClInclude Include="pathfinding\grid.hpp" />
+    <ClInclude Include="pathfinding\pathfinder.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="targetver.hpp" />
+    <ClInclude Include="terrain\editor.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="game\my_game.cpp" />
     <ClCompile Include="graphics\graphics.cpp" />
     <ClCompile Include="graphics\graphics_DX.cpp" />
     <ClCompile Include="graphics\shapes.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pathfinding\graph_node.cpp" />
     <ClCompile Include="pathfinding\grid.cpp" />
+    <ClCompile Include="pathfinding\pathfinder.cpp" />
+    <ClCompile Include="terrain\editor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="graphics\pixel_shader.hlsl">

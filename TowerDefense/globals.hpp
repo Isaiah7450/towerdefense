@@ -4,15 +4,6 @@
 #include <string>
 
 namespace hoffman::isaiah {
-	namespace math {
-		// Constexpr functions
-		// Obtains the absolute value of a number
-		template <typename T>
-		constexpr T get_abs(T val) noexcept {
-			return val >= 0 ? val : -val;
-		}
-	}
-
 	namespace winapi {
 		// Global constants
 		constexpr const auto main_class_name {"my_game"};
@@ -24,8 +15,25 @@ namespace hoffman::isaiah {
 		[[noreturn]] void handleWindowsError(std::wstring lpszFunction);
 	}
 	namespace graphics {
+		// Forward declarations
+		class Renderer2D;
+		// Interfaces
+		/// <summary>Interface for objects that can be drawn.</summary>
+		class IDrawable {
+		public:
+			// Default destructor declared virtual
+			virtual ~IDrawable() = default;
+			/// <summary>Implement this method for anything that can be drawn.</summary>
+			virtual void draw(const Renderer2D& renderer) const noexcept = 0;
+		};
+
 		// Global constants and variables
 		// Variables should be defined in main.cpp
+		// The following 4 values define the % of the screen covered by margins
+		constexpr const double margin_left = 0.025;
+		constexpr const double margin_right = 0.025;
+		constexpr const double margin_top = 0.050;
+		constexpr const double margin_bottom = 0.033;
 		/// <summary>The screen resolution width.</summary>
 		extern int screen_width;
 		/// <summary>The screen resolution height.</summary>
@@ -34,5 +42,23 @@ namespace hoffman::isaiah {
 		extern int grid_width;
 		/// <summary>The height of the game grid.</summary>
 		extern int grid_height;
+	}
+
+	namespace pathfinding {
+		// Global classes
+		/// <summary>Enumeration of various heuristic strategies to estimate h during pathfinding.</summary>
+		enum class HeuristicStrategies {
+			Manhattan, Diagonal, Euclidean, Max_Dx_Dy
+		};
+	}
+
+	namespace game {
+		// To conserve CPU, the program only redraws the screen once a frame
+		// where the following number dictates the number of graphical frames
+		// in a second.
+		constexpr const int graphics_framerate = 100;
+		// This framerate controls how often the game state is updated
+		// per second.
+		constexpr const int logic_framerate = 200;
 	}
 }
