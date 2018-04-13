@@ -39,7 +39,8 @@ namespace hoffman::isaiah {
 			if (graph.getWidth() != graphics::grid_width ||
 				graph.getHeight() != graphics::grid_height ||
 				is.fail()) {
-				throw std::runtime_error {"Error reading graph: not enough nodes were read."};
+				throw std::runtime_error {"Error reading graph: not enough nodes were read "
+					"or input file does not exist."};
 			}
 			// Finally, read the start and end nodes
 			int sx = 0;

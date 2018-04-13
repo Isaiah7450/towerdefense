@@ -45,7 +45,12 @@ namespace hoffman::isaiah {
 				winapi::handleWindowsError(L"TE Thread: Terrain editor creation");
 			}
 			my_editor->createWindow(my_h_inst);
-			my_editor->run();
+			try {
+				my_editor->run();
+			}
+			catch (std::runtime_error& e) {
+				MessageBoxA(my_editor->getHWND(), e.what(), "TE Thread Error", MB_OK);
+			}
 			return 0;
 		}
 
@@ -122,9 +127,26 @@ namespace hoffman::isaiah {
 					{
 						switch (msg.wParam) {
 						case ID_TE_FILE_NEW_MAP:
+						{
 							this->map_name += L"1";
+							// FIXME: Synchronization Issue
+							WaitForSingleObject(sync_mutex, INFINITE);
+							// Reset map to all mountainous terrain
+							this->getMap().getTerrainGraph(false).clearGrid(pathfinding::GraphNode::blocked_space_weight);
+							this->getMap().getTerrainGraph(true).clearGrid(pathfinding::GraphNode::blocked_space_weight);
+							this->getMap().getTerrainGraph(false).setStartNode(0, 0);
+							this->getMap().getTerrainGraph(true).setStartNode(0, 0);
+							this->getMap().getTerrainGraph(false).setGoalNode(0, 0);
+							this->getMap().getTerrainGraph(true).setGoalNode(0, 0);
+							// Disable revert to save --> No save exists!
+							constexpr MENUITEMINFO m_item {
+								sizeof(MENUITEMINFO), MIIM_STATE, 0, MFS_DISABLED,
+								0, nullptr, nullptr, nullptr, 0, nullptr, 0, nullptr
+							};
+							SetMenuItemInfo(GetSubMenu(GetMenu(hwnd), 1), ID_TE_ACTIONS_REVERT_TO_SAVE, false, &m_item);
 							need_to_update = true;
 							break;
+						}
 						case ID_TE_FILE_OPEN_MAP:
 						{
 							/*
@@ -153,6 +175,12 @@ namespace hoffman::isaiah {
 								MessageBox(this->hwnd, L"TE Thread: Could not save map!", this->window_name, MB_OK);
 								break;
 							}
+							// Reenable revert to save
+							constexpr MENUITEMINFO m_item {
+								sizeof(MENUITEMINFO), MIIM_STATE, 0, MFS_ENABLED,
+								0, nullptr, nullptr, nullptr, 0, nullptr, 0, nullptr
+							};
+							SetMenuItemInfo(GetSubMenu(GetMenu(hwnd), 1), ID_TE_ACTIONS_REVERT_TO_SAVE, false, &m_item);
 							// Output maps to save files
 							ground_save_file << this->getTerrainGraph(false);
 							air_save_file << this->getTerrainGraph(true);
@@ -173,7 +201,6 @@ namespace hoffman::isaiah {
 							WaitForSingleObject(sync_mutex, INFINITE);
 							this->getMap().resetOtherGraphs();
 							this->getMap().setTerrainGraphs(std::move(ground_grid), std::move(air_grid));
-							ReleaseMutex(sync_mutex);
 							need_to_update = true;
 							break;
 						}
@@ -340,10 +367,9 @@ namespace hoffman::isaiah {
 				}
 				else {
 					// Render scene
+					WaitForSingleObject(sync_mutex, INFINITE);
 					if (need_to_update) {
-						// Kinda a waste of time in non-debug builds
-						// but meh.
-						WaitForSingleObject(sync_mutex, INFINITE);
+						// Note that we still have the mutex...
 						// Update first if necessary
 						game::g_my_game->debug_update(game::DebugUpdateStates::Terrain_Changed);
 						ReleaseMutex(sync_mutex);
@@ -354,7 +380,7 @@ namespace hoffman::isaiah {
 						my_resources->discardDeviceResources();
 						my_resources->createDeviceResources(this->hwnd);
 					}
-					// ReleaseMutex(sync_mutex);
+					ReleaseMutex(sync_mutex);
 				}
 			}
 			CloseHandle(sync_mutex);
