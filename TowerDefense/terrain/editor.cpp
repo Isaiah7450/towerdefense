@@ -95,9 +95,16 @@ namespace hoffman::isaiah {
 			// Show window
 			ShowWindow(this->hwnd, SW_SHOWNORMAL);
 			UpdateWindow(this->hwnd);
+			// Keep track of mutex
+			auto sync_mutex = OpenMutex(SYNCHRONIZE | MUTEX_MODIFY_STATE, false, TEXT("can_execute"));
+			if (!sync_mutex) {
+				winapi::handleWindowsError(L"TE Thread: Can execute mutex creation");
+				return;
+			}
 			// Keep track of draw event
 			auto draw_event = OpenEvent(SYNCHRONIZE, false, TEXT("can_draw"));
 			if (!draw_event) {
+				CloseHandle(sync_mutex);
 				winapi::handleWindowsError(L"TE Thread: Can draw event creation");
 				return;
 			}
@@ -310,6 +317,9 @@ namespace hoffman::isaiah {
 							}
 							this->terrain_modifier_active = false;
 						}
+						WaitForSingleObject(sync_mutex, INFINITE);
+						game::g_my_game->debug_update(game::DebugUpdateStates::Terrain_Changed);
+						ReleaseMutex(sync_mutex);
 						// Reset start and end coordinates
 						this->start_gx = -1;
 						this->start_gy = -1;
@@ -335,6 +345,7 @@ namespace hoffman::isaiah {
 					}
 				}
 			}
+			CloseHandle(sync_mutex);
 			CloseHandle(draw_event);
 		}
 	}

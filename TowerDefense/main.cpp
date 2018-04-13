@@ -65,6 +65,12 @@ namespace hoffman::isaiah {
 					CloseHandle(update_thread_init_event);
 					throw std::runtime_error {"Can update event does not exist."};
 				}
+				auto sync_mutex = OpenMutex(SYNCHRONIZE | MUTEX_MODIFY_STATE, false, TEXT("can_execute"));
+				if (!sync_mutex) {
+					CloseHandle(update_thread_init_event);
+					CloseHandle(update_event);
+					throw std::runtime_error {"Can execute mutex does not exist."};
+				}
 				auto* my_game = game::g_my_game.get();
 
 				// Force creation of message queue
@@ -91,12 +97,18 @@ namespace hoffman::isaiah {
 					}
 					else {
 						// Update stuff
-						WaitForSingleObject(update_event, INFINITE);
+						const HANDLE update_handles[] = {
+							update_event, sync_mutex
+						};
+						// WaitForSingleObject(update_event, INFINITE);
+						WaitForMultipleObjects(2, update_handles, true, INFINITE);
 						my_game->update();
+						ReleaseMutex(sync_mutex);
 					}
 				}
 				CloseHandle(update_thread_init_event);
 				CloseHandle(update_event);
+				CloseHandle(sync_mutex);
 			}
 			catch (...) {
 				return 1;
@@ -184,6 +196,10 @@ namespace hoffman::isaiah {
 			ShowWindow(this->hwnd, n_cmd_show);
 			UpdateWindow(this->hwnd);
 			// Create update thread
+			auto sync_mutex = CreateMutex(nullptr, false, TEXT("can_execute"));
+			if (!sync_mutex) {
+				winapi::handleWindowsError(L"Can execute mutex creation");
+			}
 			auto update_event = CreateEvent(nullptr, true, true, TEXT("can_update"));
 			if (!update_event) {
 				winapi::handleWindowsError(L"Can update event creation");
@@ -319,13 +335,18 @@ namespace hoffman::isaiah {
 				}
 				else {
 					// Render scene
-					WaitForSingleObject(draw_event, INFINITE);
+					const HANDLE draw_object_handles[] = {
+						draw_event, sync_mutex
+					};
+					// WaitForSingleObject(draw_event, INFINITE);
+					WaitForMultipleObjects(2, draw_object_handles, true, INFINITE);
 					HRESULT hr = my_renderer->render(game::g_my_game, this->start_gx, this->start_gy,
 						this->end_gx, this->end_gy);
 					if (hr == D2DERR_RECREATE_TARGET) {
 						my_resources->discardDeviceResources();
 						my_resources->createDeviceResources(this->hwnd);
 					}
+					ReleaseMutex(sync_mutex);
 					// Sleep a little bit
 					Sleep(0);
 				}
@@ -333,6 +354,7 @@ namespace hoffman::isaiah {
 			CloseHandle(update_thread);
 			CloseHandle(update_event);
 			CloseHandle(draw_event);
+			CloseHandle(sync_mutex);
 		}
 	}
 }

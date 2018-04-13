@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "./globals.hpp"
+#include "./pathfinding/graph_node.hpp"
 #include "./pathfinding/grid.hpp"
+#include "./pathfinding/pathfinder.hpp"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -130,6 +132,52 @@ public:
 		catch (...) {
 			Assert::Fail(L"An unexpected exception occurred.");
 		}
+	}
+
+	// Tests if a grid clears correctly.
+	// It also tests that the number of rows and number of columns are correct.
+	TEST_METHOD(Pathfinder_Grid_Clear) {
+		auto new_graph = pathfinding::Grid {25, 15};
+		Assert::AreEqual(25, new_graph.getRows());
+		Assert::AreEqual(15, new_graph.getColumns());
+		new_graph.getNode(3, 7).setWeight(5);
+		new_graph.clearGrid(0);
+		Assert::AreEqual(25, new_graph.getRows());
+		Assert::AreEqual(15, new_graph.getColumns());
+		Assert::AreEqual(0, new_graph.getNode(3, 7).getWeight());
+		new_graph.clearGrid(12, 8, 3);
+		Assert::AreEqual(12, new_graph.getRows());
+		Assert::AreEqual(8, new_graph.getColumns());
+		Assert::AreEqual(3, new_graph.getNode(0, 1).getWeight());
+	}
+
+	// Tests Pathfinder::checkPathExists() method of pathfinder
+	TEST_METHOD(Pathfinder_Pathfinder_Path_Exists) {
+		auto terrain_graph_a = pathfinding::Grid {0, 0, 4, 4, {
+			{  1, 100, 100, 100, 100},
+			{  1, 100, 100, 100, 100},
+			{  1,   1,   1,   1, 100},
+			{100, 100, 100,   1, 100},
+			{100, 100, 100,   1,   1}
+		}};
+		auto filter_graph_a = pathfinding::Grid {5, 5};
+		auto influence_graph = pathfinding::Grid {5, 5};
+		auto pathfinder_nd_a = std::make_unique<pathfinding::Pathfinder>(terrain_graph_a, filter_graph_a, influence_graph, false,
+			pathfinding::HeuristicStrategies::Manhattan);
+		Assert::IsTrue(pathfinder_nd_a->checkPathExists());
+		auto pathfinder_d_a = std::make_unique<pathfinding::Pathfinder>(terrain_graph_a, filter_graph_a, influence_graph, true,
+			pathfinding::HeuristicStrategies::Manhattan);
+		Assert::IsTrue(pathfinder_d_a->checkPathExists());
+		auto terrain_graph_b = terrain_graph_a;
+		terrain_graph_b.getNode(0, 1).setBlockage(true);
+		terrain_graph_b.getNode(1, 1).setWeight(1);
+		auto filter_graph_b = filter_graph_a;
+		auto pathfinder_nd_b = std::make_unique<pathfinding::Pathfinder>(terrain_graph_b, filter_graph_b, influence_graph, false,
+			pathfinding::HeuristicStrategies::Manhattan);
+		Assert::IsFalse(pathfinder_nd_b->checkPathExists());
+		auto pathfinder_d_b = std::make_unique<pathfinding::Pathfinder>(terrain_graph_b, filter_graph_b, influence_graph, true,
+			pathfinding::HeuristicStrategies::Manhattan);
+		Assert::IsTrue(pathfinder_d_b->checkPathExists());
 	}
 		};
 	}

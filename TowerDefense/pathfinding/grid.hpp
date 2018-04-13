@@ -68,6 +68,29 @@ namespace hoffman::isaiah {
 				is >> *this;
 			}
 
+			/// <summary>Resets the grid to all nodes having a certain weight</summary>
+			/// <param name="default_weight">The weight to assign to all the nodes.</param>
+			void clearGrid(int default_weight) {
+				this->clearGrid(this->getRows(), this->getColumns(), default_weight);
+			}
+
+			/// <summary>Resets the grid to all nodes having a certain weight</summary>
+			/// <param name="new_rows">The new number of rows in the grid.</param>
+			/// <param name="new_cols">The new number of columns in the grid.</param>
+			/// <param name="default_weight">The weight to assign to all the nodes.</param>
+			void clearGrid(int new_rows, int new_cols, int default_weight) {
+				this->start_node = nullptr;
+				this->goal_node = nullptr;
+				this->nodes.clear();
+				for (int i = 0; i < new_rows; ++i) {
+					std::vector<GraphNode> new_row;
+					for (int j = 0; j < new_cols; ++j) {
+						new_row.emplace_back(j, i, default_weight);
+					}
+					this->nodes.emplace_back(new_row);
+				}
+			}
+
 			// Getters
 			/// <param name="x">The x-coordinate (column number) of the node in the grid.</param>
 			/// <param name="y">The y-coordinate (row number) of the node in the grid.</param>
@@ -219,6 +242,7 @@ namespace hoffman::isaiah {
 			}
 			/// <summary>Resets the non-terrain graphs to their initial state.</summary>
 			void resetOtherGraphs() {
+				/*
 				// With any luck, this will work properly
 				auto ptr_gf_graph = std::make_unique<pathfinding::Grid>();
 				auto ptr_af_graph = std::make_unique<pathfinding::Grid>();
@@ -228,6 +252,13 @@ namespace hoffman::isaiah {
 				this->air_filter_graph.swap(ptr_af_graph);
 				this->ground_influence_graph.swap(ptr_gi_graph);
 				this->air_influence_graph.swap(ptr_ai_graph);
+				*/
+				const auto new_rows = this->getTerrainGraph(false).getRows();
+				const auto new_cols = this->getTerrainGraph(false).getColumns();
+				this->ground_filter_graph->clearGrid(new_rows, new_cols, 0);
+				this->air_filter_graph->clearGrid(new_rows, new_cols, 0);
+				this->ground_influence_graph->clearGrid(new_rows, new_cols, 0);
+				this->air_influence_graph->clearGrid(new_rows, new_cols, 0);
 			}
 		private:
 			/// <summary>Graph that contains information about the basic terrain weights

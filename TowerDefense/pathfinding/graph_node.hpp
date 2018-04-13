@@ -1,6 +1,7 @@
 #pragma once
 // File Author: Isaiah Hoffman
 // File Created: March 23, 2018
+#include <memory>
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 
@@ -84,7 +85,7 @@ namespace hoffman::isaiah {
 		/// <summary>Class that represents a node used by a pathfinder to find optimal paths.</summary>
 		class PathFinderNode {
 		public:
-			PathFinderNode(const GraphNode* me_node, const PathFinderNode* my_parent_node, const GraphNode* my_goal_node,
+			PathFinderNode(const GraphNode* me_node, std::shared_ptr<PathFinderNode> my_parent_node, const GraphNode* my_goal_node,
 				HeuristicStrategies h_strat, double j_cost, double h_modifier = 1.0) noexcept :
 				parent_node {my_parent_node},
 				graph_node {me_node},
@@ -109,7 +110,7 @@ namespace hoffman::isaiah {
 				this->f = this->g + this->h + this->j;
 			}
 			// Getters
-			const PathFinderNode* getParentNode() const noexcept {
+			const std::shared_ptr<PathFinderNode>& getParentNode() const noexcept {
 				return this->parent_node;
 			}
 			const GraphNode& getGraphNode() const noexcept {
@@ -170,7 +171,7 @@ namespace hoffman::isaiah {
 			}
 		private:
 			/// <summary>This node's parent node or nullptr if this node does not have a parent node.</summary>
-			const PathFinderNode* parent_node;
+			std::shared_ptr<PathFinderNode> parent_node;
 			/// <summary>The graph node represented by this pathfinding node.</summary>
 			const GraphNode* graph_node;
 			/// <summary>The estimated total cost of reaching some destination node from some starting node.

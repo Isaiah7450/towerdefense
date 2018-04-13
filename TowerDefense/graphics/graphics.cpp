@@ -50,6 +50,16 @@ namespace hoffman::isaiah {
 			render_target->BeginDraw();
 			render_target->Clear(Color {1.f, 1.f, 1.f, 1.f});
 			my_game->getMap().draw(*this);
+			// Paint pathfinder paths
+			if (my_game->ground_test_pf->checkPathExists()) {
+				auto ground_path = my_game->ground_test_pf->findPath();
+				while (!ground_path.empty()) {
+					auto my_node = ground_path.front();
+					ground_path.pop();
+					this->paintSquare(my_node->getGameX(), my_node->getGameY(), Color {0.f, 1.f, 0.f, 1.f},
+						Color {0.8f, 0.8f, 0.8f, 0.3f});
+				}
+			}
 			// Highlight squares
 			if (my_game->getMap().getTerrainGraph(false).verifyCoordinates(mouse_gx, mouse_gy)
 				&& my_game->getMap().getTerrainGraph(false).verifyCoordinates(mouse_end_gx, mouse_end_gy)) {
