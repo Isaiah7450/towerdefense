@@ -59,6 +59,13 @@ namespace hoffman::isaiah {
 					this->paintSquare(my_node->getGameX(), my_node->getGameY(), Color {0.f, 1.f, 0.f, 1.f},
 						Color {0.8f, 0.8f, 0.8f, 0.3f});
 				}
+				auto air_path = my_game->air_test_pf->findPath();
+				while (!air_path.empty()) {
+					auto my_node = air_path.front();
+					air_path.pop();
+					this->paintSquare(my_node->getGameX(), my_node->getGameY(), Color {1.f, 0.f, 0.f, 1.f},
+						Color {0.8f, 0.8f, 0.8f, 0.3f});
+				}
 			}
 			// Highlight squares
 			if (my_game->getMap().getTerrainGraph(false).verifyCoordinates(mouse_gx, mouse_gy)

@@ -200,6 +200,8 @@ namespace hoffman::isaiah {
 			if (!sync_mutex) {
 				winapi::handleWindowsError(L"Can execute mutex creation");
 			}
+			// (Note: update and draw events necessary to ensure that the game can
+			// both update and draw regularly.)
 			auto update_event = CreateEvent(nullptr, true, true, TEXT("can_update"));
 			if (!update_event) {
 				winapi::handleWindowsError(L"Can update event creation");
