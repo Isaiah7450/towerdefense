@@ -99,9 +99,20 @@ namespace hoffman::isaiah {
 						// Diagonal movement
 						multiplier = math::get_sqrt(2);
 					}
+					this->start_node = this->getParentNode()->getStartNode();
 				}
+				else {
+					// No parent node so this is the starting node
+					this->start_node = this;
+				}
+				// Vector cross product as tiebreaker
+				const int dx_current = this->getGameX() - my_goal_node->getGameX();
+				const int dy_current = this->getGameY() - my_goal_node->getGameY();
+				const int dx_goal = this->getStartNode()->getGameX() - my_goal_node->getGameX();
+				const int dy_goal = this->getStartNode()->getGameY() - my_goal_node->getGameY();
+				const int vector_cross = math::get_abs(dx_current * dy_goal - dx_goal * dy_current);
 				// Add movement cost
-				this->g += this->getGraphNode().getWeight() * multiplier;
+				this->g += (this->getGraphNode().getWeight() * (1.0 + vector_cross * 0.001)) * multiplier;
 				this->calculateHeuristic(my_goal_node, h_strat, h_modifier);
 				this->f = this->g + this->h + this->j;
 			}
@@ -165,7 +176,14 @@ namespace hoffman::isaiah {
 					break;
 				}
 			}
+		protected:
+			// Getters
+			PathFinderNode* getStartNode() const noexcept {
+				return this->start_node;
+			}
 		private:
+			/// <summary>The node that the pathfinder started with.</summary>
+			PathFinderNode* start_node;
 			/// <summary>This node's parent node or nullptr if this node does not have a parent node.</summary>
 			std::shared_ptr<PathFinderNode> parent_node;
 			/// <summary>The graph node represented by this pathfinding node.</summary>
