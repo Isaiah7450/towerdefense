@@ -50,7 +50,13 @@ namespace hoffman::isaiah {
 			render_target->BeginDraw();
 			render_target->Clear(Color {1.f, 1.f, 1.f, 1.f});
 			my_game->getMap().draw(*this);
+#if defined(DEBUG) || defined(_DEBUG)
 			// Paint pathfinder paths
+			// (Not sure why if I don't use the preprocessor to
+			// comment out this code, it causes a crash every
+			// single time after I use revert to last save
+			// in the terrain editor on any builds without DEBUG
+			// defined.)
 			if (my_game->ground_test_pf->checkPathExists()) {
 				auto ground_path = my_game->ground_test_pf->findPath();
 				while (!ground_path.empty()) {
@@ -67,6 +73,7 @@ namespace hoffman::isaiah {
 						Color {0.8f, 0.8f, 0.8f, 0.3f});
 				}
 			}
+#endif // DEBUG | _DEBUG
 			// Highlight squares
 			if (my_game->getMap().getTerrainGraph(false).verifyCoordinates(mouse_gx, mouse_gy)
 				&& my_game->getMap().getTerrainGraph(false).verifyCoordinates(mouse_end_gx, mouse_end_gy)) {

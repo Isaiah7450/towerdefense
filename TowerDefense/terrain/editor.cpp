@@ -111,6 +111,7 @@ namespace hoffman::isaiah {
 			// Message Loop
 			MSG msg;
 			bool keep_looping = true;
+			bool need_to_update = false;
 			while (keep_looping) {
 				if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
 					TranslateMessage(&msg);
@@ -122,6 +123,7 @@ namespace hoffman::isaiah {
 						switch (msg.wParam) {
 						case ID_TE_FILE_NEW_MAP:
 							this->map_name += L"1";
+							need_to_update = true;
 							break;
 						case ID_TE_FILE_OPEN_MAP:
 						{
@@ -139,6 +141,7 @@ namespace hoffman::isaiah {
 							IFileDialogEvents* file_dialog_events = nullptr;
 							hr = CDialogEventHandler_CreateInstance(IID_PPV_ARGS(&file_dialog_events));
 							*/
+							need_to_update = true;
 							break;
 						}
 						case ID_TE_FILE_SAVE_MAP:
@@ -167,8 +170,11 @@ namespace hoffman::isaiah {
 							std::wifstream air_save_file {L"./resources/graphs/air_"s + this->map_name};
 							auto ground_grid {std::make_unique<pathfinding::Grid>(ground_save_file)};
 							auto air_grid {std::make_unique<pathfinding::Grid>(air_save_file)};
+							WaitForSingleObject(sync_mutex, INFINITE);
 							this->getMap().resetOtherGraphs();
 							this->getMap().setTerrainGraphs(std::move(ground_grid), std::move(air_grid));
+							ReleaseMutex(sync_mutex);
+							need_to_update = true;
 							break;
 						}
 						case ID_TE_ACTIONS_SET_GROUND_START:
@@ -317,9 +323,7 @@ namespace hoffman::isaiah {
 							}
 							this->terrain_modifier_active = false;
 						}
-						WaitForSingleObject(sync_mutex, INFINITE);
-						game::g_my_game->debug_update(game::DebugUpdateStates::Terrain_Changed);
-						ReleaseMutex(sync_mutex);
+						need_to_update = true;
 						// Reset start and end coordinates
 						this->start_gx = -1;
 						this->start_gy = -1;
@@ -336,13 +340,21 @@ namespace hoffman::isaiah {
 				}
 				else {
 					// Render scene
-					WaitForSingleObject(draw_event, INFINITE);
+					if (need_to_update) {
+						// Kinda a waste of time in non-debug builds
+						// but meh.
+						WaitForSingleObject(sync_mutex, INFINITE);
+						// Update first if necessary
+						game::g_my_game->debug_update(game::DebugUpdateStates::Terrain_Changed);
+						ReleaseMutex(sync_mutex);
+					}
 					HRESULT hr = my_renderer->render(game::g_my_game, this->start_gx, this->start_gy,
 						this->end_gx, this->end_gy);
 					if (hr == D2DERR_RECREATE_TARGET) {
 						my_resources->discardDeviceResources();
 						my_resources->createDeviceResources(this->hwnd);
 					}
+					// ReleaseMutex(sync_mutex);
 				}
 			}
 			CloseHandle(sync_mutex);

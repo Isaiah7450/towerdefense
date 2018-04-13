@@ -28,7 +28,6 @@ namespace hoffman::isaiah {
 
 		void MyGame::debug_update(DebugUpdateStates cause) {
 #if defined(DEBUG) || defined(_DEBUG)
-			// (Note: Mutex ensures that one can update)
 			// Set lock
 			auto draw_event = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT("can_draw"));
 			if (!draw_event) {

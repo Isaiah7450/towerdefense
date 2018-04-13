@@ -99,10 +99,6 @@ namespace hoffman::isaiah {
 						// Diagonal movement
 						multiplier = math::get_sqrt(2);
 					}
-					// Prefer points on a horizontal line to the goal
-					if (dy == 0) {
-						this->g += 0.05;
-					}
 				}
 				// Add movement cost
 				this->g += this->getGraphNode().getWeight() * multiplier;
