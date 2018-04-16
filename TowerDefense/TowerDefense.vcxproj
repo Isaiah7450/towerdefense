@@ -218,6 +218,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="game\game_util.hpp" />
     <ClInclude Include="game\my_game.hpp" />
     <ClInclude Include="globals.hpp" />
     <ClInclude Include="graphics\file_dialogs.hpp" />
@@ -237,6 +238,7 @@
     <ResourceCompile Include="resource.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="game\game_util.cpp" />
     <ClCompile Include="game\my_game.cpp" />
     <ClCompile Include="graphics\graphics.cpp" />
     <ClCompile Include="graphics\graphics_DX.cpp" />

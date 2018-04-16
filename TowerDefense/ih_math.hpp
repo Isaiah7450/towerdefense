@@ -89,10 +89,20 @@ namespace hoffman::isaiah {
 		// Honestly, hardcoding this may be the best method
 		template <typename T = double>
 		constexpr T calculate_pi() noexcept {
-			return T {3.1415926535897932384626433832795};
+			return static_cast<T>(3.1415926535897932384626433832795);
 		}
 		constexpr const auto pi = calculate_pi();
 #endif
+		// Converts an angle "theta" to degrees from radians
+		template <typename U = double, typename T = double>
+		constexpr U convert_to_degrees(T theta) noexcept {
+			return static_cast<U>(theta) * static_cast<U>(180) / calculate_pi<U>();
+		}
+		// Converts an angle from degrees to radians
+		template <typename U = double, typename T = double>
+		constexpr U convert_to_radians(T angle) noexcept {
+			return static_cast<U>(angle) / static_cast<U>(180) * calculate_pi<U>();
+		}
 
 		// Attempts to calculate the value of e by employing an infinite series
 		// which converges way faster than using the limit definition of e.

@@ -75,6 +75,14 @@ namespace hoffman::isaiah {
 			/// <param name="o_color">The color to outline the square with.</param>
 			/// <param name="f_color">The color to fill the square with.</param>
 			void paintSquare(double gx, double gy, Color o_color, Color f_color) const noexcept;
+			/// <summary>Draws the outline of a geometry.</summary>
+			/// <param name="my_geom">The geometry to outline.</param>
+			/// <param name="o_color">The color to outline the geometry with.</param>
+			void drawGeometry(ID2D1Geometry* my_geom, Color o_color) const noexcept;
+			/// <summary>Fills in the interior of a geometry.</summary>
+			/// <param name="my_geom">The geometry to fill.</param>
+			/// <param name="f_color">The color to fill the geometry with.</param>
+			void fillGeometry(ID2D1Geometry* my_geom, Color f_color) const noexcept;
 			
 			/// <summary>Draws the current scene based on the game state.</summary>
 			/// <param name="my_game">Shared pointer to object that contains the current game state.</param>

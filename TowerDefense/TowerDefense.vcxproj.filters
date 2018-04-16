@@ -57,6 +57,9 @@
     <ClInclude Include="graphics\file_dialogs.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\game_util.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">
@@ -89,6 +92,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="terrain\editor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\game_util.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

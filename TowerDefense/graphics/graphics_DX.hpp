@@ -60,6 +60,9 @@ namespace hoffman::isaiah {
 			ID2D1SolidColorBrush* getTextBrush() noexcept {
 				return this->text_brush;
 			}
+			ID2D1Factory* getFactory() noexcept {
+				return this->factory;
+			}
 		private:
 			/// <summary>Pointer to the Direct2D factory.</summary>
 			ID2D1Factory* factory {nullptr};

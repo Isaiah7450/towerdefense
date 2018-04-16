@@ -9,6 +9,7 @@
 #include "./../main.hpp"
 #include "./graphics_DX.hpp"
 #include "./graphics.hpp"
+#include "./shapes.hpp"
 #include "./../pathfinding/graph_node.hpp"
 #include "./../pathfinding/grid.hpp"
 #include "./../pathfinding/pathfinder.hpp"
@@ -26,6 +27,16 @@ namespace hoffman::isaiah {
 			const auto my_rect = this->createRectangle(slx, sty, sw, sh);
 			this->fillRectangle(my_rect);
 			this->outlineRectangle(my_rect);
+		}
+
+		void Renderer2D::drawGeometry(ID2D1Geometry* my_geom, Color o_color) const noexcept {
+			this->setOutlineColor(o_color);
+			this->device_resources->getRenderTarget()->DrawGeometry(my_geom, this->device_resources->getOutlineBrush());
+		}
+
+		void Renderer2D::fillGeometry(ID2D1Geometry* my_geom, Color f_color) const noexcept {
+			this->setFillColor(f_color);
+			this->device_resources->getRenderTarget()->FillGeometry(my_geom, this->device_resources->getFillBrush());
 		}
 
 		HRESULT Renderer2D::render(const std::shared_ptr<game::MyGame> my_game, int mouse_gx, int mouse_gy,
@@ -50,7 +61,31 @@ namespace hoffman::isaiah {
 			render_target->BeginDraw();
 			render_target->Clear(Color {1.f, 1.f, 1.f, 1.f});
 			my_game->getMap().draw(*this);
-#if defined(DEBUG) || defined(_DEBUG)
+#if 0
+			{
+				constexpr const Color black_color {0.f, 0.f, 0.f, 1.f};
+				// Shape debugging
+				Shape2DEllipse my_ellipse {this->device_resources, black_color, Color {0.f, 1.f, 0.f, 1.f},
+					static_cast<float>(convertToScreenX(2.5)),
+					static_cast<float>(convertToScreenY(2.5)),
+					getGameSquareWidth<float>() * 0.75f,
+					getGameSquareHeight<float>() * 0.75f};
+				Shape2DRectangle my_rectangle {this->device_resources, black_color, Color {1.f, 0.f, 0.f, 1.f},
+					static_cast<float>(convertToScreenX(5.25)),
+					static_cast<float>(convertToScreenY(3.25)),
+					static_cast<float>(convertToScreenX(5.75)),
+					static_cast<float>(convertToScreenY(3.75))};
+				Shape2DDiamond my_diamond {this->device_resources, black_color, Color {1.f, 0.f, 0.f, 1.f},
+					static_cast<float>(convertToScreenX(8.5)),
+					static_cast<float>(convertToScreenY(8.5)),
+					getGameSquareWidth<float>() * 0.75f,
+					getGameSquareHeight<float>() * 0.75f};
+				my_ellipse.draw(*this);
+				my_rectangle.draw(*this);
+				my_diamond.draw(*this);
+			}
+#endif // -> Shape debugging
+#if (defined(DEBUG) || defined(_DEBUG)) && 0
 			// Paint pathfinder paths
 			// (Not sure why if I don't use the preprocessor to
 			// comment out this code, it causes a crash every
@@ -73,7 +108,7 @@ namespace hoffman::isaiah {
 						Color {0.8f, 0.8f, 0.8f, 0.3f});
 				}
 			}
-#endif // DEBUG | _DEBUG
+#endif // DEBUG | _DEBUG -> Path Debugging
 			// Highlight squares
 			if (my_game->getMap().getTerrainGraph(false).verifyCoordinates(mouse_gx, mouse_gy)
 				&& my_game->getMap().getTerrainGraph(false).verifyCoordinates(mouse_end_gx, mouse_end_gy)) {
