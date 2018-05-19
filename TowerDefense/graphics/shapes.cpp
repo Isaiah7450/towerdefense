@@ -12,7 +12,7 @@
 #include "./shapes.hpp"
 
 namespace hoffman::isaiah {
-	namespace graphics {
+	namespace graphics::shapes {
 		void Shape2DBase::draw(const Renderer2D& renderer) const noexcept {
 			renderer.drawGeometry(this->transformed_geometry, this->outline_color);
 			renderer.fillGeometry(this->transformed_geometry, this->fill_color);
@@ -21,8 +21,9 @@ namespace hoffman::isaiah {
 		void Shape2DBase::recreateGeometry() {
 			auto my_translate = D2D1::Matrix3x2F::Translation({this->h_translate, this->v_translate});
 			auto my_rotate = D2D1::Matrix3x2F::Scale({this->h_scale, this->v_scale});
-			auto my_scale = D2D1::Matrix3x2F::Rotation(math::convert_to_degrees<float>(this->theta));
-			auto my_transform = my_translate * my_rotate * my_scale;
+			auto my_scale = D2D1::Matrix3x2F::Rotation(math::convert_to_degrees<float>(this->theta),
+				D2D1::Point2F(this->center_sx, this->center_sy));
+			auto my_transform = my_rotate * my_translate * my_scale;
 			this->device_resources->getFactory()->CreateTransformedGeometry(this->path_geometry,
 				my_transform, &this->transformed_geometry);
 		}
@@ -36,7 +37,7 @@ namespace hoffman::isaiah {
 
 		Shape2DEllipse::Shape2DEllipse(std::shared_ptr<DX::DeviceResources2D> dev_res, Color o_color, Color f_color,
 			float csx, float csy, float sw, float sh) :
-			Shape2DBase {dev_res, o_color, f_color} {
+			Shape2DBase {dev_res, o_color, f_color, csx, csy} {
 			ID2D1GeometrySink* geom_sink {nullptr};
 			HRESULT hr = this->path_geometry->Open(&geom_sink);
 			if (FAILED(hr)) {
@@ -56,7 +57,9 @@ namespace hoffman::isaiah {
 
 		Shape2DTriangle::Shape2DTriangle(std::shared_ptr<DX::DeviceResources2D> dev_res, Color o_color, Color f_color,
 			float sx1, float sy1, float sx2, float sy2, float sx3, float sy3) :
-			Shape2DBase {dev_res, o_color, f_color} {
+			Shape2DBase {dev_res, o_color, f_color,
+				math::get_avg(math::get_min(sx1, sx2, sx3), math::get_max(sx1, sx2, sx3)),
+				math::get_avg(math::get_min(sy1, sy2, sy3), math::get_max(sy1, sy2, sy3))} {
 			ID2D1GeometrySink* geom_sink {nullptr};
 			HRESULT hr = this->path_geometry->Open(&geom_sink);
 			if (FAILED(hr)) {
@@ -73,7 +76,7 @@ namespace hoffman::isaiah {
 
 		Shape2DRectangle::Shape2DRectangle(std::shared_ptr<DX::DeviceResources2D> dev_res, Color o_color, Color f_color,
 			float lsx, float tsy, float rsx, float bsy) :
-			Shape2DBase {dev_res, o_color, f_color} {
+			Shape2DBase {dev_res, o_color, f_color, (lsx + rsx) / 2.f, (tsy + bsy) / 2.f} {
 			ID2D1GeometrySink* geom_sink {nullptr};
 			HRESULT hr = this->path_geometry->Open(&geom_sink);
 			if (FAILED(hr)) {
@@ -92,7 +95,7 @@ namespace hoffman::isaiah {
 
 		Shape2DDiamond::Shape2DDiamond(std::shared_ptr<DX::DeviceResources2D> dev_res, Color o_color, Color f_color,
 			float csx, float csy, float sw, float sh) :
-			Shape2DBase {dev_res, o_color, f_color} {
+			Shape2DBase {dev_res, o_color, f_color, csx, csy} {
 			ID2D1GeometrySink* geom_sink {nullptr};
 			HRESULT hr = this->path_geometry->Open(&geom_sink);
 			if (FAILED(hr)) {

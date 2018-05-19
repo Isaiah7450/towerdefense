@@ -11,7 +11,11 @@
 #include "./graphics_DX.hpp"
 
 namespace hoffman::isaiah {
-	namespace graphics {
+	namespace graphics::shapes {
+		enum class ShapeTypes {
+			Ellipse, Triangle, Rectangle, Diamond, Star
+		};
+
 		/// <summary>Abstract base class for all shapes.</summary>
 		class Shape2DBase : public graphics::IDrawable {
 		public:
@@ -75,10 +79,12 @@ namespace hoffman::isaiah {
 				this->change_transform(this->h_translate, this->v_translate, this->theta, new_hscale, new_vscale);
 			}
 		protected:
-			Shape2DBase(std::shared_ptr<DX::DeviceResources2D> dev_res, Color o_color, Color f_color) :
+			Shape2DBase(std::shared_ptr<DX::DeviceResources2D> dev_res, Color o_color, Color f_color, float csx, float csy) :
 				device_resources {dev_res},
 				outline_color {o_color},
-				fill_color {f_color} {
+				fill_color {f_color},
+				center_sx {csx},
+				center_sy {csy} {
 				HRESULT hr = this->device_resources->getFactory()->CreatePathGeometry(&this->path_geometry);
 				if (FAILED(hr)) {
 					throw std::runtime_error {"Creation of shape geometry failed!"};
@@ -98,6 +104,10 @@ namespace hoffman::isaiah {
 			ID2D1PathGeometry* path_geometry {nullptr};
 			/// <summary>Pointer to the geometry after applying transformations.</summary>
 			ID2D1TransformedGeometry* transformed_geometry {nullptr};
+			/// <summary>The screen x-coordinate of the approximate center of the geometry.</summary>
+			float center_sx;
+			/// <summary>The screen y-coordinate of the approximate center of the geometry.</summary>
+			float center_sy;
 			// Note: Transformation order is translate first, then scale, then rotate last.
 			/// <summary>Amount by which to translate the geometry horizontally by.</summary>
 			float h_translate {0.f};
@@ -127,6 +137,7 @@ namespace hoffman::isaiah {
 		// Polygon.
 		/// <summary>Shape that represents a triangle.</summary>
 		class Shape2DTriangle : public Shape2DBase {
+		public:
 			/// <param name="sx1">The screen x-coordinate of the first point.</param>
 			/// <param name="sy1">The screen y-coordinate of the first point.</param>
 			/// <param name="sx2">The screen x-coordinate of the second point.</param>
@@ -165,22 +176,26 @@ namespace hoffman::isaiah {
 		public:
 			/// <param name="points">An array of points containing the screen x and screen y coordinates of
 			/// each point in the polygon.</param>
+			/// <param name="csx">The screen x-coordinate of the polygon's center. Note that invalid values
+			/// could result in transformations not working properly.</param>
+			/// <param name="csy">The screen y-coordinate of the polygon's center. Note that invalid values
+			/// could result in transformations not working properly.</param>
 			Shape2DPolygon(std::shared_ptr<DX::DeviceResources2D> dev_res, Color o_color, Color f_color,
-				std::array<std::array<float, 2>, N> points);
+				std::array<std::array<float, 2>, N> points, float csx, float csy);
 		};
 
 		// Templates must be defined in the same file as they are declared...
 		template <int N>
 		Shape2DPolygon<N>::Shape2DPolygon(std::shared_ptr<DX::DeviceResources2D> dev_res, Color o_color, Color f_color,
-			std::array<std::array<float, 2>, N> points) :
-			Shape2DBase {dev_res, o_color, f_color} {
+			std::array<std::array<float, 2>, N> points, float csx, float csy) :
+			Shape2DBase {dev_res, o_color, f_color, csx, csy} {
 			ID2D1GeometrySink* geom_sink {nullptr};
 			HRESULT hr = this->path_geometry->Open(&geom_sink);
 			if (FAILED(hr)) {
 				throw std::runtime_error {"Could not open geometry sink to define shape."};
 			}
 			geom_sink->BeginFigure(D2D1::Point2F(points[0][0], points[0][1]), D2D1_FIGURE_BEGIN_FILLED);
-			for (int i = 1; i < points.size(); ++i) {
+			for (unsigned int i = 1; i < points.size(); ++i) {
 				geom_sink->AddLine(D2D1::Point2F(points[i][0], points[i][1]));
 			}
 			geom_sink->EndFigure(D2D1_FIGURE_END_CLOSED);
