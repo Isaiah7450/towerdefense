@@ -13,6 +13,7 @@
 #include "./../pathfinding/graph_node.hpp"
 #include "./../pathfinding/grid.hpp"
 #include "./../pathfinding/pathfinder.hpp"
+#include "./../game/game_object.hpp"
 #include "./../game/my_game.hpp"
 #include "./../terrain/editor.hpp"
 
@@ -62,20 +63,28 @@ namespace hoffman::isaiah {
 			render_target->Clear(Color {1.f, 1.f, 1.f, 1.f});
 			my_game->getMap().draw(*this);
 #if 0
+			// Testing the star
+			constexpr const Color black_color {0.f, 0.f, 0.f, 1.f};
+			constexpr const Color white_color {1.f, 1.f, 1.f, 1.f};
+			game::GameObject my_star {this->device_resources, graphics::shapes::ShapeTypes::Star,
+				black_color, white_color, 5.5, 5.5, 1., 1.};
+			my_star.draw(*this);
+#endif
+#if 0
 			{
 				constexpr const Color black_color {0.f, 0.f, 0.f, 1.f};
 				// Shape debugging
-				Shape2DEllipse my_ellipse {this->device_resources, black_color, Color {0.f, 1.f, 0.f, 1.f},
+				shapes::Shape2DEllipse my_ellipse {this->device_resources, black_color, Color {0.f, 1.f, 0.f, 1.f},
 					static_cast<float>(convertToScreenX(2.5)),
 					static_cast<float>(convertToScreenY(2.5)),
 					getGameSquareWidth<float>() * 0.75f,
 					getGameSquareHeight<float>() * 0.75f};
-				Shape2DRectangle my_rectangle {this->device_resources, black_color, Color {1.f, 0.f, 0.f, 1.f},
+				shapes::Shape2DRectangle my_rectangle {this->device_resources, black_color, Color {1.f, 0.f, 0.f, 1.f},
 					static_cast<float>(convertToScreenX(5.25)),
 					static_cast<float>(convertToScreenY(3.25)),
 					static_cast<float>(convertToScreenX(5.75)),
 					static_cast<float>(convertToScreenY(3.75))};
-				Shape2DDiamond my_diamond {this->device_resources, black_color, Color {1.f, 0.f, 0.f, 1.f},
+				shapes::Shape2DDiamond my_diamond {this->device_resources, black_color, Color {1.f, 0.f, 0.f, 1.f},
 					static_cast<float>(convertToScreenX(8.5)),
 					static_cast<float>(convertToScreenY(8.5)),
 					getGameSquareWidth<float>() * 0.75f,
