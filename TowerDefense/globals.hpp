@@ -6,8 +6,8 @@
 namespace hoffman::isaiah {
 	namespace winapi {
 		// Global constants
-		constexpr const auto main_class_name {"my_game"};
-		constexpr const auto main_window_name {"Isaiah's tower defense game"};
+		constexpr const auto main_class_name {L"my_game"};
+		constexpr const auto main_window_name {L"Isaiah's tower defense game"};
 		// Prototypes
 		/// <summary>Attempts to provide a human-readable error message
 		/// if an error occurs while trying to initialize the program.</summary>

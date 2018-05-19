@@ -12,20 +12,47 @@ namespace hoffman::isaiah {
 		// Practically all of these are defined in the standard library; however,
 		// since most of them predate C++11 and constexpr, I have decided to redefine
 		// a constexpr version of them here.
-		// Returns the smaller of a and b. If they are equal, a is returned.
-		template <typename T>
-		constexpr T get_min(T a, T b) noexcept {
-			return a <= b ? a : b;
+		// Returns the smallest of the provided arguments.
+		template <typename U, typename... Arguments>
+		constexpr U get_min(U first, Arguments... rest) noexcept {
+			U lowest = first;
+			U args[] {rest...};
+			for (auto arg : args) {
+				lowest = static_cast<U>(arg) < lowest ? static_cast<U>(arg) : lowest;
+			}
+			return lowest;
 		}
-		// Returns the larger of a and b. If they are equal, a is returned.
-		template <typename T>
-		constexpr T get_max(T a, T b) noexcept {
-			return a >= b ? a : b;
+		// Returns the largest of the provided arguments.
+		template <typename U, typename... Arguments>
+		constexpr U get_max(U first, Arguments... rest) noexcept {
+			U highest = first;
+			U args[] {rest...};
+			for (auto arg : args) {
+				highest = static_cast<U>(arg) > highest ? static_cast<U>(arg) : highest;
+			}
+			return highest;
 		}
 		// Obtains the absolute value of a number
 		template <typename T>
 		constexpr T get_abs(T val) noexcept {
 			return val >= 0 ? val : -val;
+		}
+		// Obtains the sum of a set of values
+		template <typename U, typename... Arguments>
+		constexpr U get_sum(U first, Arguments... rest) noexcept {
+			U total = first;
+			U args[] {rest...};
+			for (auto arg : args) {
+				total += static_cast<U>(arg);
+			}
+			return total;
+		}
+		// Obtains the average of a set of values
+		template <typename U, typename... Arguments>
+		constexpr U get_avg(U first, Arguments... rest) noexcept {
+			const U num_args = static_cast<U>(sizeof...(Arguments));
+			U my_sum = get_sum<U>(first, rest...);
+			return my_sum / (num_args + U {1});
 		}
 		// Obtains the real square root of a number to a certain number of decimal places
 		// given by min_delta (which should be a multiple of 10.) (Negative values will result
