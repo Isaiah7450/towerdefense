@@ -218,6 +218,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="game\enemy.hpp" />
+    <ClInclude Include="game\enemy_type.hpp" />
+    <ClInclude Include="game\game_object.hpp" />
+    <ClInclude Include="game\game_object_type.hpp" />
     <ClInclude Include="game\game_util.hpp" />
     <ClInclude Include="game\my_game.hpp" />
     <ClInclude Include="globals.hpp" />
@@ -238,6 +242,7 @@
     <ResourceCompile Include="resource.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="game\game_object.cpp" />
     <ClCompile Include="game\game_util.cpp" />
     <ClCompile Include="game\my_game.cpp" />
     <ClCompile Include="graphics\graphics.cpp" />
