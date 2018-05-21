@@ -18,8 +18,12 @@ namespace hoffman::isaiah {
 			gy {cgy} {
 			const float csx = static_cast<float>(graphics::convertToScreenX(cgx));
 			const float csy = static_cast<float>(graphics::convertToScreenY(cgy));
-			const float sw = static_cast<float>(gw) * graphics::getGameSquareWidth<float>();
-			const float sh = static_cast<float>(gh) * graphics::getGameSquareHeight<float>();
+			float sw = static_cast<float>(gw) * graphics::getGameSquareWidth<float>();
+			float sh = static_cast<float>(gh) * graphics::getGameSquareHeight<float>();
+			if (st == graphics::shapes::ShapeTypes::Star) {
+				// Swap sw and sh due to the 90 degree rotation performed
+				std::swap(sw, sh);
+			}
 
 			switch (st) {
 			case graphics::shapes::ShapeTypes::Star:
@@ -47,7 +51,7 @@ namespace hoffman::isaiah {
 				}};
 				this->sprite = std::make_unique<graphics::shapes::Shape2DPolygon<10>>(dev_res, o_color, f_color,
 					points, csx, csy);
-				this->rotate(math::calculate_pi<float>() * 1.5f);
+				this->rotate(math::calculate_pi<float>() * -0.5f);
 				break;
 			}
 			case graphics::shapes::ShapeTypes::Diamond:

@@ -13,6 +13,7 @@ namespace hoffman::isaiah {
 		public:
 			GameObject(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, graphics::shapes::ShapeTypes st,
 				graphics::Color o_color, graphics::Color f_color, double cgx, double cgy, double gw, double gh);
+
 			// Implements graphics::Drawable::draw()
 			void draw(const graphics::Renderer2D& renderer) const noexcept {
 				this->sprite->draw(renderer);
