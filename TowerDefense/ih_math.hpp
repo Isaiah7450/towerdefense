@@ -144,5 +144,18 @@ namespace hoffman::isaiah {
 			return ret_value;
 		}
 		constexpr const auto e = calculate_e();
+		// Raises a number to an integer power
+		template <typename T, typename U = double>
+		constexpr U get_pow(T base, int exp) noexcept {
+			U ret_value = static_cast<U>(base);
+			int abs_exp = math::get_abs(exp);
+			if (exp == 0) {
+				return U {1};
+			}
+			for (int i = 1; i < abs_exp; ++i) {
+				ret_value *= static_cast<U>(base);
+			}
+			return abs_exp > exp ? U {1} / ret_value : ret_value;
+		}
 	}
 }
