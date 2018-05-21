@@ -30,8 +30,8 @@ namespace hoffman::isaiah {
 			void translate(double dgx, double dgy) {
 				this->changeGameX(dgx);
 				this->changeGameY(dgy);
-				this->sprite->change_translate(static_cast<float>(graphics::convertToScreenX(dgx)), 0.f);
-				this->sprite->change_translate(0.f, static_cast<float>(graphics::convertToScreenY(dgy)));
+				this->sprite->change_translate(static_cast<float>(dgx * graphics::getGameSquareWidth()), 0.f);
+				this->sprite->change_translate(0.f, static_cast<float>(dgy * graphics::getGameSquareHeight()));
 			}
 			void rotate(float new_theta) {
 				this->sprite->change_rotation(new_theta);

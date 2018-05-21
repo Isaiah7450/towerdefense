@@ -148,6 +148,8 @@ namespace hoffman::isaiah {
 			std::queue<const pathfinding::GraphNode*> my_path;
 			/// <summary>The last node in the path that the enemy travelled to.</summary>
 			const pathfinding::GraphNode* current_node;
+			/// <summary>The direction the enemy is currently moving in (in radians).</summary>
+			double current_direction;
 			// Information and statistics
 			/// <summary>The amount of health that the enemy has remaining.</summary>
 			double current_health;
