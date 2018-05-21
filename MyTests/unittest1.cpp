@@ -105,29 +105,29 @@ public:
 			}};
 
 			auto neighbor_set_a = my_graph.getNeighbors(3, 3, filter_graph, false);
-			Assert::AreEqual(4U, neighbor_set_a.size());
+			Assert::AreEqual(size_t {4}, neighbor_set_a.size());
 			auto neighbor_set_b = my_graph.getNeighbors(3, 3, filter_graph, true);
-			Assert::AreEqual(8U, neighbor_set_b.size());
+			Assert::AreEqual(size_t {8}, neighbor_set_b.size());
 			try {
 				auto neighbor_set_c = my_graph.getNeighbors(0, 3, filter_graph, true);
-				Assert::AreEqual(2U, neighbor_set_c.size());
+				Assert::AreEqual(size_t {2}, neighbor_set_c.size());
 				auto neighbor_set_d = my_graph.getNeighbors(9, 1, filter_graph, false);
-				Assert::AreEqual(1U, neighbor_set_d.size());
+				Assert::AreEqual(size_t {1}, neighbor_set_d.size());
 			}
 			catch (...) {
 				Assert::Fail(L"Exception caught: invalid bounds (x-dimension)!");
 			}
 			try {
 				auto neighbor_set_e = my_graph.getNeighbors(5, 0, filter_graph, true);
-				Assert::AreEqual(3U, neighbor_set_e.size());
+				Assert::AreEqual(size_t {3}, neighbor_set_e.size());
 				auto neighbor_set_f = my_graph.getNeighbors(4, 7, filter_graph, true);
-				Assert::AreEqual(1U, neighbor_set_f.size());
+				Assert::AreEqual(size_t {1}, neighbor_set_f.size());
 			}
 			catch (...) {
 				Assert::Fail(L"Exception caught: invalid bounds (y-dimension)!");
 			}
 			auto neighbor_set_g = my_graph.getNeighbors(5, 3, filter_graph, true);
-			Assert::AreEqual(4U, neighbor_set_g.size());
+			Assert::AreEqual(size_t {4}, neighbor_set_g.size());
 		}
 		catch (...) {
 			Assert::Fail(L"An unexpected exception occurred.");
