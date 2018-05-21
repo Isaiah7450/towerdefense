@@ -12,7 +12,7 @@ namespace hoffman::isaiah {
 		/// paths for enemies.</summary>
 		class Pathfinder {
 		public:
-			Pathfinder(const Grid& tgraph, Grid fgraph, Grid igraph, bool allow_diag, HeuristicStrategies h_strat,
+			Pathfinder(Grid tgraph, Grid fgraph, Grid igraph, bool allow_diag, HeuristicStrategies h_strat,
 				int start_x = -1, int start_y = -1, int goal_x = -1, int goal_y = -1) :
 				terrain_graph {tgraph},
 				filter_graph {fgraph},
@@ -28,6 +28,11 @@ namespace hoffman::isaiah {
 				Pathfinder::Pathfinder {gmap.getTerrainGraph(find_air), gmap.getFiterGraph(find_air),
 					gmap.getInfluenceGraph(find_air), allow_diag, h_strat, start_x, start_y, goal_x, goal_y} {
 			}
+			~Pathfinder() = default;
+			Pathfinder(const Pathfinder& rhs) = default;
+			Pathfinder(Pathfinder&& rhs) = default;
+			Pathfinder& operator=(const Pathfinder& rhs) = default;
+			Pathfinder& operator=(Pathfinder&& rhs) = default;
 			/// <summary>Checks if a path actually exists from the start location
 			/// to the goal location.</summary>
 			/// <returns>True if a path exists from the starting node to the goal
@@ -39,7 +44,7 @@ namespace hoffman::isaiah {
 			std::queue<const GraphNode*> findPath(double h_modifier = 1.0) const;
 		private:
 			/// <summary>A reference to the terrain graph to use.</summary>
-			const Grid& terrain_graph;
+			Grid terrain_graph;
 			/// <summary>The filter graph used by the pathfinder.</summary>
 			Grid filter_graph;
 			/// <summary>A graph that marks areas that the enemy would like to avoid.</summary>

@@ -21,8 +21,14 @@ namespace hoffman::isaiah {
 		/// <summary>Interface for objects that can be drawn.</summary>
 		class IDrawable {
 		public:
+			IDrawable() = default;
 			// Default destructor declared virtual
 			virtual ~IDrawable() = default;
+			// Rule of 5
+			IDrawable(const IDrawable& rhs) = default;
+			IDrawable(IDrawable&& rhs) = default;
+			IDrawable& operator=(const IDrawable& rhs) = default;
+			IDrawable& operator=(IDrawable&& rhs) = default;
 			/// <summary>Implement this method for anything that can be drawn.</summary>
 			virtual void draw(const Renderer2D& renderer) const noexcept = 0;
 		};
