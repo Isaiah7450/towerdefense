@@ -103,6 +103,7 @@ namespace hoffman::isaiah {
 				ret_value.push(&path_node->getGraphNode());
 				path_node = path_parent;
 			}
+			ret_value.push(&path_node->getGraphNode());
 			// Clear the priority queue
 			while (!my_set.empty()) {
 				my_set.pop();
