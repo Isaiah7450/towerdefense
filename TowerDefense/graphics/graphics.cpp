@@ -7,15 +7,16 @@
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 #include "./../main.hpp"
-#include "./graphics_DX.hpp"
-#include "./graphics.hpp"
-#include "./shapes.hpp"
+#include "./../game/enemy.hpp"
+#include "./../game/game_object.hpp"
+#include "./../game/my_game.hpp"
 #include "./../pathfinding/graph_node.hpp"
 #include "./../pathfinding/grid.hpp"
 #include "./../pathfinding/pathfinder.hpp"
-#include "./../game/game_object.hpp"
-#include "./../game/my_game.hpp"
 #include "./../terrain/editor.hpp"
+#include "./graphics_DX.hpp"
+#include "./graphics.hpp"
+#include "./shapes.hpp"
 
 namespace hoffman::isaiah {
 	namespace graphics {
@@ -62,6 +63,10 @@ namespace hoffman::isaiah {
 			render_target->BeginDraw();
 			render_target->Clear(Color {1.f, 1.f, 1.f, 1.f});
 			my_game->getMap().draw(*this);
+			// Draw enemies
+			for (auto& e : my_game->enemies) {
+				e->draw(*this);
+			}
 #if 0
 			// Testing the star
 			constexpr const Color black_color {0.f, 0.f, 0.f, 1.f};
