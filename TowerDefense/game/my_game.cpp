@@ -101,8 +101,8 @@ namespace hoffman::isaiah {
 		void MyGame::init_enemy_types() {
 			// Dummy data
 			auto my_type = std::make_shared<EnemyType>(L"Test Enemy", L"An enemy made for testing purposes.",
-				graphics::Color {1.f, 0.f, 0.f, 0.f}, graphics::shapes::ShapeTypes::Diamond,
-				1, 10.0, 0.0, 0.0, 0.75, 2.50, 2.50, 2.50, pathfinding::HeuristicStrategies::Manhattan,
+				graphics::Color {1.f, 0.f, 0.f, 1.f}, graphics::shapes::ShapeTypes::Diamond,
+				1, 10.0, 0.0, 0.0, 0.75, 20.00, 20.00, 20.00, pathfinding::HeuristicStrategies::Manhattan,
 				false, false);
 			this->enemy_types.emplace_back(my_type);
 		}
