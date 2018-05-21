@@ -146,8 +146,9 @@
     </Link>
     <ClCompile>
       <EnablePREfast>true</EnablePREfast>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalOptions>/constexpr:steps9999999 %(AdditionalOptions)</AdditionalOptions>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -157,16 +158,18 @@
     </Link>
     <ClCompile>
       <EnablePREfast>true</EnablePREfast>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalOptions>/constexpr:steps9999999 %(AdditionalOptions)</AdditionalOptions>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <EnablePREfast>true</EnablePREfast>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalOptions>/constexpr:steps9999999 %(AdditionalOptions)</AdditionalOptions>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -178,9 +181,10 @@
     <ClCompile>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <EnablePREfast>true</EnablePREfast>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalOptions>/constexpr:steps9999999 %(AdditionalOptions)</AdditionalOptions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -193,8 +197,9 @@
     <ClCompile>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <EnablePREfast>true</EnablePREfast>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalOptions>/constexpr:steps9999999 %(AdditionalOptions)</AdditionalOptions>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -206,9 +211,10 @@
     <ClCompile>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <EnablePREfast>true</EnablePREfast>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalOptions>/constexpr:steps9999999 %(AdditionalOptions)</AdditionalOptions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
