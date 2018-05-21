@@ -16,6 +16,8 @@
 #include "./graphics/graphics_DX.hpp"
 #include "./graphics/graphics.hpp"
 #include "./pathfinding/grid.hpp"
+#include "./game/enemy.hpp"
+#include "./game/enemy_type.hpp"
 #include "./game/my_game.hpp"
 #include "./terrain/editor.hpp"
 
@@ -192,6 +194,12 @@ namespace hoffman::isaiah {
 			}
 			// Store in global variable --> It's the only way!
 			game::g_my_game = std::make_shared<game::MyGame>(ground_terrain_file, air_terrain_file);
+			// Add debug enemy
+			game::g_my_game->init_enemy_types();
+			auto my_enemy = std::make_unique<game::Enemy>(my_resources,
+				game::g_my_game->getEnemyType(0), graphics::Color {0.f, 0.f, 0.f, 1.f}, game::g_my_game->getMap(),
+				1, 1);
+			game::g_my_game->addEnemy(std::move(my_enemy));
 			// Show window
 			ShowWindow(this->hwnd, n_cmd_show);
 			UpdateWindow(this->hwnd);

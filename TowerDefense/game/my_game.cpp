@@ -6,12 +6,15 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include <utility>
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 #include "./../main.hpp"
 #include "./../pathfinding/grid.hpp"
 #include "./../pathfinding/pathfinder.hpp"
+#include "./enemy_type.hpp"
+#include "./enemy.hpp"
 #include "./my_game.hpp"
 
 namespace hoffman::isaiah {
@@ -19,12 +22,16 @@ namespace hoffman::isaiah {
 		std::shared_ptr<MyGame> g_my_game {nullptr};
 
 		MyGame::MyGame(std::wistream& ground_terrain_file, std::wistream& air_terrain_file) :
-			map {std::make_shared<GameMap>(ground_terrain_file, air_terrain_file)} {
+			map {std::make_shared<GameMap>(ground_terrain_file, air_terrain_file)},
+			enemy_types {},
+			enemies {} {
 			this->ground_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), false,
 				false, pathfinding::HeuristicStrategies::Manhattan);
 			this->air_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), true,
 				false, pathfinding::HeuristicStrategies::Manhattan);
 		}
+
+		MyGame::~MyGame() noexcept = default;
 
 		void MyGame::debug_update(DebugUpdateStates cause) {
 #if defined(DEBUG) || defined(_DEBUG)
@@ -71,9 +78,37 @@ namespace hoffman::isaiah {
 			}
 			ResetEvent(draw_event);
 			// Do processing...
+			// Update enemies
+			std::vector<int> enemies_to_remove {};
+			for (unsigned int i = 0; i < this->enemies.size(); ++i) {
+				if (this->enemies[i]->update()) {
+					if (this->enemies[i]->isAlive()) {
+						// Reached goal....
+						// TODO: Implement this section
+					}
+					enemies_to_remove.emplace_back(i);
+				}
+			}
+			for (unsigned int i = 0; i < enemies_to_remove.size(); ++i) {
+				// Remove dead/goal enemies
+				this->enemies.erase(this->enemies.begin() + enemies_to_remove[i] - i);
+			}
 			// Remove lock
 			SetEvent(draw_event);
 			CloseHandle(draw_event);
+		}
+
+		void MyGame::init_enemy_types() {
+			// Dummy data
+			auto my_type = std::make_shared<EnemyType>(L"Test Enemy", L"An enemy made for testing purposes.",
+				graphics::Color {1.f, 0.f, 0.f, 0.f}, graphics::shapes::ShapeTypes::Diamond,
+				1, 10.0, 0.0, 0.0, 0.75, 2.50, 2.50, 2.50, pathfinding::HeuristicStrategies::Manhattan,
+				false, false);
+			this->enemy_types.emplace_back(my_type);
+		}
+
+		void MyGame::addEnemy(std::unique_ptr<Enemy>&& e) {
+			this->enemies.emplace_back(std::move(e));
 		}
 	}
 }
