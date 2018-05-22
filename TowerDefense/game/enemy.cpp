@@ -15,8 +15,9 @@
 #include "./enemy_type.hpp"
 #include "./enemy.hpp"
 #include "./game_object.hpp"
+#include "./my_game.hpp"
 #include "./status_effects.hpp"
-
+using namespace std::literals::string_literals;
 namespace hoffman::isaiah {
 	namespace game {
 		// enemy_type.hpp
@@ -81,11 +82,22 @@ namespace hoffman::isaiah {
 			maximum_armor_health {etype->getBaseArmorHP() * (1.0 + level * 0.001 * difficulty)},
 			current_strat {etype->getDefaultStrategy()},
 			move_diagonally {etype->canMoveDiagonally()},
-			status_effects {} {
+			status_effects {},
+			buffs {} {
 			this->my_path = this->my_pathfinder.findPath();
 			this->current_node = this->my_path.front();
 			this->my_path.pop();
 			this->changeDirection();
+			// Add buffs
+			for (auto& b : this->getBaseType().getBuffTypes()) {
+				// Ugh... I have to switch on the name cuz of template resolution
+				if (b->getName() == L"Intelligence"s) {
+					this->buffs.emplace_back(std::make_unique<SmartBuff>(dynamic_cast<SmartBuff&>(*b)));
+				}
+				else if (b->getName() == L"Speed"s) {
+					this->buffs.emplace_back(std::make_unique<SpeedBuff>(dynamic_cast<SpeedBuff&>(*b)));
+				}
+			}
 		}
 
 		bool Enemy::update() {
@@ -93,8 +105,13 @@ namespace hoffman::isaiah {
 			if (!this->isAlive()) {
 				return true;
 			}
-			std::vector<int> statuses_to_remove {};
+			// Apply buffs
+			for (auto& b : this->buffs) {
+				b->apply(*this, game::g_my_game->getEnemies());
+			}
+
 			// Apply status effects
+			std::vector<int> statuses_to_remove {};
 			for (unsigned int i = 0; i < this->status_effects.size(); ++i) {
 				if (this->status_effects[i]->update(*this)) {
 					statuses_to_remove.emplace_back(i);

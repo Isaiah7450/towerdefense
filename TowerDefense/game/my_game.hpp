@@ -62,6 +62,9 @@ namespace hoffman::isaiah {
 			std::shared_ptr<EnemyType> getEnemyType(int i) {
 				return this->enemy_types.at(i);
 			}
+			std::vector<std::unique_ptr<Enemy>>& getEnemies() noexcept {
+				return this->enemies;
+			}
 		private:
 			/// <summary>Shared pointer to the device resources.</summary>
 			std::shared_ptr<graphics::DX::DeviceResources2D> device_resources;

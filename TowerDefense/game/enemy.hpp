@@ -223,6 +223,9 @@ namespace hoffman::isaiah {
 			double speed_multiplier {1.0};
 			/// <summary>Is a stun effect active?</summary>
 			bool stun_active {false};
+			// Buffs
+			/// <summary>The list of passive buffs that this enemy possesses.</summary>
+			std::vector<std::unique_ptr<BuffBase>> buffs;
 			// Status ailments
 			/// <summary>The list of status effects that are currently affecting this enemy.</summary>
 			std::vector<std::unique_ptr<StatusEffectBase>> status_effects;

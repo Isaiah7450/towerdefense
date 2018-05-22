@@ -177,7 +177,8 @@ namespace hoffman::isaiah {
 			// Constructor
 			EnemyType(std::wstring n, std::wstring d, graphics::Color c, graphics::shapes::ShapeTypes st,
 				int dmg, double base_hp, double base_ahp, double ar, double pt, double base_wspd, double base_rspd,
-				double base_ispd, pathfinding::HeuristicStrategies def_strat, bool diag, bool fly) :
+				double base_ispd, pathfinding::HeuristicStrategies def_strat, bool diag, bool fly,
+				std::vector<std::shared_ptr<BuffBase>> btypes = {}) :
 				GameObjectType {n, d, c, st},
 				damage {dmg},
 				base_health {base_hp},
@@ -189,7 +190,8 @@ namespace hoffman::isaiah {
 				injured_speed {base_ispd},
 				default_strategy {def_strat},
 				move_diag {diag},
-				flying {fly} {
+				flying {fly},
+				buff_types {btypes} {
 			}
 			// Getters
 			int getDamage() const noexcept {
@@ -226,6 +228,9 @@ namespace hoffman::isaiah {
 			}
 			bool isFlying() const noexcept {
 				return this->flying;
+			}
+			const std::vector<std::shared_ptr<BuffBase>>& getBuffTypes() const noexcept {
+				return this->buff_types;
 			}
 			// A bunch of statistical information
 			/// <returns>The effective armor health of the enemy, which is an estimate of how much
@@ -272,8 +277,11 @@ namespace hoffman::isaiah {
 			}
 			/// <returns>Another rating that focuses primarily on the enemy's special abilities.</returns>
 			double getExtraRating() const noexcept {
-				// TODO: Implement this
-				return 0;
+				double multiplier = 0.0;
+				for (const auto& b : this->buff_types) {
+					multiplier += b->getRating();
+				}
+				return multiplier * this->getBaseRating() * 0.05;
 			}
 			/// <returns>Returns the enemy's full rating.</returns>
 			double getRating() const noexcept {
@@ -317,8 +325,8 @@ namespace hoffman::isaiah {
 			bool move_diag;
 			/// <summary>Is the enemy a flying enemy?</summary>
 			bool flying;
-			// Buff Parameters --> To do later!
-
+			/// <summary>List of buffs that enemies of this type possess.</summary>
+			std::vector<std::shared_ptr<BuffBase>> buff_types;
 		};
 	}
 }
