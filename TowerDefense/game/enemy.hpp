@@ -37,6 +37,9 @@ namespace hoffman::isaiah {
 			/// <param name="bypass_armor_completely">If true, no damage will be dealt to the enemy's
 			/// armor.</param>
 			void takeDamage(double dmg, double wap, bool bypass_armor_completely = false);
+			/// <summary>Heals the enemy's hitpoints.</summary>
+			/// <param name="amt">The amount of hitpoints to restore.</param>
+			void heal(double amt);
 			/// <summary>Adds a status to the enemy.</summary>
 			/// <param name="effect">The effect to add; uses move semantics.</param>
 			void addStatus(std::unique_ptr<StatusEffectBase>&& effect);
@@ -59,6 +62,12 @@ namespace hoffman::isaiah {
 			void setSpeedMultiplier(double new_value) noexcept {
 				this->speed_multiplier = new_value;
 			}
+			/// <summary>Changes the enemy's pathfinding strategy.</summary>
+			/// <param name="gmap">Reference to the game's maps.</param>
+			/// <param name="new_strat">The new heuristic estimation strategy to use.</param>
+			/// <param name="diag_move">Whether the enemy is now allowed to move diagonally or not.</param>
+			void changeStrategy(const GameMap& gmap,
+				pathfinding::HeuristicStrategies new_strat, bool diag_move);
 			// Getters
 			const EnemyType& getBaseType() const noexcept {
 				return *this->base_type;
@@ -123,6 +132,12 @@ namespace hoffman::isaiah {
 				return this->isInjured() ? this->getCurrentInjuredSpeed() :
 					this->isRunning() ? this->getCurrentRunningSpeed() : this->getCurrentWalkingSpeed();
 			}
+			pathfinding::HeuristicStrategies getCurrentStrategy() const noexcept {
+				return this->current_strat;
+			}
+			bool canMoveDiagonally() const noexcept {
+				return this->move_diagonally;
+			}
 		protected:
 			// Setters/Changers
 			// Getters
@@ -151,6 +166,9 @@ namespace hoffman::isaiah {
 			bool isRunning() const noexcept {
 				return !(this->isInjured() || this->hasArmor());
 			}
+		protected:
+			/// <summary>Updates the direction that the enemy is taking.</summary>
+			void changeDirection() noexcept;
 		private:
 			/// <summary>The template type used to create the enemy.</summary>
 			std::shared_ptr<EnemyType> base_type;
@@ -175,6 +193,8 @@ namespace hoffman::isaiah {
 			double maximum_armor_health;
 			/// <summary>The current pathfinding strategy being employed by the enemy.</summary>
 			pathfinding::HeuristicStrategies current_strat;
+			/// <summary>Can the enemy currently move diagonally?</summary>
+			bool move_diagonally;
 			/// <summary>The current speeds of the enemy. 0 => Walking, 1 => Running, 2 => Injured</summary>
 			std::array<double, 3> current_speeds;
 			/// <summary>The current speed multiplier of the enemy.</summary>

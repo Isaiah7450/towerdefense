@@ -120,6 +120,10 @@ namespace hoffman::isaiah {
 			auto my_fire_dot = std::make_unique<DoTEffect>(DoTDamageTypes::Fire, 10.0 / 3.0, 500, 3);
 			e->addStatus(std::move(my_fire_dot));
 #endif
+			// Test strategy changes
+			auto my_smart_buff = std::make_unique<SmartStrategyEffect>(5000, pathfinding::HeuristicStrategies::Diagonal,
+				true);
+			e->addStatus(std::move(my_smart_buff));
 			this->enemies.emplace_back(std::move(e));
 		}
 	}

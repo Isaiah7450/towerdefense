@@ -41,9 +41,7 @@ namespace hoffman::isaiah {
 			this->my_path = this->my_pathfinder.findPath();
 			this->current_node = this->my_path.front();
 			this->my_path.pop();
-			const double dx = (this->getNextNode()->getGameX() + 0.5) - this->getGameX();
-			const double dy = (this->getNextNode()->getGameY() + 0.5) - this->getGameY();
-			this->current_direction = std::atan2(dy, dx);
+			this->changeDirection();
 		}
 
 		bool Enemy::update() {
@@ -68,9 +66,9 @@ namespace hoffman::isaiah {
 			const double rx = my_speed;
 			const double ry = my_speed;
 			this->translate(rx * std::cos(this->current_direction), ry * std::sin(this->current_direction));
-			double dx = (this->getNextNode()->getGameX() + 0.5) - this->getGameX();
-			double dy = (this->getNextNode()->getGameY() + 0.5) - this->getGameY();
-			bool update_next_node = math::get_sqrt(dx * dx + dy * dy) <= my_speed;
+			const double dx = (this->getNextNode()->getGameX() + 0.5) - this->getGameX();
+			const double dy = (this->getNextNode()->getGameY() + 0.5) - this->getGameY();
+			bool update_next_node = math::get_sqrt(dx * dx + dy * dy) <= my_speed + 0.25 / game::logic_framerate;
 			if (update_next_node) {
 				// Change path
 				if (this->my_path.size() == 1) {
@@ -78,9 +76,7 @@ namespace hoffman::isaiah {
 				}
 				this->current_node = this->getNextNode();
 				this->my_path.pop();
-				dx = (this->getNextNode()->getGameX() + 0.5) - this->getGameX();
-				dy = (this->getNextNode()->getGameY() + 0.5) - this->getGameY();
-				this->current_direction = std::atan2(dy, dx);
+				this->changeDirection();
 			}
 			return !this->isAlive();
 		}
@@ -147,8 +143,33 @@ namespace hoffman::isaiah {
 			}
 		}
 
+		void Enemy::heal(double amt) {
+			this->current_health = math::get_min(this->getMaxHealth(), this->getHealth() + amt);
+		}
+
 		void Enemy::addStatus(std::unique_ptr<StatusEffectBase>&& effect) {
 			this->status_effects.emplace_back(std::move(effect));
+		}
+
+		void Enemy::changeStrategy(const GameMap& gmap,
+			pathfinding::HeuristicStrategies new_strat, bool diag_move) {
+			this->current_strat = new_strat;
+			this->move_diagonally = diag_move;
+			// Obtain new path
+			this->my_pathfinder = pathfinding::Pathfinder {gmap, this->getBaseType().isFlying(),
+				diag_move, new_strat};
+			this->my_path = this->my_pathfinder.findPath(1.0,
+				static_cast<int>(this->getGameX()),
+				static_cast<int>(this->getGameY()));
+			this->current_node = this->my_path.front();
+			this->my_path.pop();
+			this->changeDirection();
+		}
+
+		void Enemy::changeDirection() noexcept {
+			const double dx = (this->getNextNode()->getGameX() + 0.5) - this->getGameX();
+			const double dy = (this->getNextNode()->getGameY() + 0.5) - this->getGameY();
+			this->current_direction = std::atan2(dy, dx);
 		}
 	}
 }
