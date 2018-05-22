@@ -1,6 +1,7 @@
 #pragma once
 // File Author: Isaiah Hoffman
 // File Created: May 21, 2018
+#include "./../ih_math.hpp"
 
 namespace hoffman::isaiah {
 	namespace game {
@@ -9,7 +10,7 @@ namespace hoffman::isaiah {
 
 		/// <summary>Enumeration of possible status effects.</summary>
 		enum class StatusEffects {
-			DoT
+			DoT, Smart, Slow, Stun, Speed_Boost
 		};
 
 		/// <summary>Base class for all status effects.</summary>
@@ -21,16 +22,6 @@ namespace hoffman::isaiah {
 			/// <param name="e">The enemy that this is being called for.</param>
 			/// <returns>True if the status effect should be removed from the enemy.</returns>
 			virtual bool update(Enemy& e) = 0;
-			// Returns the number of milliseconds in a single logical frame.
-			static constexpr double get_milliseconds_per_frame() noexcept {
-				return 1000.0 / game::logic_framerate;
-			}
-			// Converts a time in milliseconds into a number of logical frames
-			// that represent the same time span.
-			// time_in_ms : The time in milliseconds to convert.
-			static constexpr double convert_milliseconds_to_frames(double time_in_ms) noexcept {
-				return time_in_ms / StatusEffectBase::get_milliseconds_per_frame();
-			}
 		private:
 		};
 
@@ -50,7 +41,7 @@ namespace hoffman::isaiah {
 			DoTEffect(DoTDamageTypes dt, double dmg_tick, int ms_tick, int t_ticks) :
 				type {dt},
 				dmg_per_tick {dmg_tick},
-				frames_between_ticks {StatusEffectBase::convert_milliseconds_to_frames(ms_tick)},
+				frames_between_ticks {math::convert_milliseconds_to_frames(ms_tick)},
 				total_ticks {t_ticks} {
 			}
 			// Implements StatusEffectBase::update()
@@ -76,7 +67,7 @@ namespace hoffman::isaiah {
 			/// expires.</param>
 			SmartStrategyEffect(int ms_til_expires, pathfinding::HeuristicStrategies new_strat,
 				bool diag_move_change) :
-				frames_until_expire {StatusEffectBase::convert_milliseconds_to_frames(ms_til_expires)},
+				frames_until_expire {math::convert_milliseconds_to_frames(ms_til_expires)},
 				strat {new_strat},
 				diag_change {diag_move_change} {
 			}
@@ -108,7 +99,7 @@ namespace hoffman::isaiah {
 			/// <param name="sf">The slow-factor applied to the enemy; the enemy
 			/// will move this much slower.</param>
 			SlowEffect(double ms_til_expires, double sf) :
-				frames_until_expire {StatusEffectBase::convert_milliseconds_to_frames(ms_til_expires)},
+				frames_until_expire {math::convert_milliseconds_to_frames(ms_til_expires)},
 				speed_multiplier {1.0 - sf} {
 			}
 			// Implements StatusEffectBase::update()
@@ -127,7 +118,7 @@ namespace hoffman::isaiah {
 		public:
 			/// <param name="ms_until_expires">The number of milliseconds until the effect expires.</param>
 			StunEffect(int ms_until_expires) :
-				frames_until_expire {StatusEffectBase::convert_milliseconds_to_frames(ms_until_expires)} {
+				frames_until_expire {math::convert_milliseconds_to_frames(ms_until_expires)} {
 			}
 			// Implements StatusEffectBase::update()
 			bool update(Enemy& e);
@@ -149,7 +140,7 @@ namespace hoffman::isaiah {
 			/// <param name="ib">The percentage increase to the enemy's injured speed boost.
 			/// (Expressed as a decimal, and note that 1.0 will be added to this value.)</param>
 			SpeedBoostEffect(int ms_until_expires, double wb, double rb, double ib) :
-				frames_until_expire {StatusEffectBase::convert_milliseconds_to_frames(ms_until_expires)},
+				frames_until_expire {math::convert_milliseconds_to_frames(ms_until_expires)},
 				walking_boost {1.0 + wb},
 				running_boost {1.0 + rb},
 				injured_boost {1.0 + ib} {

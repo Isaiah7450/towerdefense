@@ -9,6 +9,17 @@ namespace hoffman::isaiah {
 		constexpr static long long getMicrosecondsInSecond() {
 			return 1000000ll;
 		}
+		// Returns the number of milliseconds in a single logical frame.
+		constexpr double get_milliseconds_per_frame() noexcept {
+			return 1000.0 / game::logic_framerate;
+		}
+		// Converts a time in milliseconds into a number of logical frames
+		// that represent the same time span.
+		// time_in_ms : The time in milliseconds to convert.
+		constexpr double convert_milliseconds_to_frames(double time_in_ms) noexcept {
+			return time_in_ms / math::get_milliseconds_per_frame();
+		}
+
 		// Practically all of these are defined in the standard library; however,
 		// since most of them predate C++11 and constexpr, I have decided to redefine
 		// a constexpr version of them here.
