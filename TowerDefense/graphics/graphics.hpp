@@ -92,7 +92,6 @@ namespace hoffman::isaiah {
 			/// <param name="mouse_end_gy">The ending game y-coordinate of the mouse.</param>
 			HRESULT render(const std::shared_ptr<game::MyGame> my_game, int mouse_gx, int mouse_gy,
 				int mouse_end_gx, int mouse_end_gy) const;
-		protected:
 			// Setters
 			void setOutlineColor(Color o_color) const noexcept {
 				this->device_resources->getOutlineBrush()->SetColor(o_color);
@@ -110,8 +109,7 @@ namespace hoffman::isaiah {
 				this->setOutlineColor(o_color);
 				this->setFillColor(f_color);
 			}
-
-			// Utility functions
+			// Utility functions and general drawing functions
 			/// <summary>Fills a rectangle using the current fill color.</summary>
 			/// <param name="my_rect">Stores the dimensions of the rectangle to fill.</param>
 			void fillRectangle(D2D1_RECT_F my_rect) const noexcept {

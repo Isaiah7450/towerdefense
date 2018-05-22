@@ -77,5 +77,45 @@ namespace hoffman::isaiah {
 			}
 			return !this->isAlive();
 		}
+
+		void Enemy::draw(const graphics::Renderer2D& renderer) const noexcept {
+			// Call base class member first
+			GameObject::draw(renderer);
+			// Draw health bars
+			constexpr const graphics::Color bar_outline_color {0.2f, 0.2f, 0.2f, 1.0f};
+			constexpr const graphics::Color bar_empty_color {0.7f, 0.7f, 0.7f, 1.0f};
+			constexpr const graphics::Color health_fill_color {0.8f, 0.0f, 0.0f, 0.9f};
+			constexpr const graphics::Color armor_fill_color {0.0f, 0.0f, 0.8f, 0.9f};
+			const double hp_percent = this->getHealthPercentage();
+			const float bar_max_width = 0.63f * graphics::getGameSquareWidth<float>();
+			const float bar_height = 0.075f * graphics::getGameSquareHeight<float>();
+			const float hp_bar_offset = 5.5f * graphics::screen_height / 645.f;
+			const float hp_bar_start_x = static_cast<float>(this->getScreenX()) - bar_max_width / 2.f;
+			const float hp_bar_end_x = static_cast<float>(hp_bar_start_x + hp_percent * bar_max_width);
+			const float hp_bar_start_y = static_cast<float>(this->getScreenY()) - bar_height / 2.f - hp_bar_offset;
+			const float hp_bar_end_y = hp_bar_start_y + bar_height;
+			const D2D1_RECT_F hp_bar_filled_rc {hp_bar_start_x, hp_bar_start_y, hp_bar_end_x, hp_bar_end_y};
+			const D2D1_RECT_F hp_bar_outline_rc {hp_bar_start_x, hp_bar_start_y, hp_bar_start_x + bar_max_width,
+				hp_bar_end_y};
+			renderer.setBrushColors(bar_outline_color, bar_empty_color);
+			renderer.outlineRectangle(hp_bar_outline_rc);
+			renderer.setFillColor(health_fill_color);
+			renderer.fillRectangle(hp_bar_filled_rc);
+			if (this->hasArmor()) {
+				const double ahp_percent = this->getArmorPercentage();
+				const float ahp_bar_offset = hp_bar_offset + bar_height + 0.85f * graphics::screen_height / 645.f;
+				const float ahp_bar_start_x = hp_bar_start_x;
+				const float ahp_bar_end_x = static_cast<float>(ahp_bar_start_x + ahp_percent * bar_max_width);
+				const float ahp_bar_start_y = static_cast<float>(this->getScreenY()) - bar_height / 2.f - ahp_bar_offset;
+				const float ahp_bar_end_y = ahp_bar_start_y + bar_height;
+				const D2D1_RECT_F ahp_bar_filled_rc {ahp_bar_start_x, ahp_bar_start_y, ahp_bar_end_x, ahp_bar_end_y};
+				const D2D1_RECT_F ahp_bar_outline_rc {ahp_bar_start_x, ahp_bar_start_y, ahp_bar_start_x + bar_max_width,
+					ahp_bar_end_y};
+				renderer.setFillColor(bar_empty_color);
+				renderer.outlineRectangle(ahp_bar_outline_rc);
+				renderer.setFillColor(armor_fill_color);
+				renderer.fillRectangle(ahp_bar_filled_rc);
+			}
+		}
 	}
 }

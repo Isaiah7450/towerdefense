@@ -28,6 +28,9 @@ namespace hoffman::isaiah {
 			/// <summary>Advances the enemy's game state by one frame.</summary>
 			/// <returns>True if the enemy should be removed; otherwise, false.</returns>
 			bool update();
+			// Overrides GameObject::draw
+			void draw(const graphics::Renderer2D& renderer) const noexcept;
+
 			// Setters/Changers
 			void changeWalkingSpeed(double amt) noexcept {
 				this->current_speeds[0] += amt;
