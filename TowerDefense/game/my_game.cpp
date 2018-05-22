@@ -18,6 +18,7 @@
 #include "./enemy_type.hpp"
 #include "./enemy.hpp"
 #include "./my_game.hpp"
+#include "./status_effects.hpp"
 
 namespace hoffman::isaiah {
 	namespace game {
@@ -106,12 +107,19 @@ namespace hoffman::isaiah {
 			// Dummy data
 			auto my_type = std::make_shared<EnemyType>(L"Test Enemy", L"An enemy made for testing purposes.",
 				graphics::Color {1.f, 0.f, 0.f, 1.f}, graphics::shapes::ShapeTypes::Diamond,
-				1, 10.0, 5.0, 0.50, 0.75, 1.50, 2.50, 1.25, pathfinding::HeuristicStrategies::Manhattan,
+				1, 30.0, 5.0, 0.50, 0.75, 1.50, 2.50, 1.25, pathfinding::HeuristicStrategies::Manhattan,
 				false, false);
 			this->enemy_types.emplace_back(my_type);
 		}
 
 		void MyGame::addEnemy(std::unique_ptr<Enemy>&& e) {
+#if 0
+			// Test status afflictions
+			auto my_poison_dot = std::make_unique<DoTEffect>(DoTDamageTypes::Poison, 10.0 / 300.0, 100, 300);
+			e->addStatus(std::move(my_poison_dot));
+			auto my_fire_dot = std::make_unique<DoTEffect>(DoTDamageTypes::Fire, 10.0 / 3.0, 500, 3);
+			e->addStatus(std::move(my_fire_dot));
+#endif
 			this->enemies.emplace_back(std::move(e));
 		}
 	}

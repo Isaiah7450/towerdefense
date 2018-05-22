@@ -51,9 +51,16 @@ namespace hoffman::isaiah {
 			if (!this->isAlive()) {
 				return true;
 			}
+			std::vector<int> statuses_to_remove {};
 			// Apply status effects
-			for (auto& status : this->status_effects) {
-				status->update(*this);
+			for (unsigned int i = 0; i < this->status_effects.size(); ++i) {
+				if (this->status_effects[i]->update(*this)) {
+					statuses_to_remove.emplace_back(i);
+				}
+			}
+			// Remove old status effects
+			for (unsigned int i = 0; i < statuses_to_remove.size(); ++i) {
+				this->status_effects.erase(this->status_effects.begin() + statuses_to_remove[i] - i);
 			}
 			// Perform movement
 			const double my_speed = this->getCurrentSpeed() / game::logic_framerate /
@@ -116,6 +123,32 @@ namespace hoffman::isaiah {
 				renderer.setFillColor(armor_fill_color);
 				renderer.fillRectangle(ahp_bar_filled_rc);
 			}
+		}
+
+		void Enemy::takeDamage(double dmg, double wap, bool bypass_armor_completely) {
+			if (this->hasArmor()) {
+				// Damage to armor => Base Damage * ((1.0 - Armor Reduce) + Piercing)
+				// to a maximum of the base damage amount
+				const double ar_protect = math::get_max(this->getBaseType().getArmorReduce() - wap,
+					0.0);
+				const double ar_dmg = dmg * (1.0 - ar_protect);
+				if (wap > 0) {
+					// Damage to health => Armor Damage * Piercing
+					const double hp_dmg = ar_dmg * wap;
+					this->current_health -= hp_dmg;
+				}
+				if (!bypass_armor_completely) {
+					this->current_armor_health -= ar_dmg;
+				}
+			}
+			else {
+				// Armor Piercing ignored
+				this->current_health -= dmg;
+			}
+		}
+
+		void Enemy::addStatus(std::unique_ptr<StatusEffectBase>&& effect) {
+			this->status_effects.emplace_back(std::move(effect));
 		}
 	}
 }

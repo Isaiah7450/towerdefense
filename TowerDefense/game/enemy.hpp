@@ -31,6 +31,16 @@ namespace hoffman::isaiah {
 			// Overrides GameObject::draw
 			void draw(const graphics::Renderer2D& renderer) const noexcept;
 
+			/// <summary>Deals damage to the enemy.</summary>
+			/// <param name="dmg">The base amount of damage for the enemy to receive.</param>
+			/// <param name="wap">The armor piercing value associated with the damage.</param>
+			/// <param name="bypass_armor_completely">If true, no damage will be dealt to the enemy's
+			/// armor.</param>
+			void takeDamage(double dmg, double wap, bool bypass_armor_completely = false);
+			/// <summary>Adds a status to the enemy.</summary>
+			/// <param name="effect">The effect to add; uses move semantics.</param>
+			void addStatus(std::unique_ptr<StatusEffectBase>&& effect);
+
 			// Setters/Changers
 			void changeWalkingSpeed(double amt) noexcept {
 				this->current_speeds[0] += amt;
