@@ -67,7 +67,7 @@ namespace hoffman::isaiah {
 			/// <summary>The number of frames since the last tick.</summary>
 			double frames_since_last_tick {0};
 		};
-		
+
 		/// <summary>Class that represents a status effect where the enemy
 		/// becomes smarter while the effect lasts.</summary>
 		class SmartStrategyEffect : public StatusEffectBase {
@@ -76,7 +76,7 @@ namespace hoffman::isaiah {
 			/// expires.</param>
 			SmartStrategyEffect(int ms_til_expires, pathfinding::HeuristicStrategies new_strat,
 				bool diag_move_change) :
-				frames_until_expires {StatusEffectBase::convert_milliseconds_to_frames(ms_til_expires)},
+				frames_until_expire {StatusEffectBase::convert_milliseconds_to_frames(ms_til_expires)},
 				strat {new_strat},
 				diag_change {diag_move_change} {
 			}
@@ -85,7 +85,7 @@ namespace hoffman::isaiah {
 		private:
 			/// <summary>The number of frames remaining until the status
 			/// effect expires.</summary>
-			double frames_until_expires;
+			double frames_until_expire;
 			/// <summary>The new strategy that the enemy will use while the status
 			/// effect is present.</summary>
 			pathfinding::HeuristicStrategies strat;
@@ -95,6 +95,77 @@ namespace hoffman::isaiah {
 			/// <summary>False if this is the first time that update
 			/// has been called for this status effect.</summary>
 			bool ran_once {false};
+		};
+
+		// Note: This effect doesn't have to just be used for slowing enemies.
+		// It can also be used to boost their speeds; you just have to provide
+		// a negative slow factor.
+		/// <summary>Status effect that slows down an enemy's movement speed.</summary>
+		class SlowEffect : public StatusEffectBase {
+		public:
+			/// <param name="ms_til_expires">The number of milliseconds until the
+			/// status effect expires.</param>
+			/// <param name="sf">The slow-factor applied to the enemy; the enemy
+			/// will move this much slower.</param>
+			SlowEffect(double ms_til_expires, double sf) :
+				frames_until_expire {StatusEffectBase::convert_milliseconds_to_frames(ms_til_expires)},
+				speed_multiplier {1.0 - sf} {
+			}
+			// Implements StatusEffectBase::update()
+			bool update(Enemy& e);
+		private:
+			/// <summary>The number of frames until the effect expires.</summary>
+			double frames_until_expire;
+			/// <summary>The percentage (as a decimal) of the enemy's normal movement speed
+			/// that the enemy moves at while slowed. E.g.: 0.2 means the enemy moves at 20%
+			/// of their normal speed.</summary>
+			double speed_multiplier;
+		};
+
+		/// <summary>Class that represents a stun effect.</summary>
+		class StunEffect : public StatusEffectBase {
+		public:
+			/// <param name="ms_until_expires">The number of milliseconds until the effect expires.</param>
+			StunEffect(int ms_until_expires) :
+				frames_until_expire {StatusEffectBase::convert_milliseconds_to_frames(ms_until_expires)} {
+			}
+			// Implements StatusEffectBase::update()
+			bool update(Enemy& e);
+		private:
+			/// <summary>The number of frames until the effect expires.</summary>
+			double frames_until_expire;
+		};
+
+		/// <summary>This class represents a status effect that increases
+		/// the speed of an enemy.</summary>
+		class SpeedBoostEffect : public StatusEffectBase {
+		public:
+			/// <param name="ms_until_expires">The number of milliseconds that the effect
+			/// lasts for.</param>
+			/// <param name="wb">The percentage increase to the enemy's walking speed boost.
+			/// (Expressed as a decimal, and note that 1.0 will be added to this value.)</param>
+			/// <param name="rb">The percentage increase to the enemy's running speed boost.
+			/// (Expressed as a decimal, and note that 1.0 will be added to this value.)</param>
+			/// <param name="ib">The percentage increase to the enemy's injured speed boost.
+			/// (Expressed as a decimal, and note that 1.0 will be added to this value.)</param>
+			SpeedBoostEffect(int ms_until_expires, double wb, double rb, double ib) :
+				frames_until_expire {StatusEffectBase::convert_milliseconds_to_frames(ms_until_expires)},
+				walking_boost {1.0 + wb},
+				running_boost {1.0 + rb},
+				injured_boost {1.0 + ib} {
+			}
+			// Implements StatusEffectBase::update()
+			bool update(Enemy& e);
+		private:
+			/// <summary>The number of logical frames remaining before the effect
+			/// expires.</summary>
+			double frames_until_expire;
+			/// <summary>The percent increase (as a decimal) to the enemy's walking speed.</summary>
+			double walking_boost;
+			/// <summary>The percent increase (as a decimal) to the enemy's running speed.</summary>
+			double running_boost;
+			/// <summary>The percent increase (as a decimal) to the enemy's injured speed.</summary>
+			double injured_boost;
 		};
 	}
 }

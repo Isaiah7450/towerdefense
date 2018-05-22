@@ -35,8 +35,7 @@ namespace hoffman::isaiah {
 			current_armor_health {etype->getBaseArmorHP() * (1.0 + level * 0.001 * difficulty)},
 			maximum_armor_health {etype->getBaseArmorHP() * (1.0 + level * 0.001 * difficulty)},
 			current_strat {etype->getDefaultStrategy()},
-			current_speeds {{etype->getBaseWalkingSpeed(), etype->getBaseRunningSpeed(), etype->getBaseInjuredSpeed()}},
-			speed_multiplier {1.0},
+			move_diagonally {etype->canMoveDiagonally()},
 			status_effects {} {
 			this->my_path = this->my_pathfinder.findPath();
 			this->current_node = this->my_path.front();
@@ -65,7 +64,9 @@ namespace hoffman::isaiah {
 				this->current_node->getWeight();
 			const double rx = my_speed;
 			const double ry = my_speed;
-			this->translate(rx * std::cos(this->current_direction), ry * std::sin(this->current_direction));
+			if (!this->isStunned()) {
+				this->translate(rx * std::cos(this->current_direction), ry * std::sin(this->current_direction));
+			}
 			const double dx = (this->getNextNode()->getGameX() + 0.5) - this->getGameX();
 			const double dy = (this->getNextNode()->getGameY() + 0.5) - this->getGameY();
 			bool update_next_node = math::get_sqrt(dx * dx + dy * dy) <= my_speed + 0.25 / game::logic_framerate;
@@ -78,6 +79,10 @@ namespace hoffman::isaiah {
 				this->my_path.pop();
 				this->changeDirection();
 			}
+			// Reset speed multipliers to normal
+			this->speed_multiplier = 1.0;
+			this->speed_boosts = {1.0, 1.0, 1.0};
+			this->stun_active = false;
 			return !this->isAlive();
 		}
 

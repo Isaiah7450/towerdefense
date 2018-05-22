@@ -31,7 +31,7 @@ namespace hoffman::isaiah {
 			// where a programming/design bug causes
 			// the enemy's strategy to be permanently
 			// replaced.)
-			if (this->frames_until_expires <= 0) {
+			if (this->frames_until_expire <= 0) {
 				// Revert to default
 				e.changeStrategy(game::g_my_game->getMap(), e.getBaseType().getDefaultStrategy(),
 					e.getBaseType().canMoveDiagonally());
@@ -49,8 +49,39 @@ namespace hoffman::isaiah {
 				}
 				e.changeStrategy(game::g_my_game->getMap(), this->strat, this->diag_change);
 			}
-			--this->frames_until_expires;
+			--this->frames_until_expire;
 			return false;
+		}
+
+		bool SlowEffect::update(Enemy& e) {
+			// It is worth noting that slow effects are multiplicative.
+			// For instance, if an enemy receives both a 10% slow effect
+			// and a 25% slow effect, the total slowdown for the enemy
+			// becomes 0.90 * 0.75 => 0.675 or a 32.5% decrease in speed!
+			// Note also that there is a minimum speed multiplier for enemies
+			// for balance sake.
+			e.setSpeedMultiplier(e.getSpeedMultiplier() * this->speed_multiplier);
+			--this->frames_until_expire;
+			return this->frames_until_expire <= 0;
+		}
+
+		bool StunEffect::update(Enemy& e) {
+			e.setStun(true);
+			--this->frames_until_expire;
+			return this->frames_until_expire <= 0;
+		}
+
+		bool SpeedBoostEffect::update(Enemy& e) {
+			// Like with the SlowEffect, these values are multiplicative,
+			// not additive.
+			// One has to be careful here as there is no upper cap, so
+			// carelessness could lead to enemies that radiate speed boosts
+			// causing tremendous speed boosts!
+			e.multiplyWalkingBoost(this->walking_boost);
+			e.multiplyRunningBoost(this->running_boost);
+			e.multiplyInjuredBoost(this->injured_boost);
+			--this->frames_until_expire;
+			return this->frames_until_expire <= 0;
 		}
 	}
 }

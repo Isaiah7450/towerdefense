@@ -45,22 +45,28 @@ namespace hoffman::isaiah {
 			void addStatus(std::unique_ptr<StatusEffectBase>&& effect);
 
 			// Setters/Changers
-			void changeWalkingSpeed(double amt) noexcept {
-				this->current_speeds[0] += amt;
+			void multiplyWalkingBoost(double amt) noexcept {
+				this->speed_boosts[0] = math::get_max(0.05, this->getWalkingSpeedBoost() * amt);
 			}
-			void changeRunningSpeed(double amt) noexcept {
-				this->current_speeds[1] += amt;
+			void multiplyRunningBoost(double amt) noexcept {
+				this->speed_boosts[1] = math::get_max(0.05, this->getRunningSpeedBoost() * amt);
 			}
-			void changeInjuredSpeed(double amt) noexcept {
-				this->current_speeds[2] += amt;
+			void multiplyInjuredBoost(double amt) noexcept {
+				this->speed_boosts[2] = math::get_max(0.05, this->getInjuredSpeedBoost() * amt);
 			}
-			void changeAllSpeeds(double amt) noexcept {
-				this->changeWalkingSpeed(amt);
-				this->changeRunningSpeed(amt);
-				this->changeInjuredSpeed(amt);
+			/// <param name="amt">Amount to multiply all of the
+			/// enemies' speed boosts by (as a decimal percent).</param>
+			void multiplyAllSpeedBoosts(double amt) noexcept {
+				this->multiplyWalkingBoost(amt);
+				this->multiplyRunningBoost(amt);
+				this->multiplyInjuredBoost(amt);
 			}
 			void setSpeedMultiplier(double new_value) noexcept {
-				this->speed_multiplier = new_value;
+				// Minimum speed place for balance purposes
+				this->speed_multiplier = math::get_max(new_value, 0.05);
+			}
+			void setStun(bool new_status) noexcept {
+				this->stun_active = new_status;
 			}
 			/// <summary>Changes the enemy's pathfinding strategy.</summary>
 			/// <param name="gmap">Reference to the game's maps.</param>
@@ -111,18 +117,35 @@ namespace hoffman::isaiah {
 			double getArmorPercentage() const noexcept {
 				return this->getArmorHealth() / this->getMaxArmorHealth();
 			}
+			/// <returns>The multiplier applied solely to the enemy's walking speed.</returns>
+			double getWalkingSpeedBoost() const noexcept {
+				return this->speed_boosts[0];
+			}
+			/// <returns>The multiplier applied solely to the enemy's running speed.</returns>
+			double getRunningSpeedBoost() const noexcept {
+				return this->speed_boosts[1];
+			}
+			/// <returns>The multiplier applied solely to the enemy's injured speed.</returns>
+			double getInjuredSpeedBoost() const noexcept {
+				return this->speed_boosts[2];
+			}
+			/// <returns>The enemy's overall speed multiplier.</returns>
 			double getSpeedMultiplier() const noexcept {
 				return this->speed_multiplier;
 			}
-			/// <returns>The enemy's walking speed multiplied by their speed multiplier.</returns>
+			/// <returns>True if the enemy is currently stunned.</returns>
+			bool isStunned() const noexcept {
+				return this->stun_active;
+			}
+			/// <returns>The enemy's raw walking speed multiplied by their speed multiplier.</returns>
 			double getCurrentWalkingSpeed() const noexcept {
 				return this->getRawWalkingSpeed() * this->getSpeedMultiplier();
 			}
-			/// <returns>The enemy's running speed multiplied by their speed multiplier.</returns>
+			/// <returns>The enemy's raw running speed multiplied by their speed multiplier.</returns>
 			double getCurrentRunningSpeed() const noexcept {
 				return this->getRawRunningSpeed() * this->getSpeedMultiplier();
 			}
-			/// <returns>The enemy's injured speed multiplied by their speed multiplier.</returns>
+			/// <returns>The enemy's raw injured speed multiplied by their speed multiplier.</returns>
 			double getCurrentInjuredSpeed() const noexcept {
 				return this->getRawInjuredSpeed() * this->getSpeedMultiplier();
 			}
@@ -141,17 +164,17 @@ namespace hoffman::isaiah {
 		protected:
 			// Setters/Changers
 			// Getters
-			/// <returns>The value stored in current_speeds[0].</returns>
+			/// <returns>The raw walking speed of the enemy. (Base Speed * Boosts)</returns>
 			double getRawWalkingSpeed() const noexcept {
-				return this->current_speeds[0];
+				return this->getBaseType().getBaseWalkingSpeed() * this->getWalkingSpeedBoost();
 			}
-			/// <returns>The value stored in current_speeds[1].</returns>
+			/// <returns>The raw running speed of the enemy. (Base Speed * Boosts)</returns>
 			double getRawRunningSpeed() const noexcept {
-				return this->current_speeds[1];
+				return this->getBaseType().getBaseRunningSpeed() * this->getRunningSpeedBoost();
 			}
-			/// <returns>The value stored in current_speeds[2].</returns>
+			/// <returns>The raw injured speed of the enemy. (Base Speed * Boosts)</returns>
 			double getRawInjuredSpeed() const noexcept {
-				return this->current_speeds[2];
+				return this->getBaseType().getBaseInjuredSpeed() * this->getInjuredSpeedBoost();
 			}
 			/// <returns>True if the enemy's health has reached a critical level
 			/// (as defined by their pain tolerance).</returns>
@@ -166,7 +189,6 @@ namespace hoffman::isaiah {
 			bool isRunning() const noexcept {
 				return !(this->isInjured() || this->hasArmor());
 			}
-		protected:
 			/// <summary>Updates the direction that the enemy is taking.</summary>
 			void changeDirection() noexcept;
 		private:
@@ -195,10 +217,12 @@ namespace hoffman::isaiah {
 			pathfinding::HeuristicStrategies current_strat;
 			/// <summary>Can the enemy currently move diagonally?</summary>
 			bool move_diagonally;
-			/// <summary>The current speeds of the enemy. 0 => Walking, 1 => Running, 2 => Injured</summary>
-			std::array<double, 3> current_speeds;
+			/// <summary>The current speed boosts of the enemy. 0 => Walking, 1 => Running, 2 => Injured</summary>
+			std::array<double, 3> speed_boosts {1.0, 1.0, 1.0};
 			/// <summary>The current speed multiplier of the enemy.</summary>
-			double speed_multiplier;
+			double speed_multiplier {1.0};
+			/// <summary>Is a stun effect active?</summary>
+			bool stun_active {false};
 			// Status ailments
 			/// <summary>The list of status effects that are currently affecting this enemy.</summary>
 			std::vector<std::unique_ptr<StatusEffectBase>> status_effects;
