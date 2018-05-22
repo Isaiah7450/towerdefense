@@ -12,21 +12,20 @@ namespace hoffman::isaiah {
 		/// paths for enemies.</summary>
 		class Pathfinder {
 		public:
-			Pathfinder(Grid tgraph, Grid fgraph, Grid igraph, bool allow_diag, HeuristicStrategies h_strat,
-				int start_x = -1, int start_y = -1, int goal_x = -1, int goal_y = -1) :
+			Pathfinder(Grid tgraph, const Grid& fgraph, const Grid& igraph,
+				bool allow_diag, HeuristicStrategies h_strat) :
 				terrain_graph {tgraph},
 				filter_graph {fgraph},
 				influence_graph {igraph},
 				move_diag {allow_diag},
 				heuristic_strategy {h_strat},
-				start_node {(start_x == -1 || start_y == -1) ? tgraph.getStartNode() : &tgraph.getNode(start_x, start_y)},
-				goal_node {(goal_x == -1 || goal_y == -1) ? tgraph.getGoalNode() : &tgraph.getNode(goal_x, goal_y)} {
+				start_node {tgraph.getStartNode()},
+				goal_node {tgraph.getGoalNode()} {
 			}
 			// Probably the one I'll use more often
-			Pathfinder(const game::GameMap& gmap, bool find_air, bool allow_diag, HeuristicStrategies h_strat,
-				int start_x = -1, int start_y = -1, int goal_x = -1, int goal_y = -1) :
+			Pathfinder(const game::GameMap& gmap, bool find_air, bool allow_diag, HeuristicStrategies h_strat) :
 				Pathfinder::Pathfinder {gmap.getTerrainGraph(find_air), gmap.getFiterGraph(find_air),
-					gmap.getInfluenceGraph(find_air), allow_diag, h_strat, start_x, start_y, goal_x, goal_y} {
+					gmap.getInfluenceGraph(find_air), allow_diag, h_strat} {
 			}
 			~Pathfinder() = default;
 			Pathfinder(const Pathfinder& rhs) = default;
@@ -41,7 +40,8 @@ namespace hoffman::isaiah {
 			/// <summary>Attempts to find the shortest path to the goal using the A* method.</summary>
 			/// <param name="h_modifier">The h-value of every node is multiplied by this value. Use
 			/// this parameter to change the admissibility of the heuristic (and how optimal paths are).</param>
-			std::queue<const GraphNode*> findPath(double h_modifier = 1.0) const;
+			std::queue<const GraphNode*> findPath(double h_modifier = 1.0, int start_x = -1,
+				int start_y = -1, int goal_x = -1, int goal_y = -1);
 		private:
 			/// <summary>A reference to the terrain graph to use.</summary>
 			Grid terrain_graph;
@@ -54,9 +54,9 @@ namespace hoffman::isaiah {
 			/// <summary>The strategy to use when making heuristic estimates.</summary>
 			HeuristicStrategies heuristic_strategy;
 			/// <summary>Pointer to the starting node.</summary>
-			const GraphNode* start_node;
+			GraphNode* start_node;
 			/// <summary>Pointer to the destination node.</summary>
-			const GraphNode* goal_node;
+			GraphNode* goal_node;
 		};
 	}
 }

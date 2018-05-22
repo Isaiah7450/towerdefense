@@ -41,7 +41,8 @@ namespace hoffman::isaiah {
 			return false;
 		}
 
-		std::queue<const GraphNode*> Pathfinder::findPath(double h_modifier) const {
+		std::queue<const GraphNode*> Pathfinder::findPath(double h_modifier, int start_x,
+			int start_y, int goal_x, int goal_y) {
 			std::queue<const GraphNode*> ret_value {};
 			class PathFinderComparator {
 			public:
@@ -52,6 +53,13 @@ namespace hoffman::isaiah {
 			const auto determine_node_index = [](int x, int y) {
 				return y * graphics::grid_width + x;
 			};
+			// Some path edits to make before beginning...
+			if (start_x != -1 && start_y != -1) {
+				this->start_node = &this->terrain_graph.getNode(start_x, start_y);
+			}
+			if (goal_x != -1 && goal_y != -1) {
+				this->goal_node = &this->terrain_graph.getNode(goal_x, goal_y);
+			}
 			std::priority_queue<std::shared_ptr<PathFinderNode>,
 				std::vector<std::shared_ptr<PathFinderNode>>, PathFinderComparator> my_set {};
 			std::map<int, double> previous_costs {};

@@ -104,9 +104,15 @@ namespace hoffman::isaiah {
 			const GraphNode& getNode(int x, int y) const {
 				return this->nodes.at(y).at(x);
 			}
+			GraphNode* getStartNode() noexcept {
+				return this->start_node;
+			}
 			/// <returns>A pointer to the node marked as the starting node in the graph.</returns>
 			const GraphNode* getStartNode() const noexcept {
 				return this->start_node;
+			}
+			GraphNode* getGoalNode() noexcept {
+				return this->goal_node;
 			}
 			/// <returns>A pointer to the node marked as the ending node in the graph.</returns>
 			const GraphNode* getGoalNode() const noexcept {
