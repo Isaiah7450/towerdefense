@@ -19,6 +19,51 @@
 
 namespace hoffman::isaiah {
 	namespace game {
+		// enemy_type.hpp
+		BuffBase::~BuffBase() noexcept = default;
+
+		bool BuffBase::isValidTarget(const Enemy& caller, const Enemy& target) const {
+			const double dx = caller.getGameX() - target.getGameX();
+			const double dy = caller.getGameY() - target.getGameY();
+			if (math::get_sqrt(dx * dx + dy * dy) <= this->getRadius()) {
+				// Check name
+				auto valid_names = this->getTargetNames();
+				for (const auto& n : valid_names) {
+					if (target.getBaseType().getName() == n) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		void SmartBuff::apply(Enemy& caller, std::vector<std::unique_ptr<Enemy>>& enemies) {
+			if (this->updateAndCheckApply()) {
+				for (auto& target : enemies) {
+					if (this->isValidTarget(caller, *target)) {
+						// Apply buff by adding status effect
+						auto my_smart_effect = std::make_unique<SmartStrategyEffect>(this->getBuffDuration(),
+							pathfinding::HeuristicStrategies::Diagonal, true);
+						target->addStatus(std::move(my_smart_effect));
+					}
+				}
+			}
+		}
+
+		void SpeedBuff::apply(Enemy& caller, std::vector<std::unique_ptr<Enemy>>& enemies) {
+			if (this->updateAndCheckApply()) {
+				for (auto& target : enemies) {
+					if (this->isValidTarget(caller, *target)) {
+						// Apply buff by adding status effect
+						auto my_speed_effect = std::make_unique<SpeedBoostEffect>(this->getBuffDuration(),
+							this->getWalkingBoost(), this->getRunningBoost(), this->getInjuredBoost());
+						target->addStatus(std::move(my_speed_effect));
+					}
+				}
+			}
+		}
+
+		// enemy.hpp
 		Enemy::Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
 			std::shared_ptr<EnemyType> etype, graphics::Color o_color,
 			const GameMap& gmap, int level, int difficulty) :
@@ -69,7 +114,7 @@ namespace hoffman::isaiah {
 			}
 			const double dx = (this->getNextNode()->getGameX() + 0.5) - this->getGameX();
 			const double dy = (this->getNextNode()->getGameY() + 0.5) - this->getGameY();
-			bool update_next_node = math::get_sqrt(dx * dx + dy * dy) <= my_speed + 0.25 / game::logic_framerate;
+			bool update_next_node = math::get_sqrt(dx * dx + dy * dy) <= my_speed + 0.05 / game::logic_framerate;
 			if (update_next_node) {
 				// Change path
 				if (this->my_path.size() == 1) {

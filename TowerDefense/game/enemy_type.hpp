@@ -2,6 +2,8 @@
 // File Author: Isaiah Hoffman
 // File Created: April 18, 2018
 #include <string>
+#include <vector>
+#include <memory>
 #include "./../globals.hpp"
 #include "./../graphics/graphics.hpp"
 #include "./../graphics/shapes.hpp"
@@ -9,6 +11,166 @@
 
 namespace hoffman::isaiah {
 	namespace game {
+		// Forward declarations:
+		class Enemy;
+
+		// Note that any functions declared here that
+		// are not implemented here will be implemented
+		// in enemy.cpp
+		// Also, note that all buffs are passive
+		/// <summary>Base class for all buffs.</summary>
+		class BuffBase {
+		public:
+			/// <param name="target_names">List of enemy names that are valid targets for the buff.</param>
+			/// <param name="br">The radius in which the buff applies.</param>
+			/// <param name="ms_ticks">The number of milliseconds between ticks.</param>
+			BuffBase(std::vector<std::wstring> target_names, double br, int ms_ticks) :
+				buff_names {target_names},
+				buff_radius {br},
+				frames_between_buff_ticks {math::convert_milliseconds_to_frames(ms_ticks)} {
+			}
+			virtual ~BuffBase() noexcept;
+			/// <returns>Returns the name of the buff as
+			/// it would appear in user interfaces.</returns>
+			virtual std::wstring getName() const noexcept = 0;
+			/// <summary>Called once each turn. It applies
+			/// the buff to all applicable enemies.</summary>
+			/// <param name="caller">The enemy that activated the buff.</param>
+			/// <param name="enemies">All of the enemies in the game.</param>
+			virtual void apply(Enemy& caller, std::vector<std::unique_ptr<Enemy>>& enemies) = 0;
+
+			// Getters
+			std::vector<std::wstring> getTargetNames() const noexcept {
+				return this->buff_names;
+			}
+			double getRadius() const noexcept {
+				return this->buff_radius;
+			}
+			double getMillisecondsBetweenApplications() const noexcept {
+				return this->frames_between_buff_ticks * math::get_milliseconds_per_frame();
+			}
+			/// <returns>The rating associated with this buff. This is a value that is an
+			/// estimate of how much more threatening the enemy is due to the buff.</returns>
+			virtual double getRating() const noexcept = 0;
+		protected:
+			/// <param name="caller">The invoker of the buff.</param>
+			/// <param name="target">The potential target of the buff.</param>
+			/// <returns>True if the given target is a valid target for the buff.</returns>
+			bool isValidTarget(const Enemy& caller, const Enemy& target) const;
+			/// <summary>This updates the buff's status and checks if it can be applied again.</summary>
+			/// <returns>True if the buff can be applied now.</returns>
+			bool updateAndCheckApply() noexcept {
+				++this->frames_since_last_tick;
+				if (this->frames_since_last_tick >= this->frames_between_buff_ticks) {
+					this->frames_since_last_tick -= this->frames_between_buff_ticks;
+					return true;
+				}
+				return false;
+			}
+			/// <returns>The basic rating of the buff as determined by its
+			/// radius of influence, time between activations, and the number of enemies it affects.</returns>
+			virtual double getBaseRating() const noexcept {
+				return this->getTargetNames().size() * this->getRadius() * this->getRadius() * math::pi
+					/ (this->getMillisecondsBetweenApplications() / 1000.0);
+			}
+		private:
+			/// <summary>The names of enemies that are affected by the buff.</summary>
+			std::vector<std::wstring> buff_names;
+			/// <summary>The maximum distance (in game coordinate squares) that the buff covers.</summary>
+			double buff_radius;
+			/// <summary>The number of logical frames between each application of the buff.</summary>
+			double frames_between_buff_ticks;
+			/// <summary>The number of frames that have passed since the last application of the buff.</summary>
+			double frames_since_last_tick {0.0};
+		};
+
+		/// <summary>Base class for all buffs of a temporary nature.</summary>
+		class TemporaryBuffBase : public BuffBase {
+		public:
+			/// <param name="bd">Duration of the buff in milliseconds.</param>
+			TemporaryBuffBase(std::vector<std::wstring> target_names, double br, int ms_ticks, int bd) :
+				BuffBase {target_names, br, ms_ticks},
+				buff_duration {bd} {
+			}
+			int getBuffDuration() const noexcept {
+				return this->buff_duration;
+			}
+		protected:
+			// Overrides BuffBase::getBaseRating()
+			double getBaseRating() const noexcept override {
+				return BuffBase::getBaseRating() * (this->getBuffDuration() / 1000.0);
+			}
+		private:
+			/// <summary>The duration of the buff in milliseconds.</summary>
+			int buff_duration;
+		};
+
+		/// <summary>Class that represents a buff that increases the intelligence of
+		/// surrounding enemies.</summary>
+		class SmartBuff : public TemporaryBuffBase {
+		public:
+			SmartBuff(std::vector<std::wstring> target_names, double br, int ms_ticks, int bd) :
+				TemporaryBuffBase {target_names, br, ms_ticks, bd} {
+			}
+			// Implements BuffBase::getName()
+			std::wstring getName() const noexcept override {
+				return L"Intelligence";
+			}
+			// Implements BuffBase::apply()
+			void apply(Enemy& e, std::vector<std::unique_ptr<Enemy>>& enemies) override;
+			// Implements BuffBase::getRating()
+			double getRating() const noexcept override {
+				return this->getBaseRating() * math::get_sqrt(2.0);
+			}
+		private:
+		};
+
+		class SpeedBuff : public TemporaryBuffBase {
+		public:
+			/// <param name="wb">The percentage increase to the enemy's walking speed boost.</param>
+			/// <param name="rb">The percentage increase to the enemy's running speed boost.</param>
+			/// <param name="ib">The percentage increase to the enemy's injured speed boost.</param>
+			SpeedBuff(std::vector<std::wstring> target_names, double br, int ms_ticks, int bd,
+				double wb, double rb, double ib) :
+				TemporaryBuffBase {target_names, br, ms_ticks, bd},
+				walking_boost {wb},
+				running_boost {rb},
+				injured_boost {ib} {
+			}
+
+			// Implements BuffBase::getName()
+			std::wstring getName() const noexcept override {
+				return L"Speed";
+			}
+			// Implements BuffBase::apply()
+			void apply(Enemy& caller, std::vector<std::unique_ptr<Enemy>>& enemies) override;
+			// Implements BuffBase::getRating()
+			double getRating() const noexcept override {
+				return this->getBaseRating() * (1.0 + this->getWalkingBoost() * 0.5
+					+ this->getRunningBoost() * 0.3 + this->getInjuredBoost() * 0.2);
+			}
+			// Getters
+			double getWalkingBoost() const noexcept {
+				return this->walking_boost;
+			}
+			double getRunningBoost() const noexcept {
+				return this->running_boost;
+			}
+			double getInjuredBoost() const noexcept {
+				return this->injured_boost;
+			}
+		private:
+			/// <summary>The percentage increase to the enemy's walking speed boost
+			/// (expressed as a decimal).</summary>
+			double walking_boost;
+			/// <summary>The percentage increase to the enemy's running speed boost
+			/// (expressed as a decimal).</summary>
+			double running_boost;
+			/// <summary>The percentage increase to the enemy's injured speed boost
+			/// (expressed as a decimal).</summary>
+			double injured_boost;
+		};
+
 		/// <summary>Template type used to create new enemies.</summary>
 		class EnemyType : public GameObjectType {
 		public:
