@@ -17,6 +17,14 @@ namespace hoffman::isaiah {
 	namespace graphics {
 		// Forward declarations
 		class Renderer2D;
+	}
+
+	namespace graphics::DX {
+		// Forward declarations
+		class DeviceResources2D;
+	}
+
+	namespace graphics {
 		// Interfaces
 		/// <summary>Interface for objects that can be drawn.</summary>
 		class IDrawable {

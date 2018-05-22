@@ -74,6 +74,12 @@ namespace hoffman::isaiah {
 					throw std::runtime_error {"Can execute mutex does not exist."};
 				}
 				auto* my_game = game::g_my_game.get();
+				// Add debug enemy
+				my_game->init_enemy_types();
+				auto my_enemy = std::make_unique<game::Enemy>(my_game->getDeviceResources(),
+					my_game->getEnemyType(0), graphics::Color {0.f, 0.f, 0.f, 1.f}, my_game->getMap(),
+					1, 1);
+				game::g_my_game->addEnemy(std::move(my_enemy));
 
 				// Force creation of message queue
 				MSG msg;
@@ -193,13 +199,7 @@ namespace hoffman::isaiah {
 				return;
 			}
 			// Store in global variable --> It's the only way!
-			game::g_my_game = std::make_shared<game::MyGame>(ground_terrain_file, air_terrain_file);
-			// Add debug enemy
-			game::g_my_game->init_enemy_types();
-			auto my_enemy = std::make_unique<game::Enemy>(my_resources,
-				game::g_my_game->getEnemyType(0), graphics::Color {0.f, 0.f, 0.f, 1.f}, game::g_my_game->getMap(),
-				1, 1);
-			game::g_my_game->addEnemy(std::move(my_enemy));
+			game::g_my_game = std::make_shared<game::MyGame>(my_resources, ground_terrain_file, air_terrain_file);
 			// Show window
 			ShowWindow(this->hwnd, n_cmd_show);
 			UpdateWindow(this->hwnd);

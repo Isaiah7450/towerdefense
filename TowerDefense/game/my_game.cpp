@@ -11,6 +11,8 @@
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 #include "./../main.hpp"
+#include "./../graphics/graphics.hpp"
+#include "./../graphics/graphics_DX.hpp"
 #include "./../pathfinding/grid.hpp"
 #include "./../pathfinding/pathfinder.hpp"
 #include "./enemy_type.hpp"
@@ -21,7 +23,9 @@ namespace hoffman::isaiah {
 	namespace game {
 		std::shared_ptr<MyGame> g_my_game {nullptr};
 
-		MyGame::MyGame(std::wistream& ground_terrain_file, std::wistream& air_terrain_file) :
+		MyGame::MyGame(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
+			std::wistream& ground_terrain_file, std::wistream& air_terrain_file) :
+			device_resources {dev_res},
 			map {std::make_shared<GameMap>(ground_terrain_file, air_terrain_file)},
 			enemy_types {},
 			enemies {} {

@@ -32,7 +32,8 @@ namespace hoffman::isaiah {
 		class MyGame {
 			friend class graphics::Renderer2D;
 		public:
-			MyGame(std::wistream& ground_terrain_file, std::wistream& air_terrain_file);
+			MyGame(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
+				std::wistream& ground_terrain_file, std::wistream& air_terrain_file);
 			~MyGame() noexcept;
 			/// <summary>Resets the game's state.</summary>
 			void resetState() {
@@ -49,6 +50,9 @@ namespace hoffman::isaiah {
 			/// <param name="e">The enemy to add.</param>
 			void addEnemy(std::unique_ptr<Enemy>&& e);
 			// Getters
+			std::shared_ptr<graphics::DX::DeviceResources2D> getDeviceResources() const noexcept {
+				return this->device_resources;
+			}
 			GameMap& getMap() noexcept {
 				return *this->map;
 			}
@@ -59,6 +63,8 @@ namespace hoffman::isaiah {
 				return this->enemy_types.at(i);
 			}
 		private:
+			/// <summary>Shared pointer to the device resources.</summary>
+			std::shared_ptr<graphics::DX::DeviceResources2D> device_resources;
 			/// <summary>The game map being used by the program.</summary>
 			std::shared_ptr<GameMap> map {nullptr};
 			/// <summary>The list of enemy template types.</summary>
