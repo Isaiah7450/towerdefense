@@ -224,6 +224,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="file_util.hpp" />
     <ClInclude Include="game\enemy.hpp" />
     <ClInclude Include="game\enemy_type.hpp" />
     <ClInclude Include="game\game_object.hpp" />
@@ -249,6 +250,8 @@
     <ResourceCompile Include="resource.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="file_util.cpp" />
+    <ClCompile Include="game\data_loading.cpp" />
     <ClCompile Include="game\enemy.cpp" />
     <ClCompile Include="game\game_object.cpp" />
     <ClCompile Include="game\game_util.cpp" />

@@ -1,9 +1,12 @@
 #include "stdafx.h"
 #include "./globals.hpp"
+#include "./file_util.hpp"
 #include "./pathfinding/graph_node.hpp"
 #include "./pathfinding/grid.hpp"
 #include "./pathfinding/pathfinder.hpp"
 
+namespace ih = hoffman::isaiah;
+using namespace std::literals::string_literals;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace hoffman::isaiah {
@@ -179,6 +182,46 @@ public:
 			pathfinding::HeuristicStrategies::Manhattan);
 		Assert::IsTrue(pathfinder_d_b->checkPathExists());
 	}
+		};
+
+		TEST_CLASS(Datafiles) {
+		public:
+			TEST_METHOD(Datafile_Quoted_String) {
+				try {
+					std::wistringstream my_string {L"\"My Quoted Input\""s};
+					int line_number = 1;
+					auto result = ih::utility::file::getNextToken(my_string, line_number);
+					Assert::AreEqual(my_string.str(), result);
+					std::wistringstream my_second_str {L"\"My Escaped \\\" Quoted Input!\""s};
+					result = ih::utility::file::getNextToken(my_second_str, line_number);
+					Assert::AreEqual(my_second_str.str(), result);
+					/*
+					std::wistringstream my_third_str {L"\"My bad string\nwith a newline.\""s};
+					try {
+						ih::utility::file::getNextToken(my_third_str, line_number);
+						Assert::Fail(L"Expected an exception to be thrown.");
+					}
+					catch (const ih::utility::file::DataFileException&) {
+						// We're good!
+					}
+					catch (...) {
+						Assert::Fail(L"Wrong exception type thrown.");
+					}
+					*/
+					std::wistringstream my_fourth_str {L"\"My hack string cut\"off by a quote.\""s};
+					result = ih::utility::file::getNextToken(my_fourth_str, line_number);
+					Assert::AreEqual(L"\"My hack string cut\""s, result);
+					std::wistringstream my_fifth_str {L"\"My perfectly normal string with a \\ in it.\""s};
+					result = ih::utility::file::getNextToken(my_fifth_str, line_number);
+					Assert::AreEqual(my_fifth_str.str(), result);
+				}
+				catch (const ih::utility::file::DataFileException& e) {
+					Assert::Fail(e.what());
+				}
+				catch (...) {
+					Assert::Fail(L"An exception occurred.");
+				}
+			}
 		};
 	}
 }

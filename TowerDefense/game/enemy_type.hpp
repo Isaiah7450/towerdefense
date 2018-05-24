@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <iosfwd>
 #include "./../globals.hpp"
 #include "./../graphics/graphics.hpp"
 #include "./../graphics/shapes.hpp"
@@ -60,6 +61,10 @@ namespace hoffman::isaiah {
 			/// <returns>The rating associated with this buff. This is a value that is an
 			/// estimate of how much more threatening the enemy is due to the buff.</returns>
 			virtual double getRating() const noexcept = 0;
+
+			// Input/Output --> Defined in data_loading.cpp
+			friend std::wostream& operator<<(std::wostream& os, const BuffBase& data);
+			friend std::wistream& operator>>(std::wistream& is, BuffBase& data);
 		protected:
 			/// <summary>This function is called for each enemy that the buff
 			/// applies to when it is activated.</summary>
@@ -374,6 +379,9 @@ namespace hoffman::isaiah {
 			double getRating() const noexcept {
 				return this->getBaseRating() + this->getExtraRating();
 			}
+			// Input/Output --> data_loading.cpp
+			friend std::wostream& operator<<(std::wostream& os, const EnemyType& data);
+			friend std::wistream& operator>>(std::wistream& is, EnemyType& data);
 		protected:
 			/// <returns>The impact that the amount of damage an enemy can potentially deal has on
 			/// an enemy's rating.</returns>
