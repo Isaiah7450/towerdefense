@@ -161,6 +161,12 @@ namespace hoffman::isaiah {
 			bool canMoveDiagonally() const noexcept {
 				return this->move_diagonally;
 			}
+			std::vector<std::unique_ptr<StatusEffectBase>>& getActiveStatuses() noexcept {
+				return this->status_effects;
+			}
+			const std::vector<std::unique_ptr<StatusEffectBase>>& getActiveStatuses() const noexcept {
+				return this->status_effects;
+			}
 		protected:
 			// Setters/Changers
 			// Getters

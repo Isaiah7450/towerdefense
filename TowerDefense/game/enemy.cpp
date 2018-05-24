@@ -23,6 +23,18 @@ namespace hoffman::isaiah {
 		// enemy_type.hpp
 		BuffBase::~BuffBase() noexcept = default;
 
+		void BuffBase::update(Enemy& caller, std::vector<std::unique_ptr<Enemy>>& targets) {
+			++this->frames_since_last_tick;
+			if (this->isTimeToApply()) {
+				this->frames_since_last_tick -= this->frames_between_buff_ticks;
+				for (const auto& e : targets) {
+					if (this->isValidTarget(caller, *e)) {
+						this->apply(*e);
+					}
+				}
+			}
+		}
+
 		bool BuffBase::isValidTarget(const Enemy& caller, const Enemy& target) const {
 			const double dx = caller.getGameX() - target.getGameX();
 			const double dy = caller.getGameY() - target.getGameY();
@@ -38,29 +50,39 @@ namespace hoffman::isaiah {
 			return false;
 		}
 
-		void SmartBuff::apply(Enemy& caller, std::vector<std::unique_ptr<Enemy>>& enemies) {
-			if (this->updateAndCheckApply()) {
-				for (auto& target : enemies) {
-					if (this->isValidTarget(caller, *target)) {
-						// Apply buff by adding status effect
-						auto my_smart_effect = std::make_unique<SmartStrategyEffect>(this->getBuffDuration(),
-							pathfinding::HeuristicStrategies::Diagonal, true);
-						target->addStatus(std::move(my_smart_effect));
+		void SmartBuff::apply(Enemy& target) {
+			// Apply buff by adding status effect
+			auto my_smart_effect = std::make_unique<SmartStrategyEffect>(this->getBuffDuration(),
+				pathfinding::HeuristicStrategies::Diagonal, true);
+			target.addStatus(std::move(my_smart_effect));
+		}
+
+		void SpeedBuff::apply(Enemy& target) {
+			// Apply buff by adding status effect
+			auto my_speed_effect = std::make_unique<SpeedBoostEffect>(this->getBuffDuration(),
+				this->getWalkingBoost(), this->getRunningBoost(), this->getInjuredBoost());
+			target.addStatus(std::move(my_speed_effect));
+		}
+
+		void HealerBuff::apply(Enemy& target) {
+			target.heal(this->getHealAmount());
+		}
+
+		void PurifyBuff::apply(Enemy& target) {
+			std::vector<int> statuses_to_remove {};
+			auto& active_statuses = target.getActiveStatuses();
+			// Determine which statuses to remove
+			for (unsigned int i = 0; i < active_statuses.size(); ++i) {
+				if (!active_statuses[i]->isPositiveEffect()) {
+					statuses_to_remove.emplace_back(i);
+					if (statuses_to_remove.size() >= static_cast<unsigned>(this->getMaxEffectsRemoved())) {
+						break;
 					}
 				}
 			}
-		}
-
-		void SpeedBuff::apply(Enemy& caller, std::vector<std::unique_ptr<Enemy>>& enemies) {
-			if (this->updateAndCheckApply()) {
-				for (auto& target : enemies) {
-					if (this->isValidTarget(caller, *target)) {
-						// Apply buff by adding status effect
-						auto my_speed_effect = std::make_unique<SpeedBoostEffect>(this->getBuffDuration(),
-							this->getWalkingBoost(), this->getRunningBoost(), this->getInjuredBoost());
-						target->addStatus(std::move(my_speed_effect));
-					}
-				}
+			// Actually remove the statuses
+			for (unsigned int i = 0; i < statuses_to_remove.size(); ++i) {
+				active_statuses.erase(active_statuses.begin() + statuses_to_remove[i] - i);
 			}
 		}
 
@@ -90,12 +112,21 @@ namespace hoffman::isaiah {
 			this->changeDirection();
 			// Add buffs
 			for (auto& b : this->getBaseType().getBuffTypes()) {
-				// Ugh... I have to switch on the name cuz of template resolution
-				if (b->getName() == L"Intelligence"s) {
+				// This is obnoxious, but I think it works better
+				// than getting into some weird cloning stuff
+				switch (b->getType()) {
+				case BuffTypes::Intelligence:
 					this->buffs.emplace_back(std::make_unique<SmartBuff>(dynamic_cast<SmartBuff&>(*b)));
-				}
-				else if (b->getName() == L"Speed"s) {
+					break;
+				case BuffTypes::Speed:
 					this->buffs.emplace_back(std::make_unique<SpeedBuff>(dynamic_cast<SpeedBuff&>(*b)));
+					break;
+				case BuffTypes::Healer:
+					this->buffs.emplace_back(std::make_unique<HealerBuff>(dynamic_cast<HealerBuff&>(*b)));
+					break;
+				case BuffTypes::Purify:
+					this->buffs.emplace_back(std::make_unique<PurifyBuff>(dynamic_cast<PurifyBuff&>(*b)));
+					break;
 				}
 			}
 		}
@@ -107,9 +138,8 @@ namespace hoffman::isaiah {
 			}
 			// Apply buffs
 			for (auto& b : this->buffs) {
-				b->apply(*this, game::g_my_game->getEnemies());
+				b->update(*this, game::g_my_game->getEnemies());
 			}
-
 			// Apply status effects
 			std::vector<int> statuses_to_remove {};
 			for (unsigned int i = 0; i < this->status_effects.size(); ++i) {

@@ -16,7 +16,7 @@ namespace hoffman::isaiah {
 		// Converts a time in milliseconds into a number of logical frames
 		// that represent the same time span.
 		// time_in_ms : The time in milliseconds to convert.
-		constexpr double convert_milliseconds_to_frames(double time_in_ms) noexcept {
+		constexpr double convertMillisecondsToFrames(double time_in_ms) noexcept {
 			return time_in_ms / math::get_milliseconds_per_frame();
 		}
 

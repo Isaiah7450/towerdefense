@@ -105,25 +105,20 @@ namespace hoffman::isaiah {
 
 		void MyGame::init_enemy_types() {
 			// Dummy data
+			std::vector<std::wstring> target_names {
+				L"Test Enemy"
+			};
+			std::vector<std::shared_ptr<BuffBase>> my_buffs;
+			auto my_strategy_buff = std::make_shared<SmartBuff>(target_names, 1.0, 1000, 500);
+			my_buffs.emplace_back(std::move(my_strategy_buff));
 			auto my_type = std::make_shared<EnemyType>(L"Test Enemy", L"An enemy made for testing purposes.",
 				graphics::Color {1.f, 0.f, 0.f, 1.f}, graphics::shapes::ShapeTypes::Diamond,
 				1, 30.0, 5.0, 0.50, 0.75, 1.50, 2.50, 1.25, pathfinding::HeuristicStrategies::Manhattan,
-				false, false);
+				false, false, my_buffs);
 			this->enemy_types.emplace_back(my_type);
 		}
 
 		void MyGame::addEnemy(std::unique_ptr<Enemy>&& e) {
-#if 0
-			// Test status afflictions
-			auto my_poison_dot = std::make_unique<DoTEffect>(DoTDamageTypes::Poison, 10.0 / 300.0, 100, 300);
-			e->addStatus(std::move(my_poison_dot));
-			auto my_fire_dot = std::make_unique<DoTEffect>(DoTDamageTypes::Fire, 10.0 / 3.0, 500, 3);
-			e->addStatus(std::move(my_fire_dot));
-#endif
-			// Test strategy changes
-			auto my_smart_buff = std::make_unique<SmartStrategyEffect>(5000, pathfinding::HeuristicStrategies::Diagonal,
-				true);
-			e->addStatus(std::move(my_smart_buff));
 			this->enemies.emplace_back(std::move(e));
 		}
 	}

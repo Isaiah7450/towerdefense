@@ -14,6 +14,9 @@ namespace hoffman::isaiah {
 				this->frames_since_last_tick -= this->frames_between_ticks;
 				--this->total_ticks;
 				switch (this->type) {
+				case DoTDamageTypes::Heal:
+					e.heal(this->dmg_per_tick);
+					break;
 				case DoTDamageTypes::Fire:
 					e.takeDamage(this->dmg_per_tick, 0.5);
 					break;

@@ -14,6 +14,11 @@ namespace hoffman::isaiah {
 		// Forward declarations:
 		class Enemy;
 
+		/// <summary>Enumeration of valid types of buffs.</summary>
+		enum class BuffTypes {
+			Intelligence, Speed, Healer, Purify
+		};
+
 		// Note that any functions declared here that
 		// are not implemented here will be implemented
 		// in enemy.cpp
@@ -27,17 +32,19 @@ namespace hoffman::isaiah {
 			BuffBase(std::vector<std::wstring> target_names, double br, int ms_ticks) :
 				buff_names {target_names},
 				buff_radius {br},
-				frames_between_buff_ticks {math::convert_milliseconds_to_frames(ms_ticks)} {
+				frames_between_buff_ticks {math::convertMillisecondsToFrames(ms_ticks)} {
 			}
 			virtual ~BuffBase() noexcept;
-			/// <returns>Returns the name of the buff as
-			/// it would appear in user interfaces.</returns>
+			/// <returns>Returns the buff's type. (Useful for switch statements.)</returns>
+			virtual BuffTypes getType() const noexcept = 0;
+			// Generally speaking, this should be the same as the enumration constant
+			// with underscores replaced by spaces.
+			/// <returns>Returns the name of the buff as it would appear in user interfaces.</returns>
 			virtual std::wstring getName() const noexcept = 0;
-			/// <summary>Called once each turn. It applies
-			/// the buff to all applicable enemies.</summary>
-			/// <param name="caller">The enemy that activated the buff.</param>
+			/// <summary>Updates the state of the buff by one logic frame.</summary>
+			/// <param name="caller">The enemy that naturally radiates the buff.</param>
 			/// <param name="enemies">All of the enemies in the game.</param>
-			virtual void apply(Enemy& caller, std::vector<std::unique_ptr<Enemy>>& enemies) = 0;
+			void update(Enemy& caller, std::vector<std::unique_ptr<Enemy>>& enemies);
 
 			// Getters
 			std::vector<std::wstring> getTargetNames() const noexcept {
@@ -46,23 +53,21 @@ namespace hoffman::isaiah {
 			double getRadius() const noexcept {
 				return this->buff_radius;
 			}
-			double getMillisecondsBetweenApplications() const noexcept {
+			/// <returns>The time (in milliseconds) between applications of the buff.</returns>
+			double getTimeBetweenApplications() const noexcept {
 				return this->frames_between_buff_ticks * math::get_milliseconds_per_frame();
 			}
 			/// <returns>The rating associated with this buff. This is a value that is an
 			/// estimate of how much more threatening the enemy is due to the buff.</returns>
 			virtual double getRating() const noexcept = 0;
 		protected:
-			/// <param name="caller">The invoker of the buff.</param>
-			/// <param name="target">The potential target of the buff.</param>
-			/// <returns>True if the given target is a valid target for the buff.</returns>
-			bool isValidTarget(const Enemy& caller, const Enemy& target) const;
-			/// <summary>This updates the buff's status and checks if it can be applied again.</summary>
-			/// <returns>True if the buff can be applied now.</returns>
-			bool updateAndCheckApply() noexcept {
-				++this->frames_since_last_tick;
+			/// <summary>This function is called for each enemy that the buff
+			/// applies to when it is activated.</summary>
+			/// <param name="target">The target of the buff.</param>
+			virtual void apply(Enemy& target) = 0;
+			/// <returns>True if it is time for the buff to be applied; otherwise, false.</returns>
+			bool isTimeToApply() noexcept {
 				if (this->frames_since_last_tick >= this->frames_between_buff_ticks) {
-					this->frames_since_last_tick -= this->frames_between_buff_ticks;
 					return true;
 				}
 				return false;
@@ -71,8 +76,12 @@ namespace hoffman::isaiah {
 			/// radius of influence, time between activations, and the number of enemies it affects.</returns>
 			virtual double getBaseRating() const noexcept {
 				return this->getTargetNames().size() * this->getRadius() * this->getRadius() * math::pi
-					/ (this->getMillisecondsBetweenApplications() / 1000.0);
+					/ (this->getTimeBetweenApplications() / 1000.0);
 			}
+			/// <param name="caller">The invoker of the buff.</param>
+			/// <param name="target">The potential target of the buff.</param>
+			/// <returns>True if the given target is a valid target for the buff.</returns>
+			bool isValidTarget(const Enemy& caller, const Enemy& target) const;
 		private:
 			/// <summary>The names of enemies that are affected by the buff.</summary>
 			std::vector<std::wstring> buff_names;
@@ -112,16 +121,21 @@ namespace hoffman::isaiah {
 			SmartBuff(std::vector<std::wstring> target_names, double br, int ms_ticks, int bd) :
 				TemporaryBuffBase {target_names, br, ms_ticks, bd} {
 			}
+			// Implements BuffBase::getType()
+			BuffTypes getType() const noexcept override {
+				return BuffTypes::Intelligence;
+			}
 			// Implements BuffBase::getName()
 			std::wstring getName() const noexcept override {
 				return L"Intelligence";
 			}
-			// Implements BuffBase::apply()
-			void apply(Enemy& e, std::vector<std::unique_ptr<Enemy>>& enemies) override;
 			// Implements BuffBase::getRating()
 			double getRating() const noexcept override {
 				return this->getBaseRating() * math::get_sqrt(2.0);
 			}
+		protected:
+			// Implements BuffBase::apply()
+			void apply(Enemy& target) override;
 		private:
 		};
 
@@ -138,12 +152,14 @@ namespace hoffman::isaiah {
 				injured_boost {ib} {
 			}
 
+			// Implements BuffBase::getType()
+			BuffTypes getType() const noexcept override {
+				return BuffTypes::Speed;
+			}
 			// Implements BuffBase::getName()
 			std::wstring getName() const noexcept override {
 				return L"Speed";
 			}
-			// Implements BuffBase::apply()
-			void apply(Enemy& caller, std::vector<std::unique_ptr<Enemy>>& enemies) override;
 			// Implements BuffBase::getRating()
 			double getRating() const noexcept override {
 				return this->getBaseRating() * (1.0 + this->getWalkingBoost() * 0.5
@@ -159,6 +175,9 @@ namespace hoffman::isaiah {
 			double getInjuredBoost() const noexcept {
 				return this->injured_boost;
 			}
+		protected:
+			// Implements BuffBase::apply()
+			void apply(Enemy& target) override;
 		private:
 			/// <summary>The percentage increase to the enemy's walking speed boost
 			/// (expressed as a decimal).</summary>
@@ -169,6 +188,74 @@ namespace hoffman::isaiah {
 			/// <summary>The percentage increase to the enemy's injured speed boost
 			/// (expressed as a decimal).</summary>
 			double injured_boost;
+		};
+
+		/// <summary>Class that represents a buff where the enemy heals
+		/// applicable enemies by a static amount every so often.</summary>
+		class HealerBuff : public BuffBase {
+		public:
+			/// <param name="heal_amt">The amount of HP healed with each tick of the buff.</param>
+			HealerBuff(std::vector<std::wstring> target_names, double br, int ms_ticks,
+				double heal_amt) :
+				BuffBase {target_names, br, ms_ticks},
+				heal_amount {heal_amt} {
+				// Note that heal amount should be positive
+			}
+			// Implements BuffBase::getType()
+			BuffTypes getType() const noexcept override {
+				return BuffTypes::Healer;
+			}
+			// Implements BuffBase::heal()
+			std::wstring getName() const noexcept override {
+				return L"Healing";
+			}
+			// Implements BuffBase::getRating()
+			double getRating() const noexcept {
+				return this->getBaseRating() * this->getHealAmount();
+			}
+			// Getters
+			double getHealAmount() const noexcept {
+				return this->heal_amount;
+			}
+		protected:
+			// Implements BuffBase::apply()
+			void apply(Enemy& target) override;
+		private:
+			/// <summary>The amount that surrounding enemies are healed by each turn.</summary>
+			double heal_amount;
+		};
+
+		/// <summary>Class that represents a buff that purifies an enemy of
+		/// negative status effects.</summary>
+		class PurifyBuff : public BuffBase {
+		public:
+			/// <param name="cure_max">This buff will cure a maximum of this number of non-beneficial effects.</param>
+			PurifyBuff(std::vector<std::wstring> target_names, double br, int ms_ticks, int cure_max) :
+				BuffBase {target_names, br, ms_ticks},
+				max_cured {cure_max} {
+			}
+			// Implements BuffBase::getType()
+			BuffTypes getType() const noexcept override {
+				return BuffTypes::Purify;
+			}
+			// Implements BuffBase::getName()
+			std::wstring getName() const noexcept override {
+				return L"Cleansing";
+			}
+			// Implements BuffBase::getRating()
+			double getRating() const noexcept override {
+				return this->getBaseRating() * this->getMaxEffectsRemoved() * 0.75;
+			}
+			// Getters
+			int getMaxEffectsRemoved() const noexcept {
+				return this->max_cured;
+			}
+		protected:
+			// Implements BuffBase::apply()
+			void apply(Enemy& target) override;
+		private:
+			/// <summary>The maximum number of status effects cured.</summary>
+			int max_cured;
 		};
 
 		/// <summary>Template type used to create new enemies.</summary>

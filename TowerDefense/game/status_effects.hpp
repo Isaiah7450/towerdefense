@@ -22,14 +22,17 @@ namespace hoffman::isaiah {
 			/// <param name="e">The enemy that this is being called for.</param>
 			/// <returns>True if the status effect should be removed from the enemy.</returns>
 			virtual bool update(Enemy& e) = 0;
+			/// <returns>True if the status effect is considered beneficial to the enemy; otherwise, false.</returns>
+			virtual bool isPositiveEffect() const noexcept = 0;
 		private:
 		};
 
 		/// <summary>Enumeration of possible DoT damage types.</summary>
 		enum class DoTDamageTypes {
-			Poison, Fire
+			Poison, Fire, Heal
 		};
 
+		// Use DoTDamageTypes::Heal to use this as a healing effect
 		/// <summary>Class that represents a status effect that deals
 		/// damage over time.</summary>
 		class DoTEffect : public StatusEffectBase {
@@ -41,11 +44,15 @@ namespace hoffman::isaiah {
 			DoTEffect(DoTDamageTypes dt, double dmg_tick, int ms_tick, int t_ticks) :
 				type {dt},
 				dmg_per_tick {dmg_tick},
-				frames_between_ticks {math::convert_milliseconds_to_frames(ms_tick)},
+				frames_between_ticks {math::convertMillisecondsToFrames(ms_tick)},
 				total_ticks {t_ticks} {
 			}
 			// Implements StatusEffectBase::update()
-			bool update(Enemy& e);
+			bool update(Enemy& e) override;
+			// Implements StatusEffectBase::isPositiveEffect()
+			bool isPositiveEffect() const noexcept override {
+				return this->type == DoTDamageTypes::Heal;
+			}
 		private:
 			/// <summary>The type of damage dealt by this DoT.</summary>
 			DoTDamageTypes type;
@@ -67,12 +74,16 @@ namespace hoffman::isaiah {
 			/// expires.</param>
 			SmartStrategyEffect(int ms_til_expires, pathfinding::HeuristicStrategies new_strat,
 				bool diag_move_change) :
-				frames_until_expire {math::convert_milliseconds_to_frames(ms_til_expires)},
+				frames_until_expire {math::convertMillisecondsToFrames(ms_til_expires)},
 				strat {new_strat},
 				diag_change {diag_move_change} {
 			}
 			// Implements StatusEffectBase::update()
-			bool update(Enemy& e);
+			bool update(Enemy& e) override;
+			// Implements StatusEffectBase::isPositiveEffect()
+			bool isPositiveEffect() const noexcept override {
+				return true;
+			}
 		private:
 			/// <summary>The number of frames remaining until the status
 			/// effect expires.</summary>
@@ -99,11 +110,15 @@ namespace hoffman::isaiah {
 			/// <param name="sf">The slow-factor applied to the enemy; the enemy
 			/// will move this much slower.</param>
 			SlowEffect(double ms_til_expires, double sf) :
-				frames_until_expire {math::convert_milliseconds_to_frames(ms_til_expires)},
+				frames_until_expire {math::convertMillisecondsToFrames(ms_til_expires)},
 				speed_multiplier {1.0 - sf} {
 			}
 			// Implements StatusEffectBase::update()
-			bool update(Enemy& e);
+			bool update(Enemy& e) override;
+			// Implements StatusEffectBase::isPositiveEffect()
+			bool isPositiveEffect() const noexcept override {
+				return this->speed_multiplier > 1.0;
+			}
 		private:
 			/// <summary>The number of frames until the effect expires.</summary>
 			double frames_until_expire;
@@ -118,15 +133,21 @@ namespace hoffman::isaiah {
 		public:
 			/// <param name="ms_until_expires">The number of milliseconds until the effect expires.</param>
 			StunEffect(int ms_until_expires) :
-				frames_until_expire {math::convert_milliseconds_to_frames(ms_until_expires)} {
+				frames_until_expire {math::convertMillisecondsToFrames(ms_until_expires)} {
 			}
 			// Implements StatusEffectBase::update()
-			bool update(Enemy& e);
+			bool update(Enemy& e) override;
+			// Implements StatusEffectBase::isPositiveEffect()
+			bool isPositiveEffect() const noexcept override {
+				return false;
+			}
 		private:
 			/// <summary>The number of frames until the effect expires.</summary>
 			double frames_until_expire;
 		};
 
+		// I wouldn't recommend trying to use this to negatively impact
+		// the enemy. Still, it is possible.
 		/// <summary>This class represents a status effect that increases
 		/// the speed of an enemy.</summary>
 		class SpeedBoostEffect : public StatusEffectBase {
@@ -140,13 +161,20 @@ namespace hoffman::isaiah {
 			/// <param name="ib">The percentage increase to the enemy's injured speed boost.
 			/// (Expressed as a decimal, and note that 1.0 will be added to this value.)</param>
 			SpeedBoostEffect(int ms_until_expires, double wb, double rb, double ib) :
-				frames_until_expire {math::convert_milliseconds_to_frames(ms_until_expires)},
+				frames_until_expire {math::convertMillisecondsToFrames(ms_until_expires)},
 				walking_boost {1.0 + wb},
 				running_boost {1.0 + rb},
 				injured_boost {1.0 + ib} {
+				// Probably should throw an exception if the value is negative;
+				// Don't try to use this as a knockback effect; this game is not
+				// designed for such an effect!
 			}
 			// Implements StatusEffectBase::update()
-			bool update(Enemy& e);
+			bool update(Enemy& e) override;
+			// Implements StatusEffectBase::isPositiveEffect()
+			bool isPositiveEffect() const noexcept override {
+				return math::get_avg(this->walking_boost, this->running_boost, this->injured_boost) > 1.0;
+			}
 		private:
 			/// <summary>The number of logical frames remaining before the effect
 			/// expires.</summary>
