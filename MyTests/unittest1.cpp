@@ -222,11 +222,11 @@ public:
 				try {
 					std::wistringstream my_string {L"\"My Quoted Input\""s};
 					int line_number = 1;
-					auto result = ih::utility::file::getNextToken(my_string, line_number);
-					Assert::AreEqual(my_string.str(), result);
-					std::wistringstream my_second_str {L"\"My Escaped \\\" Quoted Input!\""s};
-					result = ih::utility::file::getNextToken(my_second_str, line_number);
-					Assert::AreEqual(my_second_str.str(), result);
+					auto result = ih::utility::file::getNextToken(my_string, line_number).second;
+					Assert::AreEqual(L"My Quoted Input"s, result);
+					std::wistringstream my_second_str {L"\"My \\\"Escaped\\\" Quoted Input!\""s};
+					result = ih::utility::file::getNextToken(my_second_str, line_number).second;
+					Assert::AreEqual(L"My \"Escaped\" Quoted Input!"s, result);
 					/*
 					std::wistringstream my_third_str {L"\"My bad string\nwith a newline.\""s};
 					try {
@@ -241,11 +241,13 @@ public:
 					}
 					*/
 					std::wistringstream my_fourth_str {L"\"My hack string cut\"off by a quote.\""s};
-					result = ih::utility::file::getNextToken(my_fourth_str, line_number);
-					Assert::AreEqual(L"\"My hack string cut\""s, result);
+					result = ih::utility::file::getNextToken(my_fourth_str, line_number).second;
+					Assert::AreEqual(L"My hack string cut"s, result);
 					std::wistringstream my_fifth_str {L"\"My perfectly normal string with a \\ in it.\""s};
-					result = ih::utility::file::getNextToken(my_fifth_str, line_number);
-					Assert::AreEqual(my_fifth_str.str(), result);
+					result = ih::utility::file::getNextToken(my_fifth_str, line_number).second;
+					Assert::AreEqual(L"My perfectly normal string with a \\ in it."s, result);
+					std::wistringstream my_sixth_str {L"\"My \\\"\\\"double quoted\\\"\\\" string\""s};
+					result = ih::utility::file::getNextToken(my_sixth_str, line_number).second;
 				}
 				catch (const ih::utility::file::DataFileException& e) {
 					Assert::Fail(e.what());

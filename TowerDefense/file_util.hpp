@@ -3,6 +3,7 @@
 // File Created: May 24, 2018
 #include <string>
 #include <iosfwd>
+#include <utility>
 
 namespace hoffman::isaiah {
 	namespace utility::file {
@@ -21,12 +22,23 @@ namespace hoffman::isaiah {
 			std::wstring message;
 		};
 
+		/// <summary>The various types of tokens that can be returned by the parser.</summary>
+		enum class TokenTypes {
+			// Identifier --> Raw text, Section --> [bracketed_text]
+			// String --> "Quoted text", Number --> [0-9]{1,}
+			// List --> <Bracketed List>, Object --> {Object}
+			Identifier, Section, String, Number, List, Object, End_Of_File
+		};
+
 		/// <summary>Obtains the next token in the input stream.</summary>
 		/// <param name="is">The input stream to parse.</param>
 		/// <param name="line">The current line number. (This may be modified
 		/// by the parser.)</param>
-		/// <returns>The parsed token.</returns>
-		std::wstring getNextToken(std::wistream& is, int& line);
+		/// <returns>The parsed token, and its corresponding type.</returns>
+		std::pair<TokenTypes, std::wstring> getNextToken(std::wistream& is, int& line);
+		/// <summary>Skips past comments in the input stream.</summary>
+		/// <param name="is">The input stream to parse.</param>
+		void skipComments(std::wistream& is);
 		/// <summary>Obtains a token surrounded in quotes from the input stream.</summary>
 		/// <param name="is">The input stream to parse.</param>
 		/// <param name="buffer">The buffer containing the initial input.</param>
@@ -34,9 +46,6 @@ namespace hoffman::isaiah {
 		/// <returns>The token that was surrounded in quotes with the \" escape sequence
 		/// expanded.</returns>
 		std::wstring getQuotedToken(std::wistream& is, std::wstring buffer, const int& line);
-		/// <summary>Skips past comments in the input stream.</summary>
-		/// <param name="is">The input stream to parse.</param>
-		void skipComments(std::wistream& is);
 		/// <summary>Attempts to parse the next token as a section
 		/// header in the configuration file, and checks if it matches
 		/// the expected input.</summary>
