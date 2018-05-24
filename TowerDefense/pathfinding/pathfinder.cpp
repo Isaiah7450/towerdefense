@@ -105,11 +105,17 @@ namespace hoffman::isaiah {
 			}
 			// Construct path by following the parent nodes
 			auto path_node = my_set.top();
-			ret_value.push(&path_node->getGraphNode());
+			// We really don't need the starting node because we know
+			// where we are starting.
+			// In fact, it hurts the AI by making them backtrack if they have to recalculate
+			// their paths.
 			std::shared_ptr<PathFinderNode> path_parent = nullptr;
 			while ((path_parent = path_node->getParentNode()) != nullptr) {
-				ret_value.push(&path_node->getGraphNode());
-				path_node = path_parent;
+				if (path_parent->getGameX() != path_node->getGameX()
+					|| path_parent->getGameY() != path_node->getGameY()) {
+					ret_value.push(&path_node->getGraphNode());
+					path_node = path_parent;
+				}
 			}
 			ret_value.push(&path_node->getGraphNode());
 			// Clear the priority queue
