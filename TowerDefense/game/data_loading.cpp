@@ -61,7 +61,10 @@ namespace hoffman::isaiah {
 					std::vector<std::wstring> target_names = util::file::parseList(my_token, data_file, line);
 					buff_target_groups.emplace(group_name, target_names);
 				}
-			} // End Buff Targets Section
+			}
+			else {
+				my_token = util::file::getNextToken(data_file, line);
+			}
 			do {
 				// Enemy Sections
 				if (!util::file::matchToken(util::file::TokenTypes::Section, L"enemy"s, my_token)) {

@@ -39,10 +39,10 @@ namespace hoffman::isaiah {
 		/// by the parser.)</param>
 		/// <returns>The parsed token, and its corresponding type.</returns>
 		std::pair<TokenTypes, std::wstring> getNextToken(std::wistream& is, int& line);
-		/// <summary>Strips leading white-space from the provided string.</summary>
-		/// <param name="buffer">The string to remove leading white-space from.</param>
-		/// <param name="line">The current line number.</param>
-		void stripLeadingWhitespace(std::wstring& buffer, int& line);
+		/// <param name="is">The input stream to parse.</param>
+		/// <param name="line">The current line number. (This may be modified
+		/// by the parser.)</param>
+		void updateLineCount(std::wistream& is, int& line);
 		/// <summary>Skips past comments in the input stream.</summary>
 		/// <param name="is">The input stream to parse.</param>
 		void skipComments(std::wistream& is);
@@ -52,7 +52,7 @@ namespace hoffman::isaiah {
 		/// <param name="line">The current line number.</param>
 		/// <returns>The token that was surrounded in quotes with the \" escape sequence
 		/// expanded.</returns>
-		std::wstring getQuotedToken(std::wistream& is, std::wstring buffer, const int& line);
+		std::wstring getQuotedToken(std::wistream& is, std::wstring buffer, int& line);
 		/// <summary>Determines if the provided token matches what is expected.</summary>
 		/// <param name="expected_type">The expected type of token.</param>
 		/// <param name="expected_input">The expected content of the token.</param>

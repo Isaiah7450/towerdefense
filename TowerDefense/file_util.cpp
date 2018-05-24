@@ -15,23 +15,23 @@ namespace hoffman::isaiah {
 		std::pair<TokenTypes, std::wstring> getNextToken(std::wistream& is, int& line) {
 			std::wstring next {};
 			is >> next;
-			stripLeadingWhitespace(next, line);
 			if (is.eof()) {
 				return std::make_pair(TokenTypes::End_Of_File, L""s);
 			}
-			else if (next[next.size() - 1] == L'\n') {
-				next.erase(next.end() - 1);
+			else if (is.peek() == L'\n') {
+				updateLineCount(is, line);
+			}
+			if (next[0] == '#' || next[0] == ';') {
+				skipComments(is);
 				++line;
+				// Recursive call after skipping comments
+				return getNextToken(is, line);
+			}
+			else if (next == L""s) {
+				return std::make_pair(TokenTypes::End_Of_File, L""s);
 			}
 			if (next[0] == '"') {
 				return std::make_pair(TokenTypes::String, getQuotedToken(is, next, line));
-			}
-			else if (next[0] == '#' || next[0] == ';') {
-				if (next[next.size() - 1] != '\n') {
-					skipComments(is);
-				}
-				// Recursive call after skipping comments
-				return getNextToken(is, line);
 			}
 			if (next[next.size() - 1] == L',') {
 				// Commas are generally optional so they are stripped
@@ -93,30 +93,30 @@ namespace hoffman::isaiah {
 			return std::make_pair(TokenTypes::Identifier, next);
 		}
 
-		void stripLeadingWhitespace(std::wstring& buffer, int& line) {
-			for (unsigned int i = 0; i < buffer.size(); ++i) {
-				if (buffer[i] == L'\r' || buffer[i] == L'\n'
-					|| buffer[i] == L' ' || buffer[i] == L'\t') {
-					if (buffer[i] == L'\n') {
-						++line;
-					}
-					buffer.erase(buffer.begin() + i);
-					--i;
+		void updateLineCount(std::wistream& is, int& line) {
+			auto old_pos = is.tellg();
+			wchar_t lookahead = 0;
+			lookahead = is.get();
+			while (!is.eof() && (lookahead == L'\n'
+				|| lookahead == L' ' || lookahead == L'\r'
+				|| lookahead == L'\t')) {
+				if (lookahead == L'\n') {
+					++line;
 				}
-				else {
-					break;
-				}
+				lookahead = is.get();
 			}
+			is.seekg(old_pos);
+			++line;
 		}
 
 		void skipComments(std::wistream& is) {
 			std::wstring buffer {};
 			do {
 				is >> buffer;
-			} while (!is.eof() && buffer[buffer.size() - 1] != '\n');
+			} while (!is.eof() && is.peek() != L'\n');
 		}
 
-		std::wstring getQuotedToken(std::wistream& is, std::wstring buffer, const int& line) {
+		std::wstring getQuotedToken(std::wistream& is, std::wstring buffer, int& line) {
 			bool found_end = false;
 			bool is_first = true;
 			std::wstring next {buffer};
@@ -138,10 +138,9 @@ namespace hoffman::isaiah {
 					else if (lookahead_char == L'"') {
 						next.erase(next.begin() + i);
 					}
-					else if (lookahead_char == L'\n') {
-						// Illegal character found!
-						throw DataFileException {L"Newlines cannot appear in quoted strings."s, line};
-					}
+				}
+				if (is.peek() == L'\n') {
+					updateLineCount(is, line);
 				}
 				if (is_first) {
 					next.erase(next.begin());
@@ -207,7 +206,8 @@ namespace hoffman::isaiah {
 				throw DataFileException {L"Expected an equal sign after the key's name."s, line};
 			}
 			my_token = getNextToken(is, line);
-			if (!matchToken(TokenTypes::Object, L"{"s, my_token)) {
+			if (!matchToken(TokenTypes::Object, L"{"s, my_token)
+				&& !matchToken(TokenTypes::Object, L"{}"s, my_token)) {
 				throw DataFileException {L"Expected an opening brace following the equal sign."s, line};
 			}
 			return !matchTokenValue(L"{}"s, my_token.second);
@@ -236,10 +236,15 @@ namespace hoffman::isaiah {
 
 		std::vector<std::wstring> parseList(std::pair<TokenTypes, std::wstring> token, std::wistream& is, int& line) {
 			std::vector<std::wstring> list_items {};
+			int start_line = line;
 			do {
 				list_items.emplace_back(token.second);
 				token = util::file::getNextToken(is, line);
-			} while (token.first != util::file::TokenTypes::List);
+			} while (token.second != L""s && token.first != util::file::TokenTypes::List);
+			if (token.second == L""s) {
+				line = start_line;
+			}
+			list_items.emplace_back(token.second);
 			return list_items;
 		}
 
