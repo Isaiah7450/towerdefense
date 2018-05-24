@@ -222,18 +222,18 @@ public:
 				try {
 					std::wistringstream my_string {L"\"My Quoted Input\""s};
 					int line_number = 1;
-					auto result = ih::utility::file::getNextToken(my_string, line_number).second;
+					auto result = ih::util::file::getNextToken(my_string, line_number).second;
 					Assert::AreEqual(L"My Quoted Input"s, result);
 					std::wistringstream my_second_str {L"\"My \\\"Escaped\\\" Quoted Input!\""s};
-					result = ih::utility::file::getNextToken(my_second_str, line_number).second;
+					result = ih::util::file::getNextToken(my_second_str, line_number).second;
 					Assert::AreEqual(L"My \"Escaped\" Quoted Input!"s, result);
 					/*
 					std::wistringstream my_third_str {L"\"My bad string\nwith a newline.\""s};
 					try {
-						ih::utility::file::getNextToken(my_third_str, line_number);
+						ih::util::file::getNextToken(my_third_str, line_number);
 						Assert::Fail(L"Expected an exception to be thrown.");
 					}
-					catch (const ih::utility::file::DataFileException&) {
+					catch (const ih::util::file::DataFileException&) {
 						// We're good!
 					}
 					catch (...) {
@@ -241,15 +241,15 @@ public:
 					}
 					*/
 					std::wistringstream my_fourth_str {L"\"My hack string cut\"off by a quote.\""s};
-					result = ih::utility::file::getNextToken(my_fourth_str, line_number).second;
+					result = ih::util::file::getNextToken(my_fourth_str, line_number).second;
 					Assert::AreEqual(L"My hack string cut"s, result);
 					std::wistringstream my_fifth_str {L"\"My perfectly normal string with a \\ in it.\""s};
-					result = ih::utility::file::getNextToken(my_fifth_str, line_number).second;
+					result = ih::util::file::getNextToken(my_fifth_str, line_number).second;
 					Assert::AreEqual(L"My perfectly normal string with a \\ in it."s, result);
 					std::wistringstream my_sixth_str {L"\"My \\\"\\\"double quoted\\\"\\\" string\""s};
-					result = ih::utility::file::getNextToken(my_sixth_str, line_number).second;
+					result = ih::util::file::getNextToken(my_sixth_str, line_number).second;
 				}
-				catch (const ih::utility::file::DataFileException& e) {
+				catch (const ih::util::file::DataFileException& e) {
 					Assert::Fail(e.what());
 				}
 				catch (...) {
