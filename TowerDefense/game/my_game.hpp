@@ -44,6 +44,7 @@ namespace hoffman::isaiah {
 			/// <summary>Updates the state of the game in some way for debugging reasons.</summary>
 			/// <param name="cause">The reason to update the game state.</param>
 			void debug_update(DebugUpdateStates cause);
+			// Note: Defined in data_loading.cpp
 			/// <summary>Initializes the list of enemy types in this game.</summary>
 			void init_enemy_types();
 			/// <summary>Adds an enemy to the game.</summary>
