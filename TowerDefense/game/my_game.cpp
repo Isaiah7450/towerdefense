@@ -106,15 +106,21 @@ namespace hoffman::isaiah {
 		void MyGame::init_enemy_types() {
 			// Dummy data
 			std::vector<std::wstring> target_names {
-				L"Test Enemy"
+				L"Test Enemy",
+				L"Test Enemy 2"
 			};
 			std::vector<std::shared_ptr<BuffBase>> my_buffs;
-			auto my_strategy_buff = std::make_shared<SmartBuff>(target_names, 1.0, 1000, 500);
+			auto my_strategy_buff = std::make_shared<SmartBuff>(target_names, 5.0, 1000, 500);
 			my_buffs.emplace_back(std::move(my_strategy_buff));
 			auto my_type = std::make_shared<EnemyType>(L"Test Enemy", L"An enemy made for testing purposes.",
 				graphics::Color {1.f, 0.f, 0.f, 1.f}, graphics::shapes::ShapeTypes::Diamond,
 				1, 30.0, 5.0, 0.50, 0.75, 1.50, 2.50, 1.25, pathfinding::HeuristicStrategies::Manhattan,
 				false, false, my_buffs);
+			this->enemy_types.emplace_back(my_type);
+			my_type = std::make_shared<EnemyType>(L"Test Enemy 2", L"Another enemy made for testing purposes.",
+				graphics::Color {1.f, 0.5f, 0.f, 1.f}, graphics::shapes::ShapeTypes::Triangle,
+				1, 25.0, 0.0, 0.00, 0.75, 1.00, 1.00, 1.00, pathfinding::HeuristicStrategies::Manhattan,
+				false, false);
 			this->enemy_types.emplace_back(my_type);
 		}
 
