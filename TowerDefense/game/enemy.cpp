@@ -92,7 +92,7 @@ namespace hoffman::isaiah {
 			const GameMap& gmap, int level, int difficulty) :
 			GameObject {dev_res, etype->getShape(), o_color, etype->getColor(),
 			gmap.getTerrainGraph(etype->isFlying()).getStartNode()->getGameX() + 0.5,
-			gmap.getTerrainGraph(etype->isFlying()).getStartNode()->getGameY() + 0.5, 0.7, 0.7},
+			gmap.getTerrainGraph(etype->isFlying()).getStartNode()->getGameY() + 0.5, 0.5, 0.5},
 			base_type {etype},
 			my_pathfinder {gmap, etype->isFlying(), etype->canMoveDiagonally(), etype->getDefaultStrategy()},
 			my_path {},
@@ -187,8 +187,8 @@ namespace hoffman::isaiah {
 			constexpr const graphics::Color health_fill_color {0.8f, 0.0f, 0.0f, 0.9f};
 			constexpr const graphics::Color armor_fill_color {0.0f, 0.0f, 0.8f, 0.9f};
 			const double hp_percent = this->getHealthPercentage();
-			const float bar_max_width = 0.63f * graphics::getGameSquareWidth<float>();
-			const float bar_height = 0.075f * graphics::getGameSquareHeight<float>();
+			const float bar_max_width = 0.4f * graphics::getGameSquareWidth<float>();
+			const float bar_height = 0.115f * graphics::getGameSquareHeight<float>();
 			const float hp_bar_offset = 5.5f * graphics::screen_height / 645.f;
 			const float hp_bar_start_x = static_cast<float>(this->getScreenX()) - bar_max_width / 2.f;
 			const float hp_bar_end_x = static_cast<float>(hp_bar_start_x + hp_percent * bar_max_width);
