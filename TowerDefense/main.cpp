@@ -12,6 +12,7 @@
 #include <iostream>
 #include "./globals.hpp"
 #include "./ih_math.hpp"
+#include "./file_util.hpp"
 #include "./main.hpp"
 #include "./graphics/graphics_DX.hpp"
 #include "./graphics/graphics.hpp"
@@ -123,8 +124,12 @@ namespace hoffman::isaiah {
 				CloseHandle(update_event);
 				CloseHandle(sync_mutex);
 			}
+			catch (const util::file::DataFileException& e) {
+				MessageBox(nullptr, e.what(), L"Error loading data file", MB_OK | MB_ICONEXCLAMATION);
+				std::exit(1);
+			}
 			catch (...) {
-				return 1;
+				std::exit(1);
 			}
 			return 0;
 		}
