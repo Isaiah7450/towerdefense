@@ -154,6 +154,38 @@ public:
 		Assert::AreEqual(3, new_graph.getNode(0, 1).getWeight());
 	}
 
+	// Tests Pathfinder::findPath
+	TEST_METHOD(Pathfinder_Pathfinder_Find_Path) {
+		auto terrain_graph_a = pathfinding::Grid {0, 0, 4, 4, {
+			{   1,   1,   1, 100,   1},
+			{   1, 100, 100,   1,   1},
+			{   1, 100,   1,  10,   1},
+			{   1,   1,   1, 100,   1},
+			{ 100, 100,   1,   1,   1}
+		}};
+		terrain_graph_a.setStartNode(0, 0);
+		terrain_graph_a.setGoalNode(4, 0);
+		auto filter_graph_a = pathfinding::Grid {5, 5};
+		auto influence_graph = pathfinding::Grid {5, 5};
+		auto pathfinder_a = std::make_unique<pathfinding::Pathfinder>(terrain_graph_a, filter_graph_a, influence_graph, false,
+			pathfinding::HeuristicStrategies::Manhattan);
+		try {
+			auto path = pathfinder_a->findPath();
+			Assert::AreEqual(size_t {13}, path.size());
+			path = pathfinder_a->findPath(5.0);
+			Assert::AreEqual(size_t {11}, path.size());
+			path = pathfinder_a->findPath(1.0, -1, -1, 4, 4);
+			Assert::AreEqual(size_t {9}, path.size());
+			path = pathfinder_a->findPath(1.0, 3, 1);
+			Assert::AreEqual(size_t {3}, path.size());
+			path = pathfinder_a->findPath(1.0, 3, 1, 4, 4);
+			Assert::AreEqual(size_t {5}, path.size());
+		}
+		catch (...) {
+			Assert::Fail(L"An exception was thrown.");
+		}
+	}
+
 	// Tests Pathfinder::checkPathExists() method of pathfinder
 	TEST_METHOD(Pathfinder_Pathfinder_Path_Exists) {
 		auto terrain_graph_a = pathfinding::Grid {0, 0, 4, 4, {
