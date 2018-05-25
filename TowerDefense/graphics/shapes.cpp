@@ -20,9 +20,9 @@ namespace hoffman::isaiah {
 
 		void Shape2DBase::recreateGeometry() {
 			auto my_translate = D2D1::Matrix3x2F::Translation({this->h_translate, this->v_translate});
-			auto my_rotate = D2D1::Matrix3x2F::Scale({this->h_scale, this->v_scale});
-			auto my_scale = D2D1::Matrix3x2F::Rotation(math::convert_to_degrees<float>(this->theta),
+			auto my_rotate = D2D1::Matrix3x2F::Rotation(math::convert_to_degrees<float>(this->theta),
 				D2D1::Point2F(this->center_sx, this->center_sy));
+			auto my_scale = D2D1::Matrix3x2F::Scale({this->h_scale, this->v_scale});
 			auto my_transform = my_rotate * my_translate * my_scale;
 			this->device_resources->getFactory()->CreateTransformedGeometry(this->path_geometry,
 				my_transform, &this->transformed_geometry);
