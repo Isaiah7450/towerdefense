@@ -250,14 +250,21 @@ namespace hoffman::isaiah {
 
 		void Enemy::changeStrategy(const GameMap& gmap,
 			pathfinding::HeuristicStrategies new_strat, bool diag_move) {
+			if (this->my_path.size() == 1) {
+				// It kinda is pointless to do here...
+				// It also solves one bug where the enemy tries
+				// to change strategies endlessly when they reach
+				// the goal.
+				return;
+			}
 			this->current_strat = new_strat;
 			this->move_diagonally = diag_move;
 			// Obtain new path
 			this->my_pathfinder = pathfinding::Pathfinder {gmap, this->getBaseType().isFlying(),
 				diag_move, new_strat};
 			this->my_path = this->my_pathfinder.findPath(1.0,
-				static_cast<int>(this->getGameX()),
-				static_cast<int>(this->getGameY()));
+				static_cast<int>(std::floor(this->getGameX())),
+				static_cast<int>(std::floor(this->getGameY())));
 			this->current_node = this->my_path.front();
 			this->my_path.pop();
 			this->changeDirection();

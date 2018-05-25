@@ -57,6 +57,8 @@ namespace hoffman::isaiah {
 			if (start_x != -1 && start_y != -1) {
 				this->start_node = &this->terrain_graph.getNode(start_x, start_y);
 			}
+			const auto oldStartWeight = this->start_node->getWeight();
+			this->start_node->setWeight(1);
 			if (goal_x != -1 && goal_y != -1) {
 				this->goal_node = &this->terrain_graph.getNode(goal_x, goal_y);
 			}
@@ -124,6 +126,7 @@ namespace hoffman::isaiah {
 			// Reset the start and end nodes
 			if (start_x != -1 && start_y != -1) {
 				this->start_node = this->terrain_graph.getStartNode();
+				this->start_node->setWeight(oldStartWeight);
 			}
 			if (goal_x != -1 && goal_y != -1) {
 				this->goal_node = this->terrain_graph.getGoalNode();
