@@ -31,7 +31,12 @@ namespace hoffman::isaiah {
 				return std::make_pair(TokenTypes::End_Of_File, L""s);
 			}
 			if (next[0] == '"') {
-				return std::make_pair(TokenTypes::String, getQuotedToken(is, next, line));
+				auto my_str = getQuotedToken(is, next, line);
+				if (my_str[my_str.size() - 1] == L'>') {
+					my_str.erase(my_str.end() - 1);
+					return std::make_pair(TokenTypes::List, my_str);
+				}
+				return std::make_pair(TokenTypes::String, my_str);
 			}
 			if (next[next.size() - 1] == L',') {
 				// Commas are generally optional so they are stripped
@@ -132,7 +137,13 @@ namespace hoffman::isaiah {
 						// Yeah, not the best solution, but the easiest
 						// plus I don't really need to super support
 						// escape sequences anyway.
-						next.erase(next.begin() + i + 1, next.end());
+						if (next[i + 2] == L'>') {
+							next.erase(next.begin() + i + 3, next.end());
+							next.erase(next.begin() + i + 1);
+						}
+						else {
+							next.erase(next.begin() + i + 1, next.end());
+						}
 						break;
 					}
 					else if (lookahead_char == L'"') {
@@ -237,10 +248,15 @@ namespace hoffman::isaiah {
 		std::vector<std::wstring> parseList(std::pair<TokenTypes, std::wstring> token, std::wistream& is, int& line) {
 			std::vector<std::wstring> list_items {};
 			int start_line = line;
+			if (token.second[token.second.size() - 1] == L'>') {
+				token.second.erase(token.second.end() - 1);
+				list_items.emplace_back(token.second);
+				return list_items;
+			}
 			do {
 				list_items.emplace_back(token.second);
 				token = util::file::getNextToken(is, line);
-			} while (token.second != L""s && token.first != util::file::TokenTypes::List);
+			} while (token.second != L""s && !matchTokenType(TokenTypes::List, token.first));
 			if (token.second == L""s) {
 				line = start_line;
 			}

@@ -61,6 +61,10 @@ namespace hoffman::isaiah {
 					}
 					std::vector<std::wstring> target_names = util::file::parseList(my_token, data_file, line);
 					buff_target_groups.emplace(group_name, target_names);
+					my_token = util::file::getNextToken(data_file, line);
+					if (!util::file::matchToken(util::file::TokenTypes::Object, L"}"s, my_token)) {
+						throw util::file::DataFileException {L"Missing ending brace (})."s, line};
+					}
 				}
 			}
 			else {
@@ -242,6 +246,7 @@ namespace hoffman::isaiah {
 					} while (!util::file::matchToken(util::file::TokenTypes::Object, L"}"s, my_token));
 					auto my_type = std::make_unique<EnemyType>(n, d, c, st, dmg, hp, ahp, ar, pt,
 						wspd, rspd, ispd, strat, move_diag, fly, std::move(my_buffs));
+					this->enemy_types.emplace_back(std::move(my_type));
 				}
 				else {
 					auto my_type = std::make_unique<EnemyType>(n, d, c, st, dmg, hp, ahp, ar, pt,
