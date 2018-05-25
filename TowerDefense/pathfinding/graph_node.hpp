@@ -2,6 +2,7 @@
 // File Author: Isaiah Hoffman
 // File Created: March 23, 2018
 #include <memory>
+#include <cmath>
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 
@@ -156,7 +157,7 @@ namespace hoffman::isaiah {
 					// between any two points (d = sqrt((x2 - x1)^2 + (y2 - y1)^2))
 					// The only problem is that one cannot move in all directions in this game
 					// so using Euclidean distances actually wastes time!
-					this->h = math::get_sqrt(dx * dx + dy * dy) * h_modifier;
+					this->h = std::sqrt(dx * dx + dy * dy) * h_modifier;
 					break;
 				case HeuristicStrategies::Diagonal:
 					// Diagonal shortcut which is generally used

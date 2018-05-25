@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 #include <iosfwd>
+#include <cmath>
 #include "./../globals.hpp"
 #include "./../graphics/graphics.hpp"
 #include "./../graphics/shapes.hpp"
@@ -379,7 +380,7 @@ namespace hoffman::isaiah {
 			/// <returns>The impact that the amount of damage an enemy can potentially deal has on
 			/// an enemy's rating.</returns>
 			double getDamageMultiplier() const noexcept {
-				return math::get_sqrt(this->getDamage());
+				return std::sqrt(this->getDamage());
 			}
 			/// <returns>The impact that being able to move diagonally has on an enemy's rating.</returns>
 			double getDiagonalMultiplier() const noexcept {

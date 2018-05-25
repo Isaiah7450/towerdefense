@@ -38,7 +38,7 @@ namespace hoffman::isaiah {
 		bool BuffBase::isValidTarget(const Enemy& caller, const Enemy& target) const {
 			const double dx = caller.getGameX() - target.getGameX();
 			const double dy = caller.getGameY() - target.getGameY();
-			if (math::get_sqrt(dx * dx + dy * dy) <= this->getRadius()) {
+			if (std::sqrt(dx * dx + dy * dy) <= this->getRadius()) {
 				// Check name
 				auto valid_names = this->getTargetNames();
 				for (const auto& n : valid_names) {
@@ -161,7 +161,7 @@ namespace hoffman::isaiah {
 			}
 			const double dx = (this->getNextNode()->getGameX() + 0.5) - this->getGameX();
 			const double dy = (this->getNextNode()->getGameY() + 0.5) - this->getGameY();
-			bool update_next_node = math::get_sqrt(dx * dx + dy * dy) <= my_speed + 0.05 / game::logic_framerate;
+			bool update_next_node = std::sqrt(dx * dx + dy * dy) <= my_speed + 0.05 / game::logic_framerate;
 			if (update_next_node) {
 				// Change path
 				if (this->my_path.size() == 1) {
