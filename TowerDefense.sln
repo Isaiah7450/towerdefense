@@ -16,17 +16,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyTests", "MyTests\MyTests.
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{6CCFBAFF-50F3-417A-82E8-543D1DD6184B}"
-	ProjectSection(SolutionItems) = preProject
-		bin\resources\enemies.xml = bin\resources\enemies.xml
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "schemas", "schemas", "{8E96A016-D6F0-47EC-8D14-A228E81E1122}"
-	ProjectSection(SolutionItems) = preProject
-		bin\resources\schemas\data_schema.xsd = bin\resources\schemas\data_schema.xsd
-		bin\resources\schemas\enemy_schema.xsd = bin\resources\schemas\enemy_schema.xsd
-		bin\resources\schemas\level_schema.xsd = bin\resources\schemas\level_schema.xsd
-		bin\resources\schemas\shot_schema.xsd = bin\resources\schemas\shot_schema.xsd
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -68,7 +57,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6CCFBAFF-50F3-417A-82E8-543D1DD6184B} = {BA3FA894-364C-4332-BC40-51481AE318B2}
-		{8E96A016-D6F0-47EC-8D14-A228E81E1122} = {6CCFBAFF-50F3-417A-82E8-543D1DD6184B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B3CC6B65-E070-4B37-81D4-FEEC6107CE30}
