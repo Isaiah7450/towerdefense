@@ -1,6 +1,7 @@
 #pragma once
 // File Author: Isaiah Hoffman
 // File Created: March 26, 2018
+#include "./globals.hpp"
 
 namespace hoffman::isaiah {
 	namespace math {
