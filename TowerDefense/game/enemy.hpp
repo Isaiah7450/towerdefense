@@ -68,6 +68,9 @@ namespace hoffman::isaiah {
 			void setStun(bool new_status) noexcept {
 				this->stun_active = new_status;
 			}
+			void setDoTActive(bool new_status) noexcept {
+				this->dot_active = new_status;
+			}
 			/// <summary>Changes the enemy's pathfinding strategy.</summary>
 			/// <param name="gmap">Reference to the game's maps.</param>
 			/// <param name="new_strat">The new heuristic estimation strategy to use.</param>
@@ -136,6 +139,14 @@ namespace hoffman::isaiah {
 			/// <returns>True if the enemy is currently stunned.</returns>
 			bool isStunned() const noexcept {
 				return this->stun_active;
+			}
+			/// <returns>True if the enemy is currently slowed.</returns>
+			bool isSlowed() const noexcept {
+				return this->getSpeedMultiplier() < 1.0;
+			}
+			/// <returns>True if the enemy has a DoT effect that is active.</returns>
+			bool hasActiveDoT() const noexcept {
+				return this->dot_active;
 			}
 			/// <returns>The enemy's raw walking speed multiplied by their speed multiplier.</returns>
 			double getCurrentWalkingSpeed() const noexcept {
@@ -227,6 +238,8 @@ namespace hoffman::isaiah {
 			std::array<double, 3> speed_boosts {1.0, 1.0, 1.0};
 			/// <summary>The current speed multiplier of the enemy.</summary>
 			double speed_multiplier {1.0};
+			/// <summary>Is a DoT effect active?</summary>
+			bool dot_active {false};
 			/// <summary>Is a stun effect active?</summary>
 			bool stun_active {false};
 			// Buffs

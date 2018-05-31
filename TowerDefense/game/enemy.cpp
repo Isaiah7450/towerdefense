@@ -174,7 +174,6 @@ namespace hoffman::isaiah {
 			// Reset speed multipliers to normal
 			this->speed_multiplier = 1.0;
 			this->speed_boosts = {1.0, 1.0, 1.0};
-			this->stun_active = false;
 			return !this->isAlive();
 		}
 

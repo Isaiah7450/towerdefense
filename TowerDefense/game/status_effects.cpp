@@ -10,6 +10,7 @@ namespace hoffman::isaiah {
 
 		bool DoTEffect::update(Enemy& e) {
 			++this->frames_since_last_tick;
+			e.setDoTActive(true);
 			if (this->frames_since_last_tick >= this->frames_between_ticks) {
 				this->frames_since_last_tick -= this->frames_between_ticks;
 				--this->total_ticks;
@@ -25,6 +26,9 @@ namespace hoffman::isaiah {
 					e.takeDamage(this->dmg_per_tick, 0.8, true);
 					break;
 				}
+			}
+			if (this->total_ticks <= 0) {
+				e.setDoTActive(false);
 			}
 			return this->total_ticks <= 0;
 		}
@@ -71,7 +75,10 @@ namespace hoffman::isaiah {
 		bool StunEffect::update(Enemy& e) {
 			e.setStun(true);
 			--this->frames_until_expire;
-			return this->frames_until_expire <= 0;
+			if (this->frames_until_expire < 0) {
+				e.setStun(false);
+			}
+			return this->frames_until_expire < 0;
 		}
 
 		bool SpeedBoostEffect::update(Enemy& e) {
