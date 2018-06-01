@@ -18,6 +18,10 @@ namespace hoffman::isaiah {
 		class GameMap;
 		class EnemyType;
 		class Enemy;
+		class ShotBaseType;
+		class Shot;
+		class TowerType;
+		class Tower;
 
 		// Debug-related update states
 		enum class DebugUpdateStates {
@@ -47,6 +51,8 @@ namespace hoffman::isaiah {
 			// Note: Defined in data_loading.cpp
 			/// <summary>Initializes the list of enemy types in this game.</summary>
 			void init_enemy_types();
+			/// <summary>Initializes the list of shot types in this game.</summary>
+			void init_shot_types();
 			/// <summary>Adds an enemy to the game.</summary>
 			/// <param name="e">The enemy to add.</param>
 			void addEnemy(std::unique_ptr<Enemy>&& e);
@@ -63,6 +69,9 @@ namespace hoffman::isaiah {
 			std::shared_ptr<EnemyType> getEnemyType(int i) {
 				return this->enemy_types.at(i);
 			}
+			std::shared_ptr<ShotBaseType> getShotType(int i) {
+				return this->shot_types.at(i);
+			}
 			std::vector<std::unique_ptr<Enemy>>& getEnemies() noexcept {
 				return this->enemies;
 			}
@@ -75,6 +84,8 @@ namespace hoffman::isaiah {
 			std::vector<std::shared_ptr<game::EnemyType>> enemy_types;
 			/// <summary>The list of enemies that are currently alive.</summary>
 			std::vector<std::unique_ptr<game::Enemy>> enemies;
+			/// <summary>The list of shot template types.</summary>
+			std::vector<std::shared_ptr<game::ShotBaseType>> shot_types;
 			// Testing things
 			std::shared_ptr<pathfinding::Pathfinder> ground_test_pf {nullptr};
 			std::shared_ptr<pathfinding::Pathfinder> air_test_pf {nullptr};

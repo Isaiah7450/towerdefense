@@ -128,7 +128,8 @@ namespace hoffman::isaiah {
 				MessageBox(nullptr, e.what(), L"Error loading data file", MB_OK | MB_ICONEXCLAMATION);
 				std::exit(1);
 			}
-			catch (...) {
+			catch (const std::exception& e) {
+				UNREFERENCED_PARAMETER(e);
 				std::exit(1);
 			}
 			return 0;

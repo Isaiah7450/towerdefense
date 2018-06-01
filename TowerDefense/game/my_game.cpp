@@ -29,7 +29,8 @@ namespace hoffman::isaiah {
 			device_resources {dev_res},
 			map {std::make_shared<GameMap>(ground_terrain_file, air_terrain_file)},
 			enemy_types {},
-			enemies {} {
+			enemies {},
+			shot_types {} {
 			this->ground_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), false,
 				false, pathfinding::HeuristicStrategies::Manhattan);
 			this->air_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), true,

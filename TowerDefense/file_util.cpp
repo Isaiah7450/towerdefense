@@ -12,169 +12,185 @@ using namespace std::literals::string_literals;
 
 namespace hoffman::isaiah {
 	namespace util::file {
-		std::pair<TokenTypes, std::wstring> getNextToken(std::wistream& is, int& line) {
-			std::wstring next {};
-			is >> next;
-			if (is.eof()) {
-				return std::make_pair(TokenTypes::End_Of_File, L""s);
+		DataFileParser::DataFileParser(std::wistream& is) :
+			data_file {is} {
+			this->lookahead = this->data_file.get();
+			if (!this->isValid() || !this->getNext()) {
+				throw DataFileException {L"Could not read data file."s, 0};
 			}
-			else if (is.peek() == L'\n') {
-				updateLineCount(is, line);
-			}
-			if (next[0] == '#' || next[0] == ';') {
-				skipComments(is);
-				++line;
-				// Recursive call after skipping comments
-				return getNextToken(is, line);
-			}
-			else if (next == L""s) {
-				return std::make_pair(TokenTypes::End_Of_File, L""s);
-			}
-			if (next[0] == '"') {
-				auto my_str = getQuotedToken(is, next, line);
-				if (my_str[my_str.size() - 1] == L'>') {
-					my_str.erase(my_str.end() - 1);
-					return std::make_pair(TokenTypes::List, my_str);
-				}
-				return std::make_pair(TokenTypes::String, my_str);
-			}
-			if (next[next.size() - 1] == L',') {
-				// Commas are generally optional so they are stripped
-				next.erase(next.end() - 1);
-			}
-			if (next[0] == L'[') {
-				// Note that new lines should have been handled by this point.
-				if (next[next.size() - 1] != L']') {
-					throw DataFileException {L"Invalid section header."s, line};
-				}
-				next.erase(next.begin());
-				next.erase(next.end() - 1);
-				return std::make_pair(TokenTypes::Section, next);
-			}
-			else if (next[0] == L'<' || next[next.size() - 1] == L'>') {
-				if (next[0] == L'<') {
-					next.erase(next.begin());
-				}
-				if (next.at(next.size() - 1) == L'>') {
-					next.erase(next.end() - 1);
-				}
-				return std::make_pair(TokenTypes::List,
-					next.at(0) == L'"' ? getQuotedToken(is, next, line) : next);
-			}
-			else if (next[0] == L'{' || next[next.size() - 1] == L'}') {
-				if (next.size() == 2 && next[0] == L'{' && next[1] == L'}') {
-					// The empty object
-					return std::make_pair(TokenTypes::Object, L"{}"s);
-				}
-				else if (next.size() != 1) {
-					// This makes parsing and handling tokens easier
-					throw DataFileException {L"Braces must stand alone; you cannot have extra characters"
-						L" immediately before or after them."s, line};
-				}
-				return std::make_pair(TokenTypes::Object, next);
-			}
-			else if (next[0] == '-' || (next[0] >= '0' && next[0] <= '9')) {
-				bool has_decimal = false;
-				for (unsigned int i = 0; i < next.size(); ++i) {
-					if (i == 0U) {
-						continue;
-					}
-					if (next[i] == L'.' && has_decimal) {
-						throw DataFileException {L"A number may not possess two decimal points."s, line};
-					}
-					else if (next[i] == L'.') {
-						has_decimal = true;
-					}
-					else if (next[i] == L',' || next[i] == L'_') {
-						next.erase(next.begin() + i);
-						--i;
-					}
-					else if (next[i] < L'0' || next[i] > L'9') {
-						throw DataFileException {L"An invalid character was encountered in a numeric literal."s, line};
-					}
-				}
-				return std::make_pair(TokenTypes::Number, next);
-			}
-			return std::make_pair(TokenTypes::Identifier, next);
 		}
 
-		void updateLineCount(std::wistream& is, int& line) {
-			auto old_pos = is.tellg();
-			wchar_t lookahead = 0;
-			lookahead = is.get();
-			while (!is.eof() && (lookahead == L'\n'
-				|| lookahead == L' ' || lookahead == L'\r'
-				|| lookahead == L'\t')) {
-				if (lookahead == L'\n') {
-					++line;
-				}
-				lookahead = is.get();
+		bool DataFileParser::getNext() {
+			if (!this->skipOptional()) {
+				return false;
 			}
-			is.seekg(old_pos);
-			++line;
+			// Special case: optional commas
+			if (this->lookahead == L',') {
+				this->lookahead = this->data_file.get();
+				if (!this->isValid() || !this->skipOptional()) {
+					return false;
+				}
+			}
+			if (this->lookahead == L'<' || this->lookahead == L'>') {
+				this->token = this->lookahead;
+				this->token_type = TokenTypes::List;
+			}
+			else if (this->lookahead == L'{' || this->lookahead == L'}') {
+				this->token = this->lookahead;
+				this->token_type = TokenTypes::Object;
+			}
+			else if (this->lookahead == L'"') {
+				this->token_type = TokenTypes::String;
+				return this->readString();
+			}
+			else if (this->lookahead == L'[') {
+				this->token_type = TokenTypes::Section;
+				return this->readSection();
+			}
+			else if ((this->lookahead >= L'0' && this->lookahead <= L'9')
+				|| (this->lookahead == L'+' || this->lookahead == L'-')) {
+				this->token_type = TokenTypes::Number;
+				return this->readNumber();
+			}
+			else {
+				this->token_type = TokenTypes::Identifier;
+				return this->readIdentifier();
+			}
+			this->lookahead = this->data_file.get();
+			return this->isValid();
 		}
 
-		void skipComments(std::wistream& is) {
-			std::wstring buffer {};
-			do {
-				is >> buffer;
-			} while (!is.eof() && is.peek() != L'\n');
-		}
-
-		std::wstring getQuotedToken(std::wistream& is, std::wstring buffer, int& line) {
-			bool found_end = false;
-			bool is_first = true;
-			std::wstring next {buffer};
-			std::wstring string_token {};
-			while (!found_end) {
-				wchar_t lookahead_char = 0;
-				wchar_t current_char = 0;
-				for (unsigned int i = 0; i < next.size() - 1; ++i) {
-					lookahead_char = next[i + 1];
-					current_char = next[i];
-					if (lookahead_char == L'"' && current_char != L'\\') {
-						found_end = true;
-						// Yeah, not the best solution, but the easiest
-						// plus I don't really need to super support
-						// escape sequences anyway.
-						if (next[i + 2] == L'>') {
-							next.erase(next.begin() + i + 3, next.end());
-							next.erase(next.begin() + i + 1);
+		bool DataFileParser::skipOptional() noexcept {
+			while (this->lookahead == L' ' || this->lookahead == L'\t'
+				|| this->lookahead == L'\r' || this->lookahead == L'\n'
+				|| this->lookahead == L'#' || this->lookahead == L';') {
+				while (this->lookahead == L'#' || this->lookahead == L';') {
+					// Skip comments
+					while (this->lookahead != L'\n') {
+						this->lookahead = this->data_file.get();
+						if (!this->isValid()) {
+							return false;
 						}
-						else {
-							next.erase(next.begin() + i + 1, next.end());
-						}
-						break;
-					}
-					else if (lookahead_char == L'"') {
-						next.erase(next.begin() + i);
 					}
 				}
-				if (is.peek() == L'\n') {
-					updateLineCount(is, line);
+				while (this->lookahead == L' ' || this->lookahead == L'\t'
+					|| this->lookahead == L'\r' || this->lookahead == L'\n') {
+					// Skip white-space
+					if (this->lookahead == L'\n') {
+						++this->line_number;
+					}
+					this->lookahead = this->data_file.get();
+					if (!this->isValid()) {
+						return false;
+					}
 				}
-				if (is_first) {
-					next.erase(next.begin());
-					string_token = next;
-					is_first = false;
+			}
+			return true;
+		}
+
+		bool DataFileParser::readString() {
+			this->token = L"";
+			wchar_t prev = this->lookahead;
+			while (true) {
+				prev = this->lookahead;
+				this->lookahead = this->data_file.get();
+				if (!this->isValid()) {
+					return false;
 				}
-				else {
-					string_token += L" "s + next;
+				if (prev == L'\\') {
+					if (this->lookahead == L'\\' || this->lookahead == L'"') {
+						this->token.erase(this->token.end() - 1);
+					}
 				}
-				if (is.eof() && !found_end) {
-					throw DataFileException {L"Unexpected EOF encountered while parsing a quoted string."s, line};
+				else if (this->lookahead == L'"') {
+					this->lookahead = this->data_file.get();
+					return this->isValid();
 				}
-				else if (!found_end) {
-					is >> next;
+				else if (this->lookahead == L'\n' || this->lookahead == L'\t') {
+					throw DataFileException {L"Newlines and tabs are unallowed inside strings.", this->getLineNumber()};
 				}
-			} // End while loop
-			return string_token;
+				this->token += this->lookahead;
+			}
+		}
+
+		bool DataFileParser::readSection() {
+			this->token = L"";
+			while ((this->lookahead = data_file.get()) != L']') {
+				if (!this->isValid()) {
+					return false;
+				}
+				if (this->lookahead != L'_' && !((this->lookahead >= L'a' && this->lookahead <= L'z')
+					|| (this->lookahead >= L'0' && this->lookahead <= L'9'))) {
+					throw DataFileException {L"Invalid character encountered: "s + this->lookahead
+						+ L" in section header!"s, this->getLineNumber()};
+				}
+				this->token += this->lookahead;
+			}
+			this->lookahead = this->data_file.get();
+			return this->isValid();
+		}
+
+		bool DataFileParser::readNumber() {
+			this->token = this->lookahead;
+			bool has_decimal_point = false;
+			while (true) {
+				this->lookahead = this->data_file.get();
+				if (!this->isValid()) {
+					return false;
+				}
+				if (this->lookahead == L'_' || this->lookahead == L',') {
+					// Underscores and commas can be used as separators.
+					continue;
+				}
+				else if (this->lookahead == L'.' && !has_decimal_point) {
+					has_decimal_point = true;
+				}
+				else if (this->lookahead == L'.') {
+					throw DataFileException {L"A decimal point (.) cannot appear twice in a number."s,
+						this->getLineNumber()};
+				}
+				else if (this->lookahead == L' ' || this->lookahead == L'\t'
+					|| this->lookahead == L'\r' || this->lookahead == L'\n'
+					|| this->lookahead == L'{' || this->lookahead == L'}'
+					|| this->lookahead == L'<' || this->lookahead == L'>'
+					|| this->lookahead == L'[' || this->lookahead == L']') {
+					return true;
+				}
+				else if (this->lookahead < L'0' || this->lookahead > L'9') {
+					throw DataFileException {L"Invalid character: "s + this->lookahead
+						+ L" encountered in numeric literal!"s, this->getLineNumber()};
+				}
+				this->token += this->lookahead;
+			}
+		}
+
+		bool DataFileParser::readIdentifier() noexcept {
+			this->token = this->lookahead;
+			while (true) {
+				this->lookahead = this->data_file.get();
+				if (!this->isValid()) {
+					return false;
+				}
+				if (!((this->lookahead >= L'a' && this->lookahead <= L'z')
+					|| (this->lookahead >= L'A' && this->lookahead <= L'Z')
+					|| (this->lookahead >= L'0' && this->lookahead <= L'9')
+					|| this->lookahead == L'_' || this->lookahead == L'=')) {
+					return true;
+				}
+				this->token += this->lookahead;
+			}
+		}
+
+		bool DataFileParser::isValid() const noexcept {
+			return !(this->data_file.bad() || this->data_file.fail());
 		}
 
 		bool matchToken(TokenTypes expected_type, std::wstring expected_input,
 			std::pair<TokenTypes, std::wstring> actual_token) noexcept {
+#pragma warning(disable: 4996)
 			return matchTokenType(expected_type, actual_token.first)
 				&& matchTokenValue(expected_input, actual_token.second);
+#pragma warning(error: 4996)
 		}
 
 		bool matchTokenType(TokenTypes expected_type, TokenTypes actual_type) noexcept {
@@ -185,57 +201,22 @@ namespace hoffman::isaiah {
 			return expected_value == actual_value;
 		}
 
-		std::pair<TokenTypes, std::wstring> getKeyValue(std::wstring expected_key, std::wistream& is, int& line) {
-			auto my_token = getNextToken(is, line);
-			if (!matchToken(TokenTypes::Identifier, expected_key, my_token)) {
-				if (!matchTokenType(TokenTypes::Identifier, my_token.first)) {
-					throw DataFileException {L"Expected a key name."s, line};
-				}
-				else {
-					throw DataFileException {L"An invalid key name was specified; expected: "s + expected_key, line};
-				}
-			}
-			my_token = getNextToken(is, line);
-			if (!matchToken(TokenTypes::Identifier, L"="s, my_token)) {
-				throw DataFileException {L"Expected an equal sign after the key's name."s, line};
-			}
-			return getNextToken(is, line);
-		}
-
-		bool verifyObjectStart(std::wstring expected_object_key, std::wistream& is, int& line) {
-			auto my_token = getNextToken(is, line);
-			if (!matchToken(TokenTypes::Identifier, expected_object_key, my_token)) {
-				if (!matchTokenType(TokenTypes::Identifier, my_token.first)) {
-					throw DataFileException {L"Expected a key name."s, line};
-				}
-				else {
-					throw DataFileException {L"An invalid key name was specified; expected: "s + expected_object_key, line};
-				}
-			}
-			my_token = getNextToken(is, line);
-			if (!matchToken(TokenTypes::Identifier, L"="s, my_token)) {
-				throw DataFileException {L"Expected an equal sign after the key's name."s, line};
-			}
-			my_token = getNextToken(is, line);
-			if (!matchToken(TokenTypes::Object, L"{"s, my_token)
-				&& !matchToken(TokenTypes::Object, L"{}"s, my_token)) {
-				throw DataFileException {L"Expected an opening brace following the equal sign."s, line};
-			}
-			return !matchTokenValue(L"{}"s, my_token.second);
-		}
-
 		std::wstring parseString(std::pair<TokenTypes, std::wstring> token, int line) {
+#pragma warning(disable: 4996)
 			if (!matchTokenType(TokenTypes::String, token.first)) {
 				throw DataFileException {L"Expected a quoted string."s, line};
 			}
 			return token.second;
+#pragma warning(error: 4996)
 		}
 
 		double parseNumber(std::pair<TokenTypes, std::wstring> token, int line) {
+#pragma warning(disable: 4996)
 			if (!matchTokenType(TokenTypes::Number, token.first)) {
 				throw DataFileException {L"Expected a quoted string."s, line};
 			}
 			return std::stod(token.second);
+#pragma warning(error: 4996)
 		}
 
 		bool parseBoolean(std::pair<TokenTypes, std::wstring> token, int line) {
@@ -243,62 +224,6 @@ namespace hoffman::isaiah {
 				: (token.second == L"False"s || token.second == L"false"s) ? false
 				: throw DataFileException {L"Invalid boolean constant specified."s
 					L" Expected one of: {True, False}."s, line};
-		}
-
-		std::vector<std::wstring> parseList(std::pair<TokenTypes, std::wstring> token, std::wistream& is, int& line) {
-			std::vector<std::wstring> list_items {};
-			int start_line = line;
-			if (token.second[token.second.size() - 1] == L'>') {
-				token.second.erase(token.second.end() - 1);
-				list_items.emplace_back(token.second);
-				return list_items;
-			}
-			do {
-				list_items.emplace_back(token.second);
-				token = util::file::getNextToken(is, line);
-			} while (token.second != L""s && !matchTokenType(TokenTypes::List, token.first));
-			if (token.second == L""s) {
-				line = start_line;
-			}
-			list_items.emplace_back(token.second);
-			return list_items;
-		}
-
-		graphics::Color readColor(std::wistream& is, int& line) {
-			auto my_token = getKeyValue(L"color"s, is, line);
-			auto my_list = parseList(my_token, is, line);
-			if (my_list.size() != 4) {
-				throw DataFileException {L"The color property takes a list of 4 values: Red, Green, Blue, and Alpha."s, line};
-			}
-			return graphics::Color {std::stof(my_list[0]), std::stof(my_list[1]), std::stof(my_list[2]),
-				std::stof(my_list[3])};
-		}
-
-		graphics::shapes::ShapeTypes readShape(std::wistream& is, int& line) {
-			auto my_token = getKeyValue(L"shape"s, is, line);
-			if (!matchTokenType(TokenTypes::Identifier, my_token.first)) {
-				throw DataFileException {L"Expected a shape constant."s, line};
-			}
-			const auto& my_value = my_token.second;
-			if (my_value == L"Ellipse"s) {
-				return graphics::shapes::ShapeTypes::Ellipse;
-			}
-			else if (my_value == L"Triangle"s) {
-				return graphics::shapes::ShapeTypes::Triangle;
-			}
-			else if (my_value == L"Rectangle"s) {
-				return graphics::shapes::ShapeTypes::Rectangle;
-			}
-			else if (my_value == L"Diamond"s) {
-				return graphics::shapes::ShapeTypes::Diamond;
-			}
-			else if (my_value == L"Star"s) {
-				return graphics::shapes::ShapeTypes::Star;
-			}
-			else {
-				throw DataFileException {L"Invalid shape constant specified."s
-					L" Expected one of: Ellipse, Triangle, Rectangle, Diamond, Star."s, line};
-			}
 		}
 	}
 }
