@@ -78,6 +78,9 @@
     <ClInclude Include="file_util.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\shot_types.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">
@@ -128,6 +131,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="file_util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\shot_types.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
