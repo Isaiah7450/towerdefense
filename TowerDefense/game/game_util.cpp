@@ -11,6 +11,7 @@ namespace hoffman::isaiah {
 #else
 			thread_local std::mt19937 gen {rd()};
 #endif
+			thread_local std::uniform_real_distribution<double> distro_uniform {};
 		}
 	}
 }

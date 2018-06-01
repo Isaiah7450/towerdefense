@@ -14,6 +14,8 @@ namespace hoffman::isaiah {
 #else
 			extern thread_local std::mt19937 gen;
 #endif
+			/// <summary>An integer distribution that gives values from 1 to 100 uniformly.</summary>
+			extern thread_local std::uniform_real_distribution<double> distro_uniform;
 		}
 	}
 }
