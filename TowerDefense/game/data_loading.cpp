@@ -13,6 +13,7 @@
 #include "./../graphics/shapes.hpp"
 #include "./enemy_type.hpp"
 #include "./my_game.hpp"
+#include "./status_effects.hpp"
 #include "./shot_types.hpp"
 using namespace std::literals::string_literals;
 
@@ -289,6 +290,197 @@ namespace hoffman::isaiah {
 				}
 			} while (my_parser->getNext());
 #pragma warning(error: 4996)
+		}
+
+		void MyGame::init_shot_types() {
+			std::wifstream data_file {L"./resources/shots.ini"};
+			if (data_file.bad() || data_file.fail()) {
+				throw util::file::DataFileException {L"Could not open resources/shots.ini for reading."s, 0};
+			}
+			auto my_parser {std::make_unique<util::file::DataFileParser>(data_file)};
+			// Global section
+			if (!my_parser->matchToken(util::file::TokenTypes::Section, L"global"s)) {
+				throw util::file::DataFileException {L"Expected [global] section header."s, my_parser->getLineNumber()};
+			}
+			my_parser->readKeyValue(L"version");
+			if (!my_parser->matchToken(util::file::TokenTypes::Number, L"1"s)) {
+				throw util::file::DataFileException {L"Version number should be equal to 1."s,
+					my_parser->getLineNumber()};
+			}
+			while (my_parser->getNext()) {
+				// Shot sections
+				if (!my_parser->matchToken(util::file::TokenTypes::Section, L"shot"s)) {
+					throw util::file::DataFileException {L"Expected either the end of the file"s
+						L" or another [shot] section header."s, my_parser->getLineNumber()};
+				}
+				my_parser->readKeyValue(L"name"s);
+				std::wstring n = my_parser->parseString();
+				my_parser->readKeyValue(L"desc"s);
+				std::wstring d = my_parser->parseString();
+				graphics::Color c = my_parser->readColor();
+				graphics::shapes::ShapeTypes st = my_parser->readShape();
+				my_parser->readKeyValue(L"damage"s);
+				double dmg = my_parser->parseNumber();
+				if (dmg < 0.0) {
+					throw util::file::DataFileException {L"Damage must be non-negative."s, my_parser->getLineNumber()};
+				}
+				my_parser->readKeyValue(L"piercing"s);
+				double wap = my_parser->parseNumber();
+				if (wap < 0.0 || wap > 1.0) {
+					throw util::file::DataFileException {L"Piercing must be between 0 and 1 inclusive."s,
+						my_parser->getLineNumber()};
+				}
+				my_parser->readKeyValue(L"move_speed"s);
+				double ms = my_parser->parseNumber();
+				if (ms < 20.00 || ms > 60.00) {
+					throw util::file::DataFileException {L"Movement speed must between 20 and 60 inclusive."s,
+						my_parser->getLineNumber()};
+				}
+				my_parser->readKeyValue(L"impact_radius"s);
+				double ir = my_parser->parseNumber();
+				if (ir < 0.0) {
+					throw util::file::DataFileException {L"Impact radius must be non-negative."s,
+						my_parser->getLineNumber()};
+				}
+				my_parser->readKeyValue(L"splash_damage"s);
+				double sdmg = my_parser->parseNumber();
+				if (sdmg < 0.0) {
+					throw util::file::DataFileException {L"Splash damage must be non-negative."s,
+						my_parser->getLineNumber()};
+				}
+				else if (sdmg > 0.0 && ir <= 0.0) {
+					throw util::file::DataFileException {L"Splash damage should be zero if impact"s
+						L" radius is zero."s, my_parser->getLineNumber()};
+				}
+				my_parser->readKeyValue(L"ground_multiplier"s);
+				double gm = my_parser->parseNumber();
+				if (gm < 0.0) {
+					throw util::file::DataFileException {L"Ground mulitplier must be non-negative."s,
+						my_parser->getLineNumber()};
+				}
+				my_parser->readKeyValue(L"air_multiplier"s);
+				double am = my_parser->parseNumber();
+				if (am < 0.0) {
+					throw util::file::DataFileException {L"Air multiplier must be non-negative."s,
+						my_parser->getLineNumber()};
+				}
+				if (am <= 0.0 && gm <= 0.0 && (dmg > 0.0 || sdmg > 0.0)) {
+					throw util::file::DataFileException {L"Either the ground multiplier or the air multiplier"s
+						L" must be positive."s, my_parser->getLineNumber()};
+				}
+				auto my_type_str = my_parser->readKeyValue(L"type"s).second;
+				ShotTypes my_type = my_type_str == L"Standard"s ? ShotTypes::Standard :
+					my_type_str == L"Damage_Over_Time"s ? ShotTypes::DoT :
+					my_type_str == L"Slow"s ? ShotTypes::Slow :
+					my_type_str == L"Stun"s ? ShotTypes::Stun :
+					throw util::file::DataFileException {L"Invalid type specified."s, my_parser->getLineNumber()};
+				if (my_type == ShotTypes::Standard && dmg <= 0.0 && sdmg <= 0.0) {
+					throw util::file::DataFileException {L"The shot should deal some kind of damage or"s
+						L" have some kind of special effect."s, my_parser->getLineNumber()};
+				}
+				[[maybe_unused]] bool affect_splash {false};
+				if (my_type != ShotTypes::Standard) {
+					my_parser->readKeyValue(L"apply_effect_on_splash"s);
+					affect_splash = my_parser->parseBoolean();
+					if (!affect_splash && ir > 0.0 && sdmg <= 0.0) {
+						throw util::file::DataFileException {L"It is pointless to set impact radius to a"s
+							L" value greater than zero if splash damage is zero, and there is no special effect"s
+							L" applied on splash."s, my_parser->getLineNumber()};
+					}
+				}
+				switch (my_type) {
+				case ShotTypes::Standard:
+				{
+					auto my_shot = std::make_shared<NormalShotType>(n, d, c, st, dmg, wap, ms, ir, sdmg, gm, am);
+					this->shot_types.emplace_back(std::move(my_shot));
+					break;
+				}
+				case ShotTypes::DoT:
+				{
+					auto dot_type_str = my_parser->readKeyValue(L"dot_damage_type"s).second;
+					DoTDamageTypes dot_type = dot_type_str == L"Poison"s ? DoTDamageTypes::Poison :
+						dot_type_str == L"Fire"s ? DoTDamageTypes::Fire :
+						throw util::file::DataFileException {L"Invalid DoT damage type specified."s,
+							my_parser->getLineNumber()};
+					my_parser->readKeyValue(L"dot_damage_per_tick"s);
+					double dot_tick_dmg = my_parser->parseNumber();
+					if (dot_tick_dmg <= 0.0) {
+						throw util::file::DataFileException {L"DoT damage per tick must be positive."s,
+							my_parser->getLineNumber()};
+					}
+					my_parser->readKeyValue(L"dot_time_between_ticks"s);
+					int dot_tick_time = static_cast<int>(my_parser->parseNumber());
+					if (dot_tick_time <= 10) {
+						throw util::file::DataFileException {L"Time between DoT ticks must be >= 10 ms."s,
+							my_parser->getLineNumber()};
+					}
+					my_parser->readKeyValue(L"dot_total_ticks"s);
+					int dot_total_ticks = static_cast<int>(my_parser->parseNumber());
+					if (dot_total_ticks < 1) {
+						throw util::file::DataFileException {L"Total number of DoT ticks must be positive."s,
+							my_parser->getLineNumber()};
+					}
+					auto my_shot = std::make_shared<DoTShotType>(n, d, c, st, dmg, wap, ms, ir, sdmg, gm, am,
+						affect_splash, dot_type, dot_tick_dmg, dot_tick_time, dot_total_ticks);
+					this->shot_types.emplace_back(std::move(my_shot));
+					break;
+				}
+				case ShotTypes::Slow:
+				{
+					my_parser->readKeyValue(L"slow_factor"s);
+					double slow_factor = my_parser->parseNumber();
+					if (slow_factor <= 0.0 || slow_factor >= 1.0) {
+						throw util::file::DataFileException {L"Slow factor must be between 0 and 1 exclusive."s,
+							my_parser->getLineNumber()};
+					}
+					my_parser->readKeyValue(L"slow_duration"s);
+					int slow_duration = static_cast<int>(my_parser->parseNumber());
+					if (slow_duration < 10) {
+						throw util::file::DataFileException {L"Slow duration must be >= 10ms."s,
+							my_parser->getLineNumber()};
+					}
+					my_parser->readKeyValue(L"slow_multi_chance"s);
+					double slow_mchance = my_parser->parseNumber();
+					if (slow_mchance < 0.0 || slow_mchance > 1.0) {
+						throw util::file::DataFileException {L"Slow multi-chance must be between 0 and 1 inclusive."s,
+							my_parser->getLineNumber()};
+					}
+					auto my_shot = std::make_shared<SlowShotType>(n, d, c, st, dmg, wap, ms, ir, sdmg, gm, am,
+						affect_splash, slow_factor, slow_duration, slow_mchance);
+					this->shot_types.emplace_back(std::move(my_shot));
+					break;
+				}
+				case ShotTypes::Stun:
+				{
+					my_parser->readKeyValue(L"stun_chance"s);
+					double stun_chance = my_parser->parseNumber();
+					if (stun_chance <= 0.0 || stun_chance > 1.0) {
+						throw util::file::DataFileException {L"Stun chance should be positive and less than 1.0."s,
+							my_parser->getLineNumber()};
+					}
+					my_parser->readKeyValue(L"stun_duration"s);
+					int stun_duration = static_cast<int>(my_parser->parseNumber());
+					if (stun_duration < 10) {
+						throw util::file::DataFileException {L"Stun duration must be >= 10ms."s,
+							my_parser->getLineNumber()};
+					}
+					my_parser->readKeyValue(L"stun_multi_chance"s);
+					double stun_mchance = my_parser->parseNumber();
+					if (stun_mchance < 0.0) {
+						throw util::file::DataFileException {L"Stun multi-chance must be non-negative."s,
+							my_parser->getLineNumber()};
+					}
+					else if (stun_mchance > stun_chance) {
+						throw util::file::DataFileException {L"Stun multi-chance must not exceed stun chance."s,
+							my_parser->getLineNumber()};
+					}
+					auto my_shot = std::make_shared<StunShotType>(n, d, c, st, dmg, wap, ms, ir, sdmg, gm, am,
+						affect_splash, stun_chance, stun_duration, stun_mchance);
+					this->shot_types.emplace_back(std::move(my_shot));
+					break;
+				}
+				} // End Switch
+			}
 		}
 	}
 }

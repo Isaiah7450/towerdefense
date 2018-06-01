@@ -75,8 +75,9 @@ namespace hoffman::isaiah {
 					throw std::runtime_error {"Can execute mutex does not exist."};
 				}
 				auto* my_game = game::g_my_game.get();
-				// Add debug enemies
 				my_game->init_enemy_types();
+				my_game->init_shot_types();
+				// Add debug enemies
 				auto my_enemy = std::make_unique<game::Enemy>(my_game->getDeviceResources(),
 					my_game->getEnemyType(0), graphics::Color {0.f, 0.f, 0.f, 1.f}, my_game->getMap(),
 					1, 1);

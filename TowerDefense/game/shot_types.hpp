@@ -17,11 +17,16 @@ namespace hoffman::isaiah {
 		// of implementing different kinds of effects for shots; applying
 		// multiple effects to a single projectile type isn't something that
 		// I think is really important or good from a balance standpoint.
+		/// <summary>Enumeration constants that represent the various types of shots.</summary>
+		enum class ShotTypes {
+			Standard, DoT, Slow, Stun
+		};
+
 		/// <summary>Base class for all shot types.</summary>
 		class ShotBaseType : public GameObjectType {
 		public:
-			/// <returns>The projectile's type as shown in user interfaces.</returns>
-			virtual std::wstring getType() const noexcept = 0;
+			/// <returns>The projectile's polymorphic type.</returns>
+			virtual ShotTypes getType() const noexcept = 0;
 			/// <summary>Applies the projectile's effect to the enemy that was directly
 			/// hit by the projectile.</summary>
 			/// <param name="e">The enemy directly hit by the projectile.</param>
@@ -133,8 +138,8 @@ namespace hoffman::isaiah {
 				ShotBaseType {n, d, c, st, dmg, wap, ms, ir, sdmg, gm, am} {
 			}
 			// Implements ShotBaseType::getType()
-			std::wstring getType() const noexcept override {
-				return L"Standard";
+			ShotTypes getType() const noexcept override {
+				return ShotTypes::Standard;
 			}
 		protected:
 			// Implements ShotBaseType::apply()
@@ -186,8 +191,8 @@ namespace hoffman::isaiah {
 				total_ticks {num_ticks} {
 			}
 			// Implements ShotBaseType::getType()
-			std::wstring getType() const noexcept override {
-				return L"Damage Over Time";
+			ShotTypes getType() const noexcept override {
+				return ShotTypes::DoT;
 			}
 
 			// Getters
@@ -239,8 +244,8 @@ namespace hoffman::isaiah {
 			}
 
 			// Implements ShotBaseType::getType()
-			std::wstring getType() const noexcept override {
-				return L"Slow";
+			ShotTypes getType() const noexcept override {
+				return ShotTypes::Slow;
 			}
 			// Getters
 			double getSlowFactor() const noexcept {
@@ -285,8 +290,8 @@ namespace hoffman::isaiah {
 				multi_stun_chance {mschance} {
 			}
 			// Implements ShotBaseType::getType()
-			std::wstring getType() const noexcept override {
-				return L"Stun";
+			ShotTypes getType() const noexcept override {
+				return ShotTypes::Stun;
 			}
 			// Getters
 			double getStunChance() const noexcept {
