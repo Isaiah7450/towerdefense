@@ -77,6 +77,7 @@ namespace hoffman::isaiah {
 				auto* my_game = game::g_my_game.get();
 				my_game->init_enemy_types();
 				my_game->init_shot_types();
+				my_game->init_tower_types();
 				// Add debug enemies
 				auto my_enemy = std::make_unique<game::Enemy>(my_game->getDeviceResources(),
 					my_game->getEnemyType(0), graphics::Color {0.f, 0.f, 0.f, 1.f}, my_game->getMap(),

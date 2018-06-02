@@ -15,6 +15,7 @@
 #include "./my_game.hpp"
 #include "./status_effects.hpp"
 #include "./shot_types.hpp"
+#include "./tower_types.hpp"
 using namespace std::literals::string_literals;
 
 namespace hoffman::isaiah {
@@ -481,6 +482,9 @@ namespace hoffman::isaiah {
 				}
 				} // End Switch
 			}
+		}
+
+		void MyGame::init_tower_types() {
 		}
 	}
 }

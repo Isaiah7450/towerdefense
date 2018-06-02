@@ -233,6 +233,7 @@
     <ClInclude Include="game\my_game.hpp" />
     <ClInclude Include="game\shot_types.hpp" />
     <ClInclude Include="game\status_effects.hpp" />
+    <ClInclude Include="game\tower_types.hpp" />
     <ClInclude Include="globals.hpp" />
     <ClInclude Include="graphics\file_dialogs.hpp" />
     <ClInclude Include="graphics\graphics.hpp" />
@@ -259,6 +260,7 @@
     <ClCompile Include="game\my_game.cpp" />
     <ClCompile Include="game\shot_types.cpp" />
     <ClCompile Include="game\status_effects.cpp" />
+    <ClCompile Include="game\tower_types.cpp" />
     <ClCompile Include="graphics\graphics.cpp" />
     <ClCompile Include="graphics\graphics_DX.cpp" />
     <ClCompile Include="graphics\shapes.cpp" />

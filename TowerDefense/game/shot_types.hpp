@@ -74,6 +74,11 @@ namespace hoffman::isaiah {
 				return std::pow(this->getImpactRadius() * this->getImpactRadius() * math::pi, 2.0 / 3.0)
 					* math::e;
 			}
+			/// <returns>The shot's expected average damage factoring in both multipliers
+			/// and splash damage.</returns>
+			double getExpectedRawDamage() const noexcept {
+				return this->getExpectedBaseDamage() * this->getDamageMultiplierRating();
+			}
 			/// <returns>The shot's total rating which also considers its special effects.</returns>
 			double getRating() const noexcept {
 				return this->getBaseRating() + this->getExtraRating();
