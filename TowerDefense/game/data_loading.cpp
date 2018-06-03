@@ -489,7 +489,6 @@ namespace hoffman::isaiah {
 			}
 			auto my_parser {std::make_unique<util::file::DataFileParser>(data_file)};
 			// Global section
-			my_parser->getNext();
 			my_parser->expectToken(util::file::TokenTypes::Section, L"global"s);
 			my_parser->readKeyValue(L"version"s);
 			my_parser->expectToken(util::file::TokenTypes::Number, L"1"s);
@@ -513,9 +512,9 @@ namespace hoffman::isaiah {
 					my_parser->readKeyValue(L"angles"s);
 					auto fm_angle_strs = my_parser->readList();
 					std::vector<double> fm_angles {};
-					std::transform(fm_angle_strs.begin(), fm_angle_strs.end(), fm_angles.begin(), [](std::wstring& e) {
-						return std::stod(e);
-					});
+					for (auto& a : fm_angle_strs) {
+						fm_angles.emplace_back(std::stod(a));
+					}
 					std::sort(fm_angles.begin(), fm_angles.end());
 					std::unique(fm_angles.begin(), fm_angles.end());
 					if (fmethod_type_str == L"Static"s) {
@@ -709,7 +708,7 @@ namespace hoffman::isaiah {
 					throw util::file::DataFileException {L"Reload delay must be zero if volley shots is zero."s,
 						my_parser->getLine()};
 				}
-				else if (rd < 10) {
+				else if (vs > 0 && rd < 10) {
 					throw util::file::DataFileException {L"Reload delay must be at least 10ms if volley shots is positive."s,
 						my_parser->getLine()};
 				}
