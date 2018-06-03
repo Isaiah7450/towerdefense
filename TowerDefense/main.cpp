@@ -80,11 +80,11 @@ namespace hoffman::isaiah {
 				my_game->init_tower_types();
 				// Add debug enemies
 				auto my_enemy = std::make_unique<game::Enemy>(my_game->getDeviceResources(),
-					my_game->getEnemyType(0), graphics::Color {0.f, 0.f, 0.f, 1.f}, my_game->getMap(),
+					my_game->getEnemyType(L"Red Scout"s), graphics::Color {0.f, 0.f, 0.f, 1.f}, my_game->getMap(),
 					1, 1);
 				my_game->addEnemy(std::move(my_enemy));
 				my_enemy = std::make_unique<game::Enemy>(my_game->getDeviceResources(),
-					my_game->getEnemyType(1), graphics::Color {0.f, 0.f, 0.f, 1.f}, my_game->getMap(),
+					my_game->getEnemyType(L"Red Soldier"s), graphics::Color {0.f, 0.f, 0.f, 1.f}, my_game->getMap(),
 					1, 1);
 				my_game->addEnemy(std::move(my_enemy));
 

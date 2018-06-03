@@ -30,7 +30,7 @@ namespace hoffman::isaiah {
 			// Identifier --> Raw text, Section --> [bracketed_text]
 			// String --> "Quoted text", Number --> [0-9]{1,}
 			// List --> <Bracketed List>, Object --> {Object}
-			Identifier, Section, String, Number, List, Object, End_Of_File
+			Identifier, Section, String, Number, List, Object
 		};
 
 		/// <summary>Lexical and syntactical analyzer that reads data files.</summary>
@@ -48,6 +48,33 @@ namespace hoffman::isaiah {
 			/// <returns>True if the current token and type match the supplied expected values.</returns>
 			bool matchToken(TokenTypes expected_type, std::wstring expected_value) const noexcept {
 				return this->matchTokenType(expected_type) && this->matchTokenValue(expected_value);
+			}
+			/// <summary>Checks if the current token matches the supplied values, and throws an
+			/// exception if they do not.</summary>
+			/// <param name="expected_type">The token type that is expected.</param>
+			/// <param name="expected_value">The token value that is expected.</param> 
+			void expectToken(TokenTypes expected_type, std::wstring expected_value) const {
+				using namespace std::literals::string_literals;
+				if (!this->matchToken(expected_type, expected_value)) {
+					switch (expected_type) {
+					case TokenTypes::Identifier:
+						throw DataFileException {L"Expected the following key/operator/identifier: "s + expected_value
+							+ L"."s, this->getLine()};
+					case TokenTypes::Number:
+						throw DataFileException {L"Expected the following number: "s + expected_value
+							+ L"."s, this->getLine()};
+					case TokenTypes::String:
+						throw DataFileException {L"Expected the following string: \""s + expected_value
+							+ L"\"."s, this->getLine()};
+					case TokenTypes::Section:
+						throw DataFileException {L"Expected the following section: ["s + expected_value
+							+ L"]."s, this->getLine()};
+					case TokenTypes::List:
+					case TokenTypes::Object:
+						throw DataFileException {L"Expected the following symbol: "s + expected_value
+							+ L"."s, this->getLine()};
+					}
+				}
 			}
 			/// <summary>Determines if the current token matches the supplied values.</summary>
 			/// <param name="expected_value">The token value that is expected.</param> 
@@ -69,23 +96,17 @@ namespace hoffman::isaiah {
 				using namespace std::literals::string_literals;
 				if (!this->getNext()) {
 					throw DataFileException {L"Data file stream is an invalid state. Maybe the file"s
-						L" ended early?"s, this->getLineNumber()};
+						L" ended early?"s, this->getLine()};
 				}
-				if (!this->matchToken(TokenTypes::Identifier, expected_key)) {
-					throw DataFileException {L"Expected the following key: "s + expected_key
-						+ L"!"s, this->getLineNumber()};
-				}
+				this->expectToken(TokenTypes::Identifier, expected_key);
 				if (!this->getNext()) {
 					throw DataFileException {L"Data file stream is an invalid state. Maybe the file"s
-						L" ended early?"s, this->getLineNumber()};
+						L" ended early?"s, this->getLine()};
 				}
-				if (!this->matchToken(TokenTypes::Identifier, L"="s)) {
-					throw DataFileException {L"Expected an equals sign (=) following the key."s,
-						this->getLineNumber()};
-				}
+				this->expectToken(TokenTypes::Identifier, L"="s);
 				if (!this->getNext()) {
 					throw DataFileException {L"Data file stream is an invalid state. Maybe the file"s
-						L" ended early?"s, this->getLineNumber()};
+						L" ended early?"s, this->getLine()};
 				}
 				return std::make_pair<TokenTypes, std::wstring>(this->getTokenType(), this->getToken());
 			}
@@ -94,7 +115,7 @@ namespace hoffman::isaiah {
 			/// <returns>The parsed string.</returns>
 			std::wstring parseString() const {
 				if (!this->matchTokenType(TokenTypes::String)) {
-					throw DataFileException {L"The current token is not a string.", this->getLineNumber()};
+					throw DataFileException {L"The current token is not a string.", this->getLine()};
 				}
 				return this->getToken();
 			}
@@ -103,7 +124,7 @@ namespace hoffman::isaiah {
 			/// <returns>The parsed number.</returns>
 			double parseNumber() const {
 				if (!this->matchTokenType(TokenTypes::Number)) {
-					throw DataFileException {L"The current token is not a number.", this->getLineNumber()};
+					throw DataFileException {L"The current token is not a number.", this->getLine()};
 				}
 				return std::stod(this->getToken());
 			}
@@ -112,11 +133,11 @@ namespace hoffman::isaiah {
 			/// <returns>The parsed boolean constant.</returns>
 			bool parseBoolean() const {
 				if (!this->matchTokenType(TokenTypes::Identifier)) {
-					throw DataFileException {L"Expected an identifier.", this->getLineNumber()};
+					throw DataFileException {L"Expected an identifier.", this->getLine()};
 				}
 				else if (this->getToken() != L"True" && this->getToken() != L"False"
 					&& this->getToken() != L"true" && this->getToken() != L"false") {
-					throw DataFileException {L"Expected a boolean literal (`True` or `False`).", this->getLineNumber()};
+					throw DataFileException {L"Expected a boolean literal (`True` or `False`).", this->getLine()};
 				}
 				return this->getToken() == L"true" || this->getToken() == L"True";
 			}
@@ -124,10 +145,8 @@ namespace hoffman::isaiah {
 			/// <returns>The items in the list.</returns>
 			std::vector<std::wstring> readList() {
 				// Note that this call should have been preceded by this->readKeyValue() or this->getNext()
-				if (!this->matchToken(TokenTypes::List, L"<")) {
-					throw DataFileException {L"Expected the start of a list.", this->getLineNumber()};
-				}
-				const int start_line = this->getLineNumber();
+				this->expectToken(TokenTypes::List, L"<");
+				const int start_line = this->getLine();
 				std::vector<std::wstring> list_items {};
 				while (true) {
 					if (!this->getNext()) {
@@ -138,11 +157,11 @@ namespace hoffman::isaiah {
 						return list_items;
 					}
 					else if (this->matchTokenType(TokenTypes::List)) {
-						throw DataFileException {L"You cannot start a list inside a list.", this->getLineNumber()};
+						throw DataFileException {L"You cannot start a list inside a list.", this->getLine()};
 					}
 					else if (this->matchTokenType(TokenTypes::Section) || this->matchTokenType(TokenTypes::Object)) {
 						throw DataFileException {L"Objects and section headers are not allowed in lists.",
-							this->getLineNumber()};
+							this->getLine()};
 					}
 					list_items.emplace_back(this->getToken());
 				}
@@ -155,7 +174,7 @@ namespace hoffman::isaiah {
 				auto my_list = this->readList();
 				if (my_list.size() != 4) {
 					throw DataFileException {L"The color property takes a list of four numbers that"
-						L" indicate the levels of Red, Green, Blue, and Alpha respectively.", this->getLineNumber()};
+						L" indicate the levels of Red, Green, Blue, and Alpha respectively.", this->getLine()};
 				}
 				return graphics::Color {std::stof(my_list[0]), std::stof(my_list[1]), std::stof(my_list[2]),
 					std::stof(my_list[3])};
@@ -167,7 +186,7 @@ namespace hoffman::isaiah {
 				using namespace std::literals::string_literals;
 				this->readKeyValue(L"shape");
 				if (!this->matchTokenType(TokenTypes::Identifier)) {
-					throw DataFileException {L"Expected a shape constant."s, this->getLineNumber()};
+					throw DataFileException {L"Expected a shape constant."s, this->getLine()};
 				}
 				constexpr const wchar_t* shape_names[5] = {
 					L"Ellipse", L"Triangle", L"Rectangle", L"Diamond", L"Star"
@@ -182,7 +201,7 @@ namespace hoffman::isaiah {
 					this->matchTokenValue(shape_names[3]) ? graphics::shapes::ShapeTypes::Diamond :
 					this->matchTokenValue(shape_names[4]) ? graphics::shapes::ShapeTypes::Star :
 					throw DataFileException {L"Invalid shape constant given: "s + this->getToken()
-						+ L" Expected one of: "s + all_shapes + L"!"s, this->getLineNumber()};
+						+ L" Expected one of: "s + all_shapes + L"!"s, this->getLine()};
 			}
 
 			// Getters
@@ -192,7 +211,7 @@ namespace hoffman::isaiah {
 			TokenTypes getTokenType() const noexcept {
 				return this->token_type;
 			}
-			int getLineNumber() const noexcept {
+			int getLine() const noexcept {
 				return this->line_number;
 			}
 		protected:

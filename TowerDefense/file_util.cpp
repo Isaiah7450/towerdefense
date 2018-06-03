@@ -107,7 +107,7 @@ namespace hoffman::isaiah {
 					return this->isValid();
 				}
 				else if (this->lookahead == L'\n' || this->lookahead == L'\t') {
-					throw DataFileException {L"Newlines and tabs are unallowed inside strings.", this->getLineNumber()};
+					throw DataFileException {L"Newlines and tabs are unallowed inside strings.", this->getLine()};
 				}
 				this->token += this->lookahead;
 			}
@@ -122,7 +122,7 @@ namespace hoffman::isaiah {
 				if (this->lookahead != L'_' && !((this->lookahead >= L'a' && this->lookahead <= L'z')
 					|| (this->lookahead >= L'0' && this->lookahead <= L'9'))) {
 					throw DataFileException {L"Invalid character encountered: "s + this->lookahead
-						+ L" in section header!"s, this->getLineNumber()};
+						+ L" in section header!"s, this->getLine()};
 				}
 				this->token += this->lookahead;
 			}
@@ -147,7 +147,7 @@ namespace hoffman::isaiah {
 				}
 				else if (this->lookahead == L'.') {
 					throw DataFileException {L"A decimal point (.) cannot appear twice in a number."s,
-						this->getLineNumber()};
+						this->getLine()};
 				}
 				else if (this->lookahead == L' ' || this->lookahead == L'\t'
 					|| this->lookahead == L'\r' || this->lookahead == L'\n'
@@ -158,7 +158,7 @@ namespace hoffman::isaiah {
 				}
 				else if (this->lookahead < L'0' || this->lookahead > L'9') {
 					throw DataFileException {L"Invalid character: "s + this->lookahead
-						+ L" encountered in numeric literal!"s, this->getLineNumber()};
+						+ L" encountered in numeric literal!"s, this->getLine()};
 				}
 				this->token += this->lookahead;
 			}

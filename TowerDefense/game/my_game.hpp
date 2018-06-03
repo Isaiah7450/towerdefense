@@ -5,6 +5,7 @@
 #include <memory>
 #include <iosfwd>
 #include <vector>
+#include <map>
 #include "./../globals.hpp"
 
 namespace hoffman::isaiah {
@@ -68,11 +69,11 @@ namespace hoffman::isaiah {
 			const GameMap& getMap() const noexcept {
 				return *this->map;
 			}
-			std::shared_ptr<EnemyType> getEnemyType(int i) {
-				return this->enemy_types.at(i);
+			std::shared_ptr<EnemyType> getEnemyType(std::wstring name) {
+				return this->enemy_types.at(name);
 			}
-			std::shared_ptr<ShotBaseType> getShotType(int i) {
-				return this->shot_types.at(i);
+			std::shared_ptr<ShotBaseType> getShotType(std::wstring name) {
+				return this->shot_types.at(name);
 			}
 			std::shared_ptr<TowerType> getTowerType(int i) {
 				return this->tower_types.at(i);
@@ -86,11 +87,11 @@ namespace hoffman::isaiah {
 			/// <summary>The game map being used by the program.</summary>
 			std::shared_ptr<GameMap> map {nullptr};
 			/// <summary>The list of enemy template types.</summary>
-			std::vector<std::shared_ptr<game::EnemyType>> enemy_types;
+			std::map<std::wstring, std::shared_ptr<game::EnemyType>> enemy_types;
 			/// <summary>The list of enemies that are currently alive.</summary>
 			std::vector<std::unique_ptr<game::Enemy>> enemies;
 			/// <summary>The list of shot template types.</summary>
-			std::vector<std::shared_ptr<game::ShotBaseType>> shot_types;
+			std::map<std::wstring, std::shared_ptr<game::ShotBaseType>> shot_types;
 			/// <summary>The list of tower template types.</summary>
 			std::vector<std::shared_ptr<game::TowerType>> tower_types;
 			// Testing things
