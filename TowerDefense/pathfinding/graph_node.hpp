@@ -98,7 +98,7 @@ namespace hoffman::isaiah {
 					int dy = math::get_abs(this->getGameY() - this->parent_node->getGameY());
 					if (dx != 0 && dy != 0) {
 						// Diagonal movement
-						multiplier = math::get_sqrt(2);
+						multiplier = std::sqrt(2);
 					}
 					this->start_node = this->getParentNode()->getStartNode();
 				}
@@ -162,7 +162,7 @@ namespace hoffman::isaiah {
 				case HeuristicStrategies::Diagonal:
 					// Diagonal shortcut which is generally used
 					// when one can move in 8 directions.
-					this->h = ((dx + dy) + (math::get_sqrt(2) - 2) * math::get_min(dx, dy)) * h_modifier;
+					this->h = ((dx + dy) + (std::sqrt(2) - 2) * math::get_min(dx, dy)) * h_modifier;
 					break;
 				case HeuristicStrategies::Max_Dx_Dy:
 					// A variant on diagonal shortcut where the cost of moving diagonally is
