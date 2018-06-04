@@ -226,7 +226,7 @@ namespace hoffman::isaiah {
 				return;
 			}
 			// Store in global variable --> It's the only way!
-			game::g_my_game = std::make_shared<game::MyGame>(my_resources, ground_terrain_file, air_terrain_file);
+			game::g_my_game = std::make_shared<game::MyGame>(my_resources, 1, ground_terrain_file, air_terrain_file);
 			// Show window
 			ShowWindow(this->hwnd, n_cmd_show);
 			UpdateWindow(this->hwnd);

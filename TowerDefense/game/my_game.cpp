@@ -28,13 +28,17 @@ namespace hoffman::isaiah {
 	namespace game {
 		std::shared_ptr<MyGame> g_my_game {nullptr};
 
-		MyGame::MyGame(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
+		MyGame::MyGame(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, int clevel,
 			std::wistream& ground_terrain_file, std::wistream& air_terrain_file) :
 			device_resources {dev_res},
 			map {std::make_shared<GameMap>(ground_terrain_file, air_terrain_file)},
 			enemy_types {},
 			enemies {},
-			shot_types {} {
+			shot_types {},
+			shots {},
+			tower_types {},
+			towers {},
+			challenge_level {clevel} {
 			this->ground_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), false,
 				false, pathfinding::HeuristicStrategies::Manhattan);
 			this->air_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), true,
@@ -72,7 +76,22 @@ namespace hoffman::isaiah {
 #endif
 		}
 
+		void MyGame::resetState() {
+			// @TODO: Define
+			this->player = Player {};
+			this->level = 1;
+			this->difficulty = 1.0;
+			this->enemies.clear();
+			this->towers.clear();
+			this->shots.clear();
+			this->is_paused = false;
+			this->in_level = false;
+		}
+
 		void MyGame::update() {
+			if (this->is_paused || !this->in_level) {
+				return;
+			}
 			// Check time before updating...
 			static LARGE_INTEGER last_update_time = LARGE_INTEGER {0};
 			auto my_times = winapi::MainWindow::getElapsedTime(last_update_time);
@@ -93,8 +112,11 @@ namespace hoffman::isaiah {
 			for (unsigned int i = 0; i < this->enemies.size(); ++i) {
 				if (this->enemies[i]->update()) {
 					if (this->enemies[i]->isAlive()) {
-						// Reached goal....
-						// TODO: Implement this section
+						this->player.changeHealth(this->enemies[i]->getBaseType().getDamage());
+						if (!this->player.isAlive()) {
+							this->is_paused = true;
+							// TODO: Finish implementation here
+						}
 					}
 					enemies_to_remove.emplace_back(i);
 				}
@@ -132,6 +154,23 @@ namespace hoffman::isaiah {
 
 		void MyGame::addTower(std::unique_ptr<Tower>&& t) {
 			this->towers.emplace_back(std::move(t));
+		}
+
+		void MyGame::buyTower(int gx, int gy) {
+			UNREFERENCED_PARAMETER(gx);
+			UNREFERENCED_PARAMETER(gy);
+		}
+
+		void MyGame::sellTower(int gx, int gy) {
+			for (unsigned int i = 0; i < this->towers.size(); ++i) {
+				const auto& t = this->towers[i];
+				if (static_cast<int>(std::floor(t->getGameX())) == gx
+					&& static_cast<int>(std::floor(t->getGameY())) == gy) {
+					this->player.changeMoney(t->getBaseType()->getCost() / 2.0);
+					this->towers.erase(towers.begin() + i);
+					break;
+				}
+			}
 		}
 	}
 }

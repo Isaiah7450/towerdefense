@@ -33,17 +33,42 @@ namespace hoffman::isaiah {
 		/// <summary>Global pointer to the my_game instance.</summary>
 		extern std::shared_ptr<MyGame> g_my_game;
 
+		/// <summary>Class that represents the player.</summary>
+		class Player {
+		public:
+			// Getters
+			double getMoney() const noexcept {
+				return this->money;
+			}
+			int getHealth() const noexcept {
+				return this->health;
+			}
+			bool isAlive() const noexcept {
+				return this->getHealth() > 0;
+			}
+			// Setters
+			void changeMoney(double amt) noexcept {
+				this->money += amt;
+			}
+			void changeHealth(int amt) noexcept {
+				this->health += amt;
+			}
+		private:
+			/// <summary>The amount of money the player possesses.</summary>
+			double money {100.0};
+			/// <summary>The amount of health the player possesses.</summary>
+			int health {20};
+		};
+
 		/// <summary>Class that represents an instance of the game itself.</summary>
 		class MyGame {
 			friend class graphics::Renderer2D;
 		public:
-			MyGame(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
+			MyGame(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, int clevel,
 				std::wistream& ground_terrain_file, std::wistream& air_terrain_file);
 			~MyGame() noexcept;
 			/// <summary>Resets the game's state.</summary>
-			void resetState() {
-				// @TODO: Define
-			}
+			void resetState();
 			/// <summary>Updates the state of the game by one tick.</summary>
 			void update();
 			/// <summary>Updates the state of the game in some way for debugging reasons.</summary>
@@ -62,6 +87,10 @@ namespace hoffman::isaiah {
 			/// <summary>Adds a tower to the game.</summary>
 			/// <param name="e">The tower to add.</param>
 			void addTower(std::unique_ptr<Tower>&& t);
+
+			// Player Actions:
+			void buyTower(int gx, int gy);
+			void sellTower(int gx, int gy);
 			// Getters
 			std::shared_ptr<graphics::DX::DeviceResources2D> getDeviceResources() const noexcept {
 				return this->device_resources;
@@ -101,6 +130,18 @@ namespace hoffman::isaiah {
 			std::vector<std::shared_ptr<game::TowerType>> tower_types;
 			/// <summary>The list of towers currently in the game.</summary>
 			std::vector<std::unique_ptr<game::Tower>> towers;
+			/// <summary>The player's health and cash.</summary>
+			Player player {};
+			/// <summary>The current level the player is on.</summary>
+			int level {1};
+			/// <summary>The current dynamic difficulty level the player is at.</summary>
+			double difficulty {1.00};
+			/// <summary>The current game difficulty level the player is at.</summary>
+			int challenge_level;
+			/// <summary>Is the game currently paused?</summary>
+			bool is_paused {false};
+			/// <summary>Is a level currently in progress?</summary>
+			bool in_level {false};
 			// Testing things
 			std::shared_ptr<pathfinding::Pathfinder> ground_test_pf {nullptr};
 			std::shared_ptr<pathfinding::Pathfinder> air_test_pf {nullptr};
