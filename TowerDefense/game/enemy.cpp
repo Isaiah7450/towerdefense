@@ -82,7 +82,7 @@ namespace hoffman::isaiah {
 			}
 			// Actually remove the statuses
 			for (unsigned int i = 0; i < statuses_to_remove.size(); ++i) {
-				active_statuses.erase(active_statuses.begin() + statuses_to_remove[i] - i);
+				active_statuses.erase(active_statuses.begin() + (statuses_to_remove[i] - i));
 			}
 		}
 
@@ -151,7 +151,7 @@ namespace hoffman::isaiah {
 			}
 			// Remove old status effects
 			for (unsigned int i = 0; i < statuses_to_remove.size(); ++i) {
-				this->status_effects.erase(this->status_effects.begin() + statuses_to_remove[i] - i);
+				this->status_effects.erase(this->status_effects.begin() + (statuses_to_remove[i] - i));
 			}
 			// Perform movement
 			const double my_speed = this->getCurrentSpeed() / game::logic_framerate /
