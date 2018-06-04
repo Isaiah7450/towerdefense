@@ -100,7 +100,7 @@ namespace hoffman::isaiah {
 				my_game->addEnemy(std::move(my_enemy));
 				// Add debug tower
 				auto my_tower = std::make_unique<game::Tower>(my_game->getDeviceResources(),
-					my_game->getTowerType(0), graphics::Color {0.f, 0.5f, 0.f, 1.f}, 3.5, 3.5);
+					my_game->getTowerType(3), graphics::Color {0.f, 0.5f, 0.f, 1.f}, 3.5, 3.5);
 				my_game->addTower(std::move(my_tower));
 
 				// Force creation of message queue

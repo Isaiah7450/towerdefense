@@ -513,7 +513,7 @@ namespace hoffman::isaiah {
 					auto fm_angle_strs = my_parser->readList();
 					std::vector<double> fm_angles {};
 					for (auto& a : fm_angle_strs) {
-						fm_angles.emplace_back(std::stod(a));
+						fm_angles.emplace_back(std::stod(a) * math::pi / 180.0);
 					}
 					std::sort(fm_angles.begin(), fm_angles.end());
 					std::unique(fm_angles.begin(), fm_angles.end());
