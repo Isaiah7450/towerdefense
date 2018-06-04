@@ -80,23 +80,25 @@ namespace hoffman::isaiah {
 				my_game->init_tower_types();
 				// Add debug enemies
 				auto my_enemy = std::make_unique<game::Enemy>(my_game->getDeviceResources(),
-					my_game->getEnemyType(L"Red Scout"s), graphics::Color {0.f, 0.f, 0.f, 1.f}, my_game->getMap(),
+					my_game->getEnemyType(L"Red Mounted Soldier"s), graphics::Color {0.f, 0.f, 0.f, 1.f}, my_game->getMap(),
 					1, 1);
 				my_game->addEnemy(std::move(my_enemy));
 				my_enemy = std::make_unique<game::Enemy>(my_game->getDeviceResources(),
 					my_game->getEnemyType(L"Red Foot Soldier"s), graphics::Color {0.f, 0.f, 0.f, 1.f}, my_game->getMap(),
 					1, 1);
 				my_game->addEnemy(std::move(my_enemy));
-				for (int i = 0; i < 100; ++i) {
+				for (int i = 0; i < 20; ++i) {
 					my_enemy = std::make_unique<game::Enemy>(my_game->getDeviceResources(),
-						my_game->getEnemyType(L"Red Mounted Soldier"s), graphics::Color {0.f, 0.f, 0.f, 1.f},
+						my_game->getEnemyType(L"Red Scout"s), graphics::Color {0.f, 0.f, 0.f, 1.f},
 						my_game->getMap(), 1, 1);
 					my_game->addEnemy(std::move(my_enemy));
 				}
+				/*
 				my_enemy = std::make_unique<game::Enemy>(my_game->getDeviceResources(),
 					my_game->getEnemyType(L"Red General"s), graphics::Color {0.5f, 0.0f, 0.f, 1.f},
 					my_game->getMap(), 1, 1);
 				my_game->addEnemy(std::move(my_enemy));
+				*/
 
 				// Force creation of message queue
 				MSG msg;

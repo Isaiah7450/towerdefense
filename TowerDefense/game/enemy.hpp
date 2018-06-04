@@ -82,13 +82,13 @@ namespace hoffman::isaiah {
 				return *this->base_type;
 			}
 			const pathfinding::GraphNode* getNextNode() const noexcept {
-				return this->my_path.front().get();
+				return &this->my_path->front();
 			}
 			// This function is mostly for caching paths since those don't change
 			// too much during a level.
 			/// <returns>A copy of the enemy's current path.</returns>
-			std::queue<std::shared_ptr<pathfinding::GraphNode>> getPathCopy() const noexcept {
-				return this->my_path;
+			std::unique_ptr<std::queue<pathfinding::GraphNode>>&& getPathCopy() const noexcept {
+				return std::make_unique<std::queue<pathfinding::GraphNode>>(*this->my_path);
 			}
 			double getHealth() const noexcept {
 				return this->current_health;
@@ -215,7 +215,7 @@ namespace hoffman::isaiah {
 			/// <summary>The pathfinder used by the enemy.</summary>
 			pathfinding::Pathfinder my_pathfinder;
 			/// <summary>The current path being taken by the enemy.</summary>
-			std::queue<std::shared_ptr<pathfinding::GraphNode>> my_path;
+			std::unique_ptr<std::queue<pathfinding::GraphNode>> my_path;
 			/// <summary>The last node in the path that the enemy travelled to.</summary>
 			const pathfinding::GraphNode* current_node;
 			/// <summary>The direction the enemy is currently moving in (in radians).</summary>

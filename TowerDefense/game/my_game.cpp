@@ -96,8 +96,8 @@ namespace hoffman::isaiah {
 				}
 			}
 			for (unsigned int i = 0; i < enemies_to_remove.size(); ++i) {
-				// Remove dead/goal enemies
-				this->enemies.erase(this->enemies.begin() + enemies_to_remove[i] - i);
+				// Remove dead/goal enemies (yes, the parenthesis are required...)
+				this->enemies.erase(this->enemies.begin() + (enemies_to_remove[i] - i));
 			}
 			// Remove lock
 			SetEvent(draw_event);
