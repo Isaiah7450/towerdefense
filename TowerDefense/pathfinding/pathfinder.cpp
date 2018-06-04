@@ -43,7 +43,7 @@ namespace hoffman::isaiah {
 			return false;
 		}
 
-		void Pathfinder::findPath(double h_modifier, int start_x,
+		std::queue<GraphNode> Pathfinder::findPath(double h_modifier, int start_x,
 			int start_y, int goal_x, int goal_y) {
 			class PathFinderComparator {
 			public:
@@ -54,7 +54,7 @@ namespace hoffman::isaiah {
 			const auto determine_node_index = [](int x, int y) {
 				return y * graphics::grid_width + x;
 			};
-			// Edit paths
+			// Get starts and ends of paths
 			auto& start_node = (start_x > -1 && start_y > -1)
 				? this->terrain_graph.getNode(start_x, start_y)
 				: *this->terrain_graph.getStartNode();
@@ -101,6 +101,10 @@ namespace hoffman::isaiah {
 			if (my_set.empty()) {
 				throw std::runtime_error {"Queue is empty; check that a path exists."};
 			}
+			// Clear old path
+			while (!this->my_path.empty()) {
+				this->my_path.pop();
+			}
 			// Construct path by following the parent nodes
 			const auto* path_node = &my_set.top();
 			// We really don't need the starting node because we know
@@ -123,6 +127,7 @@ namespace hoffman::isaiah {
 			if (start_x != -1 && start_y != -1) {
 				start_node.setWeight(oldStartWeight);
 			}
+			return this->my_path;
 		}
 	}
 }

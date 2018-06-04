@@ -38,7 +38,8 @@ namespace hoffman::isaiah {
 			/// <summary>Attempts to find the shortest path to the goal using the A* method.</summary>
 			/// <param name="h_modifier">The h-value of every node is multiplied by this value. Use
 			/// this parameter to change the admissibility of the heuristic (and how optimal paths are).</param>
-			void findPath(double h_modifier = 1.0, int start_x = -1, int start_y = -1, int goal_x = -1, int goal_y = -1);
+			std::queue<GraphNode> findPath(double h_modifier = 1.0, int start_x = -1, int start_y = -1,
+				int goal_x = -1, int goal_y = -1);
 			// Setters
 			void setStrategy(HeuristicStrategies new_strat, bool diag_status) {
 				this->heuristic_strategy = new_strat;
