@@ -59,6 +59,9 @@ namespace hoffman::isaiah {
 			/// <summary>Adds an enemy to the game.</summary>
 			/// <param name="e">The enemy to add.</param>
 			void addEnemy(std::unique_ptr<Enemy>&& e);
+			/// <summary>Adds a tower to the game.</summary>
+			/// <param name="e">The tower to add.</param>
+			void addTower(std::unique_ptr<Tower>&& t);
 			// Getters
 			std::shared_ptr<graphics::DX::DeviceResources2D> getDeviceResources() const noexcept {
 				return this->device_resources;

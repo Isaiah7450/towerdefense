@@ -10,6 +10,8 @@
 #include "./../game/enemy.hpp"
 #include "./../game/game_object.hpp"
 #include "./../game/my_game.hpp"
+#include "./../game/shot.hpp"
+#include "./../game/tower.hpp"
 #include "./../pathfinding/graph_node.hpp"
 #include "./../pathfinding/grid.hpp"
 #include "./../pathfinding/pathfinder.hpp"
@@ -63,8 +65,14 @@ namespace hoffman::isaiah {
 			render_target->BeginDraw();
 			render_target->Clear(Color {1.f, 1.f, 1.f, 1.f});
 			my_game->getMap().draw(*this);
-			// Draw enemies
-			for (auto& e : my_game->enemies) {
+			// Draw shots, towers, and enemies.
+			for (const auto& s : my_game->shots) {
+				s->draw(*this);
+			}
+			for (const auto& t : my_game->towers) {
+				t->draw(*this);
+			}
+			for (const auto& e : my_game->enemies) {
 				e->draw(*this);
 			}
 #if 0

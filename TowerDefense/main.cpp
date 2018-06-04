@@ -20,6 +20,7 @@
 #include "./game/enemy.hpp"
 #include "./game/enemy_type.hpp"
 #include "./game/my_game.hpp"
+#include "./game/tower.hpp"
 #include "./terrain/editor.hpp"
 
 using namespace std::literals::string_literals;
@@ -87,7 +88,7 @@ namespace hoffman::isaiah {
 					my_game->getEnemyType(L"Red Foot Soldier"s), graphics::Color {0.f, 0.f, 0.f, 1.f},
 					my_game->getMap(), 1, 1.0, 1);
 				my_game->addEnemy(std::move(my_enemy));
-				for (int i = 0; i < 100; ++i) {
+				for (int i = 0; i < 10; ++i) {
 					my_enemy = std::make_unique<game::Enemy>(my_game->getDeviceResources(),
 						my_game->getEnemyType(L"Red Scout"s), graphics::Color {0.f, 0.f, 0.f, 1.f},
 						my_game->getMap(), 1, 1.0, 1);
@@ -97,6 +98,10 @@ namespace hoffman::isaiah {
 					my_game->getEnemyType(L"Red General"s), graphics::Color {0.5f, 0.0f, 0.f, 1.f},
 					my_game->getMap(), 1, 1.0, 1);
 				my_game->addEnemy(std::move(my_enemy));
+				// Add debug tower
+				auto my_tower = std::make_unique<game::Tower>(my_game->getDeviceResources(),
+					my_game->getTowerType(0), graphics::Color {0.f, 0.5f, 0.f, 1.f}, 3.5, 3.5);
+				my_game->addTower(std::move(my_tower));
 
 				// Force creation of message queue
 				MSG msg;

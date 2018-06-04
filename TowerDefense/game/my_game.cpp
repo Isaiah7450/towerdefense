@@ -129,5 +129,9 @@ namespace hoffman::isaiah {
 		void MyGame::addEnemy(std::unique_ptr<Enemy>&& e) {
 			this->enemies.emplace_back(std::move(e));
 		}
+
+		void MyGame::addTower(std::unique_ptr<Tower>&& t) {
+			this->towers.emplace_back(std::move(t));
+		}
 	}
 }
