@@ -26,7 +26,8 @@ namespace hoffman::isaiah {
 				device_resources {dev_res},
 				base_type {ttype} {
 			}
-			/// <summary>Advances
+			/// <summary>Advances the tower's state by one logical frame.</summary>
+			/// <param name="enemies">The list of living enemies.</param>
 			/// <returns>The shot created by the tower or nullptr if no shot was created.</returns>
 			std::unique_ptr<Shot> update(const std::vector<std::unique_ptr<Enemy>>& enemies);
 			// Getters
@@ -38,6 +39,9 @@ namespace hoffman::isaiah {
 			/// <param name="enemies">The list of enemies currently in the game.</param>
 			/// <returns>Nullptr if no valid target was found; otherwise, the selected target.</returns>
 			const Enemy* findTarget(const std::vector<std::unique_ptr<Enemy>>& enemies) const;
+			/// <summary>Creates and returns a new shot.</summary>
+			/// <param name="target">The target enemy found by findTarget().</param>
+			/// <returns>The newly created projectile.</returns>
 			std::unique_ptr<Shot> createShot(const Enemy* target) const;
 		private:
 			/// <summary>Pointer to the game's device resources.</summary>

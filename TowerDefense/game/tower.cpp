@@ -144,8 +144,8 @@ namespace hoffman::isaiah {
 			// For now, I'm implementing pulse the same as static...
 			const auto method = this->getBaseType()->getFiringMethod().getMethod();
 			if (method == FiringMethodTypes::Default) {
-				const double gdx = math::get_abs(this->getGameX() - target->getGameX());
-				const double gdy = std::abs(this->getGameX() - target->getGameY());
+				const double gdx = target->getGameX() - this->getGameX();
+				const double gdy = target->getGameY() - this->getGameY();
 				const double theta = std::atan2(gdy, gdx);
 				return std::make_unique<Shot>(this->device_resources, stype, graphics::Color {1.f, 0.f, 1.f, 1.f},
 					*this, theta);
