@@ -92,8 +92,12 @@ namespace hoffman::isaiah {
 			std::vector<std::unique_ptr<game::Enemy>> enemies;
 			/// <summary>The list of shot template types.</summary>
 			std::map<std::wstring, std::shared_ptr<game::ShotBaseType>> shot_types;
+			/// <summary>The list of projectiles that are currently active.</summary>
+			std::vector<std::unique_ptr<game::Shot>> shots;
 			/// <summary>The list of tower template types.</summary>
 			std::vector<std::shared_ptr<game::TowerType>> tower_types;
+			/// <summary>The list of towers currently in the game.</summary>
+			std::vector<std::unique_ptr<game::Tower>> towers;
 			// Testing things
 			std::shared_ptr<pathfinding::Pathfinder> ground_test_pf {nullptr};
 			std::shared_ptr<pathfinding::Pathfinder> air_test_pf {nullptr};

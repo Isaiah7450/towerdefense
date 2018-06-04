@@ -18,7 +18,11 @@
 #include "./enemy_type.hpp"
 #include "./enemy.hpp"
 #include "./my_game.hpp"
+#include "./shot_types.hpp"
+#include "./shot.hpp"
 #include "./status_effects.hpp"
+#include "./tower_types.hpp"
+#include "./tower.hpp"
 
 namespace hoffman::isaiah {
 	namespace game {
@@ -98,6 +102,24 @@ namespace hoffman::isaiah {
 			for (unsigned int i = 0; i < enemies_to_remove.size(); ++i) {
 				// Remove dead/goal enemies (yes, the parenthesis are required...)
 				this->enemies.erase(this->enemies.begin() + (enemies_to_remove[i] - i));
+			}
+			// Update shots
+			std::vector<int> shots_to_remove {};
+			for (unsigned int i = 0; i < this->shots.size(); ++i) {
+				if (this->shots[i]->update(*this->map, this->enemies)) {
+					shots_to_remove.emplace_back(i);
+				}
+			}
+			for (unsigned int i = 0; i < shots_to_remove.size(); ++i) {
+				// Remove shots that collided or that should otherwise be erased
+				this->shots.erase(this->shots.begin() + (shots_to_remove[i] - i));
+			}
+			// Update towers
+			for (auto& t : this->towers) {
+				auto ret_value = t->update(this->enemies);
+				if (ret_value) {
+					this->shots.emplace_back(std::move(ret_value));
+				}
 			}
 			// Remove lock
 			SetEvent(draw_event);

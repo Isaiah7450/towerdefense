@@ -84,6 +84,12 @@
     <ClInclude Include="game\tower_types.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="game\tower.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="game\shot.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">
@@ -140,6 +146,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\tower_types.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\shot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\tower.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

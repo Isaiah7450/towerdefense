@@ -231,8 +231,10 @@
     <ClInclude Include="game\game_object_type.hpp" />
     <ClInclude Include="game\game_util.hpp" />
     <ClInclude Include="game\my_game.hpp" />
+    <ClInclude Include="game\shot.hpp" />
     <ClInclude Include="game\shot_types.hpp" />
     <ClInclude Include="game\status_effects.hpp" />
+    <ClInclude Include="game\tower.hpp" />
     <ClInclude Include="game\tower_types.hpp" />
     <ClInclude Include="globals.hpp" />
     <ClInclude Include="graphics\file_dialogs.hpp" />
@@ -258,8 +260,10 @@
     <ClCompile Include="game\game_object.cpp" />
     <ClCompile Include="game\game_util.cpp" />
     <ClCompile Include="game\my_game.cpp" />
+    <ClCompile Include="game\shot.cpp" />
     <ClCompile Include="game\shot_types.cpp" />
     <ClCompile Include="game\status_effects.cpp" />
+    <ClCompile Include="game\tower.cpp" />
     <ClCompile Include="game\tower_types.cpp" />
     <ClCompile Include="graphics\graphics.cpp" />
     <ClCompile Include="graphics\graphics_DX.cpp" />
