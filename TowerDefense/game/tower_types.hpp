@@ -122,6 +122,15 @@ namespace hoffman::isaiah {
 			}
 
 			// Getters and similar
+			std::vector<std::pair<std::shared_ptr<ShotBaseType>, double>> getShotTypes() const noexcept {
+				return this->shot_types;
+			}
+			const FiringMethod& getFiringMethod() const noexcept {
+				return *this->firing_method;
+			}
+			const TargetingStrategy& getTargetingStrategy() const noexcept {
+				return *this->targeting_strategy;
+			}
 			double getFiringSpeed() const noexcept {
 				return this->firing_speed;
 			}

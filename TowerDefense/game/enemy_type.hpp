@@ -321,6 +321,9 @@ namespace hoffman::isaiah {
 			const std::vector<std::shared_ptr<BuffBase>>& getBuffTypes() const noexcept {
 				return this->buff_types;
 			}
+			int getBuffTypesCount() const noexcept {
+				return static_cast<int>(this->getBuffTypes().size());
+			}
 			// A bunch of statistical information
 			/// <returns>The effective armor health of the enemy, which is an estimate of how much
 			/// damage the enemy can withstand before their armor is rendered ineffective.</returns>
