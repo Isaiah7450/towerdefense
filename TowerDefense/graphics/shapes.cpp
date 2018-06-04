@@ -24,6 +24,9 @@ namespace hoffman::isaiah {
 				D2D1::Point2F(this->center_sx, this->center_sy));
 			auto my_scale = D2D1::Matrix3x2F::Scale({this->h_scale, this->v_scale});
 			auto my_transform = my_rotate * my_translate * my_scale;
+			// Release old geometry
+			graphics::SafeRelease(&this->transformed_geometry);
+			// Create new geometry
 			this->device_resources->getFactory()->CreateTransformedGeometry(this->path_geometry,
 				my_transform, &this->transformed_geometry);
 		}
