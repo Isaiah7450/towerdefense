@@ -107,7 +107,7 @@ namespace hoffman::isaiah {
 			status_effects {},
 			buffs {} {
 			this->my_path = this->my_pathfinder.findPath();
-			this->current_node = this->my_path.front();
+			this->current_node = this->my_path.front().get();
 			this->my_path.pop();
 			this->changeDirection();
 			// Add buffs
@@ -264,7 +264,7 @@ namespace hoffman::isaiah {
 			this->my_path = this->my_pathfinder.findPath(1.0,
 				static_cast<int>(std::floor(this->getGameX())),
 				static_cast<int>(std::floor(this->getGameY())));
-			this->current_node = this->my_path.front();
+			this->current_node = this->my_path.front().get();
 			this->my_path.pop();
 			this->changeDirection();
 		}

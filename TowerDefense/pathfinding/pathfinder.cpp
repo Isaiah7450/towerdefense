@@ -41,13 +41,12 @@ namespace hoffman::isaiah {
 			return false;
 		}
 
-		std::queue<const GraphNode*> Pathfinder::findPath(double h_modifier, int start_x,
+		std::queue<std::shared_ptr<GraphNode>> Pathfinder::findPath(double h_modifier, int start_x,
 			int start_y, int goal_x, int goal_y) {
-			std::queue<const GraphNode*> ret_value {};
 			class PathFinderComparator {
 			public:
-				bool operator()(std::shared_ptr<PathFinderNode> a, std::shared_ptr<PathFinderNode> b) const {
-					return a->getF() > b->getF();
+				bool operator()(PathFinderNode a, PathFinderNode b) const {
+					return a.getF() > b.getF();
 				}
 			};
 			const auto determine_node_index = [](int x, int y) {
@@ -62,43 +61,40 @@ namespace hoffman::isaiah {
 			if (goal_x != -1 && goal_y != -1) {
 				this->goal_node = &this->terrain_graph.getNode(goal_x, goal_y);
 			}
-			std::priority_queue<std::shared_ptr<PathFinderNode>,
-				std::vector<std::shared_ptr<PathFinderNode>>, PathFinderComparator> my_set {};
+			std::priority_queue<PathFinderNode, std::vector<PathFinderNode>, PathFinderComparator> my_set {};
 			std::map<int, double> previous_costs {};
 			// Yes, I am actually going to do the search in reverse order so
 			// that the beginning of the queue that will be returned will be the start node.
-			auto my_goal = std::make_shared<PathFinderNode>(this->goal_node, nullptr, this->start_node,
-				this->heuristic_strategy, 0, h_modifier);
+			auto my_goal = PathFinderNode {this->goal_node, nullptr, this->start_node,
+				this->heuristic_strategy, 0, h_modifier};
 			my_set.push(my_goal);
-			previous_costs.emplace(determine_node_index(my_goal->getGameX(), my_goal->getGameY()), my_goal->getF());
+			previous_costs.emplace(determine_node_index(my_goal.getGameX(), my_goal.getGameY()), my_goal.getF());
 			while (!my_set.empty()) {
 				auto current_node = my_set.top();
 				// If this is the start node, we have found the path
-				if (&current_node->getGraphNode() == this->start_node) {
-					break;
-				}
-				else if (current_node->getGameX() == this->start_node->getGameX() &&
-					current_node->getGameY() == this->start_node->getGameY()) {
+				if (current_node.getGameX() == this->start_node->getGameX() &&
+					current_node.getGameY() == this->start_node->getGameY()) {
 					break;
 				}
 				my_set.pop();
-				auto my_neighbors = this->terrain_graph.getNeighbors(current_node->getGameX(), current_node->getGameY(),
+				auto my_neighbors = this->terrain_graph.getNeighbors(current_node.getGameX(), current_node.getGameY(),
 					this->filter_graph, this->move_diag);
 				// Look at neighbors
 				for (auto& neighbor_node : my_neighbors) {
-					auto next_node = PathFinderNode {neighbor_node, current_node, this->start_node, this->heuristic_strategy,
+					auto next_node = PathFinderNode {neighbor_node, std::make_shared<PathFinderNode>(current_node),
+						this->start_node, this->heuristic_strategy,
 						static_cast<double>(influence_graph.getNode(neighbor_node->getGameX(),
 							neighbor_node->getGameY()).getWeight()), h_modifier};
 					auto next_node_index = determine_node_index(next_node.getGameX(), next_node.getGameY());
 					// Check F score and only add if F score is lower
 					if (previous_costs.find(next_node_index) == previous_costs.end()) {
 						previous_costs.emplace(next_node_index, next_node.getF());
-						my_set.push(std::make_shared<PathFinderNode>(next_node));
+						my_set.push(next_node);
 					}
 					else if (previous_costs.at(next_node_index) > next_node.getF()) {
 						previous_costs.erase(next_node_index);
 						previous_costs.emplace(next_node_index, next_node.getF());
-						my_set.push(std::make_shared<PathFinderNode>(next_node));
+						my_set.push(next_node);
 					}
 				}
 			}
@@ -111,14 +107,14 @@ namespace hoffman::isaiah {
 			// where we are starting. (It seems it gets in the queue twice
 			// for some reason.)
 			std::shared_ptr<PathFinderNode> path_parent = nullptr;
-			while ((path_parent = path_node->getParentNode()) != nullptr) {
-				if (path_parent->getGameX() != path_node->getGameX()
-					|| path_parent->getGameY() != path_node->getGameY()) {
-					ret_value.push(&path_node->getGraphNode());
-					path_node = path_parent;
+			while ((path_parent = path_node.getParentNode()) != nullptr) {
+				if (path_parent->getGameX() != path_node.getGameX()
+					|| path_parent->getGameY() != path_node.getGameY()) {
+					this->path.emplace(std::make_shared<GraphNode>(path_node.getGraphNode()));
+					path_node = *path_parent;
 				}
 			}
-			ret_value.push(&path_node->getGraphNode());
+			this->path.emplace(std::make_shared<GraphNode>(path_node.getGraphNode()));
 			// Clear the priority queue
 			while (!my_set.empty()) {
 				my_set.pop();
@@ -132,7 +128,7 @@ namespace hoffman::isaiah {
 				this->goal_node = this->terrain_graph.getGoalNode();
 			}
 			// Return the found path
-			return ret_value;
+			return this->path;
 		}
 	}
 }

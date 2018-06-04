@@ -40,7 +40,7 @@ namespace hoffman::isaiah {
 			/// <summary>Attempts to find the shortest path to the goal using the A* method.</summary>
 			/// <param name="h_modifier">The h-value of every node is multiplied by this value. Use
 			/// this parameter to change the admissibility of the heuristic (and how optimal paths are).</param>
-			std::queue<const GraphNode*> findPath(double h_modifier = 1.0, int start_x = -1,
+			std::queue<std::shared_ptr<GraphNode>> findPath(double h_modifier = 1.0, int start_x = -1,
 				int start_y = -1, int goal_x = -1, int goal_y = -1);
 		private:
 			/// <summary>A reference to the terrain graph to use.</summary>
@@ -57,6 +57,8 @@ namespace hoffman::isaiah {
 			GraphNode* start_node;
 			/// <summary>Pointer to the destination node.</summary>
 			GraphNode* goal_node;
+			/// <summary>Queue that contains the path last found by the pathfinder.</summary>
+			std::queue<std::shared_ptr<GraphNode>> path;
 		};
 	}
 }
