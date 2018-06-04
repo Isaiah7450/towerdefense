@@ -123,15 +123,6 @@ namespace hoffman::isaiah {
 			double getF() const noexcept {
 				return this->f;
 			}
-			// Setters
-			/// <summary>Sets the path costs to get from some starting node to a goal node
-			/// while passing through this node.</summary>
-			void setPathCosts(double g_cost, double h_cost, double j_cost) noexcept {
-				this->g = g_cost;
-				this->h = h_cost;
-				this->j = j_cost;
-				this->f = this->g + this->h + this->j;
-			}
 		protected:
 			/// <summary>Calculates the h score of this node using the provided strategy.</summary>
 			/// <param name="my_goal_node">The destination one is trying to reach.</param>

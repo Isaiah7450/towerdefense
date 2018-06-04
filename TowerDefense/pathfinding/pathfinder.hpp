@@ -18,9 +18,7 @@ namespace hoffman::isaiah {
 				filter_graph {fgraph},
 				influence_graph {igraph},
 				move_diag {allow_diag},
-				heuristic_strategy {h_strat},
-				start_node {tgraph.getStartNode()},
-				goal_node {tgraph.getGoalNode()} {
+				heuristic_strategy {h_strat} {
 			}
 			// Probably the one I'll use more often
 			Pathfinder(const game::GameMap& gmap, bool find_air, bool allow_diag, HeuristicStrategies h_strat) :
@@ -40,8 +38,16 @@ namespace hoffman::isaiah {
 			/// <summary>Attempts to find the shortest path to the goal using the A* method.</summary>
 			/// <param name="h_modifier">The h-value of every node is multiplied by this value. Use
 			/// this parameter to change the admissibility of the heuristic (and how optimal paths are).</param>
-			std::unique_ptr<std::queue<pathfinding::GraphNode>>&& findPath(double h_modifier = 1.0, int start_x = -1,
-				int start_y = -1, int goal_x = -1, int goal_y = -1);
+			void findPath(double h_modifier = 1.0, int start_x = -1, int start_y = -1, int goal_x = -1, int goal_y = -1);
+			// Setters
+			void setStrategy(HeuristicStrategies new_strat, bool diag_status) {
+				this->heuristic_strategy = new_strat;
+				this->move_diag = diag_status;
+			}
+			// Getters
+			std::queue<GraphNode> getPath() const noexcept {
+				return this->my_path;
+			}
 		private:
 			/// <summary>The terrain graph used by the pathfinder.</summary>
 			Grid terrain_graph;
@@ -53,12 +59,8 @@ namespace hoffman::isaiah {
 			bool move_diag;
 			/// <summary>The strategy to use when making heuristic estimates.</summary>
 			HeuristicStrategies heuristic_strategy;
-			/// <summary>Pointer to the starting node.</summary>
-			GraphNode* start_node;
-			/// <summary>Pointer to the destination node.</summary>
-			GraphNode* goal_node;
 			/// <summary>Queue that contains the path last found by the pathfinder.</summary>
-			std::unique_ptr<std::queue<GraphNode>> path;
+			std::queue<GraphNode> my_path;
 		};
 	}
 }

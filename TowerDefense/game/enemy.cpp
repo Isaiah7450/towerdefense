@@ -95,7 +95,7 @@ namespace hoffman::isaiah {
 			gmap.getTerrainGraph(etype->isFlying()).getStartNode()->getGameY() + 0.5, 0.5, 0.5},
 			base_type {etype},
 			my_pathfinder {gmap, etype->isFlying(), etype->canMoveDiagonally(), etype->getDefaultStrategy()},
-			my_path {nullptr},
+			my_path {},
 			current_node {nullptr},
 			current_direction {0.0},
 			current_health {etype->getBaseHP() + (5.0 * level * difficulty)},
@@ -106,9 +106,11 @@ namespace hoffman::isaiah {
 			move_diagonally {etype->canMoveDiagonally()},
 			status_effects {},
 			buffs {} {
-			this->my_path = this->my_pathfinder.findPath();
-			this->current_node = &this->my_path->front();
-			this->my_path->pop();
+			// Get path
+			this->my_pathfinder.findPath();
+			this->my_path = this->my_pathfinder.getPath();
+			this->current_node = &this->my_path.front();
+			this->my_path.pop();
 			this->changeDirection();
 			// Add buffs
 			for (auto& b : this->getBaseType().getBuffTypes()) {
@@ -159,16 +161,16 @@ namespace hoffman::isaiah {
 			if (!this->isStunned()) {
 				this->translate(rx * std::cos(this->current_direction), ry * std::sin(this->current_direction));
 			}
-			const double dx = (this->getNextNode()->getGameX() + 0.5) - this->getGameX();
-			const double dy = (this->getNextNode()->getGameY() + 0.5) - this->getGameY();
+			const double dx = (this->getNextNode().getGameX() + 0.5) - this->getGameX();
+			const double dy = (this->getNextNode().getGameY() + 0.5) - this->getGameY();
 			bool update_next_node = std::sqrt(dx * dx + dy * dy) <= my_speed + 0.05 / game::logic_framerate;
 			if (update_next_node) {
 				// Change path
-				if (this->my_path->size() == 1) {
+				if (this->my_path.size() == 1) {
 					return true;
 				}
-				this->current_node = this->getNextNode();
-				this->my_path->pop();
+				this->current_node = &this->getNextNode();
+				this->my_path.pop();
 				this->changeDirection();
 			}
 			// Reset speed multipliers to normal
@@ -247,9 +249,9 @@ namespace hoffman::isaiah {
 			this->status_effects.emplace_back(std::move(effect));
 		}
 
-		void Enemy::changeStrategy(const GameMap& gmap,
-			pathfinding::HeuristicStrategies new_strat, bool diag_move) {
-			if (this->my_path->size() == 1) {
+		void Enemy::changeStrategy(const GameMap& gmap, pathfinding::HeuristicStrategies new_strat, bool diag_move) {
+			UNREFERENCED_PARAMETER(gmap);
+			if (this->my_path.size() == 1) {
 				// It kinda is pointless to do here...
 				// It also solves one bug where the enemy tries
 				// to change strategies endlessly when they reach
@@ -259,19 +261,17 @@ namespace hoffman::isaiah {
 			this->current_strat = new_strat;
 			this->move_diagonally = diag_move;
 			// Obtain new path
-			this->my_pathfinder = pathfinding::Pathfinder {gmap, this->getBaseType().isFlying(),
-				diag_move, new_strat};
-			this->my_path = this->my_pathfinder.findPath(1.0,
-				static_cast<int>(std::floor(this->getGameX())),
+			this->my_pathfinder.setStrategy(new_strat, diag_move);
+			this->my_pathfinder.findPath(1.0, static_cast<int>(std::floor(this->getGameX())),
 				static_cast<int>(std::floor(this->getGameY())));
-			this->current_node = &this->my_path->front();
-			this->my_path->pop();
+			this->current_node = &this->my_path.front();
+			this->my_path.pop();
 			this->changeDirection();
 		}
 
 		void Enemy::changeDirection() noexcept {
-			const double dx = (this->getNextNode()->getGameX() + 0.5) - this->getGameX();
-			const double dy = (this->getNextNode()->getGameY() + 0.5) - this->getGameY();
+			const double dx = (this->getNextNode().getGameX() + 0.5) - this->getGameX();
+			const double dy = (this->getNextNode().getGameY() + 0.5) - this->getGameY();
 			this->current_direction = std::atan2(dy, dx);
 		}
 	}
