@@ -89,7 +89,7 @@ namespace hoffman::isaiah {
 		// enemy.hpp
 		Enemy::Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
 			std::shared_ptr<EnemyType> etype, graphics::Color o_color,
-			const GameMap& gmap, int level, int difficulty) :
+			const GameMap& gmap, int level, double difficulty, int challenge_level) :
 			GameObject {dev_res, etype->getShape(), o_color, etype->getColor(),
 			gmap.getTerrainGraph(etype->isFlying()).getStartNode()->getGameX() + 0.5,
 			gmap.getTerrainGraph(etype->isFlying()).getStartNode()->getGameY() + 0.5, 0.5, 0.5},
@@ -98,10 +98,10 @@ namespace hoffman::isaiah {
 			my_path {},
 			current_node {nullptr},
 			current_direction {0.0},
-			current_health {etype->getBaseHP() + (5.0 * level * difficulty)},
-			maximum_health {etype->getBaseHP() + (5.0 * level * difficulty)},
-			current_armor_health {etype->getBaseArmorHP() * (1.0 + level * 0.001 * difficulty)},
-			maximum_armor_health {etype->getBaseArmorHP() * (1.0 + level * 0.001 * difficulty)},
+			current_health {(etype->getBaseHP() + 5.0 * level) * (difficulty * challenge_level / 5.0)},
+			maximum_health {(etype->getBaseHP() + 5.0 * level) * (difficulty * challenge_level / 5.0)},
+			current_armor_health {(etype->getBaseArmorHP() + 2.5 * level * challenge_level) * (1.0 + difficulty / 2.5)},
+			maximum_armor_health {(etype->getBaseArmorHP() + 2.5 * level * challenge_level) * (1.0 + difficulty / 2.5)},
 			current_strat {etype->getDefaultStrategy()},
 			move_diagonally {etype->canMoveDiagonally()},
 			status_effects {},

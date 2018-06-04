@@ -24,7 +24,7 @@ namespace hoffman::isaiah {
 		public:
 			Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
 				std::shared_ptr<EnemyType> etype, graphics::Color o_color,
-				const GameMap& gmap, int level, int difficulty);
+				const GameMap& gmap, int level, double difficulty, int challenge_level);
 			/// <summary>Advances the enemy's game state by one frame.</summary>
 			/// <returns>True if the enemy should be removed; otherwise, false.</returns>
 			bool update();
