@@ -32,7 +32,7 @@ namespace hoffman::isaiah {
 			}
 			--this->frames_til_next_shot;
 			if (this->frames_til_next_shot <= 0.0) {
-				this->frames_til_next_shot += game::logic_framerate / this->getBaseType()->getFiringSpeed();
+				this->frames_til_next_shot += math::convertMillisecondsToFrames(1000.0 / this->getBaseType()->getFiringSpeed());
 				auto target = this->findTarget(enemies);
 				if (!target) {
 					// Take the time to reload a single shot instead of firing

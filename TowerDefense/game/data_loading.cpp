@@ -715,7 +715,7 @@ namespace hoffman::isaiah {
 				my_parser->readKeyValue(L"cost_adjust"s);
 				int cost_adj = static_cast<int>(my_parser->parseNumber());
 				auto my_tower_type = std::make_shared<TowerType>(n, d, c, st, fmethod, tstrategy,
-					std::move(my_tower_shots), fr, fs, vs, rd, cost_adj);
+					std::move(my_tower_shots), fs, fr, vs, rd, cost_adj);
 				this->tower_types.emplace_back(std::move(my_tower_type));
 			} while (my_parser->getNext());
 		}
