@@ -26,6 +26,9 @@ namespace hoffman::isaiah {
 				device_resources {dev_res},
 				base_type {ttype} {
 			}
+			// Overrides GameObject::draw()
+			void draw(const graphics::Renderer2D& renderer) const noexcept override;
+
 			/// <summary>Advances the tower's state by one logical frame.</summary>
 			/// <param name="enemies">The list of living enemies.</param>
 			/// <returns>The shot created by the tower or nullptr if no shot was created.</returns>
