@@ -5,6 +5,7 @@
 #include <utility>
 #include <memory>
 #include <vector>
+#include <algorithm>
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 #include "./game_object_type.hpp"
@@ -34,7 +35,10 @@ namespace hoffman::isaiah {
 
 		double TowerType::getRating() const noexcept {
 			return math::get_avg(this->getAverageDamagePerShot() * 1.5, this->getAverageShotRating())
-				* this->getRateOfFire() * std::cbrt(this->getFiringRange() * this->getFiringRange() * math::pi);
+				* this->getRateOfFire() * this->getFiringRange() * std::sqrt(math::e)
+				* (this->getFiringMethod().getMethod() == FiringMethodTypes::Default ? 1.0
+					: (this->getFiringMethod().getMaximumAngle() - this->getFiringMethod().getMinimumAngle())
+						/ (2.0 * math::pi));
 		}
 	}
 }

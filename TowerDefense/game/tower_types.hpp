@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 #include <utility>
+#include <algorithm>
 #include "./../globals.hpp"
 #include "./../graphics/graphics.hpp"
 #include "./game_object_type.hpp"
@@ -36,6 +37,22 @@ namespace hoffman::isaiah {
 			}
 			int getDuration() const noexcept {
 				return this->duration;
+			}
+			/// <returns>The minimum angle in the list of angles, or -20 if this does not apply.</returns>
+			double getMinimumAngle() const noexcept {
+				if (this->method != FiringMethodTypes::Default) {
+					// (The angles are sorted during input.)
+					return this->angles[0];
+				}
+				return -20;
+			}
+			/// <returns>The maximum angle in the list of angles, or 20 if this does not apply.</returns>
+			double getMaximumAngle() const noexcept {
+				if (this->method != FiringMethodTypes::Default) {
+					// (The angles are sorted during input.)
+					return this->angles.at(this->angles.size() - 1);
+				}
+				return 20;
 			}
 		private:
 			/// <summary>The firing method being employed.</summary>

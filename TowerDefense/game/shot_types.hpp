@@ -71,8 +71,7 @@ namespace hoffman::isaiah {
 			/// <returns>The expected number of additional targets impacted by
 			/// this projectile's splash effect.</returns>
 			double getAverageExtraTargets() const noexcept {
-				return std::pow(this->getImpactRadius() * this->getImpactRadius() * math::pi, 2.0 / 3.0)
-					* math::e;
+				return std::sqrt(this->getImpactRadius() * this->getImpactRadius() * math::pi) * math::e;
 			}
 			/// <returns>The shot's expected average damage factoring in both multipliers
 			/// and splash damage.</returns>

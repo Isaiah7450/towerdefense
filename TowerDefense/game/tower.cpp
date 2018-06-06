@@ -52,7 +52,7 @@ namespace hoffman::isaiah {
 		}
 
 		const Enemy* Tower::findTarget(const std::vector<std::unique_ptr<Enemy>>& enemies) const {
-			// Firing method is ignored here
+			const auto& my_method = this->getBaseType()->getFiringMethod();
 			const bool use_highest = this->getBaseType()->getTargetingStrategy().getProtocol()
 				== TargetingStrategyProtocols::Highest;
 			// The fall-back value is the enemy that is closest/farthest from the tower
@@ -65,8 +65,21 @@ namespace hoffman::isaiah {
 			const auto my_strat = this->getBaseType()->getTargetingStrategy().getStrategy();
 			bool use_fallback = true;
 			for (const auto& e : enemies) {
-				const double gdx = math::get_abs(this->getGameX() - e->getGameX());
-				const double gdy = std::abs(this->getGameY() - e->getGameY());
+				const double signed_gdx = e->getGameX() - this->getGameX();
+				const double signed_gdy = e->getGameY() - this->getGameY();
+				// (Values during input are specified from [0...2 pi], so this fixes the range.
+				const double e_angle_from_tower = std::atan2(signed_gdy, signed_gdx);
+				const double adjusted_angle = e_angle_from_tower >= 0 ? e_angle_from_tower
+					: math::pi - e_angle_from_tower;
+				if (my_method.getMethod() != FiringMethodTypes::Default) {
+					if (adjusted_angle < my_method.getMinimumAngle()
+						|| adjusted_angle > my_method.getMaximumAngle()) {
+						// Not within firing angle of the tower
+						continue;
+					}
+				}
+				const double gdx = math::get_abs(signed_gdx);
+				const double gdy = std::abs(signed_gdy);
 				const double gdist = std::sqrt(gdx * gdx + gdy * gdy);
 				if (gdist <= this->getBaseType()->getFiringRange()) {
 					// Valid target
