@@ -4,6 +4,7 @@
 #include "./../targetver.hpp"
 #include <Windows.h>
 #include <d2d1.h>
+#include <dwrite.h>
 #include <memory>
 #include "./../globals.hpp"
 #include "./graphics_DX.hpp"
@@ -83,6 +84,12 @@ namespace hoffman::isaiah {
 			/// <param name="my_geom">The geometry to fill.</param>
 			/// <param name="f_color">The color to fill the geometry with.</param>
 			void fillGeometry(ID2D1Geometry* my_geom, Color f_color) const noexcept;
+
+			/// <summary>Renders some text on the screen.</summary>
+			/// <param name="text">The text to render on the screen.</param>
+			/// <param name="t_color">The color to render the text in.</param>
+			/// <param name="my_rect">The enclosing rectangle of the text.</param>
+			void drawText(std::wstring text, Color t_color, D2D_RECT_F my_rect) const noexcept;
 			
 			/// <summary>Draws the current scene based on the game state.</summary>
 			/// <param name="my_game">Shared pointer to object that contains the current game state.</param>

@@ -3,6 +3,7 @@
 #include "./../targetver.hpp"
 #include <Windows.h>
 #include <d2d1.h>
+#include <dwrite.h>
 #include <string>
 #include "./../globals.hpp"
 #include "./graphics_DX.hpp"
@@ -14,6 +15,25 @@ namespace hoffman::isaiah {
 			HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &this->factory);
 			if (FAILED(hr)) {
 				winapi::handleWindowsError(L"Creation of Direct2D factory");
+			}
+			hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory),
+				reinterpret_cast<IUnknown**>(&this->write_factory));
+			if (FAILED(hr)) {
+				winapi::handleWindowsError(L"Creation of DirectWrite factory");
+			}
+			hr = this->write_factory->CreateTextFormat(L"Arial", nullptr, DWRITE_FONT_WEIGHT_REGULAR,
+				DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.f,
+				L"en-us", &this->text_format);
+			if (FAILED(hr)) {
+				winapi::handleWindowsError(L"Creation of text format");
+			}
+			hr = this->text_format->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+			if (FAILED(hr)) {
+				winapi::handleWindowsError(L"Horizontal centering of text");
+			}
+			hr = this->text_format->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+			if (FAILED(hr)) {
+				winapi::handleWindowsError(L"Vertical centering of text");
 			}
 		}
 

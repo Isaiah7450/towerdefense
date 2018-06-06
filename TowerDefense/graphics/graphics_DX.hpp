@@ -4,9 +4,10 @@
 #include "../targetver.hpp"
 #include <Windows.h>
 #include <d2d1.h>
+#include <dwrite.h>
 #include <string>
-
 #pragma comment(lib, "d2d1.lib")
+#pragma comment(lib, "dwrite.lib")
 
 namespace hoffman::isaiah {
 	namespace graphics {
@@ -29,6 +30,8 @@ namespace hoffman::isaiah {
 			/// <summary>Releases all COM resources owned by this class.</summary>
 			~DeviceResources2D() noexcept {
 				this->discardDeviceResources();
+				SafeRelease(&this->text_format);
+				SafeRelease(&this->write_factory);
 				SafeRelease(&this->factory);
 			}
 			/// <summary>Creates resources that are independent of the underlying devices.</summary>
@@ -63,6 +66,13 @@ namespace hoffman::isaiah {
 			ID2D1Factory* getFactory() noexcept {
 				return this->factory;
 			}
+			IDWriteTextFormat* getTextFormat() noexcept {
+				return this->text_format;
+			}
+		protected:
+			IDWriteFactory* getWriteFactory() noexcept {
+				return this->write_factory;
+			}
 		private:
 			/// <summary>Pointer to the Direct2D factory.</summary>
 			ID2D1Factory* factory {nullptr};
@@ -72,8 +82,13 @@ namespace hoffman::isaiah {
 			ID2D1SolidColorBrush* outline_brush {nullptr};
 			/// <summary>Pointer to the Direct2D brush used for filling shapes.</summary>
 			ID2D1SolidColorBrush* fill_brush {nullptr};
+			/// <summary>Pointer to the DirectWrite factory.</summary>
+			IDWriteFactory* write_factory {nullptr};
+			/// <summary>Pointer to the text format (used with DirectWrite).</summary>
+			IDWriteTextFormat* text_format {nullptr};
 			/// <summary>Pointer to the Direct2D brush used for text.</summary>
 			ID2D1SolidColorBrush* text_brush {nullptr};
+
 		};
 	}
 }
