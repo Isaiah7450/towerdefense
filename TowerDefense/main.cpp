@@ -273,6 +273,11 @@ namespace hoffman::isaiah {
 					case WM_COMMAND:
 					{
 						switch (msg.wParam) {
+						case ID_MM_ACTIONS_NEXT_WAVE:
+						{
+							game::g_my_game->startWave();
+							break;
+						}
 						case ID_MM_DEVELOP_TERRAIN_EDITOR:
 						{
 							terrain_editor_thread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0,

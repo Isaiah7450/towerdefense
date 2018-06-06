@@ -89,6 +89,10 @@ namespace hoffman::isaiah {
 			void addTower(std::unique_ptr<Tower>&& t);
 
 			// Player Actions:
+			void startWave() {
+				this->is_paused = false;
+				this->in_level = true;
+			}
 			void buyTower(int gx, int gy);
 			void sellTower(int gx, int gy);
 			// Getters
