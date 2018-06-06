@@ -185,6 +185,27 @@ namespace hoffman::isaiah {
 		void MyGame::buyTower(int gx, int gy) {
 			UNREFERENCED_PARAMETER(gx);
 			UNREFERENCED_PARAMETER(gy);
+			if (this->getSelectedTower() < 0
+				|| this->getSelectedTower() > static_cast<int>(this->getAllTowerTypes().size())) {
+				// Invalid tower selected
+				return;
+			}
+			if (this->getMap().getFiterGraph(false).getNode(gx, gy).isBlocked()
+				|| this->getMap().getTerrainGraph(false).getNode(gx, gy).isBlocked()) {
+				// Cannot build on this space...
+				return;
+			}
+			// (We round for simplicity sake and also consistency.)
+			if (this->player.getMoney() < std::ceil(this->getTowerType(this->getSelectedTower())->getCost())) {
+				// Insufficient funds...
+				return;
+			}
+			this->player.changeMoney(-this->getTowerType(this->getSelectedTower())->getCost());
+			this->getMap().getFiterGraph(false).getNode(gx, gy).setBlockage(true);
+			this->getMap().getFiterGraph(true).getNode(gx, gy).setBlockage(true);
+			auto my_tower = std::make_unique<Tower>(this->device_resources, this->getTowerType(this->getSelectedTower()),
+				graphics::Color {0.f, 0.f, 0.f, 1.0f}, gx + 0.5, gy + 0.5);
+			this->addTower(std::move(my_tower));
 		}
 
 		void MyGame::sellTower(int gx, int gy) {
@@ -192,7 +213,10 @@ namespace hoffman::isaiah {
 				const auto& t = this->towers[i];
 				if (static_cast<int>(std::floor(t->getGameX())) == gx
 					&& static_cast<int>(std::floor(t->getGameY())) == gy) {
+					// (Refunds => 1/2 original price unrounded)
 					this->player.changeMoney(t->getBaseType()->getCost() / 2.0);
+					this->getMap().getFiterGraph(false).getNode(gx, gy).setBlockage(false);
+					this->getMap().getFiterGraph(true).getNode(gx, gy).setBlockage(false);
 					this->towers.erase(towers.begin() + i);
 					break;
 				}

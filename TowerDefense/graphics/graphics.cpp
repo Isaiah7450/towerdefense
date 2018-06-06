@@ -5,17 +5,23 @@
 #include <d2d1.h>
 #include <dwrite.h>
 #include <memory>
+#include <cmath>
 #include <string>
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <vector>
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 #include "./../main.hpp"
+#include "./../resource.h"
+#include "./../game/enemy_type.hpp"
 #include "./../game/enemy.hpp"
 #include "./../game/game_object.hpp"
 #include "./../game/my_game.hpp"
+#include "./../game/shot_types.hpp"
 #include "./../game/shot.hpp"
+#include "./../game/tower_types.hpp"
 #include "./../game/tower.hpp"
 #include "./../pathfinding/graph_node.hpp"
 #include "./../pathfinding/grid.hpp"
@@ -27,6 +33,30 @@
 using namespace std::literals::string_literals;
 namespace hoffman::isaiah {
 	namespace graphics {
+		void Renderer2D::createTowerMenu(HWND hwnd,
+			const std::vector<std::shared_ptr<game::TowerType>>& towers) const noexcept {
+			auto my_menu = GetSubMenu(GetMenu(hwnd), 2);
+			// Delete what may have previously been in the menu...
+			while (GetMenuItemCount(my_menu) > 1) {
+				DeleteMenu(my_menu, 1, MF_BYPOSITION);
+			}
+			// Add menu items
+			for (unsigned int i = 0; i < towers.size(); ++i) {
+				std::wstring my_tower_str = towers[i]->getName() + L": $"s
+					+ std::to_wstring(static_cast<int>(std::ceil(towers[i]->getCost())));
+				AppendMenu(my_menu, MF_STRING, ID_MM_TOWERS_NONE + i + 1, my_tower_str.c_str());
+			}
+			this->updateSelectedTower(hwnd, ID_MM_TOWERS_NONE);
+		}
+
+		void Renderer2D::updateSelectedTower(HWND hwnd, int selected_tower) const noexcept {
+			auto my_menu = GetSubMenu(GetMenu(hwnd), 2);
+			auto num_items = GetMenuItemCount(my_menu);
+			CheckMenuRadioItem(my_menu, ID_MM_TOWERS_NONE, ID_MM_TOWERS_NONE + num_items, selected_tower,
+				MF_BYCOMMAND);
+			DrawMenuBar(hwnd);
+		}
+
 		void Renderer2D::paintSquare(double gx, double gy, Color o_color, Color f_color) const noexcept {
 			this->setBrushColors(o_color, f_color);
 			const float slx = static_cast<float>(graphics::convertToScreenX(gx));

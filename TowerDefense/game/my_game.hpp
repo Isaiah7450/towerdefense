@@ -87,13 +87,17 @@ namespace hoffman::isaiah {
 			/// <summary>Adds a tower to the game.</summary>
 			/// <param name="e">The tower to add.</param>
 			void addTower(std::unique_ptr<Tower>&& t);
-
 			// Player Actions:
 			/// <summary>Starts the next wave.</summary>
 			void startWave();
 			/// <summary>Toggles the pause state of the game.</summary>
 			void togglePause() noexcept {
 				this->is_paused = !this->is_paused;
+			}
+			/// <summary>Selects a new tower type from the available choices.</summary>
+			/// <param name="selection">The tower that was selected.</param>
+			void selectTower(int selection) {
+				this->selected_tower = selection;
 			}
 			void buyTower(int gx, int gy);
 			void sellTower(int gx, int gy);
@@ -116,6 +120,9 @@ namespace hoffman::isaiah {
 			std::shared_ptr<TowerType> getTowerType(int i) {
 				return this->tower_types.at(i);
 			}
+			const std::vector<std::shared_ptr<TowerType>>& getAllTowerTypes() const noexcept {
+				return this->tower_types;
+			}
 			std::vector<std::unique_ptr<Enemy>>& getEnemies() noexcept {
 				return this->enemies;
 			}
@@ -124,6 +131,9 @@ namespace hoffman::isaiah {
 			}
 			bool isInLevel() const noexcept {
 				return this->in_level;
+			}
+			int getSelectedTower() const noexcept {
+				return this->selected_tower;
 			}
 		private:
 			/// <summary>Shared pointer to the device resources.</summary>
@@ -154,6 +164,8 @@ namespace hoffman::isaiah {
 			bool is_paused {false};
 			/// <summary>Is a level currently in progress?</summary>
 			bool in_level {false};
+			/// <summary>The currently selected tower.</summary>
+			int selected_tower {0};
 			// Testing things
 			std::shared_ptr<pathfinding::Pathfinder> ground_test_pf {nullptr};
 			std::shared_ptr<pathfinding::Pathfinder> air_test_pf {nullptr};

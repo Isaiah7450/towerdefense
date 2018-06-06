@@ -6,6 +6,7 @@
 #include <d2d1.h>
 #include <dwrite.h>
 #include <memory>
+#include <vector>
 #include "./../globals.hpp"
 #include "./graphics_DX.hpp"
 
@@ -13,7 +14,11 @@ namespace hoffman::isaiah {
 	namespace game {
 		// Forward declaration
 		class MyGame;
+		class EnemyType;
+		class TowerType;
+		class ShotBaseType;
 	}
+
 	namespace terrain_editor {
 		// Forward declaration
 		class TerrainEditor;
@@ -69,6 +74,14 @@ namespace hoffman::isaiah {
 			Renderer2D(std::shared_ptr<DX::DeviceResources2D> dev_res) :
 				device_resources {dev_res} {
 			}
+			/// <summary>Recreates the tower menu with the current list of towers.</summary>
+			/// <param name="hwnd">Handle to the parent window.</param>
+			/// <param name="towers">The list of tower types that the player can choose from.</param>
+			void createTowerMenu(HWND hwnd, const std::vector<std::shared_ptr<game::TowerType>>& towers) const noexcept;
+			/// <summary>Updates the currently selected tower on the tower menu.</summary>
+			/// <param name="hwnd">Handle to the parent window.</param>
+			/// <param name="selected_tower">The index of the tower type currently selected starting from 1.</param>
+			void updateSelectedTower(HWND hwnd, int selected_tower) const noexcept;
 
 			/// <summary>Paints a game square a certain color.</summary>
 			/// <param name="gx">The game x-coordinate of the square.</param>

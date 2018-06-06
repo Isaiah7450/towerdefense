@@ -242,6 +242,7 @@ namespace hoffman::isaiah {
 				winapi::handleWindowsError(L"Update thread creation");
 			}
 			WaitForSingleObject(update_thread_init_event, INFINITE);
+			my_renderer->createTowerMenu(hwnd, game::g_my_game->getAllTowerTypes());
 			HANDLE terrain_editor_thread {nullptr};
 			// Message Loop
 			MSG msg;
@@ -278,12 +279,21 @@ namespace hoffman::isaiah {
 						default:
 							break;
 						}
+						// Check if the tower menu thingy got selected
+						if (msg.wParam >= ID_MM_TOWERS_NONE
+							&& msg.wParam <= ID_MM_TOWERS_NONE + game::g_my_game->getAllTowerTypes().size()) {
+							my_renderer->updateSelectedTower(hwnd, msg.wParam);
+							game::g_my_game->selectTower(msg.wParam - ID_MM_TOWERS_NONE - 1);
+						}
 						break;
 					}
 					case WM_KEYUP:
 					{
 						if (GetKeyState(VK_CONTROL) && HIWORD(GetAsyncKeyState(VK_CONTROL))) {
 							switch (msg.wParam) {
+							case 'N':
+
+								break;
 							case 'S':
 								break;
 							case 'Q':
@@ -344,13 +354,25 @@ namespace hoffman::isaiah {
 						this->start_gy = math::get_min(this->start_gy, new_gy);
 						if (game::g_my_game->getMap().getTerrainGraph(false).verifyCoordinates(this->start_gx, this->start_gy)
 							&& game::g_my_game->getMap().getTerrainGraph(false).verifyCoordinates(this->end_gx, this->end_gy)) {
-							// Do an action
+							// Buy a tower
+							game::g_my_game->buyTower(this->end_gx, this->end_gy);
 						}
 						// Reset coordinates
 						this->start_gx = -1;
 						this->start_gy = -1;
 						this->end_gx = -1;
 						this->end_gy = -1;
+						break;
+					}
+					case WM_RBUTTONUP:
+					{
+						// Get coordinates
+						auto my_gx = static_cast<int>(graphics::convertToGameX(GET_X_LPARAM(msg.lParam)));
+						auto my_gy = static_cast<int>(graphics::convertToGameY(GET_Y_LPARAM(msg.lParam)));
+						if (game::g_my_game->getMap().getTerrainGraph(false).verifyCoordinates(my_gx, my_gy)) {
+							// Sell a tower
+							game::g_my_game->sellTower(my_gx, my_gy);
+						}
 						break;
 					}
 					default:
