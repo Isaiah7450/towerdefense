@@ -79,6 +79,7 @@ namespace hoffman::isaiah {
 				my_game->init_enemy_types();
 				my_game->init_shot_types();
 				my_game->init_tower_types();
+				my_game->load_global_level_data();
 				// Force creation of message queue
 				MSG msg;
 				PeekMessage(&msg, nullptr, WM_USER, WM_USER, PM_NOREMOVE);

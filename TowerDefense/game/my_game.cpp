@@ -8,6 +8,7 @@
 #include <fstream>
 #include <vector>
 #include <utility>
+#include "./../file_util.hpp"
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 #include "./../main.hpp"
@@ -17,6 +18,7 @@
 #include "./../pathfinding/pathfinder.hpp"
 #include "./enemy_type.hpp"
 #include "./enemy.hpp"
+#include "./game_level.hpp"
 #include "./my_game.hpp"
 #include "./shot_types.hpp"
 #include "./shot.hpp"
@@ -78,16 +80,20 @@ namespace hoffman::isaiah {
 		}
 
 		void MyGame::resetState() {
-			// @TODO: Define
 			this->player = Player {};
 			this->level = 1;
 			this->difficulty = 1.0;
+			while (this->my_level->hasEnemiesLeft()) {
+				this->my_level->update();
+			}
+			this->my_level = nullptr;
 			this->enemies.clear();
 			this->towers.clear();
 			this->shots.clear();
 			this->is_paused = false;
 			this->in_level = false;
 			this->map->resetOtherGraphs();
+			this->my_level_enemy_count = 0;
 		}
 
 		void MyGame::update() {
@@ -109,6 +115,10 @@ namespace hoffman::isaiah {
 			}
 			ResetEvent(draw_event);
 			// Do processing...
+			// Update level
+			if (this->my_level) {
+				this->my_level->update();
+			}
 			// Update enemies
 			std::vector<int> enemies_to_remove {};
 			for (unsigned int i = 0; i < this->enemies.size(); ++i) {
@@ -145,6 +155,13 @@ namespace hoffman::isaiah {
 					this->shots.emplace_back(std::move(ret_value));
 				}
 			}
+			// Determine if the level is finished
+			if (this->my_level && !this->my_level->hasEnemiesLeft() && this->enemies.empty()) {
+				this->in_level = false;
+				++this->level;
+				// TODO: Think up a better cash amount to award
+				this->player.changeMoney(this->my_level_enemy_count);
+			}
 			// Remove lock
 			SetEvent(draw_event);
 			CloseHandle(draw_event);
@@ -162,26 +179,13 @@ namespace hoffman::isaiah {
 			this->is_paused = false;
 			if (!this->isInLevel()) {
 				this->in_level = true;
-				++this->level;
-				// Add debug enemies
-				auto my_enemy = std::make_unique<game::Enemy>(this->getDeviceResources(),
-					this->getEnemyType(L"Red Mounted Soldier"s), graphics::Color {0.f, 0.f, 0.f, 1.f},
-					this->getMap(), this->level, this->difficulty, this->challenge_level);
-				this->addEnemy(std::move(my_enemy));
-				my_enemy = std::make_unique<game::Enemy>(this->getDeviceResources(),
-					this->getEnemyType(L"Red Foot Soldier"s), graphics::Color {0.f, 0.f, 0.f, 1.f},
-					this->getMap(), this->level, this->difficulty, this->challenge_level);
-				this->addEnemy(std::move(my_enemy));
-				for (int i = 0; i < 10; ++i) {
-					my_enemy = std::make_unique<game::Enemy>(this->getDeviceResources(),
-						this->getEnemyType(L"Red Scout"s), graphics::Color {0.f, 0.f, 0.f, 1.f},
-						this->getMap(), this->level, this->difficulty, this->challenge_level);
-					this->addEnemy(std::move(my_enemy));
+				try {
+					this->load_level_data();
 				}
-				my_enemy = std::make_unique<game::Enemy>(this->getDeviceResources(),
-					this->getEnemyType(L"Red General"s), graphics::Color {0.5f, 0.0f, 0.f, 1.f},
-					this->getMap(), 1, 1.0, 1);
-				this->addEnemy(std::move(my_enemy));
+				catch (const util::file::DataFileException& e) {
+					MessageBox(nullptr, e.what(), L"Level Loading Error", MB_OK);
+					std::exit(1);
+				}
 			}
 		}
 

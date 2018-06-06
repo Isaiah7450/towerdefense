@@ -8,11 +8,14 @@
 #include <map>
 #include <vector>
 #include <stdexcept>
+#include <queue>
+#include <deque>
 #include "./../file_util.hpp"
 #include "./../globals.hpp"
 #include "./../graphics/graphics.hpp"
 #include "./../graphics/shapes.hpp"
 #include "./enemy_type.hpp"
+#include "./game_level.hpp"
 #include "./my_game.hpp"
 #include "./status_effects.hpp"
 #include "./shot_types.hpp"
@@ -718,6 +721,95 @@ namespace hoffman::isaiah {
 					std::move(my_tower_shots), fs, fr, vs, rd, cost_adj);
 				this->tower_types.emplace_back(std::move(my_tower_type));
 			} while (my_parser->getNext());
+		}
+
+		void MyGame::load_global_level_data() {
+			std::wifstream data_file {L"./resources/levels/global.ini"};
+			if (data_file.bad() || data_file.fail()) {
+				throw util::file::DataFileException {L"Could not open resources/levels/global.ini for reading."s, 0};
+			}
+			auto my_parser = std::make_unique<util::file::DataFileParser>(data_file);
+			my_parser->expectToken(util::file::TokenTypes::Section, L"global"s);
+			my_parser->readKeyValue(L"backup_level_if_load_fails"s);
+			this->my_level_backup_number = static_cast<int>(my_parser->parseNumber());
+			if (this->my_level_backup_number < 1) {
+				this->my_level_backup_number = 1;
+			}
+		}
+
+		void MyGame::load_level_data() {
+			std::wifstream data_file {L"./resources/levels/level"s + std::to_wstring(this->level) + L".ini"s};
+			if (data_file.bad() || data_file.fail()) {
+				data_file.open(L"./resources/levels/level"s + std::to_wstring(this->my_level_backup_number) + L".ini"s);
+				if (data_file.bad() || data_file.fail()) {
+					throw util::file::DataFileException {L"Could not open ./resources/levels/level"s
+						+ std::to_wstring(this->level) + L".ini for reading!"s, 0};
+				}
+			}
+			auto my_parser = std::make_unique<util::file::DataFileParser>(data_file);
+			// Global section
+			my_parser->expectToken(util::file::TokenTypes::Section, L"global"s);
+			my_parser->readKeyValue(L"version"s);
+			my_parser->expectToken(util::file::TokenTypes::Number, L"1"s);
+			my_parser->readKeyValue(L"wave_spawn_delay"s);
+			int wave_spawn_delay = static_cast<int>(my_parser->parseNumber());
+			if (wave_spawn_delay < 200 || wave_spawn_delay > 20000) {
+				throw util::file::DataFileException {L"Wave spawn delay should be between 200ms and 20000ms inclusive."s,
+					my_parser->getLine()};
+			}
+			my_parser->getNext();
+			std::deque<std::unique_ptr<EnemyWave>> my_level_waves {};
+			do {
+				// [wave] sections
+				my_parser->expectToken(util::file::TokenTypes::Section, L"wave"s);
+				my_parser->readKeyValue(L"group_spawn_delay"s);
+				int group_spawn_delay = static_cast<int>(my_parser->parseNumber());
+				if (group_spawn_delay < 100 || group_spawn_delay > 7500) {
+					throw util::file::DataFileException {L"Group spawn delay should be between 100ms and 7500ms inclusive."s,
+						my_parser->getLine()};
+				}
+				std::deque<std::unique_ptr<EnemyGroup>> my_wave_groups {};
+				my_parser->readKeyValue(L"groups"s);
+				my_parser->expectToken(util::file::TokenTypes::Object, L"{"s);
+				my_parser->getNext();
+				do {
+					my_parser->readKeyValue(L"enemy_name"s);
+					std::wstring enemy_name = my_parser->parseString();
+					if (this->enemy_types.find(enemy_name) == this->enemy_types.end()) {
+						throw util::file::DataFileException {L"Enemy type not found: "s + enemy_name + L"."s,
+							my_parser->getLine()};
+					}
+					std::shared_ptr<EnemyType> etype = this->getEnemyType(enemy_name);
+					my_parser->readKeyValue(L"extra_count"s);
+					int enemy_count = static_cast<int>(my_parser->parseNumber()) + this->challenge_level + 2;
+					if (enemy_count - this->challenge_level - 2 < 0) {
+						throw util::file::DataFileException {L"Extra count should be non-negative."s, my_parser->getLine()};
+					}
+					my_parser->readKeyValue(L"enemy_spawn_delay"s);
+					int enemy_spawn_delay = static_cast<int>(my_parser->parseNumber());
+					if (enemy_spawn_delay < 10 || enemy_spawn_delay > 5000) {
+						throw util::file::DataFileException {L"Enemy spawn delay should be between 10ms and 5000ms inclusive."s,
+							my_parser->getLine()};
+					}
+					std::queue<std::unique_ptr<Enemy>> my_enemy_spawns {};
+					for (int i = 0; i < enemy_count; ++i) {
+						auto my_enemy = std::make_unique<Enemy>(this->getDeviceResources(), etype,
+							graphics::Color {0.f, 0.f, 0.f, 1.f}, this->getMap(), this->level,
+							this->difficulty, this->challenge_level);
+						my_enemy_spawns.emplace(std::move(my_enemy));
+					}
+					auto my_group = std::make_unique<EnemyGroup>(std::move(my_enemy_spawns), enemy_spawn_delay);
+					my_wave_groups.emplace_front(std::move(my_group));
+					my_parser->getNext();
+					my_parser->expectToken(util::file::TokenTypes::Object, L"}"s);
+					my_parser->getNext();
+				} while (my_parser->matchToken(util::file::TokenTypes::Object, L"{"s));
+				my_parser->expectToken(util::file::TokenTypes::Object, L"}"s);
+				auto my_wave = std::make_unique<EnemyWave>(std::move(my_wave_groups), group_spawn_delay);
+				my_level_waves.emplace_front(std::move(my_wave));
+			} while (my_parser->getNext());
+			this->my_level = std::make_unique<GameLevel>(this->level, std::move(my_level_waves), wave_spawn_delay);
+			this->my_level_enemy_count = this->my_level->getEnemyCount();
 		}
 	}
 }

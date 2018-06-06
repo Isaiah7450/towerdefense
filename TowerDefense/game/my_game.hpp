@@ -23,6 +23,7 @@ namespace hoffman::isaiah {
 		class Shot;
 		class TowerType;
 		class Tower;
+		class GameLevel;
 
 		// Debug-related update states
 		enum class DebugUpdateStates {
@@ -81,6 +82,10 @@ namespace hoffman::isaiah {
 			void init_shot_types();
 			/// <summary>Initializes the list of tower types in this game.</summary>
 			void init_tower_types();
+			/// <summary>Loads data that applies to all levels.</summary>
+			void load_global_level_data();
+			/// <summary>Loads the level data for the current level.</summary>
+			void load_level_data();
 			/// <summary>Adds an enemy to the game.</summary>
 			/// <param name="e">The enemy to add.</param>
 			void addEnemy(std::unique_ptr<Enemy>&& e);
@@ -154,8 +159,14 @@ namespace hoffman::isaiah {
 			std::vector<std::unique_ptr<game::Tower>> towers;
 			/// <summary>The player's health and cash.</summary>
 			Player player {};
-			/// <summary>The current level the player is on.</summary>
+			/// <summary>The current level number the player is on.</summary>
 			int level {1};
+			/// <summary>The current game level the player is on.</summary>
+			std::unique_ptr<GameLevel> my_level {nullptr};
+			/// <summary>The total number of enemies that were created for a certain level.</summary>
+			int my_level_enemy_count {0};
+			/// <summary>The game level to use if the loading of a level file fails.</summary>
+			int my_level_backup_number;
 			/// <summary>The current dynamic difficulty level the player is at.</summary>
 			double difficulty {1.00};
 			/// <summary>The current game difficulty level the player is at.</summary>

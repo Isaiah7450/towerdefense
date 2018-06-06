@@ -227,6 +227,7 @@
     <ClInclude Include="file_util.hpp" />
     <ClInclude Include="game\enemy.hpp" />
     <ClInclude Include="game\enemy_type.hpp" />
+    <ClInclude Include="game\game_level.hpp" />
     <ClInclude Include="game\game_object.hpp" />
     <ClInclude Include="game\game_object_type.hpp" />
     <ClInclude Include="game\game_util.hpp" />
@@ -257,6 +258,7 @@
     <ClCompile Include="file_util.cpp" />
     <ClCompile Include="game\data_loading.cpp" />
     <ClCompile Include="game\enemy.cpp" />
+    <ClCompile Include="game\game_level.cpp" />
     <ClCompile Include="game\game_object.cpp" />
     <ClCompile Include="game\game_util.cpp" />
     <ClCompile Include="game\my_game.cpp" />
