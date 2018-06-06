@@ -87,6 +87,7 @@ namespace hoffman::isaiah {
 			this->shots.clear();
 			this->is_paused = false;
 			this->in_level = false;
+			this->map->resetOtherGraphs();
 		}
 
 		void MyGame::update() {
@@ -159,32 +160,36 @@ namespace hoffman::isaiah {
 
 		void MyGame::startWave() {
 			this->is_paused = false;
-			this->in_level = true;
-			++this->level;
-			// Add debug enemies
-			auto my_enemy = std::make_unique<game::Enemy>(this->getDeviceResources(),
-				this->getEnemyType(L"Red Mounted Soldier"s), graphics::Color {0.f, 0.f, 0.f, 1.f},
-				this->getMap(), this->level, this->difficulty, this->challenge_level);
-			this->addEnemy(std::move(my_enemy));
-			my_enemy = std::make_unique<game::Enemy>(this->getDeviceResources(),
-				this->getEnemyType(L"Red Foot Soldier"s), graphics::Color {0.f, 0.f, 0.f, 1.f},
-				this->getMap(), this->level, this->difficulty, this->challenge_level);
-			this->addEnemy(std::move(my_enemy));
-			for (int i = 0; i < 10; ++i) {
-				my_enemy = std::make_unique<game::Enemy>(this->getDeviceResources(),
-					this->getEnemyType(L"Red Scout"s), graphics::Color {0.f, 0.f, 0.f, 1.f},
+			if (!this->isInLevel()) {
+				this->in_level = true;
+				++this->level;
+				// Add debug enemies
+				auto my_enemy = std::make_unique<game::Enemy>(this->getDeviceResources(),
+					this->getEnemyType(L"Red Mounted Soldier"s), graphics::Color {0.f, 0.f, 0.f, 1.f},
 					this->getMap(), this->level, this->difficulty, this->challenge_level);
 				this->addEnemy(std::move(my_enemy));
+				my_enemy = std::make_unique<game::Enemy>(this->getDeviceResources(),
+					this->getEnemyType(L"Red Foot Soldier"s), graphics::Color {0.f, 0.f, 0.f, 1.f},
+					this->getMap(), this->level, this->difficulty, this->challenge_level);
+				this->addEnemy(std::move(my_enemy));
+				for (int i = 0; i < 10; ++i) {
+					my_enemy = std::make_unique<game::Enemy>(this->getDeviceResources(),
+						this->getEnemyType(L"Red Scout"s), graphics::Color {0.f, 0.f, 0.f, 1.f},
+						this->getMap(), this->level, this->difficulty, this->challenge_level);
+					this->addEnemy(std::move(my_enemy));
+				}
+				my_enemy = std::make_unique<game::Enemy>(this->getDeviceResources(),
+					this->getEnemyType(L"Red General"s), graphics::Color {0.5f, 0.0f, 0.f, 1.f},
+					this->getMap(), 1, 1.0, 1);
+				this->addEnemy(std::move(my_enemy));
 			}
-			my_enemy = std::make_unique<game::Enemy>(this->getDeviceResources(),
-				this->getEnemyType(L"Red General"s), graphics::Color {0.5f, 0.0f, 0.f, 1.f},
-				this->getMap(), 1, 1.0, 1);
-			this->addEnemy(std::move(my_enemy));
 		}
 
 		void MyGame::buyTower(int gx, int gy) {
-			UNREFERENCED_PARAMETER(gx);
-			UNREFERENCED_PARAMETER(gy);
+			if (this->isInLevel()) {
+				// Can't build while enemies are attacking
+				return;
+			}
 			if (this->getSelectedTower() < 0
 				|| this->getSelectedTower() > static_cast<int>(this->getAllTowerTypes().size())) {
 				// Invalid tower selected
@@ -209,6 +214,10 @@ namespace hoffman::isaiah {
 		}
 
 		void MyGame::sellTower(int gx, int gy) {
+			if (this->isInLevel()) {
+				// Can't sell while enemies are present
+				return;
+			}
 			for (unsigned int i = 0; i < this->towers.size(); ++i) {
 				const auto& t = this->towers[i];
 				if (static_cast<int>(std::floor(t->getGameX())) == gx

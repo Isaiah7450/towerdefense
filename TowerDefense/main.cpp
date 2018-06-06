@@ -79,11 +79,6 @@ namespace hoffman::isaiah {
 				my_game->init_enemy_types();
 				my_game->init_shot_types();
 				my_game->init_tower_types();
-				// Add debug tower
-				auto my_tower = std::make_unique<game::Tower>(my_game->getDeviceResources(),
-					my_game->getTowerType(4), graphics::Color {0.f, 0.5f, 0.f, 1.f}, 3.5, 3.5);
-				my_game->addTower(std::move(my_tower));
-
 				// Force creation of message queue
 				MSG msg;
 				PeekMessage(&msg, nullptr, WM_USER, WM_USER, PM_NOREMOVE);
@@ -255,6 +250,23 @@ namespace hoffman::isaiah {
 					case WM_COMMAND:
 					{
 						switch (msg.wParam) {
+						case ID_MM_FILE_NEW_GAME:
+						{
+							// (Wait for the update thread to finish first...)
+							WaitForSingleObject(sync_mutex, INFINITE);
+							game::g_my_game->resetState();
+							ReleaseMutex(sync_mutex);
+							break;
+						}
+						case ID_MM_FILE_SAVE_GAME:
+						{
+							break;
+						}
+						case ID_MM_FILE_QUIT:
+						{
+							PostMessage(hwnd, WM_DESTROY, 0, 0);
+							break;
+						}
 						case ID_MM_ACTIONS_NEXT_WAVE:
 						{
 							game::g_my_game->startWave();
@@ -292,9 +304,10 @@ namespace hoffman::isaiah {
 						if (GetKeyState(VK_CONTROL) && HIWORD(GetAsyncKeyState(VK_CONTROL))) {
 							switch (msg.wParam) {
 							case 'N':
-
+								PostMessage(hwnd, WM_COMMAND, ID_MM_FILE_NEW_GAME, 0);
 								break;
 							case 'S':
+								PostMessage(hwnd, WM_COMMAND, ID_MM_FILE_SAVE_GAME, 0);
 								break;
 							case 'Q':
 								// Good way to keep mistakes from happening from keypresses
@@ -302,12 +315,20 @@ namespace hoffman::isaiah {
 								// flat out annoying.
 								if (MessageBox(hwnd, L"Are you sure you want to quit?",
 									L"Tower defense - Quit?", MB_YESNO) == IDYES) {
-									PostMessage(hwnd, WM_DESTROY, 0, 0);
+									PostMessage(hwnd, WM_COMMAND, ID_MM_FILE_QUIT, 0);
 								}
 								break;
 							default:
 								break;
 							}
+						}
+						switch (msg.wParam) {
+						case 'W':
+							PostMessage(hwnd, WM_COMMAND, ID_MM_ACTIONS_NEXT_WAVE, 0);
+							break;
+						case 'P':
+							PostMessage(hwnd, WM_COMMAND, ID_MM_ACTIONS_TOGGLE_PAUSE, 0);
+							break;
 						}
 						break;
 					}

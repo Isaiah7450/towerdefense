@@ -165,7 +165,7 @@ namespace hoffman::isaiah {
 			/// <summary>Is a level currently in progress?</summary>
 			bool in_level {false};
 			/// <summary>The currently selected tower.</summary>
-			int selected_tower {0};
+			int selected_tower {-1};
 			// Testing things
 			std::shared_ptr<pathfinding::Pathfinder> ground_test_pf {nullptr};
 			std::shared_ptr<pathfinding::Pathfinder> air_test_pf {nullptr};
