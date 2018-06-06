@@ -23,6 +23,7 @@
 #include "./status_effects.hpp"
 #include "./tower_types.hpp"
 #include "./tower.hpp"
+using namespace std::literals::string_literals;
 
 namespace hoffman::isaiah {
 	namespace game {
@@ -112,7 +113,7 @@ namespace hoffman::isaiah {
 			for (unsigned int i = 0; i < this->enemies.size(); ++i) {
 				if (this->enemies[i]->update()) {
 					if (this->enemies[i]->isAlive()) {
-						this->player.changeHealth(this->enemies[i]->getBaseType().getDamage());
+						this->player.changeHealth(-this->enemies[i]->getBaseType().getDamage());
 						if (!this->player.isAlive()) {
 							this->is_paused = true;
 							// TODO: Finish implementation here
@@ -154,6 +155,31 @@ namespace hoffman::isaiah {
 
 		void MyGame::addTower(std::unique_ptr<Tower>&& t) {
 			this->towers.emplace_back(std::move(t));
+		}
+
+		void MyGame::startWave() {
+			this->is_paused = false;
+			this->in_level = true;
+			++this->level;
+			// Add debug enemies
+			auto my_enemy = std::make_unique<game::Enemy>(this->getDeviceResources(),
+				this->getEnemyType(L"Red Mounted Soldier"s), graphics::Color {0.f, 0.f, 0.f, 1.f},
+				this->getMap(), this->level, this->difficulty, this->challenge_level);
+			this->addEnemy(std::move(my_enemy));
+			my_enemy = std::make_unique<game::Enemy>(this->getDeviceResources(),
+				this->getEnemyType(L"Red Foot Soldier"s), graphics::Color {0.f, 0.f, 0.f, 1.f},
+				this->getMap(), this->level, this->difficulty, this->challenge_level);
+			this->addEnemy(std::move(my_enemy));
+			for (int i = 0; i < 10; ++i) {
+				my_enemy = std::make_unique<game::Enemy>(this->getDeviceResources(),
+					this->getEnemyType(L"Red Scout"s), graphics::Color {0.f, 0.f, 0.f, 1.f},
+					this->getMap(), this->level, this->difficulty, this->challenge_level);
+				this->addEnemy(std::move(my_enemy));
+			}
+			my_enemy = std::make_unique<game::Enemy>(this->getDeviceResources(),
+				this->getEnemyType(L"Red General"s), graphics::Color {0.5f, 0.0f, 0.f, 1.f},
+				this->getMap(), 1, 1.0, 1);
+			this->addEnemy(std::move(my_enemy));
 		}
 
 		void MyGame::buyTower(int gx, int gy) {

@@ -103,6 +103,7 @@ namespace hoffman::isaiah {
 			const float margin_top_sy = static_cast<float>(graphics::screen_height * graphics::margin_top);
 			const float text_rect_top_sy = margin_top_sy / 4.f;
 			constexpr const float text_rect_height = 15.f;
+			this->setOutlineColor(Color {0.5f, 0.5f, 0.5f, 1.f});
 			std::wstring level_text = L"Level: "s + std::to_wstring(my_game->level);
 			const auto level_rect = Renderer2D::createRectangle(margin_left_sx,
 				text_rect_top_sy, 70.f, text_rect_height);
@@ -121,6 +122,14 @@ namespace hoffman::isaiah {
 			const auto cash_rect = Renderer2D::createRectangle(margin_left_sx + 240.f + 75.f + 25.f,
 				text_rect_top_sy, 100.f, text_rect_height);
 			this->drawText(cash_text.str(), Color {0.f, 0.f, 0.f, 1.f}, cash_rect);
+			if (!my_game->player.isAlive()) {
+				int score = static_cast<int>((my_game->level * 1000.0 + my_game->difficulty * 2500.0)
+					* (my_game->challenge_level + 1.0)) + static_cast<int>(my_game->player.getMoney() * 300);
+				std::wstring score_text = L"Game over! Final Score: "s + std::to_wstring(score);
+				const auto score_rect = Renderer2D::createRectangle(margin_left_sx + 340.f + 100.f + 25.f,
+					text_rect_top_sy, 225.f, text_rect_height);
+				this->drawText(score_text, Color {0.f, 0.f, 0.f, 1.f}, score_rect);
+			}
 #if (defined(DEBUG) || defined(_DEBUG)) && 0
 			// Paint pathfinder paths
 			// (Not sure why if I don't use the preprocessor to

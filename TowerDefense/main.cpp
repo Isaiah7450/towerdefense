@@ -79,25 +79,6 @@ namespace hoffman::isaiah {
 				my_game->init_enemy_types();
 				my_game->init_shot_types();
 				my_game->init_tower_types();
-				// Add debug enemies
-				auto my_enemy = std::make_unique<game::Enemy>(my_game->getDeviceResources(),
-					my_game->getEnemyType(L"Red Mounted Soldier"s), graphics::Color {0.f, 0.f, 0.f, 1.f},
-					my_game->getMap(), 1, 1.0, 1);
-				my_game->addEnemy(std::move(my_enemy));
-				my_enemy = std::make_unique<game::Enemy>(my_game->getDeviceResources(),
-					my_game->getEnemyType(L"Red Foot Soldier"s), graphics::Color {0.f, 0.f, 0.f, 1.f},
-					my_game->getMap(), 1, 1.0, 1);
-				my_game->addEnemy(std::move(my_enemy));
-				for (int i = 0; i < 10; ++i) {
-					my_enemy = std::make_unique<game::Enemy>(my_game->getDeviceResources(),
-						my_game->getEnemyType(L"Red Scout"s), graphics::Color {0.f, 0.f, 0.f, 1.f},
-						my_game->getMap(), 1, 1.0, 1);
-					my_game->addEnemy(std::move(my_enemy));
-				}
-				my_enemy = std::make_unique<game::Enemy>(my_game->getDeviceResources(),
-					my_game->getEnemyType(L"Red General"s), graphics::Color {0.5f, 0.0f, 0.f, 1.f},
-					my_game->getMap(), 1, 1.0, 1);
-				my_game->addEnemy(std::move(my_enemy));
 				// Add debug tower
 				auto my_tower = std::make_unique<game::Tower>(my_game->getDeviceResources(),
 					my_game->getTowerType(4), graphics::Color {0.f, 0.5f, 0.f, 1.f}, 3.5, 3.5);
@@ -276,6 +257,11 @@ namespace hoffman::isaiah {
 						case ID_MM_ACTIONS_NEXT_WAVE:
 						{
 							game::g_my_game->startWave();
+							break;
+						}
+						case ID_MM_ACTIONS_TOGGLE_PAUSE:
+						{
+							game::g_my_game->togglePause();
 							break;
 						}
 						case ID_MM_DEVELOP_TERRAIN_EDITOR:

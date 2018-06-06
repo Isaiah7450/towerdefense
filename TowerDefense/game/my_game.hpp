@@ -89,9 +89,11 @@ namespace hoffman::isaiah {
 			void addTower(std::unique_ptr<Tower>&& t);
 
 			// Player Actions:
-			void startWave() {
-				this->is_paused = false;
-				this->in_level = true;
+			/// <summary>Starts the next wave.</summary>
+			void startWave();
+			/// <summary>Toggles the pause state of the game.</summary>
+			void togglePause() noexcept {
+				this->is_paused = !this->is_paused;
 			}
 			void buyTower(int gx, int gy);
 			void sellTower(int gx, int gy);
@@ -116,6 +118,12 @@ namespace hoffman::isaiah {
 			}
 			std::vector<std::unique_ptr<Enemy>>& getEnemies() noexcept {
 				return this->enemies;
+			}
+			bool isPaused() const noexcept {
+				return this->is_paused;
+			}
+			bool isInLevel() const noexcept {
+				return this->in_level;
 			}
 		private:
 			/// <summary>Shared pointer to the device resources.</summary>
