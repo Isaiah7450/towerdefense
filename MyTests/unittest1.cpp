@@ -170,9 +170,9 @@ public:
 		auto pathfinder_a = std::make_unique<pathfinding::Pathfinder>(terrain_graph_a, filter_graph_a, influence_graph, false,
 			pathfinding::HeuristicStrategies::Manhattan);
 		try {
-			auto path = pathfinder_a->findPath();
+			auto path = pathfinder_a->findPath(1.0);
 			Assert::AreEqual(size_t {13}, path.size());
-			path = pathfinder_a->findPath(5.0);
+			path = pathfinder_a->findPath(1.0, -1, -1, -1, -1, 5.0);
 			Assert::AreEqual(size_t {11}, path.size());
 			path = pathfinder_a->findPath(1.0, -1, -1, 4, 4);
 			Assert::AreEqual(size_t {9}, path.size());

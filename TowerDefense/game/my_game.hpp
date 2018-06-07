@@ -140,6 +140,9 @@ namespace hoffman::isaiah {
 			int getSelectedTower() const noexcept {
 				return this->selected_tower;
 			}
+			int getChallengeLevel() const noexcept {
+				return this->challenge_level;
+			}
 		private:
 			/// <summary>Shared pointer to the device resources.</summary>
 			std::shared_ptr<graphics::DX::DeviceResources2D> device_resources;

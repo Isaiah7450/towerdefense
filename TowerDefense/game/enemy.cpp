@@ -100,14 +100,18 @@ namespace hoffman::isaiah {
 			current_direction {0.0},
 			current_health {(etype->getBaseHP() + 5.0 * level) * (difficulty * challenge_level / 5.0)},
 			maximum_health {(etype->getBaseHP() + 5.0 * level) * (difficulty * challenge_level / 5.0)},
-			current_armor_health {(etype->getBaseArmorHP() + 2.5 * level * challenge_level) * (1.0 + difficulty / 2.5)},
-			maximum_armor_health {(etype->getBaseArmorHP() + 2.5 * level * challenge_level) * (1.0 + difficulty / 2.5)},
+			current_armor_health {etype->getBaseArmorHP() > 0
+				? (etype->getBaseArmorHP() + 2.5 * level * challenge_level) * (1.0 + difficulty / 2.5)
+				: 0},
+			maximum_armor_health {etype->getBaseArmorHP() > 0
+				? (etype->getBaseArmorHP() + 2.5 * level * challenge_level) * (1.0 + difficulty / 2.5)
+				: 0},
 			current_strat {etype->getDefaultStrategy()},
 			move_diagonally {etype->canMoveDiagonally()},
 			status_effects {},
 			buffs {} {
 			// Get path
-			this->my_pathfinder.findPath();
+			this->my_pathfinder.findPath(challenge_level / 25.0);
 			this->my_path = this->my_pathfinder.getPath();
 			this->current_node = &this->my_path.front();
 			this->my_path.pop();
@@ -262,7 +266,8 @@ namespace hoffman::isaiah {
 			this->move_diagonally = diag_move;
 			// Obtain new path
 			this->my_pathfinder.setStrategy(new_strat, diag_move);
-			this->my_pathfinder.findPath(1.0, static_cast<int>(std::floor(this->getGameX())),
+			this->my_pathfinder.findPath(game::g_my_game->getChallengeLevel(),
+				static_cast<int>(std::floor(this->getGameX())),
 				static_cast<int>(std::floor(this->getGameY())));
 			this->current_node = &this->my_path.front();
 			this->my_path.pop();

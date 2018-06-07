@@ -87,8 +87,8 @@ namespace hoffman::isaiah {
 		class PathFinderNode {
 		public:
 			PathFinderNode(const GraphNode& me_node, std::shared_ptr<PathFinderNode> my_parent_node,
-				const GraphNode& my_goal_node,
-				HeuristicStrategies h_strat, double j_cost, double h_modifier = 1.0) noexcept :
+				const GraphNode& my_goal_node, HeuristicStrategies h_strat, double j_cost,
+				double j_multiplier, double h_modifier = 1.0) noexcept :
 				parent_node {my_parent_node},
 				graph_node {std::make_shared<GraphNode>(me_node)},
 				j {j_cost} {
@@ -105,7 +105,7 @@ namespace hoffman::isaiah {
 				// Add movement cost
 				this->g += (this->getGraphNode()->getWeight()) * multiplier;
 				this->calculateHeuristic(&my_goal_node, h_strat, h_modifier);
-				this->f = this->g + this->h + this->j;
+				this->f = this->g + this->h + this->j * j_multiplier;
 			}
 			// Getters
 			const std::shared_ptr<PathFinderNode> getParentNode() const noexcept {

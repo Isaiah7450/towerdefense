@@ -43,8 +43,8 @@ namespace hoffman::isaiah {
 			return false;
 		}
 
-		std::queue<GraphNode> Pathfinder::findPath(double h_modifier, int start_x,
-			int start_y, int goal_x, int goal_y) {
+		std::queue<GraphNode> Pathfinder::findPath(double j_multiplier, int start_x,
+			int start_y, int goal_x, int goal_y, double h_modifier) {
 			class PathFinderComparator {
 			public:
 				bool operator()(PathFinderNode a, PathFinderNode b) const {
@@ -67,7 +67,7 @@ namespace hoffman::isaiah {
 			// Yes, I am actually going to do the search in reverse order so
 			// that the beginning of the queue has the start node.
 			auto my_goal = PathFinderNode {goal_node, nullptr, start_node,
-				this->heuristic_strategy, 0, h_modifier};
+				this->heuristic_strategy, 0, j_multiplier, h_modifier};
 			my_set.push(my_goal);
 			previous_costs.emplace(determine_node_index(my_goal.getGameX(), my_goal.getGameY()), my_goal.getF());
 			while (!my_set.empty()) {
@@ -84,7 +84,7 @@ namespace hoffman::isaiah {
 					auto next_node = PathFinderNode {*neighbor_node, current_node,
 						start_node, this->heuristic_strategy,
 						static_cast<double>(influence_graph.getNode(neighbor_node->getGameX(),
-							neighbor_node->getGameY()).getWeight()), h_modifier};
+							neighbor_node->getGameY()).getWeight()), j_multiplier, h_modifier};
 					auto next_node_index = determine_node_index(next_node.getGameX(), next_node.getGameY());
 					// Check F score and only add if F score is lower
 					if (previous_costs.find(next_node_index) == previous_costs.end()) {
