@@ -154,6 +154,16 @@ namespace hoffman::isaiah {
 			double getFiringRange() const noexcept {
 				return this->firing_range;
 			}
+			/// <returns>The approximate area covered by the tower.</returns>
+			double getFiringArea() const noexcept {
+				// Using the min-max angles for the tower is probably bad
+				// but whatever; this is basically your formula for
+				// the area of a circular sector (except in radians rather than degrees)
+				return this->getFiringMethod().getMethod() == FiringMethodTypes::Default
+					? this->getFiringRange() * this->getFiringRange() * math::pi
+					: this->getFiringRange() * this->getFiringRange()
+						* (this->getFiringMethod().getMaximumAngle() - this->getFiringMethod().getMinimumAngle()) / 2.0;
+			}
 			int getVolleyShots() const noexcept {
 				return this->volley_shots;
 			}
@@ -173,7 +183,7 @@ namespace hoffman::isaiah {
 				if (this->isWall()) {
 					return static_cast<double>(this->cost_adjustment);
 				}
-				return this->getCostAdjustment() + this->getRating() / 6.0;
+				return this->getCostAdjustment() + this->getRating() / 18.0 + 1.0;
 			}
 		protected:
 			// Getters

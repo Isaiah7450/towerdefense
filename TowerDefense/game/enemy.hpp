@@ -25,6 +25,10 @@ namespace hoffman::isaiah {
 			Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
 				std::shared_ptr<EnemyType> etype, graphics::Color o_color,
 				const GameMap& gmap, int level, double difficulty, int challenge_level);
+			Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
+				std::shared_ptr<EnemyType> etype, graphics::Color o_color,
+				pathfinding::Pathfinder pf, double start_gx, double start_gy,
+				int level, double difficulty, int challenge_level);
 			/// <summary>Advances the enemy's game state by one frame.</summary>
 			/// <returns>True if the enemy should be removed; otherwise, false.</returns>
 			bool update();
@@ -179,6 +183,37 @@ namespace hoffman::isaiah {
 				return this->status_effects;
 			}
 		protected:
+			// Functions that help construction
+			/// <returns>The enemy's starting health adjusted for the level, difficulty, and challenge level.</returns>
+			static double getAdjustedHealth(double base_hp, int level, double difficulty, int challenge_level) noexcept {
+				return math::get_max(0.0, (base_hp + (level - 1.0)) * ((difficulty + challenge_level) / 10.0 + 0.8));
+			}
+			/// <returns>The enemy's starting armor health adjusted for the level, difficulty, and challenge level.</returns>
+			static double getAdjustedArmorHealth(double base_ahp, int level, double difficulty, int challenge_level) noexcept {
+				return base_ahp > 0 ? math::get_min(9999999.0, base_ahp + (level - 1.0)
+					* ((difficulty + challenge_level) / 12.5 + 0.84)) : 0;
+			}
+			/// <summary>Creates the enemy's actual buffs from the templates stored in its type.</summary>
+			void addEnemyBuffs() noexcept {
+				for (auto& b : this->getBaseType().getBuffTypes()) {
+					// This is obnoxious, but I think it works better
+					// than getting into some weird cloning stuff
+					switch (b->getType()) {
+					case BuffTypes::Intelligence:
+						this->buffs.emplace_back(std::make_unique<SmartBuff>(dynamic_cast<SmartBuff&>(*b)));
+						break;
+					case BuffTypes::Speed:
+						this->buffs.emplace_back(std::make_unique<SpeedBuff>(dynamic_cast<SpeedBuff&>(*b)));
+						break;
+					case BuffTypes::Healer:
+						this->buffs.emplace_back(std::make_unique<HealerBuff>(dynamic_cast<HealerBuff&>(*b)));
+						break;
+					case BuffTypes::Purify:
+						this->buffs.emplace_back(std::make_unique<PurifyBuff>(dynamic_cast<PurifyBuff&>(*b)));
+						break;
+					}
+				}
+			}
 			// Setters/Changers
 			// Getters
 			/// <returns>The raw walking speed of the enemy. (Base Speed * Boosts)</returns>

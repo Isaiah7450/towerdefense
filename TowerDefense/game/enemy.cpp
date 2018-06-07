@@ -98,14 +98,10 @@ namespace hoffman::isaiah {
 			my_path {},
 			current_node {nullptr},
 			current_direction {0.0},
-			current_health {(etype->getBaseHP() + 3.5 * level) * (difficulty * challenge_level / 5.0)},
-			maximum_health {(etype->getBaseHP() + 3.5 * level) * (difficulty * challenge_level / 5.0)},
-			current_armor_health {etype->getBaseArmorHP() > 0
-				? (etype->getBaseArmorHP() + 1.2 * level * challenge_level) * (1.0 + difficulty / 2.5)
-				: 0},
-			maximum_armor_health {etype->getBaseArmorHP() > 0
-				? (etype->getBaseArmorHP() + 1.2 * level * challenge_level) * (1.0 + difficulty / 2.5)
-				: 0},
+			current_health {Enemy::getAdjustedHealth(etype->getBaseHP(), level, difficulty, challenge_level)},
+			maximum_health {Enemy::getAdjustedHealth(etype->getBaseHP(), level, difficulty, challenge_level)},
+			current_armor_health {Enemy::getAdjustedArmorHealth(etype->getBaseArmorHP(), level, difficulty, challenge_level)},
+			maximum_armor_health {Enemy::getAdjustedArmorHealth(etype->getBaseArmorHP(), level, difficulty, challenge_level)},
 			current_strat {etype->getDefaultStrategy()},
 			move_diagonally {etype->canMoveDiagonally()},
 			status_effects {},
@@ -116,25 +112,31 @@ namespace hoffman::isaiah {
 			this->current_node = &this->my_path.front();
 			this->my_path.pop();
 			this->changeDirection();
-			// Add buffs
-			for (auto& b : this->getBaseType().getBuffTypes()) {
-				// This is obnoxious, but I think it works better
-				// than getting into some weird cloning stuff
-				switch (b->getType()) {
-				case BuffTypes::Intelligence:
-					this->buffs.emplace_back(std::make_unique<SmartBuff>(dynamic_cast<SmartBuff&>(*b)));
-					break;
-				case BuffTypes::Speed:
-					this->buffs.emplace_back(std::make_unique<SpeedBuff>(dynamic_cast<SpeedBuff&>(*b)));
-					break;
-				case BuffTypes::Healer:
-					this->buffs.emplace_back(std::make_unique<HealerBuff>(dynamic_cast<HealerBuff&>(*b)));
-					break;
-				case BuffTypes::Purify:
-					this->buffs.emplace_back(std::make_unique<PurifyBuff>(dynamic_cast<PurifyBuff&>(*b)));
-					break;
-				}
-			}
+			this->addEnemyBuffs();
+		}
+
+		Enemy::Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
+			std::shared_ptr<EnemyType> etype, graphics::Color o_color,
+			pathfinding::Pathfinder pf, double start_gx, double start_gy,
+			int level, double difficulty, int challenge_level) :
+			GameObject {dev_res, etype->getShape(), o_color, etype->getColor(), start_gx, start_gy, 0.5, 0.5},
+			base_type {etype},
+			my_pathfinder {pf},
+			my_path {pf.getPath()},
+			current_node {nullptr},
+			current_direction {0.0},
+			current_health {Enemy::getAdjustedHealth(etype->getBaseHP(), level, difficulty, challenge_level)},
+			maximum_health {Enemy::getAdjustedHealth(etype->getBaseHP(), level, difficulty, challenge_level)},
+			current_armor_health {Enemy::getAdjustedArmorHealth(etype->getBaseArmorHP(), level, difficulty, challenge_level)},
+			maximum_armor_health {Enemy::getAdjustedArmorHealth(etype->getBaseArmorHP(), level, difficulty, challenge_level)},
+			current_strat {etype->getDefaultStrategy()},
+			move_diagonally {etype->canMoveDiagonally()},
+			status_effects {},
+			buffs {} {
+			this->current_node = &this->my_path.front();
+			this->my_path.pop();
+			this->changeDirection();
+			this->addEnemyBuffs();
 		}
 
 		bool Enemy::update() {

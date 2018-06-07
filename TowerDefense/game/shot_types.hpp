@@ -71,7 +71,7 @@ namespace hoffman::isaiah {
 			/// <returns>The expected number of additional targets impacted by
 			/// this projectile's splash effect.</returns>
 			double getAverageExtraTargets() const noexcept {
-				return std::sqrt(this->getImpactRadius() * this->getImpactRadius() * math::pi) * math::e;
+				return this->getImpactRadius() * this->getImpactRadius() * math::pi;
 			}
 			/// <returns>The shot's expected average damage factoring in both multipliers
 			/// and splash damage.</returns>
@@ -218,11 +218,10 @@ namespace hoffman::isaiah {
 			// Overrides ShotBaseType::getExtraRating()
 			double getExtraRating() const noexcept override {
 				// I really do hope I don't end up with a precision issue with that last part.
-				return (this->getDamageType() == DoTDamageTypes::Fire ? 1.25 : 1.7)
+				return (this->getDamageType() == DoTDamageTypes::Fire ? 1.2 : 1.6)
 					* (this->getDamageMultiplierRating() * this->getDamagePerTick() * this->getTotalTicks())
 					* (1.0 + (this->isSplashEffectType() ? this->getAverageExtraTargets() : 0.0))
-					/ std::pow(this->getTotalTicks() * this->getMillisecondsBetweenTicks() / 1000.0,
-						1.0 / (this->getTotalTicks() * this->getMillisecondsBetweenTicks() / 1000.0));
+					/ (this->getTotalTicks() * this->getMillisecondsBetweenTicks() / 1000.0) + 3.5;
 			}
 		private:
 			/// <summary>The type of damage dealt by the damage over time effect.</summary>
@@ -266,9 +265,9 @@ namespace hoffman::isaiah {
 			void apply(Enemy& e) const override;
 			// Overrides ShotBaseType::getExtraRating()
 			double getExtraRating() const noexcept override {
-				return (this->getSlowFactor() * this->getSlowDuration() * 7.5 / 1000.0)
+				return this->getSlowFactor() * this->getSlowDuration() / 1000.0
 					* (1.0 + (this->isSplashEffectType() ? this->getAverageExtraTargets() : 0.0))
-					* (1.0 + this->getMultipleSlowChance());
+					* (1.0 + this->getMultipleSlowChance() / 2.5) + 5.0;
 			}
 		private:
 			/// <summary>The slow factor applied to the enemy; the enemy will move this percentage
@@ -309,9 +308,9 @@ namespace hoffman::isaiah {
 			void apply(Enemy& e) const override;
 			// Overrides ShotBaseType::getExtraRating()
 			double getExtraRating() const noexcept override {
-				return this->getStunChance() * this->getStunDuration() * 10.0 / 1000.0
+				return this->getStunChance() * this->getStunDuration() / 1000.0
 					* (1.0 + (this->isSplashEffectType() ? this->getAverageExtraTargets() : 0.0))
-					* (this->isSplashEffectType() ? 7.50 : 1.00);
+					* (1.0 + this->getMultipleStunChance() / 1.5) + 7.5;
 			}
 			// Getters
 			double getMultipleStunChance() const noexcept {

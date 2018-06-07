@@ -791,10 +791,15 @@ namespace hoffman::isaiah {
 					if (etype->isUnique()) {
 						enemy_count -= this->getChallengeLevel() + 1;
 					}
+					pathfinding::Pathfinder my_pathfinder {this->getMap(), etype->isFlying(), etype->canMoveDiagonally(),
+						etype->getDefaultStrategy()};
+					my_pathfinder.findPath(this->challenge_level);
 					for (int i = 0; i < enemy_count; ++i) {
 						auto my_enemy = std::make_unique<Enemy>(this->getDeviceResources(), etype,
-							graphics::Color {0.f, 0.f, 0.f, 1.f}, this->getMap(), this->level,
-							this->difficulty, this->challenge_level);
+							graphics::Color {0.f, 0.f, 0.f, 1.f}, my_pathfinder,
+							this->getMap().getTerrainGraph(etype->isFlying()).getStartNode()->getGameX() + 0.5,
+							this->getMap().getTerrainGraph(etype->isFlying()).getStartNode()->getGameY() + 0.5,
+							this->level, this->difficulty, this->challenge_level);
 						my_enemy_spawns.emplace(std::move(my_enemy));
 					}
 					auto my_group = std::make_unique<EnemyGroup>(std::move(my_enemy_spawns), enemy_spawn_delay);
