@@ -98,13 +98,13 @@ namespace hoffman::isaiah {
 			my_path {},
 			current_node {nullptr},
 			current_direction {0.0},
-			current_health {(etype->getBaseHP() + 5.0 * level) * (difficulty * challenge_level / 5.0)},
-			maximum_health {(etype->getBaseHP() + 5.0 * level) * (difficulty * challenge_level / 5.0)},
+			current_health {(etype->getBaseHP() + 3.5 * level) * (difficulty * challenge_level / 5.0)},
+			maximum_health {(etype->getBaseHP() + 3.5 * level) * (difficulty * challenge_level / 5.0)},
 			current_armor_health {etype->getBaseArmorHP() > 0
-				? (etype->getBaseArmorHP() + 2.5 * level * challenge_level) * (1.0 + difficulty / 2.5)
+				? (etype->getBaseArmorHP() + 1.2 * level * challenge_level) * (1.0 + difficulty / 2.5)
 				: 0},
 			maximum_armor_health {etype->getBaseArmorHP() > 0
-				? (etype->getBaseArmorHP() + 2.5 * level * challenge_level) * (1.0 + difficulty / 2.5)
+				? (etype->getBaseArmorHP() + 1.2 * level * challenge_level) * (1.0 + difficulty / 2.5)
 				: 0},
 			current_strat {etype->getDefaultStrategy()},
 			move_diagonally {etype->canMoveDiagonally()},
