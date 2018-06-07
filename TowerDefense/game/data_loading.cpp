@@ -41,9 +41,7 @@ namespace hoffman::isaiah {
 			my_parser->getNext();
 			my_parser->expectToken(util::file::TokenTypes::Section, L"buff_targets"s);
 			my_parser->readKeyValue(L"targets"s);
-			if (!my_parser->matchToken(util::file::TokenTypes::Object, L"{"s)) {
-				throw util::file::DataFileException {L"Expected the start of an object ({)."s, my_parser->getLine()};
-			}
+			my_parser->expectToken(util::file::TokenTypes::Object, L"{"s);
 			// Key => Group Name, Value => List of enemy names associated with that group name
 			std::map<std::wstring, std::vector<std::wstring>> buff_target_groups {};
 			while (true) {
@@ -66,16 +64,11 @@ namespace hoffman::isaiah {
 				std::vector<std::wstring> target_names = my_parser->readList();
 				buff_target_groups.emplace(group_name, target_names);
 				my_parser->getNext();
-				if (!my_parser->matchToken(util::file::TokenTypes::Object, L"}"s)) {
-					throw util::file::DataFileException {L"Missing ending brace (})."s, my_parser->getLine()};
-				}
+				my_parser->expectToken(util::file::TokenTypes::Object, L"}"s);
 			}
 			do {
 				// Enemy Sections
-				if (!my_parser->matchToken(util::file::TokenTypes::Section, L"enemy"s)) {
-					throw util::file::DataFileException {L"Expected either the end of the file"s
-						L" or another [enemy] section."s, my_parser->getLine()};
-				}
+				my_parser->expectToken(util::file::TokenTypes::Section, L"enemy"s);
 				my_token = my_parser->readKeyValue(L"name"s);
 				std::wstring n = util::file::parseString(my_token, my_parser->getLine());
 				my_token = my_parser->readKeyValue(L"desc"s);
@@ -143,10 +136,12 @@ namespace hoffman::isaiah {
 					: my_token.second == L"Maximum"s ? pathfinding::HeuristicStrategies::Max_Dx_Dy
 					: throw util::file::DataFileException {L"Invalid strategy constant specified."s,
 						my_parser->getLine()};
-				my_token = my_parser->readKeyValue(L"can_move_diagonally"s);
-				bool move_diag = util::file::parseBoolean(my_token, my_parser->getLine());
-				my_token = my_parser->readKeyValue(L"is_flying"s);
-				bool fly = util::file::parseBoolean(my_token, my_parser->getLine());
+				my_parser->readKeyValue(L"can_move_diagonally"s);
+				bool move_diag = my_parser->parseBoolean();
+				my_parser->readKeyValue(L"is_flying"s);
+				bool fly = my_parser->parseBoolean();
+				my_parser->readKeyValue(L"is_unique"s);
+				bool unique = my_parser->parseBoolean();
 				my_parser->readKeyValue(L"buffs"s);
 				if (!my_parser->matchToken(util::file::TokenTypes::Object, L"{"s)) {
 					throw util::file::DataFileException {L"Expected the start of an object definition."s,
@@ -157,7 +152,7 @@ namespace hoffman::isaiah {
 				// Case when we have {} next to buffs
 				if (my_parser->matchToken(util::file::TokenTypes::Object, L"}"s)) {
 					auto my_type = std::make_unique<EnemyType>(n, d, c, st, dmg, hp, ahp, ar, pt,
-						wspd, rspd, ispd, strat, move_diag, fly);
+						wspd, rspd, ispd, strat, move_diag, fly, unique);
 					auto ret = this->enemy_types.emplace(n, std::move(my_type));
 					insert_succeeded = ret.second;
 				}
@@ -284,7 +279,7 @@ namespace hoffman::isaiah {
 				}
 				if (my_buffs.size() > 0) {
 					auto my_type = std::make_unique<EnemyType>(n, d, c, st, dmg, hp, ahp, ar, pt,
-						wspd, rspd, ispd, strat, move_diag, fly, std::move(my_buffs));
+						wspd, rspd, ispd, strat, move_diag, fly, unique, std::move(my_buffs));
 					insert_succeeded = this->enemy_types.emplace(n, std::move(my_type)).second;
 				}
 				if (!insert_succeeded) {
@@ -793,6 +788,9 @@ namespace hoffman::isaiah {
 							my_parser->getLine()};
 					}
 					std::queue<std::unique_ptr<Enemy>> my_enemy_spawns {};
+					if (etype->isUnique()) {
+						enemy_count -= this->getChallengeLevel() + 1;
+					}
 					for (int i = 0; i < enemy_count; ++i) {
 						auto my_enemy = std::make_unique<Enemy>(this->getDeviceResources(), etype,
 							graphics::Color {0.f, 0.f, 0.f, 1.f}, this->getMap(), this->level,

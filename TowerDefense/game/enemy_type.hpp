@@ -266,7 +266,7 @@ namespace hoffman::isaiah {
 			// Constructor
 			EnemyType(std::wstring n, std::wstring d, graphics::Color c, graphics::shapes::ShapeTypes st,
 				int dmg, double base_hp, double base_ahp, double ar, double pt, double base_wspd, double base_rspd,
-				double base_ispd, pathfinding::HeuristicStrategies def_strat, bool diag, bool fly,
+				double base_ispd, pathfinding::HeuristicStrategies def_strat, bool diag, bool fly, bool unique,
 				std::vector<std::shared_ptr<BuffBase>> btypes = {}) :
 				GameObjectType {n, d, c, st},
 				damage {dmg},
@@ -280,6 +280,7 @@ namespace hoffman::isaiah {
 				default_strategy {def_strat},
 				move_diag {diag},
 				flying {fly},
+				unique_class {unique},
 				buff_types {btypes} {
 			}
 			// Getters
@@ -317,6 +318,9 @@ namespace hoffman::isaiah {
 			}
 			bool isFlying() const noexcept {
 				return this->flying;
+			}
+			bool isUnique() const noexcept {
+				return this->unique_class;
 			}
 			const std::vector<std::shared_ptr<BuffBase>>& getBuffTypes() const noexcept {
 				return this->buff_types;
@@ -417,6 +421,8 @@ namespace hoffman::isaiah {
 			bool move_diag;
 			/// <summary>Is the enemy a flying enemy?</summary>
 			bool flying;
+			/// <summary>Is this enemy a unique enemy?</summary>
+			bool unique_class;
 			/// <summary>List of buffs that enemies of this type possess.</summary>
 			std::vector<std::shared_ptr<BuffBase>> buff_types;
 		};

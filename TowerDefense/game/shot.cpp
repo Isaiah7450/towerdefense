@@ -56,7 +56,10 @@ namespace hoffman::isaiah {
 			const double tdy = std::abs(this->getGameY() - this->origin_tower.getGameY());
 			const int igx = static_cast<int>(std::floor(this->getGameX()));
 			const int igy = static_cast<int>(std::floor(this->getGameY()));
-			const bool is_on_blocked_space = gmap.getTerrainGraph(true).getNode(igx, igy).isBlocked();
+			const bool is_on_blocked_space = igx >= 0 && igy >= 0
+				&& igx < graphics::screen_width && igy < graphics::screen_height
+				? gmap.getTerrainGraph(true).getNode(igx, igy).isBlocked()
+				: true;
 			return i < enemies.size() || is_on_blocked_space
 				|| std::sqrt(tdx * tdx + tdy * tdy) > this->origin_tower.getBaseType()->getFiringRange();
 		}
