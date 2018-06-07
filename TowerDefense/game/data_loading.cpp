@@ -612,6 +612,7 @@ namespace hoffman::isaiah {
 				throw util::file::DataFileException {L"The cost to build walls should be positive."s, my_parser->getLine()};
 			}
 			auto my_wall = std::make_shared<WallType>(wall_name, wall_desc, wall_color, wall_shape, wall_cost);
+			this->tower_types.emplace_back(std::move(my_wall));
 			// Trap section(s)
 			my_parser->getNext();
 			while (my_parser->matchToken(util::file::TokenTypes::Section, L"trap"s)) {
