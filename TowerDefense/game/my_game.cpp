@@ -177,7 +177,7 @@ namespace hoffman::isaiah {
 				}
 				this->shots.clear();
 				++this->level;
-				this->player.changeMoney(this->level < 5 ? this->my_level_enemy_count * 2.5
+				this->player.changeMoney((this->level < 5 ? this->my_level_enemy_count * 2.5
 					: this->level < 10 ? this->my_level_enemy_count * 1.5
 					: this->level < 15 ? this->my_level_enemy_count
 					: this->level < 25 ? this->my_level_enemy_count * 0.85
@@ -187,7 +187,7 @@ namespace hoffman::isaiah {
 					: this->level < 150 ? this->my_level_enemy_count * 0.25
 					: this->level < 250 ? this->my_level_enemy_count * 0.15
 					: this->level < 500 ? this->my_level_enemy_count * 0.10
-					: this->level < 1000 ? this->my_level_enemy_count * 0.05 : this->my_level_enemy_count * 0.01);
+					: this->level < 1000 ? this->my_level_enemy_count * 0.05 : this->my_level_enemy_count * 0.01) * 1.33);
 			}
 			// Remove lock
 			SetEvent(draw_event);
