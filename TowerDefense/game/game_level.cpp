@@ -46,8 +46,8 @@ namespace hoffman::isaiah {
 				return;
 			}
 			this->frames_until_next_spawn += this->spawn_frame_delay;
-			this->active_groups.emplace_back(std::move(this->groups.front()));
-			this->groups.pop_front();
+			this->active_groups.emplace_back(std::move(this->groups.back()));
+			this->groups.pop_back();
 		}
 
 		GameLevel::GameLevel(int level_no, std::deque<std::unique_ptr<EnemyWave>>&& level_waves, int spawn_ms_delay) :
@@ -70,8 +70,8 @@ namespace hoffman::isaiah {
 				return;
 			}
 			this->frames_until_next_spawn += this->spawn_frame_delay;
-			this->active_waves.emplace_back(std::move(this->waves.front()));
-			this->waves.pop_front();
+			this->active_waves.emplace_back(std::move(this->waves.back()));
+			this->waves.pop_back();
 		}
 	}
 }
