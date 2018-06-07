@@ -172,6 +172,9 @@ namespace hoffman::isaiah {
 				this->updateDifficulty();
 				this->did_lose_life = false;
 				this->in_level = false;
+				for (auto& t : this->towers) {
+					t->resetTower();
+				}
 				++this->level;
 				// TODO: Think up a better cash amount to award
 				this->player.changeMoney(this->my_level_enemy_count);

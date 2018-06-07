@@ -28,6 +28,13 @@ namespace hoffman::isaiah {
 			}
 			// Overrides GameObject::draw()
 			void draw(const graphics::Renderer2D& renderer) const noexcept override;
+			/// <summary>Reset's the tower's state to its initial state.</summary>
+			void resetTower() noexcept {
+				this->frames_til_next_shot = 0;
+				this->shots_fired_since_reload = 0;
+				this->must_reload = false;
+				this->frames_to_reload = 0;
+			}
 
 			/// <summary>Advances the tower's state by one logical frame.</summary>
 			/// <param name="enemies">The list of living enemies.</param>
