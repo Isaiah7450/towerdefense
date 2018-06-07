@@ -175,6 +175,7 @@ namespace hoffman::isaiah {
 				for (auto& t : this->towers) {
 					t->resetTower();
 				}
+				this->shots.clear();
 				++this->level;
 				// TODO: Think up a better cash amount to award
 				this->player.changeMoney(this->my_level_enemy_count);
