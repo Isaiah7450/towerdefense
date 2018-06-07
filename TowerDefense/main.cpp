@@ -270,7 +270,9 @@ namespace hoffman::isaiah {
 						}
 						case ID_MM_ACTIONS_NEXT_WAVE:
 						{
+							WaitForSingleObject(sync_mutex, INFINITE);
 							game::g_my_game->startWave();
+							ReleaseMutex(sync_mutex);
 							break;
 						}
 						case ID_MM_ACTIONS_TOGGLE_PAUSE:
