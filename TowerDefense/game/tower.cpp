@@ -31,7 +31,7 @@ namespace hoffman::isaiah {
 			const float shots_fired_percent = static_cast<float>(this->shots_fired_since_reload)
 				/ static_cast<float>(this->getBaseType()->getVolleyShots());
 			const float reload_time_percent = static_cast<float>(this->frames_to_reload)
-				/ static_cast<float>(this->getBaseType()->getReloadDelay());
+				/ static_cast<float>(math::convertMillisecondsToFrames(this->getBaseType()->getReloadDelay()));
 			const float bar_max_width = 0.7f * graphics::getGameSquareWidth<float>();
 			const float bar_height = 0.15f * graphics::getGameSquareHeight<float>();
 			const float ammo_bar_offset = 8.f * graphics::screen_height / 645.f;
@@ -47,13 +47,15 @@ namespace hoffman::isaiah {
 			renderer.fillRectangle(ammo_bar_outline_rc);
 			renderer.setFillColor(bar_filling_color);
 			renderer.fillRectangle(ammo_bar_filled_rc);
-			const float reload_bar_start_x = static_cast<float>(this->getScreenX()) - bar_max_width / 2.f
-				+ (bar_max_width * (1.f - reload_time_percent));
-			const float reload_bar_end_x = static_cast<float>(this->getScreenX()) + bar_max_width / 2.f;
-			const D2D_RECT_F reload_bar_filled_rc {reload_bar_start_x, ammo_bar_start_y,
-				reload_bar_end_x, ammo_bar_end_y};
-			renderer.setFillColor(bar_reloading_color);
-			renderer.fillRectangle(reload_bar_filled_rc);
+			if (reload_time_percent > 0) {
+				const float reload_bar_start_x = static_cast<float>(this->getScreenX()) + bar_max_width / 2.f
+					- (bar_max_width * (1.f - reload_time_percent));
+				const float reload_bar_end_x = static_cast<float>(this->getScreenX()) + bar_max_width / 2.f;
+				const D2D_RECT_F reload_bar_filled_rc {reload_bar_start_x, ammo_bar_start_y,
+					reload_bar_end_x, ammo_bar_end_y};
+				renderer.setFillColor(bar_reloading_color);
+				renderer.fillRectangle(reload_bar_filled_rc);
+			}
 		}
 
 		std::unique_ptr<Shot> Tower::update(const std::vector<std::unique_ptr<Enemy>>& enemies) {
