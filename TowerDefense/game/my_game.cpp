@@ -94,6 +94,9 @@ namespace hoffman::isaiah {
 			this->in_level = false;
 			this->map->resetOtherGraphs();
 			this->my_level_enemy_count = 0;
+			this->did_lose_life = false;
+			this->win_streak = 0;
+			this->lose_streak = 0;
 		}
 
 		void MyGame::update() {
@@ -124,6 +127,7 @@ namespace hoffman::isaiah {
 			for (unsigned int i = 0; i < this->enemies.size(); ++i) {
 				if (this->enemies[i]->update()) {
 					if (this->enemies[i]->isAlive()) {
+						this->did_lose_life = true;
 						this->player.changeHealth(-this->enemies[i]->getBaseType().getDamage());
 						if (!this->player.isAlive()) {
 							this->is_paused = true;
@@ -165,6 +169,8 @@ namespace hoffman::isaiah {
 			}
 			// Determine if the level is finished
 			if (this->my_level && !this->my_level->hasEnemiesLeft() && this->enemies.empty()) {
+				this->updateDifficulty();
+				this->did_lose_life = false;
 				this->in_level = false;
 				++this->level;
 				// TODO: Think up a better cash amount to award

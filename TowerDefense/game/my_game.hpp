@@ -143,6 +143,28 @@ namespace hoffman::isaiah {
 			int getChallengeLevel() const noexcept {
 				return this->challenge_level;
 			}
+		protected:
+			/// <summary>Updates the value of the dynamic difficulty variable.</summary>
+			void updateDifficulty() noexcept {
+				if (!this->did_lose_life) {
+					++this->win_streak;
+					this->lose_streak = 0;
+				}
+				else {
+					++this->lose_streak;
+					this->win_streak = 0;
+				}
+				if (this->win_streak > 1) {
+					// Increase the game's difficulty some
+					this->difficulty += 0.005 * this->getChallengeLevel() * (this->win_streak - 1);
+				}
+				else if (this->lose_streak > 0) {
+					// Decrease the game's difficulty
+					this->difficulty -= 0.015 * this->getChallengeLevel() * this->lose_streak
+						+ this->level * 0.001;
+				}
+				// Else do nothing
+			}
 		private:
 			/// <summary>Shared pointer to the device resources.</summary>
 			std::shared_ptr<graphics::DX::DeviceResources2D> device_resources;
@@ -174,6 +196,12 @@ namespace hoffman::isaiah {
 			double difficulty {1.00};
 			/// <summary>The current game difficulty level the player is at.</summary>
 			int challenge_level;
+			/// <summary>The number of levels in a row that a player has lost life.</summary>
+			int lose_streak {0};
+			/// <summary>The number of levels in a row that a player has NOT lost any life.</summary>
+			int win_streak {0};
+			/// <summary>Whether or not the player has lost life this level.</summary>
+			bool did_lose_life {false};
 			/// <summary>Is the game currently paused?</summary>
 			bool is_paused {false};
 			/// <summary>Is a level currently in progress?</summary>
