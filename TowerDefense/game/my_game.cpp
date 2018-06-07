@@ -217,9 +217,19 @@ namespace hoffman::isaiah {
 				// Insufficient funds...
 				return;
 			}
-			this->player.changeMoney(-this->getTowerType(this->getSelectedTower())->getCost());
 			this->getMap().getFiterGraph(false).getNode(gx, gy).setBlockage(true);
 			this->getMap().getFiterGraph(true).getNode(gx, gy).setBlockage(true);
+			const auto my_pathfinder_ground = std::make_unique<pathfinding::Pathfinder>(this->getMap(), false,
+				false, pathfinding::HeuristicStrategies::Manhattan);
+			const auto my_pathfinder_air = std::make_unique<pathfinding::Pathfinder>(this->getMap(), true,
+				false, pathfinding::HeuristicStrategies::Manhattan);
+			if (!my_pathfinder_ground->checkPathExists() || !my_pathfinder_air->checkPathExists()) {
+				// No path for enemies...
+				this->getMap().getFiterGraph(false).getNode(gx, gy).setBlockage(false);
+				this->getMap().getFiterGraph(true).getNode(gx, gy).setBlockage(false);
+				return;
+			}
+			this->player.changeMoney(-this->getTowerType(this->getSelectedTower())->getCost());
 			auto my_tower = std::make_unique<Tower>(this->device_resources, this->getTowerType(this->getSelectedTower()),
 				graphics::Color {0.f, 0.f, 0.f, 1.0f}, gx + 0.5, gy + 0.5);
 			this->addTower(std::move(my_tower));

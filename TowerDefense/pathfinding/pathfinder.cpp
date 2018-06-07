@@ -59,6 +59,11 @@ namespace hoffman::isaiah {
 				? this->terrain_graph.getNode(start_x, start_y)
 				: *this->terrain_graph.getStartNode();
 			const auto oldStartWeight = start_node.getWeight();
+			[[maybe_unused]] auto oldFilterStartWeight = 0;
+			if (start_x > -1 && start_y > -1) {
+				oldFilterStartWeight = this->filter_graph.getNode(start_x, start_y).getWeight();
+				this->filter_graph.getNode(start_x, start_y).setBlockage(false);
+			}
 			const auto& goal_node = (goal_x > -1 && goal_y > -1)
 				? this->terrain_graph.getNode(goal_x, goal_y)
 				: *this->terrain_graph.getGoalNode();
@@ -126,6 +131,7 @@ namespace hoffman::isaiah {
 			// Reset the start and end nodes
 			if (start_x != -1 && start_y != -1) {
 				start_node.setWeight(oldStartWeight);
+				this->filter_graph.getNode(start_x, start_y).setWeight(oldFilterStartWeight);
 			}
 			return this->my_path;
 		}
