@@ -38,10 +38,10 @@ namespace hoffman::isaiah {
 					break;
 				}
 			}
-			if (i < enemies.size()) {
+			if (i < enemies.size() && this->base_type->getImpactRadius() > 0.0) {
 				// Check for splash effects as well
 				for (unsigned int j = 0; j < enemies.size(); ++j) {
-					auto& e = enemies[i];
+					auto& e = enemies[j];
 					if (j != i) {
 						const double edx = std::abs(this->getGameX() - e->getGameX());
 						const double edy = std::abs(this->getGameY() - e->getGameY());
@@ -61,7 +61,10 @@ namespace hoffman::isaiah {
 				? gmap.getTerrainGraph(true).getNode(igx, igy).isBlocked()
 				: true;
 			return i < enemies.size() || is_on_blocked_space
-				|| std::sqrt(tdx * tdx + tdy * tdy) > this->origin_tower.getBaseType()->getFiringRange();
+				|| std::sqrt(tdx * tdx + tdy * tdy) > this->origin_tower.getBaseType()->getFiringRange()
+				|| this->getGameX() < 0 || this->getGameY() < 0
+				|| this->getGameX() >= gmap.getTerrainGraph(false).getWidth()
+				|| this->getGameY() >= gmap.getTerrainGraph(false).getWidth();
 		}
 	}
 }
