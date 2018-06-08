@@ -37,21 +37,26 @@ namespace hoffman::isaiah {
 		/// <summary>Class that represents the player.</summary>
 		class Player {
 		public:
+			constexpr Player() = default;
+			constexpr Player(double cash, int hp) :
+				money {cash},
+				health {hp} {
+			}
 			// Getters
-			double getMoney() const noexcept {
+			constexpr double getMoney() const noexcept {
 				return this->money;
 			}
-			int getHealth() const noexcept {
+			constexpr int getHealth() const noexcept {
 				return this->health;
 			}
-			bool isAlive() const noexcept {
+			constexpr bool isAlive() const noexcept {
 				return this->getHealth() > 0;
 			}
-			// Setters
-			void changeMoney(double amt) noexcept {
+			// Setters and Changers
+			constexpr void changeMoney(double amt) noexcept {
 				this->money += amt;
 			}
-			void changeHealth(int amt) noexcept {
+			constexpr void changeHealth(int amt) noexcept {
 				this->health += amt;
 			}
 		private:
@@ -86,6 +91,12 @@ namespace hoffman::isaiah {
 			void load_global_level_data();
 			/// <summary>Loads the level data for the current level.</summary>
 			void load_level_data();
+			/// <summary>Saves the game state.</summary>
+			/// <param name="save_file">The file to save the game's state to.</param>
+			void save_game(std::wostream& save_file) const;
+			/// <summary>Loads a previously saved game state.</summary>
+			/// <param name="save_file">The file to load the game's state from.</param>
+			void load_game(std::wistream& save_file);
 			/// <summary>Adds an enemy to the game.</summary>
 			/// <param name="e">The enemy to add.</param>
 			void addEnemy(std::unique_ptr<Enemy>&& e);

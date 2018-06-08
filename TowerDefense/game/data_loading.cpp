@@ -20,6 +20,7 @@
 #include "./status_effects.hpp"
 #include "./shot_types.hpp"
 #include "./tower_types.hpp"
+#include "./tower.hpp"
 using namespace std::literals::string_literals;
 
 namespace hoffman::isaiah {
@@ -814,6 +815,83 @@ namespace hoffman::isaiah {
 			} while (my_parser->getNext());
 			this->my_level = std::make_unique<GameLevel>(this->level, std::move(my_level_waves), wave_spawn_delay);
 			this->my_level_enemy_count = this->my_level->getEnemyCount();
+		}
+
+		void MyGame::save_game(std::wostream& save_file) const {
+			if (this->isInLevel()) {
+				// Can't save now...
+				return;
+			}
+			save_file << L"V: " << 1 << L"\n";
+			save_file << L"C: " << this->challenge_level << L" D: " << this->difficulty
+				<< L" L: " << this->level << L"\n";
+			save_file << L"H: " << this->player.getHealth() << L" M: " << this->player.getMoney() << L"\n";
+			save_file << L"W: " << this->win_streak << L" L: " << this->lose_streak << L"\n";
+			// Output terrain map
+			save_file << this->getMap().getTerrainGraph(false) << L"\n";
+			save_file << this->getMap().getTerrainGraph(true) << L"\n";
+			// Output influence map
+			save_file << this->getMap().getInfluenceGraph(false) << L"\n";
+			save_file << this->getMap().getInfluenceGraph(true) << L"\n";
+			// Output towers as well.
+			for (const auto& t : this->towers) {
+				save_file << L"T: " << t->getBaseType()->getName() << L"\n\tT: " << t->getGameX() << L" "
+					<< t->getGameY() << L"\n";
+			}
+		}
+
+		void MyGame::load_game(std::wistream& save_file) {
+			std::wstring buffer {};
+			int version;
+			save_file >> buffer >> version;
+			if (version == 1) {
+				save_file >> buffer >> this->challenge_level >> buffer >> this->difficulty
+					>> buffer >> this->level;
+				int player_health;
+				double player_cash;
+				save_file >> buffer >> player_health >> buffer >> player_cash;
+				this->player = Player {player_cash, player_health};
+				save_file >> buffer >> this->win_streak >> buffer >> this->lose_streak;
+				// Terrain map
+				// (This is tricky --> Due to the way the start and end nodes are loaded,
+				// I need to TRANSFER the ownership of these resources TO this->map.)
+				auto my_gterrain = std::make_unique<pathfinding::Grid>();
+				auto my_aterrain = std::make_unique<pathfinding::Grid>();
+				save_file >> *my_gterrain >> *my_aterrain;
+				this->map = std::make_shared<game::GameMap>(std::move(my_gterrain), std::move(my_aterrain));
+				// Influence map
+				pathfinding::Grid ground_influence_map {};
+				pathfinding::Grid air_influence_map {};
+				save_file >> ground_influence_map >> air_influence_map;
+				this->map->setInfluenceGraphs(ground_influence_map, air_influence_map);
+				// Towers
+				std::wstring tower_name;
+				double tower_gx;
+				double tower_gy;
+				while (save_file >> buffer) {
+					std::getline(save_file, tower_name);
+					// Leading space is removed...
+					tower_name.erase(tower_name.begin());
+					save_file >> buffer >> tower_gx >> tower_gy;
+					std::shared_ptr<TowerType> my_type {nullptr};
+					for (const auto& tt : this->getAllTowerTypes()) {
+						if (tt->getName() == tower_name) {
+							my_type = tt;
+							break;
+						}
+					}
+					auto my_tower = std::make_unique<Tower>(this->getDeviceResources(), my_type,
+						graphics::Color {0.f, 0.f, 0.f, 1.f}, tower_gx, tower_gy);
+					this->addTower(std::move(my_tower));
+					auto my_floored_gx = static_cast<int>(std::floor(tower_gx));
+					auto my_floored_gy = static_cast<int>(std::floor(tower_gy));
+					this->getMap().getFiterGraph(false).getNode(my_floored_gx, my_floored_gy).setBlockage(true);
+					this->getMap().getFiterGraph(true).getNode(my_floored_gx, my_floored_gy).setBlockage(true);
+				}
+			}
+			else {
+				throw util::file::DataFileException {L"Unrecognized save file version."s, 1};
+			}
 		}
 	}
 }

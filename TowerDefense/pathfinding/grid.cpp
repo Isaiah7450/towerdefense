@@ -48,15 +48,19 @@ namespace hoffman::isaiah {
 			int gx = 0;
 			int gy = 0;
 			is >> sx >> sy >> gx >> gy;
-			graph.start_node = &graph.getNode(sx, sy);
-			graph.goal_node = &graph.getNode(gx, gy);
+			if (sx > -1 && sy > -1) {
+				graph.start_node = &graph.getNode(sx, sy);
+				graph.goal_node = &graph.getNode(gx, gy);
+			}
 			return is;
 		}
 
 		std::wostream& operator<<(std::wostream& os, const Grid& graph) {
+			/*
 			if (!graph.getStartNode() || !graph.getGoalNode()) {
 				throw std::runtime_error {"Cannot output a graph that lacks a starting and ending location."};
 			}
+			*/
 			// Width and height
 			os << graph.getRows() << L" " << graph.getColumns() << L"\n";
 			// Output grid contents
@@ -68,6 +72,9 @@ namespace hoffman::isaiah {
 				os << L"\n";
 			}
 			// Finally, output the start and end nodes
+			if (!graph.getStartNode()) {
+				return os << L"-1 -1\n-1 -1\n";
+			}
 			return os << graph.getStartNode()->getGameX() << L" "
 				<< graph.getStartNode()->getGameY() << L"\n"
 				<< graph.getGoalNode()->getGameX() << L" "

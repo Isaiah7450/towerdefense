@@ -190,9 +190,9 @@ namespace hoffman::isaiah {
 			}
 			/// <param name="gt_graph">The graph containing the ground terrain information.</param>
 			/// <param name="at_graph">The graph containing the air terrain information.</param>
-			GameMap(pathfinding::Grid gt_graph, pathfinding::Grid at_graph) :
-				ground_terrain_graph {std::make_unique<pathfinding::Grid>(gt_graph)},
-				air_terrain_graph {std::make_unique<pathfinding::Grid>(at_graph)},
+			GameMap(std::unique_ptr<pathfinding::Grid>&& gt_graph, std::unique_ptr<pathfinding::Grid>&& at_graph) :
+				ground_terrain_graph {std::move(gt_graph)},
+				air_terrain_graph {std::move(at_graph)},
 				ground_filter_graph {std::make_unique<pathfinding::Grid>()},
 				air_filter_graph {std::make_unique<pathfinding::Grid>()},
 				ground_influence_graph {std::make_unique<pathfinding::Grid>()},
@@ -200,6 +200,13 @@ namespace hoffman::isaiah {
 			}
 			// Overriding graphics::IDrawable
 			void draw(const graphics::Renderer2D& renderer) const noexcept override;
+			/// <summary>Sets the influence graphs stored in the map.</summary>
+			/// <param name="ground">The new ground influence graph.</param>
+			/// <param name="air">The new air influence graph.</param>
+			void setInfluenceGraphs(pathfinding::Grid ground, pathfinding::Grid air) {
+				this->ground_influence_graph = std::make_unique<pathfinding::Grid>(ground);
+				this->air_influence_graph = std::make_unique<pathfinding::Grid>(air);
+			}
 
 			// Getters
 			/// <param name="get_air_graph">Set this true to return the air graph; otherwise,
