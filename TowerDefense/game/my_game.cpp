@@ -128,7 +128,7 @@ namespace hoffman::isaiah {
 						this->player.changeHealth(-this->enemies[i]->getBaseType().getDamage());
 						if (!this->player.isAlive()) {
 							this->is_paused = true;
-							// TODO: Finish implementation here
+							this->in_level = false;
 						}
 					}
 					else {
@@ -201,7 +201,7 @@ namespace hoffman::isaiah {
 
 		void MyGame::startWave() {
 			this->is_paused = false;
-			if (!this->isInLevel()) {
+			if (!this->isInLevel() && this->player.isAlive()) {
 				// Automatically save the player's progress...
 				std::wofstream save_file {game::default_save_file_name};
 				if (!save_file.fail() && !save_file.bad()) {
@@ -220,8 +220,8 @@ namespace hoffman::isaiah {
 		}
 
 		void MyGame::buyTower(int gx, int gy) {
-			if (this->isInLevel()) {
-				// Can't build while enemies are attacking
+			if (this->isInLevel() || !this->player.isAlive()) {
+				// Can't build while enemies are attacking or if dead
 				return;
 			}
 			if (this->getSelectedTower() < 0
@@ -258,8 +258,8 @@ namespace hoffman::isaiah {
 		}
 
 		void MyGame::sellTower(int gx, int gy) {
-			if (this->isInLevel()) {
-				// Can't sell while enemies are present
+			if (this->isInLevel() || !this->player.isAlive()) {
+				// Can't sell while enemies are present or if dead
 				return;
 			}
 			for (unsigned int i = 0; i < this->towers.size(); ++i) {
