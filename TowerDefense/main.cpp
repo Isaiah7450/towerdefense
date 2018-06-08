@@ -450,7 +450,6 @@ namespace hoffman::isaiah {
 								WaitForSingleObject(sync_mutex, INFINITE);
 								for (int gx = this->start_gx; gx <= this->end_gx; ++gx) {
 									for (int gy = this->start_gy; gy <= this->end_gy; ++gy) {
-//										auto my_new_lparam = MAKELPARAM(gx, gy);
 										game::g_my_game->buyTower(gx, gy);
 									}
 								}

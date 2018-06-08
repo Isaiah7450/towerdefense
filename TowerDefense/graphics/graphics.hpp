@@ -140,6 +140,15 @@ namespace hoffman::isaiah {
 			void outlineRectangle(D2D1_RECT_F my_rect) const noexcept {
 				this->device_resources->getRenderTarget()->DrawRectangle(my_rect, this->device_resources->getOutlineBrush());
 			}
+			/// <summary>Outlines an ellipse using the current outline color.</summary>
+			/// <param name="my_ellipse">Stores the dimensions of the ellipse to outline.</param>
+			void outlineEllipse(D2D1_ELLIPSE my_ellipse) const noexcept {
+				this->device_resources->getRenderTarget()->DrawEllipse(my_ellipse, this->device_resources->getOutlineBrush());
+			}
+			// Creates an ellipse definition using the provided center and "radii" of the ellipse
+			constexpr static D2D1_ELLIPSE createEllipse(float cx, float cy, float rw, float rh) noexcept {
+				return D2D1_ELLIPSE {D2D1_POINT_2F {cx, cy}, rw, rh};
+			}
 			// Creates a rectangle definition using the provided left x, top y, width,
 			// and height of the rectangle
 			constexpr static D2D1_RECT_F createRectangle(float lx, float ty, float w, float h) noexcept {

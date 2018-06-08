@@ -224,6 +224,16 @@ namespace hoffman::isaiah {
 				// Can't build while enemies are attacking or if dead
 				return;
 			}
+			if (this->getMap().getFiterGraph(false).getNode(gx, gy).isBlocked()
+				&& this->getMap().getFiterGraph(true).getNode(gx, gy).isBlocked()) {
+				// Toggle radius
+				for (auto& t : this->towers) {
+					if (t->getGameX() == gx + 0.5 && t->getGameY() == gy + 0.5) {
+						t->toggleShowCoverage();
+					}
+				}
+				return;
+			}
 			if (this->getSelectedTower() < 0
 				|| this->getSelectedTower() > static_cast<int>(this->getAllTowerTypes().size())) {
 				// Invalid tower selected

@@ -28,6 +28,11 @@ namespace hoffman::isaiah {
 			}
 			// Overrides GameObject::draw()
 			void draw(const graphics::Renderer2D& renderer) const noexcept override;
+			/// <summary>Toggles the showing of the area that the tower covers.</summary>
+			void toggleShowCoverage() noexcept {
+				this->show_coverage = !this->show_coverage;
+			}
+
 			/// <summary>Reset's the tower's state to its initial state.</summary>
 			void resetTower() noexcept {
 				this->frames_til_next_shot = 0;
@@ -67,6 +72,8 @@ namespace hoffman::isaiah {
 			double frames_to_reload {0.0};
 			/// <summary>Whether or not the tower must completely reload before firing again.</summary>
 			bool must_reload {false};
+			/// <summary>Shows the tower's coverage.</summary>
+			bool show_coverage {false};
 			/// <summary>The index of the last angle that the tower fired its shot from.</summary>
 			mutable int angle_index {-1};
 		};

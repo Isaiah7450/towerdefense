@@ -20,6 +20,14 @@ namespace hoffman::isaiah {
 	namespace game {
 		void Tower::draw(const graphics::Renderer2D& renderer) const noexcept {
 			GameObject::draw(renderer);
+			// Draw radius if appropriate
+			if (!this->getBaseType()->isWall() && this->show_coverage) {
+				renderer.setOutlineColor(graphics::Color {1.f, 0.f, 0.f, 0.8f});
+				renderer.outlineEllipse(renderer.createEllipse(static_cast<float>(this->getScreenX()),
+					static_cast<float>(this->getScreenY()),
+					static_cast<float>(this->getBaseType()->getFiringRange() * graphics::getGameSquareWidth()),
+					static_cast<float>(this->getBaseType()->getFiringRange() * graphics::getGameSquareHeight())));
+			}
 			if (this->getBaseType()->getVolleyShots() == 0) {
 				return;
 			}
