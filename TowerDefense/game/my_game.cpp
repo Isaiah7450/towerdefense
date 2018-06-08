@@ -202,6 +202,12 @@ namespace hoffman::isaiah {
 		void MyGame::startWave() {
 			this->is_paused = false;
 			if (!this->isInLevel()) {
+				// Automatically save the player's progress...
+				std::wofstream save_file {game::default_save_file_name};
+				if (!save_file.fail() && !save_file.bad()) {
+					this->save_game(save_file);
+				}
+				// Load the level...
 				this->in_level = true;
 				try {
 					this->load_level_data();

@@ -75,11 +75,28 @@ namespace hoffman::isaiah {
 					CloseHandle(update_event);
 					throw std::runtime_error {"Can execute mutex does not exist."};
 				}
-				auto* my_game = game::g_my_game.get();
+				// Initialize the game's state
+				auto my_game = game::g_my_game;
 				my_game->init_enemy_types();
 				my_game->init_shot_types();
 				my_game->init_tower_types();
 				my_game->load_global_level_data();
+				std::wifstream default_save_file {game::default_save_file_name};
+				if (!default_save_file.bad() && !default_save_file.fail()) {
+					try {
+						my_game->load_game(default_save_file);
+					}
+					catch (...) {
+						MessageBox(nullptr, L"Error: Corrupted saved file! Reverting to new game.", L"Corrupted Save",
+							MB_OK | MB_ICONERROR);
+						// Reset state and save over the corrupted file...
+						my_game->resetState();
+						std::wofstream save_file {game::default_save_file_name};
+						if (!save_file.bad() && !save_file.fail()) {
+							my_game->save_game(save_file);
+						}
+					}
+				}
 				// Force creation of message queue
 				MSG msg;
 				PeekMessage(&msg, nullptr, WM_USER, WM_USER, PM_NOREMOVE);
@@ -90,6 +107,55 @@ namespace hoffman::isaiah {
 					BOOL ret_value = PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE);
 					if (ret_value > 0) {
 						switch (msg.message) {
+						case WM_COMMAND:
+						{
+							switch (msg.wParam) {
+							case ID_MM_FILE_NEW_GAME:
+								WaitForSingleObject(sync_mutex, INFINITE);
+								my_game->resetState();
+								ReleaseMutex(sync_mutex);
+								break;
+							case ID_MM_FILE_SAVE_GAME:
+							{
+								std::wofstream save_file {game::default_save_file_name};
+								if (save_file.fail() || save_file.bad()) {
+									MessageBox(nullptr, L"Could not save game.", L"Save failed!", MB_ICONEXCLAMATION | MB_OK);
+								}
+								else {
+									WaitForSingleObject(sync_mutex, INFINITE);
+									my_game->save_game(save_file);
+									ReleaseMutex(sync_mutex);
+								}
+								break;
+							}
+							case ID_MM_ACTIONS_NEXT_WAVE:
+								WaitForSingleObject(sync_mutex, INFINITE);
+								my_game->startWave();
+								ReleaseMutex(sync_mutex);
+								break;
+							case ID_MM_TOWERS_BUY_TOWER:
+							{
+								auto my_gx = static_cast<int>(GET_X_LPARAM(msg.lParam));
+								auto my_gy = static_cast<int>(GET_Y_LPARAM(msg.lParam));
+								WaitForSingleObject(sync_mutex, INFINITE);
+								my_game->buyTower(my_gx, my_gy);
+								ReleaseMutex(sync_mutex);
+								break;
+							}
+							case ID_MM_TOWERS_SELL_TOWER:
+							{
+								auto my_gx = static_cast<int>(GET_X_LPARAM(msg.lParam));
+								auto my_gy = static_cast<int>(GET_Y_LPARAM(msg.lParam));
+								WaitForSingleObject(sync_mutex, INFINITE);
+								my_game->sellTower(my_gx, my_gy);
+								ReleaseMutex(sync_mutex);
+								break;
+							}
+							default:
+								break;
+							}
+							break;
+						}
 						case WM_DESTROY:
 						case WM_QUIT:
 							keep_running = false;
@@ -102,12 +168,11 @@ namespace hoffman::isaiah {
 						// Error
 						winapi::handleWindowsError(L"Update thread ");
 					}
-					else {
+					if (keep_running) {
 						// Update stuff
 						const HANDLE update_handles[] = {
 							update_event, sync_mutex
 						};
-						// WaitForSingleObject(update_event, INFINITE);
 						WaitForMultipleObjects(2, update_handles, true, INFINITE);
 						my_game->update();
 						ReleaseMutex(sync_mutex);
@@ -255,26 +320,26 @@ namespace hoffman::isaiah {
 						switch (msg.wParam) {
 						case ID_MM_FILE_NEW_GAME:
 						{
-							// (Wait for the update thread to finish first...)
-							WaitForSingleObject(sync_mutex, INFINITE);
-							game::g_my_game->resetState();
-							ReleaseMutex(sync_mutex);
+							PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
 							break;
 						}
 						case ID_MM_FILE_SAVE_GAME:
 						{
+							PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
 							break;
 						}
 						case ID_MM_FILE_QUIT:
 						{
+							// Save player's progress...
+							PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_FILE_SAVE_GAME, 0);
+							Sleep(0);
+							PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
 							PostMessage(hwnd, WM_DESTROY, 0, 0);
 							break;
 						}
 						case ID_MM_ACTIONS_NEXT_WAVE:
 						{
-							WaitForSingleObject(sync_mutex, INFINITE);
-							game::g_my_game->startWave();
-							ReleaseMutex(sync_mutex);
+							PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
 							break;
 						}
 						case ID_MM_ACTIONS_TOGGLE_PAUSE:
@@ -309,10 +374,10 @@ namespace hoffman::isaiah {
 						if (GetKeyState(VK_CONTROL) && HIWORD(GetAsyncKeyState(VK_CONTROL))) {
 							switch (msg.wParam) {
 							case 'N':
-								PostMessage(hwnd, WM_COMMAND, ID_MM_FILE_NEW_GAME, 0);
+								PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_FILE_NEW_GAME, 0);
 								break;
 							case 'S':
-								PostMessage(hwnd, WM_COMMAND, ID_MM_FILE_SAVE_GAME, 0);
+								PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_FILE_SAVE_GAME, 0);
 								break;
 							case 'Q':
 								// Good way to keep mistakes from happening from keypresses
@@ -329,7 +394,7 @@ namespace hoffman::isaiah {
 						}
 						switch (msg.wParam) {
 						case 'W':
-							PostMessage(hwnd, WM_COMMAND, ID_MM_ACTIONS_NEXT_WAVE, 0);
+							PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_ACTIONS_NEXT_WAVE, 0);
 							break;
 						case 'P':
 							PostMessage(hwnd, WM_COMMAND, ID_MM_ACTIONS_TOGGLE_PAUSE, 0);
@@ -380,8 +445,22 @@ namespace hoffman::isaiah {
 						this->start_gy = math::get_min(this->start_gy, new_gy);
 						if (game::g_my_game->getMap().getTerrainGraph(false).verifyCoordinates(this->start_gx, this->start_gy)
 							&& game::g_my_game->getMap().getTerrainGraph(false).verifyCoordinates(this->end_gx, this->end_gy)) {
-							// Buy a tower
-							game::g_my_game->buyTower(this->end_gx, this->end_gy);
+							if (game::g_my_game->getSelectedTower() == 0) {
+								// Wall...
+								WaitForSingleObject(sync_mutex, INFINITE);
+								for (int gx = this->start_gx; gx <= this->end_gx; ++gx) {
+									for (int gy = this->start_gy; gy <= this->end_gy; ++gy) {
+//										auto my_new_lparam = MAKELPARAM(gx, gy);
+										game::g_my_game->buyTower(gx, gy);
+									}
+								}
+								ReleaseMutex(sync_mutex);
+							}
+							else {
+								auto my_new_lparam = MAKELPARAM(this->end_gx, this->end_gy);
+								PostThreadMessage(GetThreadId(update_thread), WM_COMMAND,
+									ID_MM_TOWERS_BUY_TOWER, my_new_lparam);
+							}
 						}
 						// Reset coordinates
 						this->start_gx = -1;
@@ -395,10 +474,8 @@ namespace hoffman::isaiah {
 						// Get coordinates
 						auto my_gx = static_cast<int>(graphics::convertToGameX(GET_X_LPARAM(msg.lParam)));
 						auto my_gy = static_cast<int>(graphics::convertToGameY(GET_Y_LPARAM(msg.lParam)));
-						if (game::g_my_game->getMap().getTerrainGraph(false).verifyCoordinates(my_gx, my_gy)) {
-							// Sell a tower
-							game::g_my_game->sellTower(my_gx, my_gy);
-						}
+						auto my_new_lparam = MAKELPARAM(my_gx, my_gy);
+						PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_TOWERS_SELL_TOWER, my_new_lparam);
 						break;
 					}
 					default:
@@ -414,7 +491,6 @@ namespace hoffman::isaiah {
 					const HANDLE draw_object_handles[] = {
 						draw_event, sync_mutex
 					};
-					// WaitForSingleObject(draw_event, INFINITE);
 					WaitForMultipleObjects(2, draw_object_handles, true, INFINITE);
 					HRESULT hr = my_renderer->render(game::g_my_game, this->start_gx, this->start_gy,
 						this->end_gx, this->end_gy);

@@ -74,5 +74,7 @@ namespace hoffman::isaiah {
 		// This framerate controls how often the game state is updated
 		// per second.
 		constexpr const int logic_framerate = 120;
+		// The name of the default save file.
+		constexpr const wchar_t* default_save_file_name = L"./userdata/xe8t6418hdefj.dat";
 	}
 }
