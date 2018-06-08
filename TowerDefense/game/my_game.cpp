@@ -83,9 +83,6 @@ namespace hoffman::isaiah {
 			this->player = Player {};
 			this->level = 1;
 			this->difficulty = 1.0;
-			while (this->my_level->hasEnemiesLeft()) {
-				this->my_level->update();
-			}
 			this->my_level = nullptr;
 			this->enemies.clear();
 			this->towers.clear();
