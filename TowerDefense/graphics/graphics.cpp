@@ -82,9 +82,9 @@ namespace hoffman::isaiah {
 			this->setTextColor(t_color);
 			this->device_resources->getRenderTarget()->DrawText(text.c_str(), text.size(),
 				this->device_resources->getTextFormat(), my_rect, this->device_resources->getTextBrush());
-#if defined(DEBUG) || defined(_DEBUG)
+// #if defined(DEBUG) || defined(_DEBUG)
 			this->outlineRectangle(my_rect);
-#endif // DEBUG || _DEBUG
+// #endif // DEBUG || _DEBUG
 		}
 
 		HRESULT Renderer2D::render(const std::shared_ptr<game::MyGame> my_game, int mouse_gx, int mouse_gy,
