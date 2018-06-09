@@ -21,6 +21,7 @@ Version 3.0
  + Challenge levels and different maps based on the challenge level. (The infrastructure for this is there; I just need to make the GUI...)
  + The ability to get in-game info about towers, shots, and enemies. (Again, this is because making GUI in C++ is not easy.)
  + The ability to upgrade towers. (Again, this isn't implemented because it requires me making a GUI for it.)
+ + The ability to purchase health. (It just isn't something I gotten to yet.)
 - New features implemented in the C++ version:
  + A pause feature that is 100% reliable. (The Java one was not reliable, and I think I removed it in a later version.)
  + More reliable and consistent saving. (I believe the Java version only saved when you exited the game--not very reliable!)
