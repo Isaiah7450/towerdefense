@@ -84,6 +84,8 @@ namespace hoffman::isaiah {
 			this->level = 1;
 			this->difficulty = 1.0;
 			this->my_level = nullptr;
+			this->my_level_enemy_count = 0;
+			this->my_level_enemy_killed = 0;
 			this->enemies.clear();
 			this->towers.clear();
 			this->shots.clear();
@@ -132,6 +134,7 @@ namespace hoffman::isaiah {
 						}
 					}
 					else {
+						++this->my_level_enemy_killed;
 						// Alter influence score on Normal challenge level and higher
 						auto& my_node = this->getMap().getInfluenceGraph(
 							this->enemies[i]->getBaseType().isFlying()).getNode(
@@ -166,25 +169,34 @@ namespace hoffman::isaiah {
 			}
 			// Determine if the level is finished
 			if (this->my_level && !this->my_level->hasEnemiesLeft() && this->enemies.empty()) {
-				this->updateDifficulty();
-				this->did_lose_life = false;
-				this->in_level = false;
+				// Award reward money
+				const double kill_percent = static_cast<double>(this->my_level_enemy_killed / this->my_level_enemy_count);
+				const int max_reward_money = static_cast<int>(std::round((this->level < 3 ? this->my_level_enemy_count * 2.5
+					: this->level < 5 ? this->my_level_enemy_count * 2.0
+					: this->level < 10 ? this->my_level_enemy_count * 1.5
+					: this->level < 15 ? this->my_level_enemy_count * 1.25
+					: this->level < 25 ? this->my_level_enemy_count
+					: this->level < 35 ? this->my_level_enemy_count * 0.85
+					: this->level < 50 ? this->my_level_enemy_count * 0.75
+					: this->level < 75 ? this->my_level_enemy_count * 0.50
+					: this->level < 150 ? this->my_level_enemy_count * 0.33
+					: this->level < 250 ? this->my_level_enemy_count * 0.25
+					: this->level < 500 ? this->my_level_enemy_count * 0.15
+					: this->level < 1000 ? this->my_level_enemy_count * 0.10 : this->my_level_enemy_count * 0.05)
+					* this->difficulty * 1.33 - std::sqrt(this->level) + this->getChallengeLevel() / 2.0));
+				this->player.changeMoney(max_reward_money * kill_percent);
+				this->my_level_enemy_count = 0;
+				this->my_level_enemy_killed = 0;
+				// Reset game state
 				for (auto& t : this->towers) {
 					t->resetTower();
 				}
 				this->shots.clear();
+				// Update difficulty
+				this->updateDifficulty();
 				++this->level;
-				this->player.changeMoney((this->level < 5 ? this->my_level_enemy_count * 2.5
-					: this->level < 10 ? this->my_level_enemy_count * 1.5
-					: this->level < 15 ? this->my_level_enemy_count
-					: this->level < 25 ? this->my_level_enemy_count * 0.85
-					: this->level < 35 ? this->my_level_enemy_count * 0.75
-					: this->level < 50 ? this->my_level_enemy_count * 0.50
-					: this->level < 75 ? this->my_level_enemy_count * 0.33
-					: this->level < 150 ? this->my_level_enemy_count * 0.25
-					: this->level < 250 ? this->my_level_enemy_count * 0.15
-					: this->level < 500 ? this->my_level_enemy_count * 0.10
-					: this->level < 1000 ? this->my_level_enemy_count * 0.05 : this->my_level_enemy_count * 0.01) * 1.33);
+				this->did_lose_life = false;
+				this->in_level = false;
 			}
 			// Remove lock
 			SetEvent(draw_event);

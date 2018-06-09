@@ -61,7 +61,7 @@ namespace hoffman::isaiah {
 			}
 		private:
 			/// <summary>The amount of money the player possesses.</summary>
-			double money {100.0};
+			double money {150.0};
 			/// <summary>The amount of health the player possesses.</summary>
 			int health {20};
 		};
@@ -201,6 +201,8 @@ namespace hoffman::isaiah {
 			std::unique_ptr<GameLevel> my_level {nullptr};
 			/// <summary>The total number of enemies that were created for a certain level.</summary>
 			int my_level_enemy_count {0};
+			/// <summary>The total number of enemies that were kill in a certain level.</summary>
+			int my_level_enemy_killed {0};
 			/// <summary>The game level to use if the loading of a level file fails.</summary>
 			int my_level_backup_number;
 			/// <summary>The current dynamic difficulty level the player is at.</summary>
