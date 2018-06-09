@@ -1,6 +1,9 @@
 # Directories
-bin/*
-bin/**/
+bin/other/**/
+bin/other/*.*
+bin/test_resources/*.*
+bin/userdata/*.*
+!bin/other/version.txt
 */doc/**/
 */obj/**/
 obj/*
@@ -20,6 +23,8 @@ documentation/*.*
 
 # File Types
 *.suo
+*.exp
+*.lastcodeanalysis*
 *.obj
 *.exe
 *.pdb
@@ -45,6 +50,13 @@ documentation/*.*
 *.sqlite
 *.ruleset
 *.props
+*.cso
+*.dll
+*.lib
+*.ilk
+
+StyleCop.Cache
+style_guide.html
 
 !install/*.*
 !install/docs/
