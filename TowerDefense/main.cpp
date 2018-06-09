@@ -330,9 +330,6 @@ namespace hoffman::isaiah {
 						}
 						case ID_MM_FILE_QUIT:
 						{
-							// Save player's progress...
-							PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_FILE_SAVE_GAME, 0);
-							Sleep(0);
 							PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
 							PostMessage(hwnd, WM_DESTROY, 0, 0);
 							break;
@@ -383,7 +380,7 @@ namespace hoffman::isaiah {
 								// Good way to keep mistakes from happening from keypresses
 								// That said, having a confirmation message every time is
 								// flat out annoying.
-								if (MessageBox(hwnd, L"Are you sure you want to quit?",
+								if (MessageBox(hwnd, L"Are you sure you want to quit? (Unsaved data will be lost.)",
 									L"Tower defense - Quit?", MB_YESNO) == IDYES) {
 									PostMessage(hwnd, WM_COMMAND, ID_MM_FILE_QUIT, 0);
 								}
