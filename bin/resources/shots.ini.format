@@ -1,0 +1,228 @@
+# Format specification for shots.ini
+# Lines that begin with a hash mark (#) or a semicolon (;)
+# are considered to be comments. Comments are mostly ignored
+# by the data file parser, so use them liberally to document
+# stuff that you feel are worth documenting.
+
+# The following is called a section header; any text
+# surrounded by square brackets is a section header.
+# The first section that should appear in this file
+# is the [global] section. It defines attributes of
+# the file that are relevant to the whole file, such
+# as the version of the file.
+[global]
+# The following number is the version number. It is
+# useful in case I decide to make breaking changes
+# to the file format (without actually rewriting
+# the entire game).
+# For now, you should simply this to the value 1
+# as this is the first version of this file.
+version = 1
+
+# The rest of the file defines the actual projectile
+# types and their properties. To define a projectile,
+# you simply add a new [shot] section and give its
+# properties below.
+[shot]
+# This is the name of the projectile type as seen
+# in places like the user interface. Note that
+# the quotes are mandatory here.
+name = "My Shot"
+# This is the description of the projectile. You
+# could leave this blank if you like, but preferably,
+# you would use this to inform users about what's
+# special about your projectile. (Make sure you
+# keep word-wrap on; it is an error to add newlines
+# here.)
+desc = "An example projectile."
+# This is simply the color of the projectile, as it
+# is seen in-game. You specify the color as a list
+# of 4 values: <Red, Green, Blue, Alpha> where each
+# of those four values are decimal numbers from 0
+# to 1. 0 indicates the absence of that color
+# (or fully transparent in the case of Alpha) while
+# 1 indicates that the color is fully used (or that
+# the shape is completely opaque in the case of
+# Alpha). Values in-between are just that--in-between
+# the absence of the color and fully lit.
+# Note that lower values tend to lead to darker
+# colors, and that higher values tend to lead
+# to lighter colors.
+# For instance, <1.0, 0.0, 1.0, 1.0> represents
+# fully opaque purple.
+color = <1.0, 0.0, 1.0, 1.0>
+# This value indicates what shape is used to represent
+# the projectile in-game. (This value may be ignored
+# depending on the characteristics of the tower firing
+# this projectile.)
+# Valid values currently include: Ellipse, Triangle, Rectangle
+#                                 Diamond, and Star.
+shape = Triangle
+# This is how much damage the projectile deals to
+# an enemy. Values above 5 or 6 are probably
+# on the high side, and do note that you are not
+# required to specify an integer here; for instance,
+# 3.5 is a perfectly valid value here.
+damage = 3.5
+# This value is the projectile's piercing rating.
+# Many enemies in the game have armor, which reduces
+# the damage they generally receive from projectiles.
+# A projectile's armor piercing rating undermines an
+# enemy armor by both causing more damage to the enemy's
+# armor as well as having some damage bypass the
+# enemy's armor.
+# The valid range for this value is 0.0 to 1.0. A value
+# of 0.0 indicates that the projectile does not pierce
+# through armor at all. A value of 1.0 indicates that
+# the projectile completely pierces through the enemy's
+# armor. In other words, the enemy will take full damage
+# from the projectile, both to its armor's endurance,
+# and to its health. Any value between the two indicates
+# that that percentage of damage will bypass the enemy's
+# armor.
+piercing = 0.50
+# This is the projectile's movement speed. For some
+# projectiles, this value probably won't matter; however,
+# in most cases, projectiles move in a straight path
+# at this speed (specified in game coordinate squares
+# per second). Generally speaking, keeping it
+# around 30 to 45 is fine for most cases. Values much
+# higher or lower may drastically affect the accuracy
+# of the projectile.
+move_speed = 40.00
+# This specifies the radius (in game coordinate squares)
+# in which other enemies are damaged indirectly when
+# this projectile hits an enemy. Think of it like
+# a bomb exploding or something like that. Note that
+# a value of 0 indicates that the projectile does no
+# AoE damage.
+impact_radius = 0.00
+# This value is the amount of damage dealt to enemies
+# that are hit indirectly by the projectile due to being
+# caught in the impact radius.
+splash_damage = 0.0
+# The amount of damage dealt to ground enemies is multiplied
+# by this value.
+ground_multiplier = 1.0
+# The amount of damage dealt to air enemies is multiplied
+# by this value.
+air_multiplier = 1.0
+# The shot's type which determines other characteristics of the
+# shot.
+type = Standard
+
+# Let's define another shot:
+[shot]
+name = "Poison Dart"
+desc = "A poisonous dart."
+color = <0.5, 0.8, 0.0, 1.0>
+shape = Diamond
+damage = 1.0
+piercing = 0.33
+move_speed = 45.00
+impact_radius = 0.50
+splash_damage = 0.0
+ground_multiplier = 0.9
+air_multiplier = 1.1
+# Here, we specify Damage_Over_Time as the type. This means the
+# shot deals additional damage over time after the initial
+# application of the shot.
+type = Damage_Over_Time
+# This determines whether or not the secondary effect (in this
+# case, a DoT (Damage Over Time) effect) is applied on enemies
+# that receive splash damage.
+apply_effect_on_splash = true
+# This is the type of damage dealt by the DoT (Damage Over Time)
+# effect. Valid values are Poison and Fire.
+# Both poison and fire pierce through armor; however, poison
+# has a higher penetration value and does not affect the
+# health of armor.
+dot_damage_type = Poison
+# This is the amount of damage that the DoT effect deals each
+# time it is activated (see below). Remember: you can use
+# decimal numbers here!
+dot_damage_per_tick = 0.5
+# This is the amount of time (in milliseconds) between
+# activations of the DoT effect; in other words, the enemy
+# takes dot_damage_per_tick points of damage every
+# dot_time_between_ticks milliseconds.
+dot_time_between_ticks = 500
+# This is the number of ticks that the DoT effect lasts
+# for before disappearing.
+dot_total_ticks = 10
+
+[shot]
+name = "Slow Shot"
+desc = "A shot that slows enemies."
+color = <0.2, 0.2, 0.6, 1.0>
+shape = Triangle
+damage = 1.5
+piercing = 0.75
+move_speed = 40.00
+impact_radius = 1.25
+splash_damage = 0.3
+ground_multiplier = 1.0
+air_multiplier = 1.0
+# We put Slow here to indicate that the shot should
+# slow enemies.
+type = Slow
+# This is the same property as last time, except now
+# one is saying NOT to apply it to enemies caught
+# in the impact radius.
+apply_effect_on_splash = false
+# This value indicates by how much enemies are slowed.
+# 1.00 indicates that the enemy moves at 0% of its speed.
+# 0.00 indicates that the enemy moves at its normal speed.
+# Values in-between indicate that the enemy moves at that
+#   much slower than their normal speed.
+# Example: 0.50 indicates the enemy moves at half its original
+#   speed.
+# Exmaple 2: 0.25 indicates the enemy moves at 75% its original
+#   speed.
+# Example 3: 0.33 indicates the enemy moves at 67% its original
+#   speed.
+slow_factor = 0.33
+# This is the time (in milliseconds) that the slow effect lasts for.
+slow_duration = 350
+# This is an advanced property that is important but easy to set
+# wrong. If you don't care that much, you should just set this value
+# to 0.00.
+# This is the percentage chance that an enemy that has already been
+# slowed will receive a second slow effect from this projectile.
+# It is primarily meant to keep enemies from always moving super slow
+# due to cumulative slow effects.
+# Note that a value of 0.50 (for instance) indicates a 50% chance.
+slow_multi_chance = 0.50
+
+[shot]
+name = "Stun Shot"
+desc = "A shot that stops enemies dead in their tracks."
+color = <1.0, 1.0, 0.0, 1.0>
+shape = Ellipse
+damage = 8.0
+piercing = 0.00
+move_speed = 42.50
+impact_radius = 0.00
+splash_damage = 0.0
+ground_multiplier = 1.25
+air_multiplier = 1.33
+# Stun indicates that the shot stops enemy movement completely.
+type = Stun
+# Again, this property is like the other two times you've seen
+# it already.
+# That said, for stun effects, it is HIGHLY recommended to always
+# set this to false, as otherwise, stun could get out of hand
+# really fast and really easily.
+apply_effect_on_splash = false
+# This is the probability that the shot will actually stun the
+# enemy. 0.0 indicates 0% probability and 1.0 indicates 100%
+# probability.
+stun_chance = 0.75
+# This is the time (in milliseconds) that the stun lasts for.
+stun_duration = 1000
+# This is an advanced property that indicates the probability
+# that the shot will stun the enemy again if the enemy is
+# already stunned. It should be <= stun_chance.
+# (Set this to 0.00 if you don't really care.)
+stun_multi_chance = 0.33
+

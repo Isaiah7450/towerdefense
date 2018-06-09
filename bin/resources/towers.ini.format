@@ -1,0 +1,339 @@
+# Format specification towers.ini
+# Lines that begin with a hash mark (#) or a semicolon (;)
+# are considered to be comments. Comments are mostly ignored
+# by the data file parser, so use them liberally to document
+# stuff that you feel are worth documenting.
+
+# The following is called a section header; any text
+# surrounded by square brackets is a section header.
+# The first section that should appear in this file
+# is the [global] section. It defines attributes of
+# the file that are relevant to the whole file, such
+# as the version of the file.
+[global]
+# The following number is the version number. It is
+# useful in case I decide to make breaking changes
+# to the file format (without actually rewriting
+# the entire game).
+# For now, you should simply this to the value 1
+# as this is the first version of this file.
+version = 1
+
+# This next section defines the firing methods
+# used by the towers defined in this file.
+[firing]
+# As indicated by the brace following the equal sign,
+# this property defines an object (or in this case,
+# an array of objects).
+# Terminology aside, this array of objects specifies
+# all the firing methods used by towers. You
+# must specify at least one method; thus, the
+# definition must always look like it does below.
+firing_methods = {
+	# As mentioned earlier, this is actually an
+	# array of objects, so this next brace
+	# begins the definition of one of the objects
+	# that the array is composed of.
+	{
+		# This name is simply a way of
+		# identifying this firing method.
+		# You can write almost anything here
+		# provided that you remember to use
+		# the quote marks ("") and remember
+		# to use this value to refer back
+		# to this entry in the array of
+		# objects.
+		name = "Guided Firing"
+		# This determines the way that
+		# the projectiles are fired.
+		# Valid values are:
+		# Default - The default method is
+		#           to fire the projectiles
+		#           close to the targeted
+		#           enemy.
+		#           This method is notorious
+		#           for its generally poor
+		#           accuracy, especially
+		#           against fast enemies;
+		#           however, it is pretty
+		#           much the only method
+		#           I used in previous
+		#           iterations; hence, it
+		#           is the default method.
+		# Static - The static method is
+		#          to simply shoot shots
+		#          at defined angles
+		#          whenever a fire is
+		#          within range.
+		# Pulse - The pulse method is very
+		#         similar to the static
+		#         method except the
+		#         projectiles instantly
+		#         reach their destination.
+		#         In other words, the
+		#         projectile's movement
+		#         speed is irrelevant.
+		method = Default
+		# The default method has no
+		# further configuration values,
+		# so you end the definition
+		# by simply adding a closing
+		# brace. Note that the comma
+		# following the closing brace
+		# is optional.
+	},
+	# Since we are going to define
+	# a second firing method
+	# to show you all the possible
+	# configuration values, we place
+	# a new opening brace on the
+	# following line as shown:
+	{
+		# Once again, you can write
+		# whatever you like here,
+		# but my advice is to choose
+		# values that make sense and
+		# help you easily identify
+		# this method.
+		name = "Cross Pulse"
+		# Like last time, this is
+		# the method used to fire the
+		# projectiles. Here's a summary
+		# of the modes:
+		# Default - Chooses angle before
+		#           firing and continues
+		#           in that direction.
+		# Static - Fires in fixed angles.
+		# Pulse - Fires in fixed angles, and
+		#        projectiles instantly reach
+		#        destination.
+		method = Pulse
+		# The following property applies only to
+		# the static and pulse firing modes.
+		# This value is a list (as
+		# indicated by the angle brackets
+		# (<) and (>)), and it defines the
+		# angles in degrees that towers with
+		# this firing method shoot at. Note that
+		# towers will rotate shots between each angle
+		# listed below, so don't specify too many.
+		# Since not everyone remembers what they
+		# learn in trigonometry, I will remind you
+		# that when measuring angles, you start with
+		# a ray from the origin going towards positive
+		# infinity on the x-axis and (in mathematics)
+		# make the angle by rotating counter-clockwise.
+		# There is one snag though with computer
+		# programming: the y-axis is flipped, so the
+		# angle being measured here is actually going
+		# to be measured clockwise.
+		# To help you understand better, I'll give a
+		# few examples:
+		# 0 degrees means the tower will fire straight
+		#   right. (i.e.: east)
+		# 45 degrees means the tower will fire southeast.
+		# 90 degrees means the tower will fire south.
+		# Also, as mentioned earlier, this value is a list,
+		# so you can specify as many values as you like,
+		# but don't forget to close the list with a right
+		# angle bracket (>). Also note that the commas
+		# are optional.
+		angles = <45, 225, 135, 315>
+		# This last value only applies to the pulse method.
+		# It determines how long the projectile remains active
+		# before it is destroyed (in milliseconds). A short
+		# time is recommended so that the projectile disappears
+		# before the next one is fired at the same angle.
+		# Note though that any value less than 10ms is probably
+		# too short and may result in an error. Very low values
+		# may also be annoying on the eyes.
+		duration = 75
+		# Don't forget to close the object as well!
+		# Indentation really helps you remember!
+	}
+}
+
+# The next section, the targeting section, defines the
+# targeting strategies used by towers.
+[targeting]
+targeting_methods = {
+	{
+		# We start with the name of the targeting method
+		# which is used later in the file to refer back
+		# to this setting...
+		name = "Default"
+		# This is the targeting strategy used:
+		# Distances - Targets enemies that are the closest/farthest
+		#            from the tower first.
+		# Statistics - Targets enemies with the highest/lowest
+		#              statistic first.
+		# Names - Targets enemies with certain names first.
+		strategy = Distances
+		# For the distance strategy, you simply specify whether
+		# to target the closest or farthest enemy; Lowest = Closest,
+		# Highest = Farthest (in terms of distance from the tower)
+		protocol = Lowest
+	},
+	{
+		name = "Highest HP"
+		strategy = Statistics
+		# For the statistics strategy, you have to specify two
+		# things: which statistic is being tested and whether
+		# to choose the enemy with the lowest or highest
+		# value in that statistic.
+		# The protocol property works the same as it does for
+		# for the distance strategy; Highest indicates that the
+		# tower will target enemies with the highest values in a
+		# stat, while Lowest indicates that the tower will target
+		# enemies with the lowest values in a stat.
+		protocol = Highest
+		# This next property indicates the statistic of the
+		# enemy to be tested.
+		# For this next property, valid values include:
+		# Damage - Tests the enemy's damage.		
+		# Health - Tests the enemy's current health.
+		# Armor_Health - Tests the enemy's current armor health.
+		# Armor_Reduce - Tests the enemy's armor reduction.
+		# Speed - Tests the enemy's current speed.
+		# Buffs - Tests the number of buffs an enemy possesses.
+		statistic = Health
+	},
+	{
+		name = "Prefer My Name"
+		strategy = Names
+		# This value is only used when there are no
+		# enemies that match the given preferred
+		# targets. The fallback method is the Distance
+		# targeting strategy, and this property specifies
+		# whether to target the closest or farthest enemy
+		# if that is the case.
+		protocol = Lowest
+		# Target names is a list of names that the
+		# tower will prefer to target first. If
+		# no enemies have a name that matches one
+		# of the given names, the tower will revert
+		# to the Distance strategy and work as
+		# specified in protocol.
+		target_names = <"My Name">
+	}
+}
+
+# There is one special tower, and it really isn't a tower.
+# This section is devoted to that "tower".
+[wall]
+# You could change this to something else if you like.
+name = "Wall"
+# You could also change this to something else if you like.
+desc = "The best way to keep the enemies at bay is by building some walls!"
+# This is the color of the wall. See the tower section below for more
+# on how this value is specified.
+color = <0.3, 0.3, 0.3, 1.0>
+# This is the shape of the wall. You could change it,
+# but I personally believe that anything besides a
+# rectangle makes for a strange looking wall. (As in,
+# more so than it already does!)
+shape = Rectangle
+# This is the cost to build the wall. You don't want
+# to set this to really high value.
+cost = 1
+
+# This is a placeholder section for if I ever decide to
+# implement one-off traps. You must include this section
+# header at least once.
+[trap]
+# For now, the section is simply empty; however, the parser
+# will ignore everything from here up until the first
+# [tower] section.
+
+# For each tower defined in the file, you must begin
+# it with a [tower] section header.
+[tower]
+# The name of the tower, as seen in-game.
+name = "My Tower"
+# The description of the tower, as seen in-game.
+# Make sure you document the tower's characteristics!
+desc = "An example tower."
+# This is simply the color of the tower, as it
+# is seen in-game. You specify the color as a list
+# of 4 values: <Red, Green, Blue, Alpha> where each
+# of those four values are decimal numbers from 0
+# to 1. 0 indicates the absence of that color
+# (or fully transparent in the case of Alpha) while
+# 1 indicates that the color is fully used (or that
+# the shape is completely opaque in the case of
+# Alpha). Values in-between are just that--in-between
+# the absence of the color and fully lit.
+# Note that lower values tend to lead to darker
+# colors, and that higher values tend to lead
+# to lighter colors.
+# For instance, <1.0, 0.0, 1.0, 1.0> represents
+# fully opaque purple.
+color = <1.0, 0.0, 1.0, 1.0>
+# The shape of the tower as depicted in-game.
+# Valid values currently include: Ellipse, Triangle, Rectangle
+#                                 Diamond, and Star.
+shape = Star
+# This is the name of the firing method used by the tower.
+firing_method = "Guided Firing"
+# This is the name of the targeting strategy used by the tower.
+# (Note: This is only relevant if the tower uses the Default
+# mode of firing. You still have to include it regardless.)
+targeting_strategy = "Default"
+# This is an array of objects that defines the
+# shots that the tower fires.
+shots = {
+	{
+		# This is the name of the projectile. You should
+		# use the name of the projectile as defined in
+		# shots.ini.
+		name = "My Shot"
+		# This is how often the projectile is fired.
+		# 1.0 means always and 0.0 means never. Values
+		# in-between indicate that the projectile is
+		# fired with that probability.
+		# Note that these values should add up to ideally
+		# 1.0; however, it is an error if these values
+		# add up to less than 1.0. (In some cases, a
+		# truncation or rounding error will cause
+		# the value to be less than 1.0; in that case,
+		# simply nudged the frequency of the last
+		# item up a little bit; it won't actually
+		# occur more frequently, but it should make
+		# the program work properly.)
+		frequency = 1.00
+	}
+	# You could give the tower multiple shots if you like
+	# by simply adding more braces.
+}
+# This is the firing speed of the tower. It specifies
+# the approximate number of shots that the tower fires
+# within a single second.
+firing_speed = 4.0
+# This is the firing range of the tower. It specifies
+# the maximum distance from the tower in game coordinate
+# squares that the tower can fire its projectiles at.
+firing_range = 5.0
+# This is the amount of ammunition the tower possesses
+# before it reloads. While reloading is free, it does
+# mean that the tower stops firing. A value of 0 here
+# indicates that the tower never has to reload.
+volley_shots = 0
+# This is the amount of time (in milliseconds) that
+# it takes for the tower to reload.
+reload_delay = 0
+# This is the cost adjustment value for the tower.
+# Because I'm really bad at balancing costs, I have
+# decided that I'll use some numerical statistics
+# to give each tower a cost, which works to a certain
+# extent; however, I also realize that sometimes the
+# numerical statistics way overestimate or way underestimate
+# the value of certain towers, and this field serves
+# to fix that.
+# Note also that a negative value here is fine; however,
+# be careful and make sure that a negative value here does
+# not result in a negative tower cost. Also note that the
+# value specified here is an integer.
+cost_adjust = 3
+
+# You could add more towers simply by adding more sections
+# to this file.

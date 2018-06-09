@@ -1,0 +1,53 @@
+Version 1.0:
+- Initial game version (coded in Java)
+
+Version 1.0.1:
+Version 1.0.2:
+Version 1.1.0:
+Version 1.1.1:
+Version 1.2.0:
+Version 1.3.0:
+- Information no longer relevant (still the Java version of the game)
+
+Version 2.0:
+- Never released
+- Rewrite of the original version
+- Game is now coded in C++ and only works on Windows now (You need DirectX)
+
+Version 3.0
+- A complete rewrite of the C++ version, but still in C++.
+- This version was designed with multi-threading in mind; in practical terms, this means that the game should be faster and be more responsive to user input.
+- Things in the Java version that haven't made it into the C++ version (primarily because they are a pain to implement in C++ compared to Java):
+ + Challenge levels and different maps based on the challenge level. (The infrastructure for this is there; I just need to make the GUI...)
+ + The ability to get in-game info about towers, shots, and enemies. (Again, this is because making GUI in C++ is not easy.)
+ + The ability to upgrade towers. (Again, this isn't implemented because it requires me making a GUI for it.)
+- New features implemented in the C++ version:
+ + A pause feature that is 100% reliable. (The Java one was not reliable, and I think I removed it in a later version.)
+ + More reliable and consistent saving. (I believe the Java version only saved when you exited the game--not very reliable!)
+ + Towers now have different firing methods and targeting strategies.
+  * Firing methods determine the way the tower shoots; towers can shoot in predefined angles or choose a target to shoot at. (The latter is the default.)
+  * Targeting strategies determine the way the tower obtains targets; it's irrelevant for all firing methods except the default one. Basically, it determines which enemies the tower shoots at first.
+ + Enemy pathfinding AI is a little bit smarter now. The enemy will now attempt to avoid paths where many enemies have died in the past.
+- Features that were changed/updated/modified in the C++ version: (Some of these are more coding-related)
+ + Everything is now handled in terms of logical frames. (Previously, some things like DoT effects were handled in exact milliseconds which was part of the reason the pause function did not work properly.)
+  * There are 120 logical frames in a single second.
+  * Configuration values are still generally specified in terms of milliseconds for consistency and ease.
+  * The game is drawn at a different framerate; the target drawing framerate is between 50 to 60 drawing frames per second.
+ + Enemies can now possess multiple passive buffs. (Previously, they could only possess a single buff type.)
+  * Two new buffs, Purify and Healing, have also been added. The former periodically removes negative status effects from enemies. The latter periodically heals enemies for a flat amount of health (not percentage based).
+ + Enemy armor and weapon piercing work slightly differently now:
+  * Enemy armor absorption was removed.
+  * Enemy armor reduction now completely blocks the amount that it reduces (rather than distributing it to its armor health and the rest to the enemy's base health).
+  * Weapon armor piercing basically reduces armor reduction and also damages the enemy in addition to its armor.
+ + A new data file format is being used for configuration data.
+  * This new format is more readable, consistent, and easier to use.
+ + The game is more flexibility in what is and isn't allowed.
+  * This is more of an implementation detail.
+  * Waves of enemies no longer have to be of the same color.
+  * More fine control over who is and who is not affected by an enemy's buff that is not based on color.
+ + Prices no longer scale with difficulty. (Rationale: This was silly and just made the game more complicated without adding anything of value.)
+ + Enemies possess two new statistics: injured movement speed and pain tolerance. An enemy that has loss a higher percentage of health than its pain tolerance are considered injured and move at the injured movement speed.
+ + The number of enemies spawned in an enemy group is no longer random and is based on the game's challenge level.
+ + Initial paths for enemies are found at the beginning of the level, and to improve performance, only one path is found (though the pathfinder is copied, not shared) for each enemy group (which are still of homogenous type).
+ + Path recalculations are still slow, but they should work more reliably now versus how they did in the Java version.
+ + It should go without saying that practically everything got rebalanced since I rewrote the game from scratch.
