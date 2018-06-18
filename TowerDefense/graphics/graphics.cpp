@@ -80,7 +80,7 @@ namespace hoffman::isaiah {
 
 		void Renderer2D::drawText(std::wstring text, Color t_color, D2D_RECT_F my_rect) const noexcept {
 			this->setTextColor(t_color);
-			this->device_resources->getRenderTarget()->DrawText(text.c_str(), text.size(),
+			this->device_resources->getRenderTarget()->DrawText(text.c_str(), static_cast<UINT32>(text.size()),
 				this->device_resources->getTextFormat(), my_rect, this->device_resources->getTextBrush());
 // #if defined(DEBUG) || defined(_DEBUG)
 			this->outlineRectangle(my_rect);

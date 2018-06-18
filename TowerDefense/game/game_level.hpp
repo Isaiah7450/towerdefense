@@ -19,7 +19,7 @@ namespace hoffman::isaiah {
 			void update() noexcept;
 			/// <returns>The total number of enemies currently in the group.</returns>
 			int getEnemyCount() const noexcept {
-				return this->enemies.size();
+				return static_cast<int>(this->enemies.size());
 			}
 			/// <returns>True if there are still enemies to spawn.</returns>
 			bool hasEnemiesLeft() const noexcept {

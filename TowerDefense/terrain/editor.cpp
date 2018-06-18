@@ -208,7 +208,7 @@ namespace hoffman::isaiah {
 						case ID_TE_ACTIONS_SET_AIR_START:
 						case ID_TE_ACTIONS_SET_GROUND_END:
 						case ID_TE_ACTIONS_SET_AIR_END:
-							this->selected_terrain_modifier = msg.wParam;
+							this->selected_terrain_modifier = static_cast<int>(msg.wParam);
 							this->terrain_modifier_active = true;
 							break;
 						case ID_TE_ACTIONS_INCREASE_WEIGHTS:
@@ -230,7 +230,7 @@ namespace hoffman::isaiah {
 						case ID_TE_TERRAIN_TYPES_CAVE:
 						case ID_TE_TERRAIN_TYPES_OCEAN:
 						case ID_TE_TERRAIN_TYPES_MOUNTAIN:
-							this->selected_terrain_type = msg.wParam;
+							this->selected_terrain_type = static_cast<int>(msg.wParam);
 							break;
 						default:
 							break;

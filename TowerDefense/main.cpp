@@ -361,8 +361,8 @@ namespace hoffman::isaiah {
 						// Check if the tower menu thingy got selected
 						if (msg.wParam >= ID_MM_TOWERS_NONE
 							&& msg.wParam <= ID_MM_TOWERS_NONE + game::g_my_game->getAllTowerTypes().size()) {
-							my_renderer->updateSelectedTower(hwnd, msg.wParam);
-							game::g_my_game->selectTower(msg.wParam - ID_MM_TOWERS_NONE - 1);
+							my_renderer->updateSelectedTower(hwnd, static_cast<int>(msg.wParam));
+							game::g_my_game->selectTower(static_cast<int>(msg.wParam) - ID_MM_TOWERS_NONE - 1);
 						}
 						break;
 					}

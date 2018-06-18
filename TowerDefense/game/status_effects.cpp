@@ -72,11 +72,15 @@ namespace hoffman::isaiah {
 			return this->frames_until_expire <= 0;
 		}
 
+		void StunEffect::clearEffects(Enemy& e) {
+			e.setStun(false);
+		}
+
 		bool StunEffect::update(Enemy& e) {
 			e.setStun(true);
 			--this->frames_until_expire;
 			if (this->frames_until_expire < 0) {
-				e.setStun(false);
+				this->clearEffects(e);
 			}
 			return this->frames_until_expire < 0;
 		}

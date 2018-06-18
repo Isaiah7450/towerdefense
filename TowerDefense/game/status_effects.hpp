@@ -17,6 +17,10 @@ namespace hoffman::isaiah {
 		class StatusEffectBase {
 		public:
 			virtual ~StatusEffectBase();
+			/// <summary>This function clears harmful effects when the status effect finishes.</summary>
+			virtual void clearEffects(Enemy& e) {
+				UNREFERENCED_PARAMETER(e);
+			}
 			/// <summary>This function is called once every frame on each
 			/// enemy afflicted by this status effect.</summary>
 			/// <param name="e">The enemy that this is being called for.</param>
@@ -135,6 +139,8 @@ namespace hoffman::isaiah {
 			StunEffect(int ms_until_expires) :
 				frames_until_expire {math::convertMillisecondsToFrames(ms_until_expires)} {
 			}
+			// Implements StatusEffectBase::onClear()
+			void clearEffects(Enemy& e) override;
 			// Implements StatusEffectBase::update()
 			bool update(Enemy& e) override;
 			// Implements StatusEffectBase::isPositiveEffect()

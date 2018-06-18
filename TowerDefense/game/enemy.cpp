@@ -74,6 +74,7 @@ namespace hoffman::isaiah {
 			// Determine which statuses to remove
 			for (unsigned int i = 0; i < active_statuses.size(); ++i) {
 				if (!active_statuses[i]->isPositiveEffect()) {
+					active_statuses[i]->clearEffects(target);
 					statuses_to_remove.emplace_back(i);
 					if (statuses_to_remove.size() >= static_cast<unsigned>(this->getMaxEffectsRemoved())) {
 						break;
