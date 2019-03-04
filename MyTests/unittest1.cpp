@@ -167,18 +167,18 @@ public:
 		terrain_graph_a.setGoalNode(4, 0);
 		auto filter_graph_a = pathfinding::Grid {5, 5};
 		auto influence_graph = pathfinding::Grid {5, 5};
-		auto pathfinder_a = std::make_unique<pathfinding::Pathfinder>(terrain_graph_a, filter_graph_a, influence_graph, false,
-			pathfinding::HeuristicStrategies::Manhattan);
+		auto pathfinder_a = pathfinding::Pathfinder {terrain_graph_a, filter_graph_a, influence_graph, false,
+			pathfinding::HeuristicStrategies::Manhattan};
 		try {
-			auto path = pathfinder_a->findPath(1.0);
+			auto path = pathfinder_a.findPath(1.0);
 			Assert::AreEqual(size_t {13}, path.size());
-			path = pathfinder_a->findPath(1.0, -1, -1, -1, -1, 5.0);
+			path = pathfinder_a.findPath(1.0, -1, -1, -1, -1, 5.0);
 			Assert::AreEqual(size_t {11}, path.size());
-			path = pathfinder_a->findPath(1.0, -1, -1, 4, 4);
+			path = pathfinder_a.findPath(1.0, -1, -1, 4, 4);
 			Assert::AreEqual(size_t {9}, path.size());
-			path = pathfinder_a->findPath(1.0, 3, 1);
+			path = pathfinder_a.findPath(1.0, 3, 1);
 			Assert::AreEqual(size_t {3}, path.size());
-			path = pathfinder_a->findPath(1.0, 3, 1, 4, 4);
+			path = pathfinder_a.findPath(1.0, 3, 1, 4, 4);
 			Assert::AreEqual(size_t {5}, path.size());
 		}
 		catch (...) {

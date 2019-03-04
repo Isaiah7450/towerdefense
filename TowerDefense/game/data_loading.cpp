@@ -41,7 +41,10 @@ namespace hoffman::isaiah {
 			// Buff Targets section
 			my_parser->getNext();
 			my_parser->expectToken(util::file::TokenTypes::Section, L"buff_targets"s);
+#pragma warning(push)
+#pragma warning(disable: 26444) // ES84: Avoid unnamed objects with custom construction/destruction. (No Idea...)
 			my_parser->readKeyValue(L"targets"s);
+#pragma warning(pop)
 			my_parser->expectToken(util::file::TokenTypes::Object, L"{"s);
 			// Key => Group Name, Value => List of enemy names associated with that group name
 			std::map<std::wstring, std::vector<std::wstring>> buff_target_groups {};
@@ -137,6 +140,8 @@ namespace hoffman::isaiah {
 					: my_token.second == L"Maximum"s ? pathfinding::HeuristicStrategies::Max_Dx_Dy
 					: throw util::file::DataFileException {L"Invalid strategy constant specified."s,
 						my_parser->getLine()};
+#pragma warning(push)
+#pragma warning(disable: 26444) // ES84: Avoid unnamed objects with custom construction/destruction. (No Idea...)
 				my_parser->readKeyValue(L"can_move_diagonally"s);
 				bool move_diag = my_parser->parseBoolean();
 				my_parser->readKeyValue(L"is_flying"s);
@@ -144,6 +149,7 @@ namespace hoffman::isaiah {
 				my_parser->readKeyValue(L"is_unique"s);
 				bool unique = my_parser->parseBoolean();
 				my_parser->readKeyValue(L"buffs"s);
+#pragma warning(pop)
 				if (!my_parser->matchToken(util::file::TokenTypes::Object, L"{"s)) {
 					throw util::file::DataFileException {L"Expected the start of an object definition."s,
 						my_parser->getLine()};
@@ -298,6 +304,8 @@ namespace hoffman::isaiah {
 			auto my_parser {std::make_unique<util::file::DataFileParser>(data_file)};
 			// Global section
 			my_parser->expectToken(util::file::TokenTypes::Section, L"global"s);
+#pragma warning(push)
+#pragma warning(disable: 26444) // ES84: Avoid unnamed objects with custom construction/destruction. (No Idea...)
 			my_parser->readKeyValue(L"version");
 			my_parser->expectToken(util::file::TokenTypes::Number, L"1"s);
 			while (my_parser->getNext()) {
@@ -378,6 +386,7 @@ namespace hoffman::isaiah {
 							L" applied on splash."s, my_parser->getLine()};
 					}
 				}
+#pragma warning(pop)
 				bool insert_succeeded = false;
 				switch (my_type) {
 				case ShotTypes::Standard:
@@ -873,8 +882,11 @@ namespace hoffman::isaiah {
 				this->map->setInfluenceGraphs(ground_influence_map, air_influence_map);
 				// Towers
 				std::wstring tower_name;
+#pragma warning(push)
+#pragma warning(disable: 26494) // Code Analysis: type.5 --> Always initialize.
 				double tower_gx;
 				double tower_gy;
+#pragma warning(pop)
 				while (save_file >> buffer) {
 					std::getline(save_file, tower_name);
 					// Leading space is removed...

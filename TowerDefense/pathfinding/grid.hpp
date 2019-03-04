@@ -15,7 +15,7 @@ namespace hoffman::isaiah {
 		public:
 			/// <summary>Creates an empty grid with grid_width columns and grid_height rows.
 			/// (Those numbers are global psuedo-constants.)</summary>
-			Grid() :
+			Grid() noexcept :
 				Grid(graphics::grid_height, graphics::grid_width) {
 			}
 			/// <summary>Creates an empty grid with the specified width and height.</summary>

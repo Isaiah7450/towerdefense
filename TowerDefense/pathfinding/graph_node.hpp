@@ -95,8 +95,8 @@ namespace hoffman::isaiah {
 				double multiplier = 1.0;
 				if (this->parent_node) {
 					this->g = this->parent_node->g;
-					int dx = math::get_abs(this->getGameX() - this->parent_node->getGameX());
-					int dy = math::get_abs(this->getGameY() - this->parent_node->getGameY());
+					const int dx = math::get_abs(this->getGameX() - this->parent_node->getGameX());
+					const int dy = math::get_abs(this->getGameY() - this->parent_node->getGameY());
 					if (dx != 0 && dy != 0) {
 						// Diagonal movement
 						multiplier = std::sqrt(2);
@@ -143,7 +143,7 @@ namespace hoffman::isaiah {
 				case HeuristicStrategies::Diagonal:
 					// Diagonal shortcut which is generally used
 					// when one can move in 8 directions.
-					this->h = ((dx + dy) + (std::sqrt(2) - 2) * math::get_min(dx, dy)) * h_modifier;
+					this->h = static_cast<double>(dx + dy) + (std::sqrt(2) - 2) * math::get_min(dx, dy) * h_modifier;
 					break;
 				case HeuristicStrategies::Max_Dx_Dy:
 					// A variant on diagonal shortcut where the cost of moving diagonally is
@@ -154,7 +154,7 @@ namespace hoffman::isaiah {
 				default:
 					// Default behavior is to use Manhattan which is
 					// generally used when one can travel only in the 4 cardinal directions.
-					this->h = (dx + dy) * h_modifier;
+					this->h = static_cast<double>(dx + dy) * h_modifier;
 					break;
 				}
 			}

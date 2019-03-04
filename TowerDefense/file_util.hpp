@@ -170,7 +170,10 @@ namespace hoffman::isaiah {
 			/// the read color on success and throwing an exception on failure.</summary>
 			/// <returns>The parsed color.</returns>
 			graphics::Color readColor() {
+#pragma warning(push)
+#pragma warning(disable: 26444) // ES84: Avoid unnamed objects with custom construction/destruction. (No Idea...)
 				this->readKeyValue(L"color");
+#pragma warning(pop)
 				auto my_list = this->readList();
 				if (my_list.size() != 4) {
 					throw DataFileException {L"The color property takes a list of four numbers that"
@@ -184,7 +187,10 @@ namespace hoffman::isaiah {
 			/// <returns>The parsed shape.</returns>
 			graphics::shapes::ShapeTypes readShape() {
 				using namespace std::literals::string_literals;
+#pragma warning(push)
+#pragma warning(disable: 26444) // ES84: Avoid unnamed objects with custom construction/destruction. (No Idea...)
 				this->readKeyValue(L"shape");
+#pragma warning(pop)
 				if (!this->matchTokenType(TokenTypes::Identifier)) {
 					throw DataFileException {L"Expected a shape constant."s, this->getLine()};
 				}

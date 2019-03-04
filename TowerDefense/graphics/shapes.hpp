@@ -35,7 +35,7 @@ namespace hoffman::isaiah {
 			/// <returns>True if the given point is inside the geometry; otherwise, false.</returns>
 			bool checkHit(float sx, float sy) const noexcept {
 				BOOL result = false;
-				HRESULT hr = this->transformed_geometry->FillContainsPoint(D2D1::Point2F(sx, sy),
+				const HRESULT hr = this->transformed_geometry->FillContainsPoint(D2D1::Point2F(sx, sy),
 					D2D1::Matrix3x2F::Identity(), &result);
 				return SUCCEEDED(hr) && result;
 			}
@@ -85,7 +85,7 @@ namespace hoffman::isaiah {
 				fill_color {f_color},
 				center_sx {csx},
 				center_sy {csy} {
-				HRESULT hr = this->device_resources->getFactory()->CreatePathGeometry(&this->path_geometry);
+				const HRESULT hr = this->device_resources->getFactory()->CreatePathGeometry(&this->path_geometry);
 				if (FAILED(hr)) {
 					throw std::runtime_error {"Creation of shape geometry failed!"};
 				}

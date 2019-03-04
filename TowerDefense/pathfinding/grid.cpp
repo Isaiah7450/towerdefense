@@ -106,7 +106,7 @@ namespace hoffman::isaiah {
 					if ((include_diag || dx == 0 || dy == 0) && !(dx == dy && dx == 0)) {
 						const auto* terrain_node = &this->getNode(gx + dx, gy + dy);
 						const auto* filter_node = &filter_graph.getNode(gx + dx, gy + dy);
-						auto total_weight = terrain_node->getWeight() + filter_node->getWeight();
+						const auto total_weight = terrain_node->getWeight() + filter_node->getWeight();
 						if (total_weight < GraphNode::blocked_space_weight
 							|| terrain_node == this->getStartNode()
 							|| terrain_node == this->getGoalNode()) {

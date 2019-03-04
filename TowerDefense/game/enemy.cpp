@@ -170,7 +170,7 @@ namespace hoffman::isaiah {
 			}
 			const double dx = (this->getNextNode().getGameX() + 0.5) - this->getGameX();
 			const double dy = (this->getNextNode().getGameY() + 0.5) - this->getGameY();
-			bool update_next_node = std::sqrt(dx * dx + dy * dy) <= my_speed + 0.05 / game::logic_framerate;
+			const bool update_next_node = std::sqrt(dx * dx + dy * dy) <= my_speed + 0.05 / game::logic_framerate;
 			if (update_next_node) {
 				// Change path
 				if (this->my_path.size() == 1) {

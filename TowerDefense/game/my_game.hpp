@@ -204,7 +204,7 @@ namespace hoffman::isaiah {
 			/// <summary>The total number of enemies that were kill in a certain level.</summary>
 			int my_level_enemy_killed {0};
 			/// <summary>The game level to use if the loading of a level file fails.</summary>
-			int my_level_backup_number;
+			int my_level_backup_number {-1};
 			/// <summary>The current dynamic difficulty level the player is at.</summary>
 			double difficulty {1.00};
 			/// <summary>The current game difficulty level the player is at.</summary>

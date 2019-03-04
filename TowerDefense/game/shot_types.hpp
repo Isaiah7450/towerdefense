@@ -221,7 +221,7 @@ namespace hoffman::isaiah {
 				return (this->getDamageType() == DoTDamageTypes::Fire ? 1.2 : 1.6)
 					* (this->getDamageMultiplierRating() * this->getDamagePerTick() * this->getTotalTicks())
 					* (1.0 + (this->isSplashEffectType() ? this->getAverageExtraTargets() : 0.0))
-					/ (this->getTotalTicks() * this->getMillisecondsBetweenTicks() / 1000.0) + 3.5;
+					/ (long long {this->getTotalTicks()} *this->getMillisecondsBetweenTicks() / 1000.0) + 3.5;
 			}
 		private:
 			/// <summary>The type of damage dealt by the damage over time effect.</summary>

@@ -30,8 +30,8 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR lpCmdLine, _In_ int nCmdShow) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
-	auto my_window = std::make_unique<ih::winapi::MainWindow>(hInstance);
-	my_window->run(nCmdShow);
+	auto my_window = ih::winapi::MainWindow {hInstance};
+	my_window.run(nCmdShow);
 	return 0;
 }
 
@@ -207,8 +207,8 @@ namespace hoffman::isaiah {
 				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPWSTR>(&lpMsgBuf), 0,
 				nullptr);
 			// Display the error message and exit the process
-			lpDisplayBuf = static_cast<LPVOID>(LocalAlloc(LMEM_ZEROINIT,
-				lstrlen(static_cast<LPWSTR>(lpMsgBuf)) + lpszFunction.size() + 120 * sizeof(TCHAR)));
+			lpDisplayBuf = LocalAlloc(LMEM_ZEROINIT,
+				lstrlen(static_cast<LPWSTR>(lpMsgBuf)) + lpszFunction.size() + 120 * sizeof(TCHAR));
 			if (!lpDisplayBuf) {
 				MessageBox(nullptr, L"Critical Error: Out of memory!", TEXT("Error"), MB_OK);
 				ExitProcess(dw);
@@ -308,7 +308,10 @@ namespace hoffman::isaiah {
 			my_renderer->createTowerMenu(hwnd, game::g_my_game->getAllTowerTypes());
 			HANDLE terrain_editor_thread {nullptr};
 			// Message Loop
+#pragma warning(push)
+#pragma warning(disable: 26494) // Code Analysis: type.5 --> Always initialize.
 			MSG msg;
+#pragma warning(pop)
 			bool keep_looping = true;
 			while (keep_looping) {
 				if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
@@ -468,9 +471,9 @@ namespace hoffman::isaiah {
 					case WM_RBUTTONUP:
 					{
 						// Get coordinates
-						auto my_gx = static_cast<int>(graphics::convertToGameX(GET_X_LPARAM(msg.lParam)));
-						auto my_gy = static_cast<int>(graphics::convertToGameY(GET_Y_LPARAM(msg.lParam)));
-						auto my_new_lparam = MAKELPARAM(my_gx, my_gy);
+						const auto my_gx = static_cast<int>(graphics::convertToGameX(GET_X_LPARAM(msg.lParam)));
+						const auto my_gy = static_cast<int>(graphics::convertToGameY(GET_Y_LPARAM(msg.lParam)));
+						const auto my_new_lparam = MAKELPARAM(my_gx, my_gy);
 						PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_TOWERS_SELL_TOWER, my_new_lparam);
 						break;
 					}

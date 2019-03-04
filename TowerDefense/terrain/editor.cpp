@@ -39,17 +39,17 @@ namespace hoffman::isaiah {
 		
 		unsigned __stdcall terrain_editor_thread_init(void* data) {
 			auto* my_game = game::g_my_game.get();
-			auto my_editor = std::make_unique<TerrainEditor>(static_cast<HWND>(data), my_game->getMap());
+			auto my_editor = TerrainEditor {static_cast<HWND>(data), my_game->getMap()};
 			HINSTANCE my_h_inst = nullptr;
 			if (!GetModuleHandleEx(0, nullptr, &my_h_inst)) {
 				winapi::handleWindowsError(L"TE Thread: Terrain editor creation");
 			}
-			my_editor->createWindow(my_h_inst);
+			my_editor.createWindow(my_h_inst);
 			try {
-				my_editor->run();
+				my_editor.run();
 			}
 			catch (std::runtime_error& e) {
-				MessageBoxA(my_editor->getHWND(), e.what(), "TE Thread Error", MB_OK);
+				MessageBoxA(my_editor.getHWND(), e.what(), "TE Thread Error", MB_OK);
 			}
 			return 0;
 		}
@@ -114,7 +114,10 @@ namespace hoffman::isaiah {
 				return;
 			}
 			// Message Loop
+#pragma warning(push)
+#pragma warning(disable: 26494) // Code Analysis: type.5 --> Always initialize.
 			MSG msg;
+#pragma warning(pop)
 			bool keep_looping = true;
 			bool need_to_update = false;
 			while (keep_looping) {
