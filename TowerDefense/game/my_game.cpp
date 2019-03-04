@@ -171,19 +171,17 @@ namespace hoffman::isaiah {
 			if (this->my_level && !this->my_level->hasEnemiesLeft() && this->enemies.empty()) {
 				// Award reward money
 				const double kill_percent = static_cast<double>(this->my_level_enemy_killed / this->my_level_enemy_count);
-				const int max_reward_money = static_cast<int>(std::round((this->level < 3 ? this->my_level_enemy_count * 2.5
-					: this->level < 5 ? this->my_level_enemy_count * 2.0
-					: this->level < 10 ? this->my_level_enemy_count * 1.5
-					: this->level < 15 ? this->my_level_enemy_count * 1.25
-					: this->level < 25 ? this->my_level_enemy_count
-					: this->level < 35 ? this->my_level_enemy_count * 0.85
-					: this->level < 50 ? this->my_level_enemy_count * 0.75
-					: this->level < 75 ? this->my_level_enemy_count * 0.50
-					: this->level < 150 ? this->my_level_enemy_count * 0.33
-					: this->level < 250 ? this->my_level_enemy_count * 0.25
-					: this->level < 500 ? this->my_level_enemy_count * 0.15
-					: this->level < 1000 ? this->my_level_enemy_count * 0.10 : this->my_level_enemy_count * 0.05)
-					* this->difficulty * 1.33 - std::sqrt(this->level) + this->getChallengeLevel() / 2.0));
+				const int max_reward_money = (this->level < 5 ?
+					100 : this->level < 10 ?
+					90 : this->level < 15 ?
+					80 : this->level < 20 ?
+					70 : this->level < 25 ?
+					65 : this->level < 30 ?
+					60 : this->level < 50 ?
+					50 : this->level < 100 ?
+					30 : 20) * static_cast<int>(this->difficulty + this->getChallengeLevel() / 2.0)
+					+ (this->level % 5 == 0 ? 15 : 0)
+					+ (this->level % 10 == 0 ? 25 : 0);
 				this->player.changeMoney(max_reward_money * kill_percent);
 				this->my_level_enemy_count = 0;
 				this->my_level_enemy_killed = 0;
