@@ -515,7 +515,14 @@ namespace hoffman::isaiah {
 						fm_angles.emplace_back(std::stod(a) * math::pi / 180.0);
 					}
 					std::sort(fm_angles.begin(), fm_angles.end());
-					std::unique(fm_angles.begin(), fm_angles.end());
+					// So weird... Why can't we just do the duplicate removal in-place?
+					// (With any luck, this will never be an issue... There is unique(),
+					// but I apparently have to make use of the returned iterator which is
+					// not favorable either.)
+					auto fm_angles2 = fm_angles;
+					std::unique_copy(fm_angles.begin(), fm_angles.end(), std::back_inserter(fm_angles2));
+					fm_angles = fm_angles2;
+
 					if (fmethod_type_str == L"Static"s) {
 						auto my_fmethod = std::make_shared<FiringMethod>(FiringMethodTypes::Static, fm_angles);
 						my_firing_methods.emplace(fm_name, std::move(my_fmethod));
@@ -725,10 +732,10 @@ namespace hoffman::isaiah {
 			if (data_file.bad() || data_file.fail()) {
 				throw util::file::DataFileException {L"Could not open resources/levels/global.ini for reading."s, 0};
 			}
-			auto my_parser = std::make_unique<util::file::DataFileParser>(data_file);
-			my_parser->expectToken(util::file::TokenTypes::Section, L"global"s);
-			my_parser->readKeyValue(L"backup_level_if_load_fails"s);
-			this->my_level_backup_number = static_cast<int>(my_parser->parseNumber());
+			auto my_parser = util::file::DataFileParser {data_file};
+			my_parser.expectToken(util::file::TokenTypes::Section, L"global"s);
+			my_parser.readKeyValue(L"backup_level_if_load_fails"s);
+			this->my_level_backup_number = static_cast<int>(my_parser.parseNumber());
 			if (this->my_level_backup_number < 1) {
 				this->my_level_backup_number = 1;
 			}
