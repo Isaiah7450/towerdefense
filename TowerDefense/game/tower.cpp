@@ -118,7 +118,7 @@ namespace hoffman::isaiah {
 				const double signed_gdx = e->getGameX() - this->getGameX();
 				const double signed_gdy = e->getGameY() - this->getGameY();
 				// (Values during input are specified from [0...2 pi], so this fixes the range.
-				const double e_angle_from_tower = std::atan2(signed_gdy, signed_gdx);
+				const double e_angle_from_tower = std::atan2(signed_gdy, -signed_gdx);
 				const double adjusted_angle = e_angle_from_tower >= 0 ? e_angle_from_tower
 					: math::pi - e_angle_from_tower;
 				if (my_method.getMethod() != FiringMethodTypes::Default) {
