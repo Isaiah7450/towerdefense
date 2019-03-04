@@ -180,8 +180,8 @@ namespace hoffman::isaiah {
 					60 : this->level < 50 ?
 					50 : this->level < 100 ?
 					30 : 20) * static_cast<int>(this->difficulty + this->getChallengeLevel() / 2.0)
-					+ (this->level % 5 == 0 ? 15 : 0)
-					+ (this->level % 10 == 0 ? 25 : 0);
+					+ (this->level % 5 == 4 ? 15 : 0)
+					+ (this->level % 10 == 9 ? 25 : 0);
 				this->player.changeMoney(max_reward_money * kill_percent);
 				this->my_level_enemy_count = 0;
 				this->my_level_enemy_killed = 0;
