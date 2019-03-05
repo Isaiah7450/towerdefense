@@ -19,7 +19,6 @@ namespace hoffman::isaiah {
 		public:
 			/// <summary>Creates a new main window.</summary>
 			/// <param name="h_inst">The hInstance parameter given by the WinMain function.</param>
-			/// <param name="nCmdShow">The nCmdShow parameter given by the WinMain function.</param>
 			MainWindow(HINSTANCE h_inst);
 			// Window's procedure
 			static LRESULT CALLBACK windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
