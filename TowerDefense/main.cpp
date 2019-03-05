@@ -16,6 +16,7 @@
 #include "./main.hpp"
 #include "./graphics/graphics_DX.hpp"
 #include "./graphics/graphics.hpp"
+#include "./graphics/info_dialogs.hpp"
 #include "./pathfinding/grid.hpp"
 #include "./game/enemy.hpp"
 #include "./game/enemy_type.hpp"
@@ -351,6 +352,7 @@ namespace hoffman::isaiah {
 						}
 						case ID_MM_ACTIONS_BUY_HEALTH:
 						{
+							// TODO: Move the "buyHealth()" part into the update thread.
 							game::g_my_game->buyHealth();
 							my_renderer->updateHealthOption(hwnd, game::g_my_game->getHealthBuyCost());
 							break;
@@ -445,8 +447,10 @@ namespace hoffman::isaiah {
 					case WM_LBUTTONUP:
 					{
 						// Update end coordinates
-						auto new_gx = static_cast<int>(graphics::convertToGameX(GET_X_LPARAM(msg.lParam)));
-						auto new_gy = static_cast<int>(graphics::convertToGameY(GET_Y_LPARAM(msg.lParam)));
+						const auto end_sx = static_cast<float>(GET_X_LPARAM(msg.lParam));
+						const auto end_sy = static_cast<float>(GET_Y_LPARAM(msg.lParam));
+						const auto new_gx = static_cast<int>(graphics::convertToGameX(end_sx));
+						const auto new_gy = static_cast<int>(graphics::convertToGameY(end_sy));
 						this->end_gx = math::get_max(new_gx, this->start_gx);
 						this->end_gy = math::get_max(new_gy, this->start_gy);
 						this->start_gx = math::get_min(this->start_gx, new_gx);
@@ -467,6 +471,20 @@ namespace hoffman::isaiah {
 								auto my_new_lparam = MAKELPARAM(this->end_gx, this->end_gy);
 								PostThreadMessage(GetThreadId(update_thread), WM_COMMAND,
 									ID_MM_TOWERS_BUY_TOWER, my_new_lparam);
+							}
+						}
+						if (game::g_my_game->isInLevel()) {
+							// Check if the user clicked on an enemy.
+							const auto& enemy_list = game::g_my_game->getEnemies();
+							for (const auto& e : enemy_list) {
+								if (e->checkHit(end_sx, end_sy)) {
+									if (!game::g_my_game->isPaused()) {
+										game::g_my_game->togglePause();
+									}
+									const winapi::EnemyInfoDialog my_dialog {hwnd, this->h_instance, e->getBaseType()};
+									game::g_my_game->togglePause();
+									break;
+								}
 							}
 						}
 						// Reset coordinates

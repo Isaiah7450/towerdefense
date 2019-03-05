@@ -241,6 +241,8 @@
     <ClInclude Include="graphics\file_dialogs.hpp" />
     <ClInclude Include="graphics\graphics.hpp" />
     <ClInclude Include="graphics\graphics_DX.hpp" />
+    <ClCompile Include="graphics\info_dialogs.cpp" />
+    <ClInclude Include="graphics\info_dialogs.hpp" />
     <ClInclude Include="graphics\shapes.hpp" />
     <ClInclude Include="main.hpp" />
     <ClInclude Include="ih_math.hpp" />

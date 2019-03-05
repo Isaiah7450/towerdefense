@@ -4,6 +4,23 @@
 //
 #define IDR_MAIN_MENU                   101
 #define IDR_TERRAIN_EDITOR_MENU         102
+
+#define IDD_INFO_ENEMY                  1001
+#define IDC_INFO_BASE_NAME              10001
+#define IDC_INFO_BASE_DESC              10002
+#define IDC_INFO_ENEMY_DAMAGE           10101
+#define IDC_INFO_ENEMY_HEALTH           10102
+#define IDC_INFO_ENEMY_ARMOR_HP         10103
+#define IDC_INFO_ENEMY_ARMOR_REDUCE     10104
+#define IDC_INFO_ENEMY_PAIN_TOLERANCE   10105
+#define IDC_INFO_ENEMY_WALK_SPEED       10106
+#define IDC_INFO_ENEMY_RUN_SPEED        10107
+#define IDC_INFO_ENEMY_INJURED_SPEED    10108
+#define IDC_INFO_ENEMY_STRATEGY         10109
+#define IDC_INFO_ENEMY_MOVE_DIAGONAL    10110
+#define IDC_INFO_ENEMY_IS_FLYING        10111
+#define IDC_INFO_ENEMY_NUM_BUFFS        10112
+
 #define ID_ACTIONS                      40009
 #define ID_MM_FILE_NEW_GAME             40101
 #define ID_MM_FILE_LOAD_GAME            40102

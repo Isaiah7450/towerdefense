@@ -1,6 +1,7 @@
 #pragma once
 // File Author: Isaiah Hoffman
 // File Created: March 13, 2018
+#include <array>
 #include <string>
 
 namespace hoffman::isaiah {
@@ -62,8 +63,16 @@ namespace hoffman::isaiah {
 		// Global classes
 		/// <summary>Enumeration of various heuristic strategies to estimate h during pathfinding.</summary>
 		enum class HeuristicStrategies {
-			Manhattan, Diagonal, Euclidean, Max_Dx_Dy
+			Manhattan, Diagonal, Euclidean, Max_Dx_Dy, Sentinel_DO_NOT_USE
 		};
+	}
+
+	inline std::wstring operator*(pathfinding::HeuristicStrategies strat) {
+		constexpr const std::array<const wchar_t*,
+			static_cast<int>(pathfinding::HeuristicStrategies::Sentinel_DO_NOT_USE)> my_strs = {
+			L"Manhattan", L"Diagonal", L"Euclidean", L"Max DX DY"
+		};
+		return my_strs.at(static_cast<int>(strat));
 	}
 
 	namespace game {
