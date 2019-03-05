@@ -87,6 +87,8 @@ namespace hoffman::isaiah {
 			void init_shot_types();
 			/// <summary>Initializes the list of tower types in this game.</summary>
 			void init_tower_types();
+			/// <summary>Loads miscellaneous data global to the application.</summary>
+			void load_global_misc_data();
 			/// <summary>Loads data that applies to all levels.</summary>
 			void load_global_level_data();
 			/// <summary>Loads the level data for the current level.</summary>
@@ -115,6 +117,7 @@ namespace hoffman::isaiah {
 			void selectTower(int selection) {
 				this->selected_tower = selection;
 			}
+			void buyHealth();
 			void buyTower(int gx, int gy);
 			void sellTower(int gx, int gy);
 			// Getters
@@ -153,6 +156,9 @@ namespace hoffman::isaiah {
 			}
 			int getChallengeLevel() const noexcept {
 				return this->challenge_level;
+			}
+			int getHealthBuyCost() const noexcept {
+				return static_cast<int>(std::ceil(this->hp_buy_cost));
 			}
 		protected:
 			/// <summary>Updates the value of the dynamic difficulty variable.</summary>
@@ -221,6 +227,12 @@ namespace hoffman::isaiah {
 			bool in_level {false};
 			/// <summary>The currently selected tower.</summary>
 			int selected_tower {-1};
+			/// <summary>The amount of health gained each time health is bought.</summary>
+			int hp_gained_per_buy {0};
+			/// <summary>The current cost to buy health.</summary>
+			double hp_buy_cost {0};
+			/// <summary>The cost to buy health is multiplied by this number each time.</summary>
+			double hp_buy_multiplier {1.00};
 			// Testing things
 			std::shared_ptr<pathfinding::Pathfinder> ground_test_pf {nullptr};
 			std::shared_ptr<pathfinding::Pathfinder> air_test_pf {nullptr};

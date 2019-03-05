@@ -25,8 +25,28 @@ using namespace std::literals::string_literals;
 
 namespace hoffman::isaiah {
 	namespace game {
+		void MyGame::load_global_misc_data() {
+			std::wifstream data_file {L"./resources/other.ini"s};
+			if (data_file.fail() || data_file.bad()) {
+				throw util::file::DataFileException {L"Could not load the enemy data file (enemies.ini)."s, 0};
+			}
+			util::file::DataFileParser my_parser {data_file};
+			// Globals section
+			my_parser.expectToken(util::file::TokenTypes::Section, L"global"s);
+			my_parser.getNext();
+			// Health buying section.
+			my_parser.expectToken(util::file::TokenTypes::Section, L"health_buying"s);
+			my_parser.readKeyValue(L"amount_gained");
+			this->hp_gained_per_buy = static_cast<int>(my_parser.parseNumber());
+			my_parser.readKeyValue(L"initial_cost");
+			this->hp_buy_cost = my_parser.parseNumber();
+			my_parser.readKeyValue(L"cost_multiplier");
+			this->hp_buy_multiplier = my_parser.parseNumber();
+		}
+
+#pragma warning(push)
+#pragma warning(disable: 4996) // I presume this is deprecated warning? Too bad I didn't document this originally.
 		void MyGame::init_enemy_types() {
-#pragma warning(disable: 4996)
 			std::wifstream data_file {L"./resources/enemies.ini"s};
 			if (data_file.fail() || data_file.bad()) {
 				throw util::file::DataFileException {L"Could not load the enemy data file (enemies.ini)."s, 0};
@@ -293,7 +313,7 @@ namespace hoffman::isaiah {
 					throw util::file::DataFileException {L"Duplicate enemy name: "s + n + L"."s, my_parser->getLine()};
 				}
 			} while (my_parser->getNext());
-#pragma warning(error: 4996)
+#pragma warning(pop)
 		}
 
 		void MyGame::init_shot_types() {

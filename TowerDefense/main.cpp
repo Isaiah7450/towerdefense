@@ -81,6 +81,7 @@ namespace hoffman::isaiah {
 				my_game->init_shot_types();
 				my_game->init_tower_types();
 				my_game->load_global_level_data();
+				my_game->load_global_misc_data();
 				std::wifstream default_save_file {game::default_save_file_name};
 				if (!default_save_file.bad() && !default_save_file.fail()) {
 					try {
@@ -305,6 +306,7 @@ namespace hoffman::isaiah {
 				winapi::handleWindowsError(L"Update thread creation");
 			}
 			WaitForSingleObject(update_thread_init_event, INFINITE);
+			my_renderer->updateHealthOption(hwnd, game::g_my_game->getHealthBuyCost());
 			my_renderer->createTowerMenu(hwnd, game::g_my_game->getAllTowerTypes());
 			HANDLE terrain_editor_thread {nullptr};
 			// Message Loop
@@ -345,6 +347,12 @@ namespace hoffman::isaiah {
 						case ID_MM_ACTIONS_TOGGLE_PAUSE:
 						{
 							game::g_my_game->togglePause();
+							break;
+						}
+						case ID_MM_ACTIONS_BUY_HEALTH:
+						{
+							game::g_my_game->buyHealth();
+							my_renderer->updateHealthOption(hwnd, game::g_my_game->getHealthBuyCost());
 							break;
 						}
 						case ID_MM_DEVELOP_TERRAIN_EDITOR:

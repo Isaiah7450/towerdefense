@@ -33,6 +33,18 @@
 using namespace std::literals::string_literals;
 namespace hoffman::isaiah {
 	namespace graphics {
+		void Renderer2D::updateHealthOption(HWND hwnd, int new_price) const noexcept {
+			auto my_menu = GetSubMenu(GetMenu(hwnd), 1);
+			MENUITEMINFO my_info {};
+			my_info.cbSize = sizeof(MENUITEMINFO);
+			my_info.fMask = MIIM_DATA | MIIM_STRING;
+			GetMenuItemInfo(my_menu, ID_MM_ACTIONS_BUY_HEALTH, FALSE, &my_info);
+			std::wstring new_string = L"Buy Health: $" + std::to_wstring(new_price) + L"\0";
+			my_info.dwTypeData = new_string.data();
+			SetMenuItemInfo(my_menu, ID_MM_ACTIONS_BUY_HEALTH, FALSE, &my_info);
+			DrawMenuBar(hwnd);
+		}
+
 		void Renderer2D::createTowerMenu(HWND hwnd,
 			const std::vector<std::shared_ptr<game::TowerType>>& towers) const noexcept {
 			auto my_menu = GetSubMenu(GetMenu(hwnd), 2);

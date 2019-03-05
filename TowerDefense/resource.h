@@ -12,6 +12,7 @@
 #define ID_MM_FILE_QUIT                 40105
 #define ID_MM_ACTIONS_TOGGLE_PAUSE      40201
 #define ID_MM_ACTIONS_NEXT_WAVE         40202
+#define ID_MM_ACTIONS_BUY_HEALTH        40203
 #define ID_MM_TOWERS_NONE               40301
 #define ID_MM_TOWERS_BUY_TOWER          40501
 #define ID_MM_TOWERS_SELL_TOWER         40502

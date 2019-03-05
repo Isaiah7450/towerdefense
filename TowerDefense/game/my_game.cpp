@@ -229,6 +229,20 @@ namespace hoffman::isaiah {
 			}
 		}
 
+		void MyGame::buyHealth() {
+			if (this->isInLevel() || !this->player.isAlive()) {
+				// Can't buy health while enemies are attacking or if dead.
+				return;
+			}
+			if (this->player.getMoney() < this->getHealthBuyCost()) {
+				// Not enough money.
+				return;
+			}
+			this->player.changeMoney(-this->hp_buy_cost);
+			this->hp_buy_cost *= this->hp_buy_multiplier;
+			this->player.changeHealth(this->hp_gained_per_buy);
+		}
+
 		void MyGame::buyTower(int gx, int gy) {
 			if (this->isInLevel() || !this->player.isAlive()) {
 				// Can't build while enemies are attacking or if dead

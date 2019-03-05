@@ -74,6 +74,10 @@ namespace hoffman::isaiah {
 			Renderer2D(std::shared_ptr<DX::DeviceResources2D> dev_res) :
 				device_resources {dev_res} {
 			}
+			/// <summary>Updates the text for the health option.</summary>
+			/// <param name="hwnd">Handle to the parent window.</param>
+			/// <param name="new_price">The new price to buy health.</param>
+			void updateHealthOption(HWND hwnd, int new_price) const noexcept;
 			/// <summary>Recreates the tower menu with the current list of towers.</summary>
 			/// <param name="hwnd">Handle to the parent window.</param>
 			/// <param name="towers">The list of tower types that the player can choose from.</param>
