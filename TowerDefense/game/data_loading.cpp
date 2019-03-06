@@ -895,6 +895,11 @@ namespace hoffman::isaiah {
 				auto my_aterrain = std::make_unique<pathfinding::Grid>();
 				save_file >> *my_gterrain >> *my_aterrain;
 				this->map = std::make_shared<game::GameMap>(std::move(my_gterrain), std::move(my_aterrain));
+				// Note that above move invalidates the test paths.
+				this->ground_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), false,
+					false, pathfinding::HeuristicStrategies::Manhattan);
+				this->air_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), true,
+					false, pathfinding::HeuristicStrategies::Manhattan);
 				// Influence map
 				pathfinding::Grid ground_influence_map {};
 				pathfinding::Grid air_influence_map {};
