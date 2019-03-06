@@ -22,8 +22,8 @@ wave_spawn_delay = 5000
 [wave]
 # This is the delay between the spawning of groups in the wave.
 # Again, you do not want all the groups to begin spawning enemies
-# all at once, so values in the range of 500ms to 2500ms are
-# recommended for this setting.
+# all at once, so values in the range of 500ms to 5000ms are
+# recommended for this setting. 1500ms to 3000ms are typical values.
 group_spawn_delay = 2500
 # Next, you define the groups that this wave is composed of, in
 # the order that you wish for them to begin spawning in.
@@ -42,8 +42,10 @@ groups = {
 		# of enemies in this group. You can set this low, but it
 		# is probably better to space out the spawning some. This
 		# probably helps with performance, and it definitely makes
-		# it easier on the player. Values between 100ms and 1000ms
-		# are reasonable for this setting.
+		# it easier on the player. Values between 100ms and 1500ms
+		# are reasonable for this setting. While the optimal "normal"
+		# density varies based on the enemy's speed, values between
+		# 400ms and 800ms should work well.
 		enemy_spawn_delay = 200
 	}
 	# If you want to add more groups, simply add more braces
