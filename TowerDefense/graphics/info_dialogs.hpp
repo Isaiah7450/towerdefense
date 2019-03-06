@@ -66,5 +66,7 @@ namespace hoffman::isaiah::winapi {
 		std::wstring num_buffs_string {};
 		std::wstring strat_string {};
 		std::wstring diag_string {};
+		std::wstring buff_rating_string {};
+		std::wstring rating_string {};
 	};
 }

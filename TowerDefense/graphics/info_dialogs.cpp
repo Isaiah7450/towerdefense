@@ -83,6 +83,14 @@ namespace hoffman::isaiah::winapi {
 		this->num_buffs_string = std::to_wstring(my_etype.getBuffTypesCount());
 		this->strat_string = *my_etype.getDefaultStrategy();
 		this->diag_string = my_etype.canMoveDiagonally() ? L"Yes" : L"No";
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(0)
+			<< my_etype.getExtraRating();
+		this->buff_rating_string = my_stream.str();
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(0)
+			<< my_etype.getRating();
+		this->rating_string = my_stream.str();
+		my_stream.str(L"");
 		SetDlgItemText(hwnd, IDC_INFO_ENEMY_HEALTH, this->hp_string.c_str());
 		SetDlgItemText(hwnd, IDC_INFO_ENEMY_ARMOR_HP, this->ahp_string.c_str());
 		SetDlgItemText(hwnd, IDC_INFO_ENEMY_ARMOR_REDUCE, this->ar_string.c_str());
@@ -95,6 +103,8 @@ namespace hoffman::isaiah::winapi {
 		SetDlgItemText(hwnd, IDC_INFO_ENEMY_NUM_BUFFS, this->num_buffs_string.c_str());
 		SetDlgItemText(hwnd, IDC_INFO_ENEMY_STRATEGY, this->strat_string.c_str());
 		SetDlgItemText(hwnd, IDC_INFO_ENEMY_MOVE_DIAGONAL, this->diag_string.c_str());
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_BUFF_RATING, this->buff_rating_string.c_str());
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_RATING, this->rating_string.c_str());
 	}
 }
 
