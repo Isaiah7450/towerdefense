@@ -368,6 +368,11 @@ namespace hoffman::isaiah {
 							terrain_editor_thread = nullptr;
 							break;
 						}
+						case ID_MM_DEVELOP_SHOW_TEST_PATHS:
+						{
+							game::g_my_game->toggleShowPaths();
+							break;
+						}
 						default:
 							break;
 						}

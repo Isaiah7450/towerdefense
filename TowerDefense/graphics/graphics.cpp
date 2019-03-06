@@ -172,26 +172,27 @@ namespace hoffman::isaiah {
 					text_rect_top_sy, 225.f, text_rect_height);
 				this->drawText(score_text, Color {0.f, 0.f, 0.f, 1.f}, score_rect);
 			}
-#if (defined(DEBUG) || defined(_DEBUG)) && 0
+#if (defined(DEBUG) || defined(_DEBUG))
 			// Paint pathfinder paths
 			// (Not sure why if I don't use the preprocessor to
 			// comment out this code, it causes a crash every
 			// single time after I use revert to last save
 			// in the terrain editor on any builds without DEBUG
 			// defined.)
-			if (my_game->ground_test_pf->checkPathExists()) {
+			if (my_game->show_test_paths
+				&& my_game->ground_test_pf->checkPathExists()) {
 				auto ground_path = my_game->ground_test_pf->findPath(1.0);
 				while (!ground_path.empty()) {
 					auto my_node = ground_path.front();
 					ground_path.pop();
-					this->paintSquare(my_node->getGameX(), my_node->getGameY(), Color {0.f, 1.f, 0.f, 1.f},
+					this->paintSquare(my_node.getGameX(), my_node.getGameY(), Color {0.f, 1.f, 0.f, 1.f},
 						Color {0.8f, 0.8f, 0.8f, 0.3f});
 				}
 				auto air_path = my_game->air_test_pf->findPath(1.0);
 				while (!air_path.empty()) {
 					auto my_node = air_path.front();
 					air_path.pop();
-					this->paintSquare(my_node->getGameX(), my_node->getGameY(), Color {1.f, 0.f, 0.f, 1.f},
+					this->paintSquare(my_node.getGameX(), my_node.getGameY(), Color {1.f, 0.f, 0.f, 1.f},
 						Color {0.8f, 0.8f, 0.8f, 0.3f});
 				}
 			}

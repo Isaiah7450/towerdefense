@@ -117,9 +117,21 @@ namespace hoffman::isaiah {
 			void selectTower(int selection) {
 				this->selected_tower = selection;
 			}
+			/// <summary>Attempts to buy health for the player.</summary>
 			void buyHealth();
+			/// <summary>Attempts to buy and place a tower at the given game coordinates.</summary>
+			/// <param name="gx">The x-location of the place to build (in game coordinate squares).</param>
+			/// <param name="gy">The y-location of the place to build (in game coordinate squares).</param>
 			void buyTower(int gx, int gy);
+			/// <summary>Attempts to sell and remove a tower at the given game coordinates.</summary>
+			/// <param name="gx">The x-location of the tower to destroy (in game coordinate squares).</param>
+			/// <param name="gy">The y-location of the tower to destroy (in game coordinate squares).</param>
 			void sellTower(int gx, int gy);
+			// Misc:
+			/// <summary>Toggles the showing of paths (as an aid for debugging pathfinding).</summary>
+			void toggleShowPaths() noexcept {
+				this->show_test_paths = !this->show_test_paths;
+			}
 			// Getters
 			std::shared_ptr<graphics::DX::DeviceResources2D> getDeviceResources() const noexcept {
 				return this->device_resources;
@@ -236,6 +248,7 @@ namespace hoffman::isaiah {
 			// Testing things
 			std::shared_ptr<pathfinding::Pathfinder> ground_test_pf {nullptr};
 			std::shared_ptr<pathfinding::Pathfinder> air_test_pf {nullptr};
+			bool show_test_paths {false};
 		};
 	}
 }

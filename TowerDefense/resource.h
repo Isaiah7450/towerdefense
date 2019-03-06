@@ -76,6 +76,7 @@
 #define ID_MM_TOWERS_BUY_TOWER                  40501
 #define ID_MM_TOWERS_SELL_TOWER                 40502
 #define ID_MM_DEVELOP_TERRAIN_EDITOR            40601
+#define ID_MM_DEVELOP_SHOW_TEST_PATHS           40602
 #define ID_TE_FILE_NEW_MAP                      41101
 #define ID_TE_FILE_OPEN_MAP                     41102
 #define ID_TE_FILE_SAVE_MAP                     41103
