@@ -544,13 +544,8 @@ namespace hoffman::isaiah {
 						fm_angles.emplace_back(std::stod(a) * math::pi / 180.0);
 					}
 					std::sort(fm_angles.begin(), fm_angles.end());
-					// So weird... Why can't we just do the duplicate removal in-place?
-					// (With any luck, this will never be an issue... There is unique(),
-					// but I apparently have to make use of the returned iterator which is
-					// not favorable either.)
-					auto fm_angles2 = fm_angles;
-					std::unique_copy(fm_angles.begin(), fm_angles.end(), std::back_inserter(fm_angles2));
-					fm_angles = fm_angles2;
+					const auto my_iterator = std::unique(fm_angles.begin(), fm_angles.end());
+					fm_angles.erase(my_iterator, fm_angles.end());
 
 					if (fmethod_type_str == L"Static"s) {
 						auto my_fmethod = std::make_shared<FiringMethod>(FiringMethodTypes::Static, fm_angles);
