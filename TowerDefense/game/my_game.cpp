@@ -171,15 +171,20 @@ namespace hoffman::isaiah {
 			if (this->my_level && !this->my_level->hasEnemiesLeft() && this->enemies.empty()) {
 				// Award reward money
 				const double kill_percent = static_cast<double>(this->my_level_enemy_killed / this->my_level_enemy_count);
-				const int max_reward_money = (this->level < 5 ?
+				const int max_reward_money = static_cast<int>(((this->level < 5 ?
 					100 : this->level < 10 ?
-					90 : this->level < 15 ?
-					80 : this->level < 20 ?
-					70 : this->level < 25 ?
-					65 : this->level < 30 ?
-					60 : this->level < 50 ?
-					50 : this->level < 100 ?
-					30 : 20) * static_cast<int>(this->difficulty + this->getChallengeLevel() / 2.0)
+					85 : this->level < 15 ?
+					75 : this->level < 20 ?
+					65 : this->level < 25 ?
+					55 : this->level < 30 ?
+					50 : this->level < 35 ?
+					45 : this->level < 40 ?
+					40 : this->level < 45 ?
+					35 : this->level < 50 ?
+					30 : this->level < 75 ?
+					25 : this->level < 100 ?
+					20 : 15) + this->difficulty)
+						* (1.25 + this->getChallengeLevel() / 4.0))
 					+ (this->level % 5 == 4 ? 15 : 0)
 					+ (this->level % 10 == 9 ? 25 : 0);
 				this->player.changeMoney(max_reward_money * kill_percent);
