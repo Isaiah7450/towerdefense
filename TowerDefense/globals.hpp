@@ -83,7 +83,21 @@ namespace hoffman::isaiah {
 		// This framerate controls how often the game state is updated
 		// per second.
 		constexpr const int logic_framerate = 120;
+#if defined(DEBUG) || defined(_DEBUG)
+#ifdef _M_X64
+#define MY_PROJECT_FORMAT L"dx64aay"
+#else
+#define MY_PROJECT_FORMAT L"dx86azk"
+#endif // _M_X64
+#else
+#ifdef _M_X64
+#define MY_PROJECT_FORMAT L"rkx64amn"
+#else
+#define MY_PROJECT_FORMAT L"rkx86all"
+#endif // _M_X64
+#endif // defined(DEBUG) || defined(_DEBUG)
 		// The name of the default save file.
-		constexpr const wchar_t* default_save_file_name = L"./userdata/xe8t6418hdefj.dat";
+		constexpr const wchar_t* default_save_file_name = L"./userdata/" MY_PROJECT_FORMAT L"_xe8t6418hdefj.dat";
 	}
+#undef MY_PROJECT_FORMAT
 }
