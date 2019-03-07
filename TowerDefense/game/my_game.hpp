@@ -113,7 +113,8 @@ namespace hoffman::isaiah {
 				this->is_paused = !this->is_paused;
 			}
 			/// <summary>Selects a new tower type from the available choices.</summary>
-			/// <param name="selection">The tower that was selected.</param>
+			/// <param name="selection">The tower that was selected. -1 => None;
+			/// otherwise, valid values are between 0 and tower_types.size() - 1.</param>
 			void selectTower(int selection) {
 				this->selected_tower = selection;
 			}
@@ -163,6 +164,8 @@ namespace hoffman::isaiah {
 			bool isInLevel() const noexcept {
 				return this->in_level;
 			}
+			/// <returns>-1 indicates that "None" is selected. Otherwise, the number
+			/// corresponds with the tower type's index in the list.</returns>
 			int getSelectedTower() const noexcept {
 				return this->selected_tower;
 			}

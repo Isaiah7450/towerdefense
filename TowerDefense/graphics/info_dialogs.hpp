@@ -12,6 +12,7 @@ namespace hoffman::isaiah::game {
 	class ShotBaseType;
 	class TowerType;
 	class GameObjectType;
+	class Tower;
 }
 
 namespace hoffman::isaiah::winapi {
@@ -68,5 +69,30 @@ namespace hoffman::isaiah::winapi {
 		std::wstring diag_string {};
 		std::wstring buff_rating_string {};
 		std::wstring rating_string {};
+	};
+
+	/// <summary>Displays information about a tower.</summary>
+	class TowerInfoDialog : public InfoDialogBase {
+	public:
+		/// <param name="owner">Handle to the window that owns this dialog box.</param>
+		/// <param name="h_inst">The hInstance parameter given by the WinMain function.</param>
+		/// <param name="ttype">The tower type to display information for.</param>
+		TowerInfoDialog(HWND owner, HINSTANCE h_inst, const game::TowerType& ttype);
+	protected:
+		// Implements InfoDialogBase::initDialog().
+		void initDialog(HWND hwnd) override;
+	private:
+	};
+
+	/// <summary>Displays information about a tower that can be upgraded.</summary>
+	class TowerUpgradeInfoDialog : public InfoDialogBase {
+	public:
+		/// <param name="owner">Handle to the window that owns this dialog box.</param>
+		/// <param name="h_inst">The hInstance parameter given by the WinMain function.</param>
+		TowerUpgradeInfoDialog(HWND owner, HINSTANCE h_inst, const game::Tower& t);
+	protected:
+		// Implements InfoDialogBase::initDialog().
+		void initDialog(HWND hwnd) override;
+	private:
 	};
 }

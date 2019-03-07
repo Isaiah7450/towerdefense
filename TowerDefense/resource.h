@@ -58,7 +58,7 @@
 #define IDC_INFO_TOWER_FIRING_RANGE             10605
 #define IDC_INFO_TOWER_VOLLEY_SHOTS             10606
 #define IDC_INFO_TOWER_RELOAD_DELAY             10607
-#define IDC_INFO_TOWER_AVG_DAMAGE_PER_SHOT      10651
+#define IDC_INFO_TOWER_EXPECTED_SHOT_DAMAGE     10651
 #define IDC_INFO_TOWER_RATE_OF_FIRE             10652
 #define IDC_INFO_TOWER_AVG_SHOT_RATING          10653
 #define IDC_INFO_TOWER_RATING                   10699
@@ -72,7 +72,10 @@
 #define ID_MM_ACTIONS_TOGGLE_PAUSE              40201
 #define ID_MM_ACTIONS_NEXT_WAVE                 40202
 #define ID_MM_ACTIONS_BUY_HEALTH                40203
-#define ID_MM_TOWERS_NONE                       40301
+#define ID_MM_ACTIONS_ENEMY_INFO_MODE           40204
+#define ID_MM_ACTIONS_TOWER_INFO_MODE           40205
+#define ID_MM_TOWERS_INFO                       40301
+#define ID_MM_TOWERS_NONE                       40302
 #define ID_MM_TOWERS_BUY_TOWER                  40501
 #define ID_MM_TOWERS_SELL_TOWER                 40502
 #define ID_MM_DEVELOP_TERRAIN_EDITOR            40601

@@ -532,7 +532,7 @@ namespace hoffman::isaiah {
 				std::wstring fm_name = my_parser->parseString();
 				my_parser->readKeyValue(L"method"s);
 				if (my_parser->getToken() == L"Default"s) {
-					auto my_fmethod = std::make_shared<FiringMethod>(FiringMethodTypes::Default);
+					auto my_fmethod = std::make_shared<FiringMethod>(fm_name, FiringMethodTypes::Default);
 					my_firing_methods.emplace(fm_name, std::move(my_fmethod));
 				}
 				else {
@@ -557,13 +557,13 @@ namespace hoffman::isaiah {
 					fm_angles.erase(my_iterator, fm_angles.end());
 
 					if (fmethod_type_str == L"Static"s) {
-						auto my_fmethod = std::make_shared<FiringMethod>(FiringMethodTypes::Static, fm_angles);
+						auto my_fmethod = std::make_shared<FiringMethod>(fm_name, FiringMethodTypes::Static, fm_angles);
 						my_firing_methods.emplace(fm_name, std::move(my_fmethod));
 					}
 					else {
 						my_parser->readKeyValue(L"duration"s);
 						int fm_duration = static_cast<int>(my_parser->parseNumber());
-						auto my_fmethod = std::make_shared<FiringMethod>(FiringMethodTypes::Pulse, fm_angles, fm_duration);
+						auto my_fmethod = std::make_shared<FiringMethod>(fm_name, FiringMethodTypes::Pulse, fm_angles, fm_duration);
 						my_firing_methods.emplace(fm_name, std::move(my_fmethod));
 					}
 				}
@@ -598,7 +598,7 @@ namespace hoffman::isaiah {
 				switch (ts_strategy) {
 				case TargetingStrategyTypes::Distances:
 				{
-					auto my_ts_strategy = std::make_shared<TargetingStrategy>(ts_strategy, ts_protocol);
+					auto my_ts_strategy = std::make_shared<TargetingStrategy>(ts_name, ts_strategy, ts_protocol);
 					my_targeting_strategies.emplace(ts_name, std::move(my_ts_strategy));
 					break;
 				}
@@ -614,7 +614,7 @@ namespace hoffman::isaiah {
 						ts_stat_str == L"Buffs"s ? TargetingStrategyStatistics::Buffs :
 						throw util::file::DataFileException {L"Expected a valid test statistic:"s
 						L" Damage, Health, Armor_Health, Armor_Reduce, Speed, Buffs."s, my_parser->getLine()};
-					auto my_ts_strategy = std::make_shared<TargetingStrategy>(ts_strategy, ts_protocol, ts_stat);
+					auto my_ts_strategy = std::make_shared<TargetingStrategy>(ts_name, ts_strategy, ts_protocol, ts_stat);
 					my_targeting_strategies.emplace(ts_name, std::move(my_ts_strategy));
 					break;
 				}
@@ -623,7 +623,7 @@ namespace hoffman::isaiah {
 					// Note: I probably should verify the given names, but I'm not...
 					my_parser->readKeyValue(L"target_names");
 					auto ts_target_names = my_parser->readList();
-					auto my_ts_strategy = std::make_shared<TargetingStrategy>(ts_strategy, ts_protocol, ts_target_names);
+					auto my_ts_strategy = std::make_shared<TargetingStrategy>(ts_name, ts_strategy, ts_protocol, ts_target_names);
 					my_targeting_strategies.emplace(ts_name, std::move(my_ts_strategy));
 					break;
 				}

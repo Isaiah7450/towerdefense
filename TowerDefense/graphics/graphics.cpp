@@ -49,8 +49,8 @@ namespace hoffman::isaiah {
 			const std::vector<std::shared_ptr<game::TowerType>>& towers) const noexcept {
 			auto my_menu = GetSubMenu(GetMenu(hwnd), 2);
 			// Delete what may have previously been in the menu...
-			while (GetMenuItemCount(my_menu) > 1) {
-				DeleteMenu(my_menu, 1, MF_BYPOSITION);
+			while (GetMenuItemCount(my_menu) > 2) {
+				DeleteMenu(my_menu, 2, MF_BYPOSITION);
 			}
 			// Add menu items
 			for (unsigned int i = 0; i < towers.size(); ++i) {

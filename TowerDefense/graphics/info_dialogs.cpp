@@ -47,8 +47,8 @@ namespace hoffman::isaiah::winapi {
 		return TRUE;
 	}
 
-	EnemyInfoDialog::EnemyInfoDialog(HWND owner, HINSTANCE h_inst, const game::EnemyType& e) :
-		InfoDialogBase {h_inst, e} {
+	EnemyInfoDialog::EnemyInfoDialog(HWND owner, HINSTANCE h_inst, const game::EnemyType& etype) :
+		InfoDialogBase {h_inst, etype} {
 		DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_ENEMY),
 			owner, InfoDialogBase::infoDialogProc, reinterpret_cast<LPARAM>(this));
 	}
@@ -105,6 +105,29 @@ namespace hoffman::isaiah::winapi {
 		SetDlgItemText(hwnd, IDC_INFO_ENEMY_MOVE_DIAGONAL, this->diag_string.c_str());
 		SetDlgItemText(hwnd, IDC_INFO_ENEMY_BUFF_RATING, this->buff_rating_string.c_str());
 		SetDlgItemText(hwnd, IDC_INFO_ENEMY_RATING, this->rating_string.c_str());
+	}
+
+	TowerInfoDialog::TowerInfoDialog(HWND owner, HINSTANCE h_inst, const game::TowerType& ttype) :
+		InfoDialogBase {h_inst, ttype} {
+		DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_TOWER),
+			owner, InfoDialogBase::infoDialogProc, reinterpret_cast<LPARAM>(this));
+	}
+
+	void TowerInfoDialog::initDialog(HWND hwnd) {
+		const auto& my_ttype = dynamic_cast<const game::TowerType&>(this->getType());
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_METHOD, my_ttype.getFiringMethod().getReferenceName().c_str());
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_TARGETING_STRATEGY, my_ttype.getTargetingStrategy().getReferenceName().c_str());
+		std::wstringstream my_stream {};
+		// Add ammo types.
+		const auto hdlg_ammo = GetDlgItem(hwnd, IDC_INFO_TOWER_AMMO_TYPES);
+		for (const auto& st_pair : my_ttype.getShotTypes()) {
+			my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(0)
+				<< (st_pair.second * 100) << L"%";
+			const std::wstring ammo_string = st_pair.first->getName() + L": " + my_stream.str();
+			my_stream.str(L"");
+			SendMessage(hdlg_ammo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(ammo_string.c_str()));
+		}
+		SendMessage(hdlg_ammo, CB_SETCURSEL, 0, 0);
 	}
 }
 

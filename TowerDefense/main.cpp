@@ -357,6 +357,24 @@ namespace hoffman::isaiah {
 							my_renderer->updateHealthOption(hwnd, game::g_my_game->getHealthBuyCost());
 							break;
 						}
+						case ID_MM_TOWERS_INFO:
+						{
+							// (Yes, walls are explicitly excluded heree.)
+							if (game::g_my_game->getSelectedTower() >= 1
+								&& static_cast<size_t>(game::g_my_game->getSelectedTower())
+								< game::g_my_game->getAllTowerTypes().size()) {
+								const auto pause_state = game::g_my_game->isPaused();
+								if (!pause_state) {
+									game::g_my_game->togglePause();
+								}
+								const TowerInfoDialog my_dialog {hwnd, this->h_instance,
+									*game::g_my_game->getTowerType(game::g_my_game->getSelectedTower())};
+								if (pause_state != game::g_my_game->isPaused()) {
+									game::g_my_game->togglePause();
+								}
+							}
+							break;
+						}
 						case ID_MM_DEVELOP_TERRAIN_EDITOR:
 						{
 							terrain_editor_thread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0,

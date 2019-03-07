@@ -1,6 +1,7 @@
 #pragma once
 // File Author: Isaiah Hoffman
 // File Created: June 2, 2018
+#include <array>
 #include <string>
 #include <memory>
 #include <vector>
@@ -11,6 +12,11 @@
 #include "./game_object_type.hpp"
 
 namespace hoffman::isaiah {
+	namespace winapi {
+		class TowerInfoDialog;
+		class TowerUpgradeInfoDialog;
+	}
+
 	namespace game {
 		// Forward declarations
 		class ShotBaseType;
@@ -20,15 +26,20 @@ namespace hoffman::isaiah {
 		enum class FiringMethodTypes {
 			Default, Static, Pulse
 		};
+
 		/// <summary>Class that represents the firing method for a tower.</summary>
 		class FiringMethod {
 		public:
-			FiringMethod(FiringMethodTypes m, std::vector<double> a = {}, int d = 0) :
+			FiringMethod(std::wstring ref_name, FiringMethodTypes m, std::vector<double> a = {}, int d = 0) :
+				reference_name {ref_name},
 				method {m},
 				angles {a},
 				duration {d} {
 			}
 			// Getters
+			std::wstring getReferenceName() const {
+				return this->reference_name;
+			}
 			FiringMethodTypes getMethod() const noexcept {
 				return this->method;
 			}
@@ -55,6 +66,8 @@ namespace hoffman::isaiah {
 				return 20;
 			}
 		private:
+			/// <summary>The name used to refer to this method.</summary>
+			std::wstring reference_name;
 			/// <summary>The firing method being employed.</summary>
 			FiringMethodTypes method;
 			// The following two properties depend on the method selected.
@@ -81,15 +94,17 @@ namespace hoffman::isaiah {
 		/// <summary>Class that represents the targeting strategy for a tower.</summary>
 		class TargetingStrategy {
 		public:
-			TargetingStrategy(TargetingStrategyTypes s, TargetingStrategyProtocols p,
+			TargetingStrategy(std::wstring ref_name, TargetingStrategyTypes s, TargetingStrategyProtocols p,
 				TargetingStrategyStatistics ts = TargetingStrategyStatistics::Not_Applicable) :
+				reference_name {ref_name},
 				strategy {s},
 				protocol {p},
 				test_stat {ts},
 				target_names {} {
 			}
-			TargetingStrategy(TargetingStrategyTypes s, TargetingStrategyProtocols p,
+			TargetingStrategy(std::wstring ref_name, TargetingStrategyTypes s, TargetingStrategyProtocols p,
 				std::vector<std::wstring> tnames) :
+				reference_name {ref_name},
 				strategy {s},
 				protocol {p},
 				test_stat {TargetingStrategyStatistics::Not_Applicable},
@@ -108,7 +123,12 @@ namespace hoffman::isaiah {
 			std::vector<std::wstring> getTargetNames() const noexcept {
 				return this->target_names;
 			}
+			std::wstring getReferenceName() const noexcept {
+				return this->reference_name;
+			}
 		private:
+			/// <summary>The name used to refer to this strategy.</summary>
+			std::wstring reference_name;
 			/// <summary>The general targeting strategy to use.</summary>
 			TargetingStrategyTypes strategy;
 			/// <summary>The protocol to use.</summary>
@@ -123,6 +143,12 @@ namespace hoffman::isaiah {
 		/// <summary>The class for all towers in the game, including walls.</summary>
 		class TowerType : public GameObjectType {
 		public:
+			/*
+			// Friends
+			friend class winapi::TowerInfoDialog;
+			friend class winapi::TowerUpgradeInfoDialog;
+			*/
+			// Constructor
 			TowerType(std::wstring n, std::wstring d, graphics::Color c, graphics::shapes::ShapeTypes st,
 				std::shared_ptr<FiringMethod> fmethod, std::shared_ptr<TargetingStrategy> tstrategy,
 				std::vector<std::pair<std::shared_ptr<ShotBaseType>, double>>&& stypes,
