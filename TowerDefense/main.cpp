@@ -479,17 +479,24 @@ namespace hoffman::isaiah {
 							}
 						}
 						if (game::g_my_game->isInLevel()) {
+							const bool pause_state = game::g_my_game->isPaused();
+							if (!pause_state) {
+								game::g_my_game->togglePause();
+							}
+							// And no wonder this crashed.... We do indeed have a race
+							// condition (but not for long!)
 							// Check if the user clicked on an enemy.
+							WaitForSingleObject(sync_mutex, INFINITE);
 							const auto& enemy_list = game::g_my_game->getEnemies();
 							for (const auto& e : enemy_list) {
 								if (e->checkHit(end_sx, end_sy)) {
-									if (!game::g_my_game->isPaused()) {
-										game::g_my_game->togglePause();
-									}
 									const winapi::EnemyInfoDialog my_dialog {hwnd, this->h_instance, e->getBaseType()};
-									game::g_my_game->togglePause();
 									break;
 								}
+							}
+							ReleaseMutex(sync_mutex);
+							if (pause_state != game::g_my_game->isPaused()) {
+								game::g_my_game->togglePause();
 							}
 						}
 						// Reset coordinates
