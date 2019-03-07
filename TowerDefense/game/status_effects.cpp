@@ -3,6 +3,7 @@
 #include "./enemy.hpp"
 #include "./my_game.hpp"
 #include "./status_effects.hpp"
+#include "./game_util.hpp"
 
 namespace hoffman::isaiah {
 	namespace game {
@@ -46,6 +47,19 @@ namespace hoffman::isaiah {
 			}
 			else if (!this->ran_once) {
 				this->ran_once = true;
+				const auto my_roll = rng::distro_uniform(rng::gen);
+				this->frames_until_apply = my_roll < 0.05 ? 0
+					: my_roll < 0.10 ? 1 : my_roll < 0.15 ? 2
+					: my_roll < 0.20 ? 3 : my_roll < 0.25 ? 4
+					: my_roll < 0.30 ? 5 : my_roll < 0.35 ? 6
+					: my_roll < 0.40 ? 7 : my_roll < 0.45 ? 8
+					: my_roll < 0.50 ? 9 : my_roll < 0.55 ? 10
+					: my_roll < 0.60 ? 11 : my_roll < 0.65 ? 12
+					: my_roll < 0.70 ? 13 : my_roll < 0.75 ? 14
+					: my_roll < 0.80 ? 15 : my_roll < 0.85 ? 16
+					: my_roll < 0.90 ? 17 : my_roll < 0.95 ? 18 : 19;
+			}
+			if (this->frames_until_apply == 0) {
 				// Recalculating the path, esp. if it isn't
 				// necessary, is expensive, so check first
 				// if it is necessary.
@@ -55,8 +69,14 @@ namespace hoffman::isaiah {
 					return true;
 				}
 				e.changeStrategy(game::g_my_game->getMap(), this->strat, this->diag_change);
+				this->done_payload = true;
 			}
-			--this->frames_until_expire;
+			if (this->done_payload) {
+				--this->frames_until_expire;
+			}
+			else {
+				--this->frames_until_apply;
+			}
 			return false;
 		}
 

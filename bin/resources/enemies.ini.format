@@ -220,15 +220,26 @@ buffs = {
 		# the game will slow significantly because
 		# the entire path has to be recalculated
 		# each time.
+		# It is not guaranteed that surrounding enemies
+		# will change strategies immediately. In fact,
+		# I have purposefully added a 0-19 frame delay.
+		# This delay is random for each enemy, but
+		# it is done in attempt to decrease the number
+		# of paths that must be updated in a given frame.
+		# ***FOR THIS REASON, IT IS IMPERATIVE THAT
+		# DELAY >= DURATION + 25.*** Strange things
+		# can happen if one does not follow the previous
+		# guideline, and I do not plan on spending the
+		# time reasoning about this behavior for the
+		# time being.
 		delay = 100
 		# This parameter only applies to certain
 		# kinds of buffs like Intelligence and
 		# Speed where the effect goes away after
 		# a while. This is the time in milliseconds
 		# that said effects last for.
-		# Generally speaking, this value should be
-		# less than or equal to the value you set
-		# for delay.
+		# ***IT IS IMPERATIVE THAT DURATION + 25
+		# <= DELAY.*** (See above comment.)
 		duration = 75
 	},
 	# Note that the above comma is optional
@@ -321,6 +332,28 @@ buffs = {
 		# the enemies affected by this buff never
 		# suffer from harmful effects.
 		purify_max_effects = 2
+	},
+	{
+		# This time, we are doing a repair buff
+		type = Repair
+		targets = "Buff Group A"
+		radius = 1.25
+		# Note that repair effects can get out of
+		# hand pretty quickly.
+		# I wouldn't recommend setting this value
+		# very low unless you plan to set the repair
+		# amount very low as well.
+		delay = 1500
+		# This value determines how much armor health is
+		# restored to an enemy every time the repair
+		# buff is activated.
+		# Note that it perfectly legal to specify
+		# a decimal value here. (Perhaps you may do
+		# so to give the illusion of a gradual repair
+		# effect if you also set a low delay value!)
+		# Anything above 10 is probably too high, but
+		# it depends on what you set delay to.
+		repair_amount = 2.50
 	}
 	# Good indentation helps with these brackets;
 	# Don't forget to include this second closing

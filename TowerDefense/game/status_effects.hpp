@@ -101,6 +101,10 @@ namespace hoffman::isaiah {
 			/// <summary>False if this is the first time that update
 			/// has been called for this status effect.</summary>
 			bool ran_once {false};
+			/// <summary>Have we executed the payload yet?</summary>
+			bool done_payload {false};
+			/// <summary>The number of frames to wait until the buff is applied.</summary>
+			int frames_until_apply {0};
 		};
 
 		// Note: This effect doesn't have to just be used for slowing enemies.
