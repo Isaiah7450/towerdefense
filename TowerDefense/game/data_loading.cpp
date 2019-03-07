@@ -115,9 +115,10 @@ namespace hoffman::isaiah {
 					throw util::file::DataFileException {L"Armor health must be non-negative."s, my_parser->getLine()};
 				}
 				my_token = my_parser->readKeyValue(L"armor_reduce"s);
+				// Allowing ar == 1.0 is not good design.
 				double ar = util::file::parseNumber(my_token, my_parser->getLine());
-				if (ar < 0.0 || ar > 1.0) {
-					throw util::file::DataFileException {L"Armor reduction must be between 0 and 1 inclusive."s,
+				if (ar < 0.0 || ar >= 1.0) {
+					throw util::file::DataFileException {L"Armor reduction must be between 0 and 1 inclusive-exclusive."s,
 						my_parser->getLine()};
 				}
 				my_token = my_parser->readKeyValue(L"pain_tolerance"s);
@@ -132,23 +133,17 @@ namespace hoffman::isaiah {
 					throw util::file::DataFileException {L"Walking speed must be between 0.5 and 25.0 inclusive."s,
 						my_parser->getLine()};
 				}
+				// Not enforcing ispd <= wspd <= rspd because of interesting effects
+				// when that rule is not followed.
 				my_token = my_parser->readKeyValue(L"running_speed"s);
 				double rspd = util::file::parseNumber(my_token, my_parser->getLine());
-				if (rspd < wspd) {
-					throw util::file::DataFileException {L"An enemy's running speed cannot be less than"s
-						L" their walking speed."s, my_parser->getLine()};
-				}
-				else if (rspd > 25.0) {
+				if (rspd > 25.0) {
 					throw util::file::DataFileException {L"Running speed must be between 0.5 and 25.0 inclusive."s,
 						my_parser->getLine()};
 				}
 				my_token = my_parser->readKeyValue(L"injured_speed"s);
 				double ispd = util::file::parseNumber(my_token, my_parser->getLine());
-				if (ispd > wspd) {
-					throw util::file::DataFileException {L"An enemy's injured speed cannot exceed thier"s
-						L" walking speed."s, my_parser->getLine()};
-				}
-				else if (ispd < 0.5) {
+				if (ispd < 0.5) {
 					throw util::file::DataFileException {L"Injured speed must be between 0.5 and 25.0 inclusive."s,
 					my_parser->getLine()};
 				}
