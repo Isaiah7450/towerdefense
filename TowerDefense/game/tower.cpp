@@ -80,7 +80,8 @@ namespace hoffman::isaiah {
 			}
 			--this->frames_til_next_shot;
 			if (this->frames_til_next_shot <= 0.0) {
-				this->frames_til_next_shot += math::convertMillisecondsToFrames(1000.0 / this->getBaseType()->getFiringSpeed());
+				this->frames_til_next_shot += math::convertMillisecondsToFrames(1000.0
+					/ this->getBaseType()->getFiringSpeed());
 				auto target = this->findTarget(enemies);
 				if (!target) {
 					// Take the time to reload a single shot instead of firing
@@ -117,10 +118,8 @@ namespace hoffman::isaiah {
 			for (const auto& e : enemies) {
 				const double signed_gdx = e->getGameX() - this->getGameX();
 				const double signed_gdy = e->getGameY() - this->getGameY();
-				// (Values during input are specified from [0...2 pi], so this fixes the range.
-				const double e_angle_from_tower = std::atan2(signed_gdy, -signed_gdx);
-				const double adjusted_angle = e_angle_from_tower >= 0 ? e_angle_from_tower
-					: math::pi - e_angle_from_tower;
+				const double e_angle_from_tower = std::atan2(-signed_gdy, signed_gdx);
+				const double adjusted_angle = e_angle_from_tower;
 				if (my_method.getMethod() != FiringMethodTypes::Default) {
 					if (adjusted_angle < my_method.getMinimumAngle()
 						|| adjusted_angle > my_method.getMaximumAngle()) {
@@ -215,8 +214,9 @@ namespace hoffman::isaiah {
 			}
 			++this->angle_index;
 			this->angle_index %= this->getBaseType()->getFiringMethod().getAngles().size();
+			// Note that the y-axis is inverted, so we need to correct the angle used here.
 			return std::make_unique<Shot>(this->device_resources, stype, graphics::Color {1.f, 0.f, 1.f, 1.f},
-				*this, this->getBaseType()->getFiringMethod().getAngles().at(this->angle_index));
+				*this, -this->getBaseType()->getFiringMethod().getAngles().at(this->angle_index));
 		}
 	}
 }
