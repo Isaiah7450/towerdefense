@@ -87,6 +87,10 @@ namespace hoffman::isaiah {
 			}
 		}
 
+		void RepairBuff::apply(Enemy& target) {
+			target.repair(this->getRepairAmount());
+		}
+
 		// enemy.hpp
 		Enemy::Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
 			std::shared_ptr<EnemyType> etype, graphics::Color o_color,
@@ -252,6 +256,10 @@ namespace hoffman::isaiah {
 			this->current_health = math::get_min(this->getMaxHealth(), this->getHealth() + amt);
 		}
 
+		void Enemy::repair(double amt) {
+			this->current_armor_health = math::get_min(this->getMaxArmorHealth(), this->getArmorHealth() + amt);
+		}
+
 		void Enemy::addStatus(std::unique_ptr<StatusEffectBase>&& effect) {
 			this->status_effects.emplace_back(std::move(effect));
 		}
@@ -269,6 +277,7 @@ namespace hoffman::isaiah {
 			this->move_diagonally = diag_move;
 			// Obtain new path
 			this->my_pathfinder.setStrategy(new_strat, diag_move);
+			// How can I optimize this?
 			this->my_pathfinder.findPath(game::g_my_game->getChallengeLevel(),
 				static_cast<int>(std::floor(this->getGameX())),
 				static_cast<int>(std::floor(this->getGameY())));

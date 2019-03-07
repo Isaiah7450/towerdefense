@@ -44,6 +44,9 @@ namespace hoffman::isaiah {
 			/// <summary>Heals the enemy's hitpoints.</summary>
 			/// <param name="amt">The amount of hitpoints to restore.</param>
 			void heal(double amt);
+			/// <summary>Restores the enemy's armor hitpoints.</summary>
+			/// <param name="amt">The amount of armor hitpoints to restore.</param>
+			void repair(double amt);
 			/// <summary>Adds a status to the enemy.</summary>
 			/// <param name="effect">The effect to add; uses move semantics.</param>
 			void addStatus(std::unique_ptr<StatusEffectBase>&& effect);

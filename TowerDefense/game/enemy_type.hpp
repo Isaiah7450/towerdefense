@@ -18,7 +18,7 @@ namespace hoffman::isaiah {
 
 		/// <summary>Enumeration of valid types of buffs.</summary>
 		enum class BuffTypes {
-			Intelligence, Speed, Healer, Purify
+			Intelligence, Speed, Healer, Purify, Repair
 		};
 
 		// Note that any functions declared here that
@@ -258,6 +258,41 @@ namespace hoffman::isaiah {
 		private:
 			/// <summary>The maximum number of status effects cured.</summary>
 			int max_cured;
+		};
+
+		/// <summary>Class that represents a buff where the enemy heals
+		/// applicable enemies by a static amount every so often.</summary>
+		class RepairBuff : public BuffBase {
+		public:
+			/// <param name="repair_amt">The amount of HP healed with each tick of the buff.</param>
+			RepairBuff(std::vector<std::wstring> target_names, double br, int ms_ticks,
+				double repair_amt) :
+				BuffBase {target_names, br, ms_ticks},
+				repair_amount {repair_amt} {
+				// Note that heal amount should be positive
+			}
+			// Implements BuffBase::getType()
+			BuffTypes getType() const noexcept override {
+				return BuffTypes::Repair;
+			}
+			// Implements BuffBase::heal()
+			std::wstring getName() const noexcept override {
+				return L"Repairing";
+			}
+			// Implements BuffBase::getRating()
+			double getRating() const noexcept {
+				return this->getBaseRating() * this->getRepairAmount();
+			}
+			// Getters
+			double getRepairAmount() const noexcept {
+				return this->repair_amount;
+			}
+		protected:
+			// Implements BuffBase::apply()
+			void apply(Enemy& target) override;
+		private:
+			/// <summary>The amount that surrounding enemies' armor are repaired by each turn.</summary>
+			double repair_amount;
 		};
 
 		/// <summary>Template type used to create new enemies.</summary>

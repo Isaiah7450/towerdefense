@@ -193,8 +193,9 @@ namespace hoffman::isaiah {
 						: my_token.second == L"Speed"s ? BuffTypes::Speed
 						: my_token.second == L"Healer"s ? BuffTypes::Healer
 						: my_token.second == L"Purify"s ? BuffTypes::Purify
+						: my_token.second == L"Repair"s ? BuffTypes::Repair
 						: throw util::file::DataFileException {L"Expected the type of the buff."s
-							L" Valid values include: Intelligence, Speed, Healer, Purify"s, my_parser->getLine()};
+							L" Valid values include: Intelligence, Speed, Healer, Purify, Repair"s, my_parser->getLine()};
 					my_token = my_parser->readKeyValue(L"targets"s);
 					std::wstring buff_group = util::file::parseString(my_token, my_parser->getLine());
 					my_token = my_parser->readKeyValue(L"radius"s);
@@ -239,19 +240,19 @@ namespace hoffman::isaiah {
 					case BuffTypes::Speed:
 					{
 						my_token = my_parser->readKeyValue(L"walking_speed_boost"s);
-						double buff_wspd = util::file::parseNumber(my_token, my_parser->getLine());
+						const double buff_wspd = util::file::parseNumber(my_token, my_parser->getLine());
 						if (buff_wspd < 0.0) {
 							throw util::file::DataFileException {L"Walking speed boost should be non-negative."s,
 								my_parser->getLine()};
 						}
 						my_token = my_parser->readKeyValue(L"running_speed_boost"s);
-						double buff_rspd = util::file::parseNumber(my_token, my_parser->getLine());
+						const double buff_rspd = util::file::parseNumber(my_token, my_parser->getLine());
 						if (buff_rspd < 0.0) {
 							throw util::file::DataFileException {L"Running speed boost should be non-negative."s,
 								my_parser->getLine()};
 						}
 						my_token = my_parser->readKeyValue(L"injured_speed_boost"s);
-						double buff_ispd = util::file::parseNumber(my_token, my_parser->getLine());
+						const double buff_ispd = util::file::parseNumber(my_token, my_parser->getLine());
 						if (buff_ispd < 0.0) {
 							throw util::file::DataFileException {L"Injured speed boost should be non-negative."s,
 								my_parser->getLine()};
@@ -268,7 +269,7 @@ namespace hoffman::isaiah {
 					case BuffTypes::Healer:
 					{
 						my_token = my_parser->readKeyValue(L"heal_amount"s);
-						double buff_heal = util::file::parseNumber(my_token, my_parser->getLine());
+						const double buff_heal = util::file::parseNumber(my_token, my_parser->getLine());
 						if (buff_heal <= 0.0) {
 							throw util::file::DataFileException {L"Heal amount should be positive."s,
 								my_parser->getLine()};
@@ -281,7 +282,7 @@ namespace hoffman::isaiah {
 					case BuffTypes::Purify:
 					{
 						my_token = my_parser->readKeyValue(L"purify_max_effects"s);
-						int buff_cure_max = static_cast<int>(util::file::parseNumber(my_token,
+						const int buff_cure_max = static_cast<int>(util::file::parseNumber(my_token,
 							my_parser->getLine()));
 						if (buff_cure_max < 1) {
 							throw util::file::DataFileException {L"Purify max effects must be positive."s,
@@ -290,6 +291,19 @@ namespace hoffman::isaiah {
 						auto purify_buff = std::make_shared<PurifyBuff>(buff_target_groups.at(buff_group),
 							buff_radius, buff_delay, buff_cure_max);
 						my_buffs.emplace_back(std::move(purify_buff));
+						break;
+					}
+					case BuffTypes::Repair:
+					{
+						my_token = my_parser->readKeyValue(L"repair_amount"s);
+						const double buff_repair = util::file::parseNumber(my_token, my_parser->getLine());
+						if (buff_repair <= 0.0) {
+							throw util::file::DataFileException {L"Repair amount should be positive."s,
+								my_parser->getLine()};
+						}
+						auto heal_buff = std::make_shared<HealerBuff>(buff_target_groups.at(buff_group),
+							buff_radius, buff_delay, buff_repair);
+						my_buffs.emplace_back(std::move(heal_buff));
 						break;
 					}
 					} // End switch, this looks weird but is correct
