@@ -866,7 +866,7 @@ namespace hoffman::isaiah {
 			this->my_level_enemy_count = this->my_level->getEnemyCount();
 		}
 
-		void MyGame::save_game(std::wostream& save_file) const {
+		void MyGame::saveGame(std::wostream& save_file) const {
 			if (this->isInLevel() || !this->player.isAlive()) {
 				// Can't save now...
 				return;
@@ -889,7 +889,7 @@ namespace hoffman::isaiah {
 			}
 		}
 
-		void MyGame::load_game(std::wistream& save_file) {
+		void MyGame::loadGame(std::wistream& save_file) {
 			std::wstring buffer {};
 			int version;
 			save_file >> buffer >> version;

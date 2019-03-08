@@ -79,7 +79,7 @@ namespace hoffman::isaiah {
 			void update();
 			/// <summary>Updates the state of the game in some way for debugging reasons.</summary>
 			/// <param name="cause">The reason to update the game state.</param>
-			void debug_update(DebugUpdateStates cause);
+			void debugUpdate(DebugUpdateStates cause);
 			// Note: Defined in data_loading.cpp
 			/// <summary>Initializes the list of enemy types in this game.</summary>
 			void init_enemy_types();
@@ -95,10 +95,10 @@ namespace hoffman::isaiah {
 			void load_level_data();
 			/// <summary>Saves the game state.</summary>
 			/// <param name="save_file">The file to save the game's state to.</param>
-			void save_game(std::wostream& save_file) const;
+			void saveGame(std::wostream& save_file) const;
 			/// <summary>Loads a previously saved game state.</summary>
 			/// <param name="save_file">The file to load the game's state from.</param>
-			void load_game(std::wistream& save_file);
+			void loadGame(std::wistream& save_file);
 			/// <summary>Adds an enemy to the game.</summary>
 			/// <param name="e">The enemy to add.</param>
 			void addEnemy(std::unique_ptr<Enemy>&& e);

@@ -374,7 +374,7 @@ namespace hoffman::isaiah {
 					if (need_to_update) {
 						// Note that we still have the mutex...
 						// Update first if necessary
-						game::g_my_game->debug_update(game::DebugUpdateStates::Terrain_Changed);
+						game::g_my_game->debugUpdate(game::DebugUpdateStates::Terrain_Changed);
 						ReleaseMutex(sync_mutex);
 					}
 					HRESULT hr = my_renderer->render(game::g_my_game, this->start_gx, this->start_gy,

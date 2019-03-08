@@ -50,7 +50,7 @@ namespace hoffman::isaiah {
 
 		MyGame::~MyGame() noexcept = default;
 
-		void MyGame::debug_update(DebugUpdateStates cause) {
+		void MyGame::debugUpdate(DebugUpdateStates cause) {
 #if defined(DEBUG) || defined(_DEBUG)
 			// Set lock
 			auto draw_event = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT("can_draw"));
@@ -220,7 +220,7 @@ namespace hoffman::isaiah {
 				// Automatically save the player's progress...
 				std::wofstream save_file {game::default_save_file_name};
 				if (!save_file.fail() && !save_file.bad()) {
-					this->save_game(save_file);
+					this->saveGame(save_file);
 				}
 				// Load the level...
 				this->in_level = true;

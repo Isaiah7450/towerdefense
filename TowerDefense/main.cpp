@@ -86,7 +86,7 @@ namespace hoffman::isaiah {
 				std::wifstream default_save_file {game::default_save_file_name};
 				if (!default_save_file.bad() && !default_save_file.fail()) {
 					try {
-						my_game->load_game(default_save_file);
+						my_game->loadGame(default_save_file);
 					}
 					catch (...) {
 						MessageBox(nullptr, L"Error: Corrupted saved file! Reverting to new game.", L"Corrupted Save",
@@ -95,7 +95,7 @@ namespace hoffman::isaiah {
 						my_game->resetState();
 						std::wofstream save_file {game::default_save_file_name};
 						if (!save_file.bad() && !save_file.fail()) {
-							my_game->save_game(save_file);
+							my_game->saveGame(save_file);
 						}
 					}
 				}
@@ -125,7 +125,7 @@ namespace hoffman::isaiah {
 								}
 								else {
 									WaitForSingleObject(sync_mutex, INFINITE);
-									my_game->save_game(save_file);
+									my_game->saveGame(save_file);
 									ReleaseMutex(sync_mutex);
 								}
 								break;
@@ -272,6 +272,9 @@ namespace hoffman::isaiah {
 				return;
 			}
 			// Store in global variable --> It's the only way!
+			// Actually, it isn't, but it's the most intuitive (and least overhead involved) way to do it.
+			// That said, there are costs (mostly management), so I should be careful with this variable.
+			// (Particularly in terms of multithreading and synchronization issues.)
 			game::g_my_game = std::make_shared<game::MyGame>(my_resources, 1, ground_terrain_file, air_terrain_file);
 			// Show window
 			ShowWindow(this->hwnd, n_cmd_show);
