@@ -74,10 +74,14 @@ namespace hoffman::isaiah {
 				}
 				return false;
 			}
+			/// <returns>The average base rating of the enemies this buff affects.</returns>
+			double getAverageInfluenceRating() const noexcept;
 			/// <returns>The basic rating of the buff as determined by its
 			/// radius of influence, time between activations, and the number of enemies it affects.</returns>
 			virtual double getBaseRating() const noexcept {
-				return this->getTargetNames().size() * this->getRadius() * this->getRadius() * math::pi
+				return (this->getRadius() * this->getRadius()
+					* math::get_max(1.0, math::pi - std::sqrt(this->getTargetNames().size())))
+					* this->getAverageInfluenceRating()
 					/ (this->getTimeBetweenApplications() / 1000.0);
 			}
 			/// <param name="caller">The invoker of the buff.</param>
@@ -213,7 +217,8 @@ namespace hoffman::isaiah {
 			}
 			// Implements BuffBase::getRating()
 			double getRating() const noexcept {
-				return this->getBaseRating() * this->getHealAmount();
+				// 1.3 is a "fudge" factor.
+				return this->getBaseRating() * this->getHealAmount() * 1.3;
 			}
 			// Getters
 			double getHealAmount() const noexcept {
@@ -246,7 +251,8 @@ namespace hoffman::isaiah {
 			}
 			// Implements BuffBase::getRating()
 			double getRating() const noexcept override {
-				return this->getBaseRating() * this->getMaxEffectsRemoved() * 0.75;
+				// 0.40 is a "fudge" factor based on the usefulness of this effect.
+				return this->getBaseRating() * std::sqrt(this->getMaxEffectsRemoved()) * 0.40;
 			}
 			// Getters
 			int getMaxEffectsRemoved() const noexcept {
@@ -281,7 +287,8 @@ namespace hoffman::isaiah {
 			}
 			// Implements BuffBase::getRating()
 			double getRating() const noexcept {
-				return this->getBaseRating() * this->getRepairAmount();
+				// 1.4 is a "fudge" factor based on the usefulness of this buff.
+				return this->getBaseRating() * this->getRepairAmount() * 1.4;
 			}
 			// Getters
 			double getRepairAmount() const noexcept {
@@ -408,11 +415,11 @@ namespace hoffman::isaiah {
 			}
 			/// <returns>Another rating that focuses primarily on the enemy's special abilities.</returns>
 			double getExtraRating() const noexcept {
-				double multiplier = 0.0;
+				double base_buff_ratings = 0.0;
 				for (const auto& b : this->buff_types) {
-					multiplier += b->getRating();
+					base_buff_ratings += b->getRating();
 				}
-				return multiplier * this->getBaseRating() * 0.05;
+				return base_buff_ratings * std::sqrt(std::sqrt(this->getBuffTypesCount()));
 			}
 			/// <returns>Returns the enemy's full rating.</returns>
 			double getRating() const noexcept {

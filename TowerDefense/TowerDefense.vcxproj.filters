@@ -93,9 +93,6 @@
     <ClInclude Include="graphics\file_dialogs.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graphics\info_dialogs.cpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="graphics\info_dialogs.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -164,6 +161,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="game\game_level.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\info_dialogs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game\enemy_type.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
