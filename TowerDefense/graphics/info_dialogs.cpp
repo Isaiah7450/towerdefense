@@ -107,6 +107,64 @@ namespace hoffman::isaiah::winapi {
 		SetDlgItemText(hwnd, IDC_INFO_ENEMY_RATING, this->rating_string.c_str());
 	}
 
+	ShotBaseInfoDialog::ShotBaseInfoDialog(HWND owner, HINSTANCE h_inst, const game::ShotBaseType& stype) :
+		InfoDialogBase {h_inst, stype} {
+		DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_SHOT_BASE),
+			owner, InfoDialogBase::infoDialogProc, reinterpret_cast<LPARAM>(this));
+	}
+
+	void ShotBaseInfoDialog::initDialog(HWND hwnd) {
+		const auto& my_stype = dynamic_cast<const game::ShotBaseType&>(this->getType());
+		std::wstringstream my_stream {};
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< my_stype.getDamage();
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_BASE_DAMAGE, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< (my_stype.getPiercing() * 100.00) << L"%";
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_BASE_PIERCING, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(2)
+			<< my_stype.getSpeed();
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_BASE_MOVE_SPEED, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< my_stype.getSplashDamage();
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_BASE_SPLASH_DAMAGE, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< my_stype.getImpactRadius() << L" cs";
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_BASE_IMPACT_RADIUS, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< (my_stype.getGroundMultiplier() * 100.00) << L"%";
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_BASE_GROUND_MULTI, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< (my_stype.getAirMultiplier() * 100.00) << L"%";
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_BASE_AIR_MULTI, my_stream.str().c_str());
+		my_stream.str(L"");
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_BASE_TYPE, (*my_stype.getType()).c_str());
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_BASE_APPLY_ON_SPLASH,
+			(my_stype.isSplashEffectType() ? L"Yes" : L"No"));
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< (1.0 + my_stype.getAverageExtraTargets());
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_BASE_NUM_TARGETS, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< my_stype.getExpectedRawDamage();
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_BASE_RAW_DAMAGE, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< my_stype.getExtraRating();
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_BASE_EXTRA_RATING, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< my_stype.getRating();
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_BASE_RATING, my_stream.str().c_str());
+		my_stream.str(L"");
+	}
+
 	TowerInfoDialog::TowerInfoDialog(HWND owner, HINSTANCE h_inst, const game::TowerType& ttype) :
 		InfoDialogBase {h_inst, ttype} {
 		DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_TOWER),

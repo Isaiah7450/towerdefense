@@ -1,6 +1,7 @@
 #pragma once
 // File Author: Isaiah Hoffman
 // File Created: May 31, 2018
+#include <array>
 #include <string>
 #include <cmath>
 #include "./../ih_math.hpp"
@@ -19,8 +20,19 @@ namespace hoffman::isaiah {
 		// I think is really important or good from a balance standpoint.
 		/// <summary>Enumeration constants that represent the various types of shots.</summary>
 		enum class ShotTypes {
-			Standard, DoT, Slow, Stun
+			Standard, DoT, Slow, Stun, Sentinel_DO_NOT_USE
 		};
+	}
+
+	inline std::wstring operator*(game::ShotTypes stype) noexcept {
+		constexpr const std::array<const wchar_t*,
+			static_cast<int>(game::ShotTypes::Sentinel_DO_NOT_USE)> stype_strs {
+			L"Standard", L"DoT", L"Slow", L"Stun"
+		};
+		return stype_strs.at(static_cast<int>(stype));
+	}
+
+	namespace game {
 
 		/// <summary>Base class for all shot types.</summary>
 		class ShotBaseType : public GameObjectType {
@@ -82,6 +94,15 @@ namespace hoffman::isaiah {
 			double getRating() const noexcept {
 				return this->getBaseRating() + this->getExtraRating();
 			}
+			/// <returns>The shot's extra rating which considers its special effects primarily.</returns>
+			virtual double getExtraRating() const noexcept {
+				return 0;
+			}
+
+			/// <returns>True if the shot's effect also applies to enemies indirectly hit.</returns>
+			virtual bool isSplashEffectType() const noexcept {
+				return false;
+			}
 		protected:
 			ShotBaseType(std::wstring n, std::wstring d, graphics::Color c, graphics::shapes::ShapeTypes st,
 				double dmg, double wap, double ms, double ir, double sdmg, double gm, double am) :
@@ -111,10 +132,7 @@ namespace hoffman::isaiah {
 				return this->getExpectedBaseDamage() * this->getDamageMultiplierRating()
 					* (1.0 + this->getPiercing() / 2.0) + (this->getSpeed() / 10.0);
 			}
-			/// <returns>The shot's extra rating which considers its special effects primarily.</returns>
-			virtual double getExtraRating() const noexcept {
-				return 0;
-			}
+
 		private:
 			/// <summary>The amount of damage dealt by the shot when it directly hits an enemy.</summary>
 			double damage;
@@ -166,9 +184,8 @@ namespace hoffman::isaiah {
 
 			// Overrides ShotBaseType::doSplashHit()
 			void doSplashHit(Enemy& e) const final;
-
-			/// <returns>True if the shot's effect also applies to enemies indirectly hit.</returns>
-			bool isSplashEffectType() const noexcept {
+			// Overrides ShotBaseType::isSplashEffectType()
+			bool isSplashEffectType() const noexcept override {
 				return affects_splash;
 			}
 		protected:
@@ -212,9 +229,6 @@ namespace hoffman::isaiah {
 			int getTotalTicks() const noexcept {
 				return this->total_ticks;
 			}
-		protected:
-			// Implements ShotEffectType::apply()
-			void apply(Enemy& e) const override;
 			// Overrides ShotBaseType::getExtraRating()
 			double getExtraRating() const noexcept override {
 				// I really do hope I don't end up with a precision issue with that last part.
@@ -223,6 +237,9 @@ namespace hoffman::isaiah {
 					* (1.0 + (this->isSplashEffectType() ? this->getAverageExtraTargets() : 0.0))
 					/ (long long {this->getTotalTicks()} *this->getMillisecondsBetweenTicks() / 1000.0) + 3.5;
 			}
+		protected:
+			// Implements ShotEffectType::apply()
+			void apply(Enemy& e) const override;
 		private:
 			/// <summary>The type of damage dealt by the damage over time effect.</summary>
 			DoTDamageTypes damage_type;
@@ -260,15 +277,16 @@ namespace hoffman::isaiah {
 			double getMultipleSlowChance() const noexcept {
 				return this->multi_slow_chance;
 			}
-		protected:
-			// Implements ShotBaseType::apply()
-			void apply(Enemy& e) const override;
 			// Overrides ShotBaseType::getExtraRating()
 			double getExtraRating() const noexcept override {
 				return this->getSlowFactor() * this->getSlowDuration() / 1000.0
 					* (1.0 + (this->isSplashEffectType() ? this->getAverageExtraTargets() : 0.0))
 					* (1.0 + this->getMultipleSlowChance() / 2.5) + 5.0;
 			}
+		protected:
+			// Implements ShotBaseType::apply()
+			void apply(Enemy& e) const override;
+
 		private:
 			/// <summary>The slow factor applied to the enemy; the enemy will move this percentage
 			/// slower. (Eg: 25% Slow Factor means the enemy moves at 75% of their original speed
@@ -303,15 +321,15 @@ namespace hoffman::isaiah {
 			int getStunDuration() const noexcept {
 				return this->stun_duration;
 			}
-		protected:
-			// Implements ShotBaseType::apply()
-			void apply(Enemy& e) const override;
 			// Overrides ShotBaseType::getExtraRating()
 			double getExtraRating() const noexcept override {
 				return this->getStunChance() * this->getStunDuration() / 1000.0
 					* (1.0 + (this->isSplashEffectType() ? this->getAverageExtraTargets() : 0.0))
 					* (1.0 + this->getMultipleStunChance() / 1.5) + 7.5;
 			}
+		protected:
+			// Implements ShotBaseType::apply()
+			void apply(Enemy& e) const override;
 			// Getters
 			double getMultipleStunChance() const noexcept {
 				return this->multi_stun_chance;

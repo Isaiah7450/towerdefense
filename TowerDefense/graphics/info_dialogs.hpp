@@ -71,6 +71,18 @@ namespace hoffman::isaiah::winapi {
 		std::wstring rating_string {};
 	};
 
+	class ShotBaseInfoDialog : public InfoDialogBase {
+	public:
+		/// <param name="owner">Handle to the window that owns this dialog box.</param>
+		/// <param name="h_inst">The hInstance parameter given by the WinMain function.</param>
+		/// <param name="stype">The shot type to display information for.</param>
+		ShotBaseInfoDialog(HWND owner, HINSTANCE h_inst, const game::ShotBaseType& stype);
+	protected:
+		// Implements InfoDialogBase::initDialog().
+		void initDialog(HWND hwnd) override;
+	private:
+	};
+
 	/// <summary>Displays information about a tower.</summary>
 	class TowerInfoDialog : public InfoDialogBase {
 	public:
