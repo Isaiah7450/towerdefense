@@ -7,6 +7,9 @@
 
 #define IDD_INFO_ENEMY                          1001
 #define IDD_INFO_SHOT_BASE                      2001
+#define IDD_INFO_SHOT_STUN                      2002
+#define IDD_INFO_SHOT_SLOW                      2003
+#define IDD_INFO_SHOT_DOT                       2004
 #define IDD_INFO_TOWER                          3001
 #define IDD_INFO_PLACED_TOWER                   3101
 #define IDD_INFO_UPGRADE_TOWER                  3102
@@ -38,6 +41,7 @@
 #define IDC_INFO_SHOT_BASE_AIR_MULTI            12007
 #define IDC_INFO_SHOT_BASE_TYPE                 12008
 #define IDC_INFO_SHOT_BASE_APPLY_ON_SPLASH      12009
+#define IDC_INFO_SHOT_BASE_VIEW_TYPE_INFO       12010
 #define IDC_INFO_SHOT_BASE_NUM_TARGETS          12050
 #define IDC_INFO_SHOT_BASE_RAW_DAMAGE           12051
 #define IDC_INFO_SHOT_BASE_EXTRA_RATING         12052
@@ -51,9 +55,13 @@
 #define IDC_INFO_SHOT_SLOW_DURATION             12202
 #define IDC_INFO_SHOT_SLOW_MULTI_CHANCE         12203
 #define IDC_INFO_SHOT_DOT_TYPE                  12301
-#define IDC_INFO_SHOT_DOT_DAMAGE_PER_TICK       12302
-#define IDC_INFO_SHOT_DOT_TIME_BETWEEN_TICKS    12303
-#define IDC_INFO_SHOT_DOT_TOTAL_TICKS           12304
+#define IDC_INFO_SHOT_DOT_TYPE_DESC             12302
+#define IDC_INFO_SHOT_DOT_DAMAGE_PER_TICK       12303
+#define IDC_INFO_SHOT_DOT_TIME_BETWEEN_TICKS    12304
+#define IDC_INFO_SHOT_DOT_TOTAL_TICKS           12305
+#define IDC_INFO_SHOT_DOT_TOTAL_DURATION        12351
+#define IDC_INFO_SHOT_DOT_SINGLE_DPS            12352
+#define IDC_INFO_SHOT_DOT_FULL_DPS              12353
 
 #define IDC_INFO_TOWER_FIRING_METHOD            13001
 #define IDC_INFO_TOWER_TARGETING_STRATEGY       13002

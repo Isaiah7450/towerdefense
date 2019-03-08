@@ -2,6 +2,8 @@
 // File Author: Isaiah Hoffman
 // File Created: May 21, 2018
 #include "./../ih_math.hpp"
+#include <array>
+#include <string>
 
 namespace hoffman::isaiah {
 	namespace game {
@@ -33,8 +35,19 @@ namespace hoffman::isaiah {
 
 		/// <summary>Enumeration of possible DoT damage types.</summary>
 		enum class DoTDamageTypes {
-			Poison, Fire, Heal
+			Poison, Fire, Heal, Sentinel_DO_NOT_USE
 		};
+	}
+
+	inline std::wstring operator*(game::DoTDamageTypes dtype) noexcept {
+		constexpr const std::array<const wchar_t*,
+			static_cast<int>(game::DoTDamageTypes::Sentinel_DO_NOT_USE)> my_dtype_strs {
+			L"Poison", L"Fire", L"Heal"
+		};
+		return my_dtype_strs.at(static_cast<int>(dtype));
+	}
+
+	namespace game {
 
 		// Use DoTDamageTypes::Heal to use this as a healing effect
 		/// <summary>Class that represents a status effect that deals

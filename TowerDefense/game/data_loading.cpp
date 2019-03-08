@@ -434,6 +434,7 @@ namespace hoffman::isaiah {
 					auto dot_type_str = my_parser->readKeyValue(L"dot_damage_type"s).second;
 					DoTDamageTypes dot_type = dot_type_str == L"Poison"s ? DoTDamageTypes::Poison :
 						dot_type_str == L"Fire"s ? DoTDamageTypes::Fire :
+						dot_type_str == L"Heal"s ? DoTDamageTypes::Heal :
 						throw util::file::DataFileException {L"Invalid DoT damage type specified."s,
 							my_parser->getLine()};
 					my_parser->readKeyValue(L"dot_damage_per_tick"s);

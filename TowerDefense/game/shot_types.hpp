@@ -229,13 +229,31 @@ namespace hoffman::isaiah {
 			int getTotalTicks() const noexcept {
 				return this->total_ticks;
 			}
+			// Derived getters:
+			/// <returns>The total amount of damage done by the DoT effect (to a single enemy).</returns>
+			double getDoTTotalDamage() const noexcept {
+				return this->getDamagePerTick() * this->getTotalTicks();
+			}
+			/// <returns>The total amount of time the DoT effect lasts for in **seconds**.</returns>
+			double getDoTTotalDuration() const noexcept {
+				return (this->getMillisecondsBetweenTicks() * this->getTotalTicks()) / 1000.0;
+			}
+			/// <returns>The average damage per second dealt to a single enemy.</returns>
+			double getDoTDPS() const noexcept {
+				return this->getDoTTotalDamage() / this->getDoTTotalDuration();
+			}
+			/// <returns>The average damage per second dealt to all targets (ignoring failure
+			/// to reapply effect; i.e.: idealized.)</returns>
+			double getDoTFullDPS() const noexcept {
+				return this->getDoTDPS() * (1.0 + (this->isSplashEffectType() ? this->getAverageExtraTargets() : 0.0));
+			}
 			// Overrides ShotBaseType::getExtraRating()
 			double getExtraRating() const noexcept override {
 				// I really do hope I don't end up with a precision issue with that last part.
-				return (this->getDamageType() == DoTDamageTypes::Fire ? 1.2 : 1.6)
-					* (this->getDamageMultiplierRating() * this->getDamagePerTick() * this->getTotalTicks())
-					* (1.0 + (this->isSplashEffectType() ? this->getAverageExtraTargets() : 0.0))
-					/ (long long {this->getTotalTicks()} *this->getMillisecondsBetweenTicks() / 1000.0) + 3.5;
+				return (this->getDamageType() == DoTDamageTypes::Fire ? 1.2
+					: this->getDamageType() == DoTDamageTypes::Poison ? 1.6
+					: this->getDamageType() == DoTDamageTypes::Heal ? -0.05 : 1.0)
+					* this->getDamageMultiplierRating() * this->getDoTFullDPS() + 3.5;
 			}
 		protected:
 			// Implements ShotEffectType::apply()
@@ -321,6 +339,9 @@ namespace hoffman::isaiah {
 			int getStunDuration() const noexcept {
 				return this->stun_duration;
 			}
+			double getMultipleStunChance() const noexcept {
+				return this->multi_stun_chance;
+			}
 			// Overrides ShotBaseType::getExtraRating()
 			double getExtraRating() const noexcept override {
 				return this->getStunChance() * this->getStunDuration() / 1000.0
@@ -330,10 +351,6 @@ namespace hoffman::isaiah {
 		protected:
 			// Implements ShotBaseType::apply()
 			void apply(Enemy& e) const override;
-			// Getters
-			double getMultipleStunChance() const noexcept {
-				return this->multi_stun_chance;
-			}
 		private:
 			/// <summary>The probability that the shot will stun the enemy if
 			/// the enemy isn't currently stunned.</summary>

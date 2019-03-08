@@ -12,6 +12,7 @@
 #include "./../globals.hpp"
 #include "./../game/enemy_type.hpp"
 #include "./../game/shot_types.hpp"
+#include "./../game/status_effects.hpp"
 #include "./../game/tower_types.hpp"
 using namespace std::literals::string_literals;
 namespace hoffman::isaiah::winapi {
@@ -24,10 +25,8 @@ namespace hoffman::isaiah::winapi {
 		switch (msg) {
 		case WM_INITDIALOG:
 		{
+			SetWindowLongPtr(hwnd, GWLP_USERDATA, lparam);
 			const auto my_dialog_class = reinterpret_cast<InfoDialogBase*>(lparam);
-			// Set common stuff.
-			SetDlgItemText(hwnd, IDC_INFO_BASE_NAME, (my_dialog_class->my_type.getName()).c_str());
-			SetDlgItemText(hwnd, IDC_INFO_BASE_DESC, (my_dialog_class->my_type.getDesc()).c_str());
 			my_dialog_class->initDialog(hwnd);
 			return TRUE;
 		}
@@ -39,12 +38,52 @@ namespace hoffman::isaiah::winapi {
 			case IDCANCEL:
 				EndDialog(hwnd, IDCANCEL);
 				break;
+				// Shot-specific code:
+			case IDC_INFO_SHOT_BASE_VIEW_TYPE_INFO:
+			{
+				const auto my_dialog_class = reinterpret_cast<InfoDialogBase*>(
+					GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				const auto& my_stype = dynamic_cast<const game::ShotBaseType&>(my_dialog_class->getType());
+				switch (my_stype.getType()) {
+				case game::ShotTypes::Standard:
+					break;
+				case game::ShotTypes::Stun:
+				{
+					const ShotStunInfoDialog my_stun_dialog {hwnd, my_dialog_class->getApplicationHandle(), my_stype};
+					break;
+				}
+				case game::ShotTypes::Slow:
+				{
+					const ShotSlowInfoDialog my_slow_dialog {hwnd, my_dialog_class->getApplicationHandle(), my_stype};
+					break;
+				}
+				case game::ShotTypes::DoT:
+				{
+					const ShotDoTInfoDialog my_dot_dialog {hwnd, my_dialog_class->getApplicationHandle(), my_stype};
+					break;
+				}
+				case game::ShotTypes::Sentinel_DO_NOT_USE:
+					MessageBox(hwnd, L"Invalid code branch reached. Please report to developer.",
+						L"Error!", MB_OK);
+					break;
+				default:
+					MessageBox(hwnd, L"Unhandled shot type. Please report to developer (include"
+						L" the value of the type field in your report).",
+						L"Error!", MB_OK | MB_ICONWARNING);
+				}
+				break;
+			}
 			}
 			break;
 		default:
 			return FALSE;
 		}
 		return TRUE;
+	}
+
+	void InfoDialogBase::setCommonControls(HWND hwnd) const noexcept {
+		SetDlgItemText(hwnd, IDC_INFO_BASE_NAME, (this->getType().getName()).c_str());
+		SetDlgItemText(hwnd, IDC_INFO_BASE_DESC, (this->getType().getDesc()).c_str());
 	}
 
 	EnemyInfoDialog::EnemyInfoDialog(HWND owner, HINSTANCE h_inst, const game::EnemyType& etype) :
@@ -54,6 +93,7 @@ namespace hoffman::isaiah::winapi {
 	}
 
 	void EnemyInfoDialog::initDialog(HWND hwnd) {
+		this->setCommonControls(hwnd);
 		const auto& my_etype = dynamic_cast<const game::EnemyType&>(this->getType());
 		this->hp_string = std::to_wstring(static_cast<int>(my_etype.getBaseHP()));
 		this->ahp_string = std::to_wstring(static_cast<int>(my_etype.getBaseArmorHP()));
@@ -114,6 +154,7 @@ namespace hoffman::isaiah::winapi {
 	}
 
 	void ShotBaseInfoDialog::initDialog(HWND hwnd) {
+		this->setCommonControls(hwnd);
 		const auto& my_stype = dynamic_cast<const game::ShotBaseType&>(this->getType());
 		std::wstringstream my_stream {};
 		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
@@ -163,6 +204,9 @@ namespace hoffman::isaiah::winapi {
 			<< my_stype.getRating();
 		SetDlgItemText(hwnd, IDC_INFO_SHOT_BASE_RATING, my_stream.str().c_str());
 		my_stream.str(L"");
+		if (my_stype.getType() == game::ShotTypes::Standard) {
+			EnableWindow(GetDlgItem(hwnd, IDC_INFO_SHOT_BASE_VIEW_TYPE_INFO), FALSE);
+		}
 	}
 
 	TowerInfoDialog::TowerInfoDialog(HWND owner, HINSTANCE h_inst, const game::TowerType& ttype) :
@@ -172,6 +216,7 @@ namespace hoffman::isaiah::winapi {
 	}
 
 	void TowerInfoDialog::initDialog(HWND hwnd) {
+		this->setCommonControls(hwnd);
 		const auto& my_ttype = dynamic_cast<const game::TowerType&>(this->getType());
 		SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_METHOD, my_ttype.getFiringMethod().getReferenceName().c_str());
 		SetDlgItemText(hwnd, IDC_INFO_TOWER_TARGETING_STRATEGY, my_ttype.getTargetingStrategy().getReferenceName().c_str());
@@ -221,6 +266,112 @@ namespace hoffman::isaiah::winapi {
 		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(0)
 			<< my_ttype.getRating();
 		SetDlgItemText(hwnd, IDC_INFO_TOWER_RATING, my_stream.str().c_str());
+		my_stream.str(L"");
+	}
+
+	ShotStunInfoDialog::ShotStunInfoDialog(HWND owner, HINSTANCE h_inst, const game::ShotBaseType& stype) :
+		InfoDialogBase {h_inst, stype} {
+		DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_SHOT_STUN),
+			owner, InfoDialogBase::infoDialogProc, reinterpret_cast<LPARAM>(this));
+	}
+
+	void ShotStunInfoDialog::initDialog(HWND hwnd) {
+		const auto& my_stype = dynamic_cast<const game::StunShotType&>(this->getType());
+		std::wstringstream my_stream {};
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< (my_stype.getStunChance() * 100.0) << L"%";
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_STUN_CHANCE, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << my_stype.getStunDuration() << L" ms";
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_STUN_DURATION, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< (my_stype.getMultipleStunChance() * 100.0) << L"%";
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_STUN_MULTI_CHANCE, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< my_stype.getExtraRating();
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_BASE_EXTRA_RATING, my_stream.str().c_str());
+		my_stream.str(L"");
+	}
+
+	ShotSlowInfoDialog::ShotSlowInfoDialog(HWND owner, HINSTANCE h_inst, const game::ShotBaseType& stype) :
+		InfoDialogBase {h_inst, stype} {
+		DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_SHOT_SLOW),
+			owner, InfoDialogBase::infoDialogProc, reinterpret_cast<LPARAM>(this));
+	}
+
+	void ShotSlowInfoDialog::initDialog(HWND hwnd) {
+		const auto& my_stype = dynamic_cast<const game::SlowShotType&>(this->getType());
+		std::wstringstream my_stream {};
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< (my_stype.getSlowFactor() * 100.0) << L"%";
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_SLOW_FACTOR, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << my_stype.getSlowDuration() << L" ms";
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_SLOW_DURATION, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< (my_stype.getMultipleSlowChance() * 100.0) << L"%";
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_SLOW_MULTI_CHANCE, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< my_stype.getExtraRating();
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_BASE_EXTRA_RATING, my_stream.str().c_str());
+		my_stream.str(L"");
+	}
+
+	ShotDoTInfoDialog::ShotDoTInfoDialog(HWND owner, HINSTANCE h_inst, const game::ShotBaseType& stype) :
+		InfoDialogBase {h_inst, stype} {
+		DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_SHOT_DOT),
+			owner, InfoDialogBase::infoDialogProc, reinterpret_cast<LPARAM>(this));
+	}
+
+	void ShotDoTInfoDialog::initDialog(HWND hwnd) {
+		const auto& my_stype = dynamic_cast<const game::DoTShotType&>(this->getType());
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_DOT_TYPE, (*my_stype.getDamageType()).c_str());
+		switch (my_stype.getDamageType()) {
+		case game::DoTDamageTypes::Poison:
+			SetDlgItemText(hwnd, IDC_INFO_SHOT_DOT_TYPE_DESC, L"Deals poison damage over time"
+				L" that has 80% armor piercing and bypasses armor completely.");
+			break;
+		case game::DoTDamageTypes::Fire:
+			SetDlgItemText(hwnd, IDC_INFO_SHOT_DOT_TYPE_DESC, L"Deals fire damage over time"
+				L" that has 50% armor piercing.");
+			break;
+		case game::DoTDamageTypes::Heal:
+			SetDlgItemText(hwnd, IDC_INFO_SHOT_DOT_TYPE_DESC, L"Restores health over time"
+				L" allowing the enemy to survive longer.");
+			break;
+		default:
+			SetDlgItemText(hwnd, IDC_INFO_SHOT_DOT_TYPE_DESC, L"Error: Description is"
+				L" unavaible. Please contact the developer and include the DoT type.");
+			break;
+		}
+		std::wstringstream my_stream {};
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< my_stype.getDamagePerTick();
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_DOT_DAMAGE_PER_TICK, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << my_stype.getMillisecondsBetweenTicks() << L" ms";
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_DOT_TIME_BETWEEN_TICKS, my_stream.str().c_str());
+		my_stream.str(L"");
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_DOT_TOTAL_TICKS, std::to_wstring(my_stype.getTotalTicks()).c_str());
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(2)
+			<< my_stype.getDoTTotalDuration() << L" s";
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_DOT_TOTAL_DURATION, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(2)
+			<< my_stype.getDoTDPS() << L" dmg / s";
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_DOT_SINGLE_DPS, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(2)
+			<< my_stype.getDoTFullDPS() << L" dmg / s";
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_DOT_FULL_DPS, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< my_stype.getExtraRating();
+		SetDlgItemText(hwnd, IDC_INFO_SHOT_BASE_EXTRA_RATING, my_stream.str().c_str());
 		my_stream.str(L"");
 	}
 }

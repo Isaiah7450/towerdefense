@@ -10,14 +10,33 @@ namespace hoffman::isaiah::game {
 	// Forward declarations.
 	class EnemyType;
 	class ShotBaseType;
+	class StunShotType;
+	class SlowShotType;
+	class DoTShotType;
 	class TowerType;
 	class GameObjectType;
 	class Tower;
 }
 
 namespace hoffman::isaiah::winapi {
+	/// <summary>Interface for informative dialog boxes.</summary>
+	class IInfoDialog {
+	public:
+		IInfoDialog() noexcept = default;
+		// Rule of 5 and virtual dtor:
+		virtual ~IInfoDialog() noexcept = default;
+		IInfoDialog(const IInfoDialog&) = default;
+		IInfoDialog(IInfoDialog&&) = default;
+		IInfoDialog& operator=(const IInfoDialog&) = default;
+		IInfoDialog& operator=(IInfoDialog&&) = default;
+	protected:
+		/// <summary>Initializes the dialog.</summary>
+		/// <param name="hwnd">Handle to the dialog box window.</param>
+		virtual void initDialog(HWND hwnd) = 0;
+	};
+
 	/// <summary>The base class for info dialog boxes.</summary>
-	class InfoDialogBase {
+	class InfoDialogBase : public IInfoDialog {
 	public:
 		// Dialog box procedure.
 		static INT_PTR CALLBACK infoDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
@@ -26,9 +45,9 @@ namespace hoffman::isaiah::winapi {
 		/// <param name="h_inst">The hInstance parameter given by the WinMain function.</param>
 		/// <param name="object_type">The object type to show info for.</param>
 		InfoDialogBase(HINSTANCE h_inst, const game::GameObjectType& object_type);
-		/// <summary>Initializes the dialog.</summary>
-		/// <param name="hwnd">Handle to the dialog box window.</param>
-		virtual void initDialog(HWND hwnd) = 0;
+		/// <summary>Sets text and other controls that are common to many info boxes.</summary>
+		/// <param name="hwnd">The handle to the dialog box window.</param>
+		void setCommonControls(HWND hwnd) const noexcept;
 
 		// Getters
 		HINSTANCE getApplicationHandle() const noexcept {
@@ -107,4 +126,44 @@ namespace hoffman::isaiah::winapi {
 		void initDialog(HWND hwnd) override;
 	private:
 	};
+
+	/// <summary>Displays additional information about shots that stun.</summary>
+	class ShotStunInfoDialog : public InfoDialogBase {
+	public:
+		/// <param name="owner">Handle to the window that owns this dialog box.</param>
+		/// <param name="h_inst">The hInstance parameter given by the WinMain function.</param>
+		/// <param name="stype">The shot type to display information for.</param>
+		ShotStunInfoDialog(HWND owner, HINSTANCE h_inst, const game::ShotBaseType& stype);
+	protected:
+		// Implements InfoDialogBase::initDialog().
+		void initDialog(HWND hwnd) override;
+	private:
+	};
+
+	/// <summary>Displays additional information about shots that slow.</summary>
+	class ShotSlowInfoDialog : public InfoDialogBase {
+	public:
+		/// <param name="owner">Handle to the window that owns this dialog box.</param>
+		/// <param name="h_inst">The hInstance parameter given by the WinMain function.</param>
+		/// <param name="stype">The shot type to display information for.</param>
+		ShotSlowInfoDialog(HWND owner, HINSTANCE h_inst, const game::ShotBaseType& stype);
+	protected:
+		// Implements InfoDialogBase::initDialog().
+		void initDialog(HWND hwnd) override;
+	private:
+	};
+
+	/// <summary>Displays additional information about shots that deal additional damage over time.</summary>
+	class ShotDoTInfoDialog : public InfoDialogBase {
+	public:
+		/// <param name="owner">Handle to the window that owns this dialog box.</param>
+		/// <param name="h_inst">The hInstance parameter given by the WinMain function.</param>
+		/// <param name="stype">The shot type to display information for.</param>
+		ShotDoTInfoDialog(HWND owner, HINSTANCE h_inst, const game::ShotBaseType& stype);
+	protected:
+		// Implements InfoDialogBase::initDialog().
+		void initDialog(HWND hwnd) override;
+	private:
+	};
 }
+
