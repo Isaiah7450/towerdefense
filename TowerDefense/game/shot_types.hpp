@@ -130,7 +130,7 @@ namespace hoffman::isaiah {
 			/// <returns>The shot's basic rating which considers its core stats only.</returns>
 			double getBaseRating() const noexcept {
 				return this->getExpectedBaseDamage() * this->getDamageMultiplierRating()
-					* (1.0 + this->getPiercing() / 2.0) + (this->getSpeed() / 10.0);
+					* (1.0 + this->getPiercing() / 2.0) + (this->getSpeed() * 0.01);
 			}
 
 		private:
