@@ -34,10 +34,21 @@ namespace hoffman::isaiah {
 		}
 
 		double TowerType::getRating() const noexcept {
-			return (this->getAverageDamagePerShot() * 0.4 + this->getAverageShotRating() * 0.6)
-				* this->getRateOfFire() * this->getFiringArea() / 2.5
-				- (this->getFiringMethod().getMethod() == FiringMethodTypes::Default ? 0.0 : 2.5)
+			const auto speed_range_multipliers = this->getRateOfFire()
+				* (this->getFiringArea() / 2.5);
+			const auto behavior_modifier = (this->getFiringMethod().getMethod() == FiringMethodTypes::Default ? 0.0 : -2.5)
 				+ (this->getTargetingStrategy().getStrategy() == TargetingStrategyTypes::Distances ? 0.0 : 3.5);
+			const auto my_dps_idea = this->getAverageDamagePerShot() * speed_range_multipliers;
+			const auto my_effect_idea = (this->getAverageShotRating() - this->getAverageDamagePerShot())
+				* speed_range_multipliers;
+			if (my_dps_idea > my_effect_idea) {
+				return (my_dps_idea * 0.65 + my_effect_idea * 0.35)
+					+ behavior_modifier;
+			}
+			else {
+				return (my_dps_idea * 0.35 + my_effect_idea * 0.65)
+					+ behavior_modifier;
+			}
 		}
 	}
 }

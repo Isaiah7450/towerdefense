@@ -243,17 +243,16 @@ namespace hoffman::isaiah {
 				return this->getDoTTotalDamage() / this->getDoTTotalDuration();
 			}
 			/// <returns>The average damage per second dealt to all targets (ignoring failure
-			/// to reapply effect; i.e.: idealized.)</returns>
+			/// to reapply effect; i.e.: idealized.) (Also ignores multipliers.)</returns>
 			double getDoTFullDPS() const noexcept {
 				return this->getDoTDPS() * (1.0 + (this->isSplashEffectType() ? this->getAverageExtraTargets() : 0.0));
 			}
 			// Overrides ShotBaseType::getExtraRating()
 			double getExtraRating() const noexcept override {
-				// I really do hope I don't end up with a precision issue with that last part.
-				return (this->getDamageType() == DoTDamageTypes::Fire ? 1.2
-					: this->getDamageType() == DoTDamageTypes::Poison ? 1.6
+				return (this->getDamageType() == DoTDamageTypes::Fire ? 1.25
+					: this->getDamageType() == DoTDamageTypes::Poison ? 1.40
 					: this->getDamageType() == DoTDamageTypes::Heal ? -0.05 : 1.0)
-					* this->getDamageMultiplierRating() * this->getDoTFullDPS() + 3.5;
+					* this->getDamageMultiplierRating() * this->getDoTFullDPS() + 0.8;
 			}
 		protected:
 			// Implements ShotEffectType::apply()
