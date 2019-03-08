@@ -69,7 +69,6 @@
 #define IDC_INFO_TOWER_COST                     13055
 #define IDC_INFO_TOWER_RATING                   13099
 
-#define ID_ACTIONS                              40009
 #define ID_MM_FILE_NEW_GAME                     40101
 #define ID_MM_FILE_LOAD_GAME                    40102
 #define ID_MM_FILE_SAVE_GAME                    40103
@@ -84,8 +83,10 @@
 #define ID_MM_TOWERS_NONE                       40302
 #define ID_MM_TOWERS_BUY_TOWER                  40501
 #define ID_MM_TOWERS_SELL_TOWER                 40502
-#define ID_MM_DEVELOP_TERRAIN_EDITOR            40601
-#define ID_MM_DEVELOP_SHOW_TEST_PATHS           40602
+#define ID_MM_SHOTS_PLACEHOLDER                 40601
+#define ID_MM_ENEMIES_PLACEHOLDER               40701
+#define ID_MM_DEVELOP_TERRAIN_EDITOR            40801
+#define ID_MM_DEVELOP_SHOW_TEST_PATHS           40802
 #define ID_TE_FILE_NEW_MAP                      41101
 #define ID_TE_FILE_OPEN_MAP                     41102
 #define ID_TE_FILE_SAVE_MAP                     41103
