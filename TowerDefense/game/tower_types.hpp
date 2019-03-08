@@ -202,20 +202,6 @@ namespace hoffman::isaiah {
 			}
 			/// <returns>The expected amount of raw damage output by the tower per shot on average.</returns>
 			double getAverageDamagePerShot() const noexcept;
-			/// <returns>The tower's overall rating.</returns>
-			double getRating() const noexcept;
-			/// <returns>The cost of the tower.</returns>
-			double getCost() const noexcept {
-				if (this->isWall()) {
-					return static_cast<double>(this->cost_adjustment);
-				}
-				return this->getCostAdjustment() + this->getRating() / 18.0 + 1.0;
-			}
-		protected:
-			// Getters
-			int getCostAdjustment() const noexcept {
-				return this->cost_adjustment;
-			}
 			/// <returns>The weighted average of the tower's shot types.</returns>
 			double getAverageShotRating() const noexcept;
 			/// <returns>The tower's average rate of fire as the average number of shots fired per second.</returns>
@@ -234,6 +220,24 @@ namespace hoffman::isaiah {
 				const double total_cycle_time = (1.0 / this->getFiringSpeed())
 					* this->getVolleyShots() + secs_to_reload;
 				return static_cast<double>(this->getVolleyShots()) / total_cycle_time;
+			}
+			/// <returns>The tower's expected DPS.</returns>
+			double getExpectedDPS() const noexcept {
+				return this->getAverageDamagePerShot() * this->getRateOfFire();
+			}
+			/// <returns>The tower's overall rating.</returns>
+			double getRating() const noexcept;
+			/// <returns>The cost of the tower.</returns>
+			double getCost() const noexcept {
+				if (this->isWall()) {
+					return static_cast<double>(this->cost_adjustment);
+				}
+				return this->getCostAdjustment() + this->getRating() / 18.0 + 1.0;
+			}
+		protected:
+			// Getters
+			int getCostAdjustment() const noexcept {
+				return this->cost_adjustment;
 			}
 		private:
 			/// <summary>The firing method used by the tower.</summary>

@@ -128,6 +128,42 @@ namespace hoffman::isaiah::winapi {
 			SendMessage(hdlg_ammo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(ammo_string.c_str()));
 		}
 		SendMessage(hdlg_ammo, CB_SETCURSEL, 0, 0);
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< my_ttype.getFiringSpeed() << L" / s";
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_SPEED, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< my_ttype.getFiringRange() << L" cs";
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_RANGE, my_stream.str().c_str());
+		my_stream.str(L"");
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_VOLLEY_SHOTS, std::to_wstring(my_ttype.getVolleyShots()).c_str());
+		my_stream << my_ttype.getReloadDelay() << L" ms";
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_RELOAD_DELAY, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< my_ttype.getAverageDamagePerShot();
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_EXPECTED_SHOT_DAMAGE, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< my_ttype.getAverageShotRating();
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_AVG_SHOT_RATING, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< my_ttype.getRateOfFire() << L" / s";
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_RATE_OF_FIRE, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(2)
+			<< my_ttype.getExpectedDPS() << L" dmg / s";
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_EXPECTED_DPS, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << L"$" << std::setiosflags(std::ios::fixed) << std::setprecision(2)
+			<< my_ttype.getCost();
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_COST, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(0)
+			<< my_ttype.getRating();
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_RATING, my_stream.str().c_str());
+		my_stream.str(L"");
 	}
 }
 

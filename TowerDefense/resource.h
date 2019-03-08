@@ -60,7 +60,9 @@
 #define IDC_INFO_TOWER_RELOAD_DELAY             10607
 #define IDC_INFO_TOWER_EXPECTED_SHOT_DAMAGE     10651
 #define IDC_INFO_TOWER_RATE_OF_FIRE             10652
-#define IDC_INFO_TOWER_AVG_SHOT_RATING          10653
+#define IDC_INFO_TOWER_EXPECTED_DPS             10653
+#define IDC_INFO_TOWER_AVG_SHOT_RATING          10654
+#define IDC_INFO_TOWER_COST                     10655
 #define IDC_INFO_TOWER_RATING                   10699
 
 #define ID_ACTIONS                              40009
