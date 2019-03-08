@@ -11,6 +11,7 @@
 #include <iomanip>
 #include <sstream>
 #include <vector>
+#include <map>
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 #include "./../main.hpp"
@@ -59,6 +60,42 @@ namespace hoffman::isaiah {
 				AppendMenu(my_menu, MF_STRING, ID_MM_TOWERS_NONE + i + 1, my_tower_str.c_str());
 			}
 			this->updateSelectedTower(hwnd, ID_MM_TOWERS_NONE);
+		}
+
+		void Renderer2D::createShotMenu(HWND hwnd,
+			const std::map<std::wstring, std::shared_ptr<game::ShotBaseType>>& shots) const noexcept {
+			auto my_menu = GetSubMenu(GetMenu(hwnd), 3);
+			// Delete what may have previously been in the menu...
+			while (GetMenuItemCount(my_menu) > 0) {
+				DeleteMenu(my_menu, 0, MF_BYPOSITION);
+			}
+			// Add menu items
+			unsigned int i = 0;
+			for (const auto& stype : shots) {
+				AppendMenu(my_menu, MF_STRING, ID_MM_SHOTS_PLACEHOLDER + i, stype.first.c_str());
+				++i;
+			}
+		}
+
+		void Renderer2D::createEnemyMenu(HWND hwnd,
+			const std::map<std::wstring, std::shared_ptr<game::EnemyType>>& enemies,
+			std::map<std::wstring, bool> seen_before) const noexcept {
+			auto my_menu = GetSubMenu(GetMenu(hwnd), 4);
+			// Clear the menu.
+			while (GetMenuItemCount(my_menu) > 0) {
+				DeleteMenu(my_menu, 0, MF_BYPOSITION);
+			}
+			// Add menu items
+			unsigned int i = 0;
+			for (const auto& etype : enemies) {
+				if (seen_before.at(etype.first)) {
+					AppendMenu(my_menu, MF_STRING, ID_MM_ENEMIES_PLACEHOLDER + i, etype.first.c_str());
+				}
+				else {
+					AppendMenu(my_menu, MF_STRING, ID_MM_ENEMIES_PLACEHOLDER + i, L"???");
+				}
+				++i;
+			}
 		}
 
 		void Renderer2D::updateSelectedTower(HWND hwnd, int selected_tower) const noexcept {

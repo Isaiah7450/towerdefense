@@ -7,6 +7,7 @@
 #include <dwrite.h>
 #include <memory>
 #include <vector>
+#include <map>
 #include "./../globals.hpp"
 #include "./graphics_DX.hpp"
 
@@ -82,6 +83,17 @@ namespace hoffman::isaiah {
 			/// <param name="hwnd">Handle to the parent window.</param>
 			/// <param name="towers">The list of tower types that the player can choose from.</param>
 			void createTowerMenu(HWND hwnd, const std::vector<std::shared_ptr<game::TowerType>>& towers) const noexcept;
+			/// <summary>Recreates the shots menu with the current list of shots.</summary>
+			/// <param name="hwnd">Handle to the parent window.</param>
+			/// <param name="shots">The list of shot types.</param>
+			void createShotMenu(HWND hwnd, const std::map<std::wstring, std::shared_ptr<game::ShotBaseType>>& shots) const noexcept;
+			/// <summary>Recreates the enemies menu with the current list of enemies (that have been seen before).</summary>
+			/// <param name="hwnd">Handle to the parent window.</param>
+			/// <param name="enemies">The list of enemy types.</param>
+			/// <param name="seen_before">A list of boolean values that indicate whether a particular enemy
+			/// type has been seen before.</param>
+			void createEnemyMenu(HWND hwnd, const std::map<std::wstring, std::shared_ptr<game::EnemyType>>& enemies,
+				std::map<std::wstring, bool> seen_before) const noexcept;
 			/// <summary>Updates the currently selected tower on the tower menu.</summary>
 			/// <param name="hwnd">Handle to the parent window.</param>
 			/// <param name="selected_tower">The index of the tower type currently selected starting from 1.</param>

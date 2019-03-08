@@ -133,6 +133,11 @@ namespace hoffman::isaiah {
 			void toggleShowPaths() noexcept {
 				this->show_test_paths = !this->show_test_paths;
 			}
+			/// <summary>Sets an enemy type as "seen" before.</summary>
+			/// <param name="name">The name of the type seen.</param>
+			void setEnemyTypeAsSeen(std::wstring name) noexcept {
+				this->enemies_seen.at(name) = true;
+			}
 			// Getters
 			std::shared_ptr<graphics::DX::DeviceResources2D> getDeviceResources() const noexcept {
 				return this->device_resources;
@@ -146,8 +151,17 @@ namespace hoffman::isaiah {
 			std::shared_ptr<EnemyType> getEnemyType(std::wstring name) {
 				return this->enemy_types.at(name);
 			}
+			const std::map<std::wstring, std::shared_ptr<EnemyType>>& getAllEnemyTypes() const noexcept {
+				return this->enemy_types;
+			}
+			std::map<std::wstring, bool> getSeenEnemies() const noexcept {
+				return this->enemies_seen;
+			}
 			std::shared_ptr<ShotBaseType> getShotType(std::wstring name) {
 				return this->shot_types.at(name);
+			}
+			const std::map<std::wstring, std::shared_ptr<ShotBaseType>>& getAllShotTypes() const noexcept {
+				return this->shot_types;
 			}
 			std::shared_ptr<TowerType> getTowerType(int i) {
 				return this->tower_types.at(i);
@@ -204,6 +218,8 @@ namespace hoffman::isaiah {
 			std::shared_ptr<GameMap> map {nullptr};
 			/// <summary>The list of enemy template types.</summary>
 			std::map<std::wstring, std::shared_ptr<game::EnemyType>> enemy_types;
+			/// <summary>Stores which enemy types have been seen before.</summary>
+			std::map<std::wstring, bool> enemies_seen {};
 			/// <summary>The list of enemies that are currently alive.</summary>
 			std::vector<std::unique_ptr<game::Enemy>> enemies;
 			/// <summary>The list of shot template types.</summary>

@@ -312,6 +312,9 @@ namespace hoffman::isaiah {
 			WaitForSingleObject(update_thread_init_event, INFINITE);
 			my_renderer->updateHealthOption(hwnd, game::g_my_game->getHealthBuyCost());
 			my_renderer->createTowerMenu(hwnd, game::g_my_game->getAllTowerTypes());
+			my_renderer->createShotMenu(hwnd, game::g_my_game->getAllShotTypes());
+			my_renderer->createEnemyMenu(hwnd, game::g_my_game->getAllEnemyTypes(),
+				game::g_my_game->getSeenEnemies());
 			HANDLE terrain_editor_thread {nullptr};
 			// Message Loop
 #pragma warning(push)
@@ -397,11 +400,59 @@ namespace hoffman::isaiah {
 						default:
 							break;
 						}
-						// Check if the tower menu thingy got selected
 						if (msg.wParam >= ID_MM_TOWERS_NONE
 							&& msg.wParam <= ID_MM_TOWERS_NONE + game::g_my_game->getAllTowerTypes().size()) {
+							// Check if the tower menu thingy got selected
 							my_renderer->updateSelectedTower(hwnd, static_cast<int>(msg.wParam));
 							game::g_my_game->selectTower(static_cast<int>(msg.wParam) - ID_MM_TOWERS_NONE - 1);
+						}
+						else if (msg.wParam >= ID_MM_SHOTS_PLACEHOLDER
+							&& msg.wParam < ID_MM_SHOTS_PLACEHOLDER + game::g_my_game->getAllShotTypes().size()) {
+							// Show info about a selected shot.
+							const auto selected_shot = msg.wParam - ID_MM_SHOTS_PLACEHOLDER;
+							const auto pause_state = game::g_my_game->isPaused();
+							if (!pause_state) {
+								game::g_my_game->togglePause();
+							}
+							std::shared_ptr<game::ShotBaseType> my_shot {nullptr};
+							unsigned int i = 0;
+							for (const auto& stype : game::g_my_game->getAllShotTypes()) {
+								if (i == selected_shot) {
+									my_shot = stype.second;
+									break;
+								}
+								++i;
+							}
+							const ShotBaseInfoDialog my_dialog {hwnd, this->h_instance,
+								*my_shot};
+							if (pause_state != game::g_my_game->isPaused()) {
+								game::g_my_game->togglePause();
+							}
+						}
+						else if (msg.wParam >= ID_MM_ENEMIES_PLACEHOLDER
+							&& msg.wParam < ID_MM_ENEMIES_PLACEHOLDER + game::g_my_game->getAllEnemyTypes().size()) {
+							// Show info about a selected enemy.
+							const auto selected_enemy = msg.wParam - ID_MM_ENEMIES_PLACEHOLDER;
+							const auto pause_state = game::g_my_game->isPaused();
+							if (!pause_state) {
+								game::g_my_game->togglePause();
+							}
+							std::shared_ptr<game::EnemyType> my_enemy {nullptr};
+							unsigned int i = 0;
+							for (const auto& etype : game::g_my_game->getAllEnemyTypes()) {
+								if (i == selected_enemy) {
+									my_enemy = etype.second;
+									break;
+								}
+								++i;
+							}
+							if (game::g_my_game->getSeenEnemies().at(my_enemy->getName())) {
+								const EnemyInfoDialog my_dialog {hwnd, this->h_instance,
+									*my_enemy};
+							}
+							if (pause_state != game::g_my_game->isPaused()) {
+								game::g_my_game->togglePause();
+							}
 						}
 						break;
 					}
@@ -552,6 +603,10 @@ namespace hoffman::isaiah {
 					WaitForMultipleObjects(2, draw_object_handles, true, INFINITE);
 					HRESULT hr = my_renderer->render(game::g_my_game, this->start_gx, this->start_gy,
 						this->end_gx, this->end_gy);
+					if (!game::g_my_game->isInLevel()) {
+						my_renderer->createEnemyMenu(hwnd, game::g_my_game->getAllEnemyTypes(),
+							game::g_my_game->getSeenEnemies());
+					}
 					if (hr == D2DERR_RECREATE_TARGET) {
 						my_resources->discardDeviceResources();
 						my_resources->createDeviceResources(this->hwnd);

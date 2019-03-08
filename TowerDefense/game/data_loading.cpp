@@ -322,6 +322,10 @@ namespace hoffman::isaiah {
 					throw util::file::DataFileException {L"Duplicate enemy name: "s + n + L"."s, my_parser->getLine()};
 				}
 			} while (my_parser->getNext());
+			// Add listing for "seen before".
+			for (const auto& etype : this->enemy_types) {
+				this->enemies_seen.emplace(etype.first, false);
+			}
 #pragma warning(pop)
 		}
 
@@ -887,6 +891,12 @@ namespace hoffman::isaiah {
 				save_file << L"T: " << t->getBaseType()->getName() << L"\n\tT: " << t->getGameX() << L" "
 					<< t->getGameY() << L"\n";
 			}
+			// Output seen enemies.
+			for (const auto& seen_e : this->enemies_seen) {
+				if (seen_e.second) {
+					save_file << L"E: " << seen_e.first << L"\n";
+				}
+			}
 		}
 
 		void MyGame::loadGame(std::wistream& save_file) {
@@ -918,32 +928,41 @@ namespace hoffman::isaiah {
 				pathfinding::Grid air_influence_map {};
 				save_file >> ground_influence_map >> air_influence_map;
 				this->map->setInfluenceGraphs(ground_influence_map, air_influence_map);
-				// Towers
-				std::wstring tower_name;
+				while (save_file >> buffer) {
+					if (buffer == L"T:") {
+						// Towers
 #pragma warning(push)
 #pragma warning(disable: 26494) // Code Analysis: type.5 --> Always initialize.
-				double tower_gx;
-				double tower_gy;
+						std::wstring tower_name;
+						double tower_gx;
+						double tower_gy;
 #pragma warning(pop)
-				while (save_file >> buffer) {
-					std::getline(save_file, tower_name);
-					// Leading space is removed...
-					tower_name.erase(tower_name.begin());
-					save_file >> buffer >> tower_gx >> tower_gy;
-					std::shared_ptr<TowerType> my_type {nullptr};
-					for (const auto& tt : this->getAllTowerTypes()) {
-						if (tt->getName() == tower_name) {
-							my_type = tt;
-							break;
+						std::getline(save_file, tower_name);
+						// Leading space is removed...
+						tower_name.erase(tower_name.begin());
+						save_file >> buffer >> tower_gx >> tower_gy;
+						std::shared_ptr<TowerType> my_type {nullptr};
+						for (const auto& tt : this->getAllTowerTypes()) {
+							if (tt->getName() == tower_name) {
+								my_type = tt;
+								break;
+							}
 						}
+						auto my_tower = std::make_unique<Tower>(this->getDeviceResources(), my_type,
+							graphics::Color {0.f, 0.f, 0.f, 1.f}, tower_gx, tower_gy);
+						this->addTower(std::move(my_tower));
+						auto my_floored_gx = static_cast<int>(std::floor(tower_gx));
+						auto my_floored_gy = static_cast<int>(std::floor(tower_gy));
+						this->getMap().getFiterGraph(false).getNode(my_floored_gx, my_floored_gy).setBlockage(true);
+						this->getMap().getFiterGraph(true).getNode(my_floored_gx, my_floored_gy).setBlockage(true);
 					}
-					auto my_tower = std::make_unique<Tower>(this->getDeviceResources(), my_type,
-						graphics::Color {0.f, 0.f, 0.f, 1.f}, tower_gx, tower_gy);
-					this->addTower(std::move(my_tower));
-					auto my_floored_gx = static_cast<int>(std::floor(tower_gx));
-					auto my_floored_gy = static_cast<int>(std::floor(tower_gy));
-					this->getMap().getFiterGraph(false).getNode(my_floored_gx, my_floored_gy).setBlockage(true);
-					this->getMap().getFiterGraph(true).getNode(my_floored_gx, my_floored_gy).setBlockage(true);
+					else if (buffer == L"E:") {
+						// Load seen enemies.
+						std::getline(save_file, buffer);
+						// Leading space is removed...
+						buffer.erase(buffer.begin());
+						this->enemies_seen.at(buffer) = true;
+					}
 				}
 			}
 			else {

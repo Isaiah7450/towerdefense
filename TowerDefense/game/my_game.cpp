@@ -89,6 +89,9 @@ namespace hoffman::isaiah {
 			this->enemies.clear();
 			this->towers.clear();
 			this->shots.clear();
+			for (auto& e_seen : this->enemies_seen) {
+				e_seen.second = false;
+			}
 			this->is_paused = false;
 			this->in_level = false;
 			this->map->resetOtherGraphs();
@@ -207,6 +210,10 @@ namespace hoffman::isaiah {
 		}
 
 		void MyGame::addEnemy(std::unique_ptr<Enemy>&& e) {
+			const std::wstring ename = e->getBaseType().getName();
+			if (!this->enemies_seen.at(ename)) {
+				this->enemies_seen.at(ename) = true;
+			}
 			this->enemies.emplace_back(std::move(e));
 		}
 
