@@ -363,8 +363,8 @@ namespace hoffman::isaiah {
 				}
 				my_parser->readKeyValue(L"move_speed"s);
 				double ms = my_parser->parseNumber();
-				if (ms < 20.00 || ms > 60.00) {
-					throw util::file::DataFileException {L"Movement speed must between 20 and 60 inclusive."s,
+				if (ms < 10.00 || ms > 60.00) {
+					throw util::file::DataFileException {L"Movement speed must between 10 and 60 inclusive."s,
 						my_parser->getLine()};
 				}
 				my_parser->readKeyValue(L"impact_radius"s);
