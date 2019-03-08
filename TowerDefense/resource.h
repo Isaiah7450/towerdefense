@@ -81,10 +81,10 @@
 #define ID_MM_ACTIONS_TOWER_INFO_MODE           40205
 #define ID_MM_TOWERS_INFO                       40301
 #define ID_MM_TOWERS_NONE                       40302
-#define ID_MM_TOWERS_BUY_TOWER                  40501
-#define ID_MM_TOWERS_SELL_TOWER                 40502
-#define ID_MM_SHOTS_PLACEHOLDER                 40601
-#define ID_MM_ENEMIES_PLACEHOLDER               40701
+#define ID_MM_TOWERS_BUY_TOWER                  40398
+#define ID_MM_TOWERS_SELL_TOWER                 40399
+#define ID_MM_SHOTS_PLACEHOLDER                 40401
+#define ID_MM_ENEMIES_PLACEHOLDER               40501
 #define ID_MM_DEVELOP_TERRAIN_EDITOR            40801
 #define ID_MM_DEVELOP_SHOW_TEST_PATHS           40802
 #define ID_TE_FILE_NEW_MAP                      41101
