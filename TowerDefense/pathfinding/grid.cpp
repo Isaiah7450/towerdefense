@@ -134,6 +134,7 @@ namespace hoffman::isaiah {
 			constexpr const graphics::Color ground_end_color = graphics::Color {0.95f, 0.f, 0.f, 0.65f};
 			constexpr const graphics::Color air_start_color = graphics::Color {0.40f, 0.40f, 0.40f, 0.65f};
 			constexpr const graphics::Color air_end_color = graphics::Color {0.90f, 0.90f, 0.90f, 0.65f};
+			constexpr const graphics::Color white_color = graphics::Color {1.f, 1.f, 1.f, 0.75f};
 			for (int gx = 0; gx < this->getTerrainGraph(false).getWidth(); ++gx) {
 				for (int gy = 0; gy < this->getTerrainGraph(false).getHeight(); ++gy) {
 					const auto& gnode = this->getTerrainGraph(false).getNode(gx, gy);;
@@ -178,6 +179,13 @@ namespace hoffman::isaiah {
 				transparent_color, air_start_color);
 			renderer.paintSquare(air_end_node->getGameX(), air_end_node->getGameY(),
 				transparent_color, air_end_color);
+			// Make it clearer which points are the start locations.
+			const auto cs_width = graphics::getGameSquareWidth<FLOAT>();
+			const auto cs_height = graphics::getGameSquareHeight<FLOAT>();
+			const auto ground_start_lx = static_cast<FLOAT>(graphics::convertToScreenX(ground_start_node->getGameX()));
+			const auto ground_start_ty = static_cast<FLOAT>(graphics::convertToScreenY(ground_start_node->getGameY()));
+			renderer.drawText(L"GS", white_color, renderer.createRectangle(ground_start_lx,
+				ground_start_ty, cs_width, cs_height));
 		}
 	}
 }
