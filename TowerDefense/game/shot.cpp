@@ -65,7 +65,7 @@ namespace hoffman::isaiah {
 				|| std::sqrt(tdx * tdx + tdy * tdy) > this->origin_tower.getFiringRange()
 				|| this->getGameX() < 0 || this->getGameY() < 0
 				|| this->getGameX() >= gmap.getTerrainGraph(false).getWidth()
-				|| this->getGameY() >= gmap.getTerrainGraph(false).getWidth();
+				|| this->getGameY() >= gmap.getTerrainGraph(false).getHeight();
 		}
 	}
 }
