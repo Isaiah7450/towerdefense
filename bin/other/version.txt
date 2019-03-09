@@ -10,13 +10,17 @@ Version 1.3.0:
 - Information no longer relevant (still the Java version of the game)
 
 Version 2.0:
-- Never released
-- Rewrite of the original version
-- Game is now coded in C++ and only works on Windows now (You need DirectX)
+- Never released.
+- Rewrite of the original version.
+- Game is now coded in C++ and only works on Windows now (You need DirectX).
+- There was an interesting "Shockwave" tower in this version where it sent out
+  pulses. As interesting as it was, I decided against adding it to the third
+  version (in part because it was also kinda overpowered.)
 
 Version 3.0
 - A complete rewrite of the C++ version, but still in C++.
-- This version was designed with multi-threading in mind; in practical terms, this means that the game should be faster and be more responsive to user input.
+- This version was designed with multi-threading in mind; in practical terms, this means that the game should be faster and be more responsive to user input. (Note that "should be" is not the
+same as "is". I make no guarantees that this version works better.)
 - Things in the Java version that haven't made it into the C++ version (primarily because they are a pain to implement in C++ compared to Java):
  + Challenge levels and different maps based on the challenge level. (The infrastructure for this is there; I just need to make the GUI...)
  + The ability to get in-game info about towers, shots, and enemies. (Again, this is because making GUI in C++ is not easy.)
@@ -24,7 +28,7 @@ Version 3.0
  + The ability to purchase health. (It just isn't something I gotten to yet.)
 - New features implemented in the C++ version:
  + A pause feature that is 100% reliable. (The Java one was not reliable, and I think I removed it in a later version.)
- + More reliable and consistent saving. (I believe the Java version only saved when you exited the game--not very reliable!)
+ + More reliable and consistent saving. (I believe the Java version only saved when you exited the game--not very reliable!) (Still not 100% reliable.)
  + Towers now have different firing methods and targeting strategies.
   * Firing methods determine the way the tower shoots; towers can shoot in predefined angles or choose a target to shoot at. (The latter is the default.)
   * Targeting strategies determine the way the tower obtains targets; it's irrelevant for all firing methods except the default one. Basically, it determines which enemies the tower shoots at first.
@@ -47,8 +51,154 @@ Version 3.0
   * Waves of enemies no longer have to be of the same color.
   * More fine control over who is and who is not affected by an enemy's buff that is not based on color.
  + Prices no longer scale with difficulty. (Rationale: This was silly and just made the game more complicated without adding anything of value.)
+ + Enemy speed no longer scales with difficulty. (Rationale: This was also silly and a bit ridiculous.)
  + Enemies possess two new statistics: injured movement speed and pain tolerance. An enemy that has loss a higher percentage of health than its pain tolerance are considered injured and move at the injured movement speed.
  + The number of enemies spawned in an enemy group is no longer random and is based on the game's challenge level.
  + Initial paths for enemies are found at the beginning of the level, and to improve performance, only one path is found (though the pathfinder is copied, not shared) for each enemy group (which are still of homogenous type).
  + Path recalculations are still slow, but they should work more reliably now versus how they did in the Java version.
  + It should go without saying that practically everything got rebalanced since I rewrote the game from scratch.
+
+Version 3.0.1:
+- Bug Fixes:
+ + Stun not removed from enemy when status effect is purified.
+ + Fixed warnings related to 64-bit code.
+- Balance Changes:
+ + Adjusted the health and armor of Purple Medic.
+  * Purple Medic: Health decreased from 45 to 40.
+  * Purple Medic: Armor Health decreased from 10 to 8.
+ + Purple Medic can now self-heal.
+ + Adjusted the power of some of Purple Medic's healing buffs.
+  * Purple Medic: "Purple Medic Group" (Healer 2) delay increased from 7500ms
+                                                  to 8000ms.
+  * Purple Medic: "Purple Infantry Group" (Healer 1) delay increased from 750ms
+                                                     to 800 ms.
+- Did I ever release this version? Probably not--oh well.
+
+Version 3.1.0:
+- Bug Fixes:
+ + A few code analysis (i.e.: code quality checks; not game-breaking by
+   any means, but best practices) warnings/errors have been fixed.
+ + Corrected a minor grammatical error in Purple Scout's description.
+ + An issue with some pathfinding debugging code and loading a saved file.
+ + Fixed the targeting of the spray towers.
+ + Fixed a slight comparison error when loading enemy types.
+- Balance Changes:
+ + Money is now gained more consistently rather than varying by the number
+   enemies in a wave. (This is way simpler and easier to balance in theory.)
+ + Every level has been rewritten. (That's what happens when I stop working
+   on a project for awhile and then get back to it. I have a habit of
+   redoing everything. Still, I hope this time, balance will seem a bit more
+   consistent and all.) (Levels 1-21 were changed.)
+ + The following rebalancing of troops was done:
+  * Red Scout: Health increased from 5 to 6.
+  * Red Foot Soldier: Health increased from 12 to 13.
+  * Red Mounted Soldier: Health increased from 10 to 11.
+  * Red Guardian: Health increased from 25 to 26.
+  * Red General: Health increased from 40 to 55.
+  * Red King: Health increased from 100 to 125.
+  * Purple Medic: Running Speed decreased from 2.575 tiles per second to
+                  2.500 tiles per second.
+  * Purple Medic: Walking Speed decreased from 2.325 tiles per second to
+                  2.300 tiles per second.
+  * Purple Medic: Armor Health decreased from 8 to 6.
+  * Purple Medic: Armor Reduction increased from 15% to 18%.
+  * Purple Medic: Health decreased from 40 to 31.
+  * Purple Medic: Pain Tolerance increased from 75% to 80%.
+  * Purple Medic: "Purple Medic" (Healer 1) heal amount increased from 0.5
+                  health to 2.5 health.
+  * Purple Medic: "Purple Medic" (Healer 1) delay increased from 2750ms
+                  to 3500ms.
+  * Purple Medic: "Purple Medic" (Healer 1) radius decreased from 1.2
+                  tiles to 1.0 tile.
+  * Purple Medic: "Purple Medic Group" (Healer 1) heal amount decreased
+                  from 7.5 health to 5.0 health.
+  * Purple Medic: Added buff "Green and Purple Unity Group" (Healer) with
+                  stats: radius = 0.5 tiles, delay = 15000ms, and
+                  heal amount = 5.0 health.
+  * Green Motivator: Pain Tolerance increased from 90% to 92%.
+  * Green Motivator: Health increased from 24 to 27.
+  * Green Motivator: Walking and Running Speed decreased from 2.750 tiles per
+                     second to 2.700 tiles per second.
+  * Green Motivator: "Green Motivation Group" (Speed 1) radius increased from
+                     3.0 tiles to 3.5 tiles.
+  * Green Motivator: "Green Motivation Group" (Speed 1) delay increased from
+                     3000ms to 3200ms.
+  * Purple Scout: Health increased from 16 to 17.
+  * Purple Scout: Walking and Running Speed increased increased from 2.625
+                  tiles per second to 2.700 tiles per second.
+ + Changes to shot types:
+  * Flak I: Damage increased from 3.00 to 3.50.
+  * Flak II: Damage increased from 4.00 to 4.50.
+  * Flak II: Splash Damage increased from 0.65 to 0.75.
+  * Anti-Ground Flak: Damage increased from 2.50 to 3.00.
+  * Anti-Air Flak: Damage increased from 2.85 to 3.15.
+  * Suppression Flak: Stun Duration increased from 250ms to 350ms.
+  * Suppression Flak: Stun Multi-Chance increased from 0% to 2%.
+  * Frost Spray: Damage increased from 3.00 to 4.00.
+  * Frost Spray: Piercing increased from 0% to 5%.
+  * Lava Spray: Damage increased from 4.25 to 5.00.
+  * Lava Spray: Splash Damage decreased from 3.00 to 2.50.
+  * Lava Spray: DoT Damage decreased from 2.25 to 1.50.
+  * Lava Spray: DoT Time Between Ticks decreased from 1250ms to 1000ms.
+  * Lava Spray: DoT Total Ticks increased from 4 to 5.
+  * Big Bang: Damage decreased from 3.00 to 2.00.
+  * Destroyer Missile: Damage increased from 13.50 to 14.00.
+  * Ice Artillery: Damage increased from 7.00 to 8.00.
+  * Ice Artillery: Splash Damage increased from 0.33 to 2.00.
+  * Ice Artillery: Impact Radius increased from 0.25 to 0.33.
+  * Added Miracle Spray.
+ + Changes to towers/walls/traps:
+  * Spray Tower NE and SE: Volley Shots decreased from 40 to 20.
+  * Spray Tower NE and SE: Reload Delay increased from 500ms to 550ms.
+  * Spray Tower NE and SE: Firing Range increased from 4.00 tiles to 4.50 tiles.
+  * Spray Tower NE and SE: Frequency of Frost Spray decreased from 50% to 48%.
+  * Spray Tower NE and SE: Frequency of Lava Spray decreased from 50% to 48%.
+  * Spray Tower NE and SE: Added "Miracle Spray" with a frequency of 4%.
+  * Wall cost increased from $2 per tile to $3 per tile.
+  * Cheap Tower: Firing Speed increased from 5.00 shots per second to
+                 6.00 shots per second.
+  * Cheap Tower: Volley Shots increased from 40 to 42.
+  * Cheap Tower: Reload Delay increased from 2000ms to 2500ms.
+  * Rapid-Fire Tower: Frequency of Flak I decreased from 30% to 20%.
+  * Rapid-Fire Tower: Frequency of Suppression Flak increased from 5% to 15%.
+  * Rapid-Fire Tower: Firing Speed increased from 6.00 shots per second to
+                      12.00 shots per second.
+  * Rapid-Fire Tower: Firing Range decreased from 6.00 tiles to 5.00 tiles.
+  * Destroyer Tower: Firing Speed increased from 1.15 shots per second to
+                     1.20 shots per second.
+  * Destroyer Tower: Firing Range decreased from 8.25 tiles to 8.00 tiles.
+  * Splash Tower: Frequency of Big Bang increased from 15% to 20%.
+  * Splash Tower: Frequency of Charged Blast decreased from 25% to 20%.
+  * Splash Tower: Reload Delay increased from 2750ms to 3000ms.
+  * Cheap Tower: Cost changed from $28 to $29.
+  * Rapid-Fire Tower: Cost changed from $86 to $88.
+  * Destroyer Tower: Cost changed from $81 to $84.
+  * Splash Tower: Cost changed from $98 to $99.
+  * Spray Tower NE: Cost changed from $95 to $94.
+  * Spray Tower SE: Cost changed from $94 to $93.
+  * Utility Tower: Cost changed from $95 to $90.
+- New Stuff:
+ + Added levels 22-30.
+ + You can now buy health.
+ + You can now click on enemies to receive information about them.
+ + You can now use "Show Info" on the towers menu to receive information about
+   the tower currently selected (on the menu). (Does not work for walls.)
+ + You can now double-click on placed towers to view info about them.
+  * You cannot upgrade towers at the moment.
+ + Added "Repair" buff for enemies.
+ + Added two new popup menus: Shots and Enemies.
+  * The enemies menu will fill up over time as you meet more enemies.
+  * You can click on any non-hidden entry (i.e.: not "???") in either menu
+    to display information about that shot type or enemy type.
+ + Added several enemies to the list. Not all of them are seen in-game yet.
+- Misc Changes:
+ + For performance reasons, a random delay (of up to 20 frames) has been added
+   for whenever an intelligence status effect is added to an enemy. This
+   should result in fewer path recalculations per frame.
+ + Stopped enforcing that an enemy's injured speed <= walking speed <=
+   running_speed. (This allows for interesting effects.)
+ + Added "Heal" as a valid DoT effect type for shots.
+ + Some internal rebalancing of calculations for enemies. (This has no real
+   effect as this information was not used for anything in-game.)
+ + Relaxed move speed restriction on shots.
+ + Added max level field to the towers file (for later use).
