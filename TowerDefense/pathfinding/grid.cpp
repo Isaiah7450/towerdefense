@@ -6,6 +6,7 @@
 #include <algorithm>
 #include "./../globals.hpp"
 #include "./../graphics/graphics.hpp"
+#include "./../terrain/editor.hpp"
 #include "./graph_node.hpp"
 #include "./grid.hpp"
 using namespace std::literals::string_literals;
@@ -186,6 +187,48 @@ namespace hoffman::isaiah {
 			const auto ground_start_ty = static_cast<FLOAT>(graphics::convertToScreenY(ground_start_node->getGameY()));
 			renderer.drawText(L"GS", white_color, renderer.createRectangle(ground_start_lx,
 				ground_start_ty, cs_width, cs_height));
+		}
+
+		void GameMap::draw(const graphics::Renderer2D& renderer, bool in_editor) const noexcept {
+			this->draw(renderer);
+
+			if (in_editor) {
+				constexpr const graphics::Color my_color = graphics::Color {1.f, 1.f, 1.f, 0.75f};
+				const auto ground_active = terrain_editor::g_my_editor->areGroundWeightsActive();
+				const auto air_active = terrain_editor::g_my_editor->areAirWeightsActive();
+				if (!ground_active && !air_active) {
+					return;
+				}
+				for (int gx = 0; gx < this->getTerrainGraph(false).getWidth(); ++gx) {
+					for (int gy = 0; gy < this->getTerrainGraph(false).getHeight(); ++gy) {
+						const auto& gnode = this->getTerrainGraph(false).getNode(gx, gy);
+						const auto& anode = this->getTerrainGraph(true).getNode(gx, gy);
+						if (gnode.isBlocked() || anode.isBlocked()) {
+							continue;
+						}
+						const auto node_lsx = static_cast<float>(graphics::convertToScreenX(gnode.getGameX()));
+						const auto node_tsy = static_cast<float>(graphics::convertToScreenY(gnode.getGameY()));
+						const auto node_width = graphics::getGameSquareWidth<float>();
+						const auto node_height = graphics::getGameSquareHeight<float>();
+						if (ground_active && air_active) {
+							const auto weight_string = std::to_wstring(gnode.getWeight()) + L"|"
+								+ std::to_wstring(anode.getWeight());
+							renderer.drawText(weight_string, my_color, renderer.createRectangle(
+								node_lsx, node_tsy, node_width, node_height));
+						}
+						else if (ground_active) {
+							const auto weight_string = std::to_wstring(gnode.getWeight());
+							renderer.drawText(weight_string, my_color, renderer.createRectangle(
+								node_lsx, node_tsy, node_width, node_height));
+						}
+						else {
+							const auto weight_string = std::to_wstring(anode.getWeight());
+							renderer.drawText(weight_string, my_color, renderer.createRectangle(
+								node_lsx, node_tsy, node_width, node_height));
+						}
+					} // End inner for.
+				} // End outer for.
+			}
 		}
 	}
 }

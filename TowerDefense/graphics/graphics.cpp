@@ -137,7 +137,7 @@ namespace hoffman::isaiah {
 		}
 
 		HRESULT Renderer2D::render(const std::shared_ptr<game::MyGame> my_game, int mouse_gx, int mouse_gy,
-			int mouse_end_gx, int mouse_end_gy) const {
+			int mouse_end_gx, int mouse_end_gy, bool in_editor) const {
 			UNREFERENCED_PARAMETER(my_game);
 			// Check time before rendering
 			static LARGE_INTEGER last_update_time = LARGE_INTEGER {0};
@@ -158,7 +158,7 @@ namespace hoffman::isaiah {
 			render_target->BeginDraw();
 			render_target->Clear(Color {1.f, 1.f, 1.f, 1.f});
 			// Draw terrain
-			my_game->getMap().draw(*this);
+			my_game->getMap().draw(*this, in_editor);
 			// Draw shots, towers, and enemies.
 			for (const auto& s : my_game->shots) {
 				s->draw(*this);

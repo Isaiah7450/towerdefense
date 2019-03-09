@@ -40,6 +40,12 @@ namespace hoffman::isaiah {
 			pathfinding::Grid& getTerrainGraph(bool return_air_map) noexcept {
 				return this->getMap().getTerrainGraph(return_air_map);
 			}
+			bool areGroundWeightsActive() const noexcept {
+				return this->show_ground_weights;
+			}
+			bool areAirWeightsActive() const noexcept {
+				return this->show_air_weights;
+			}
 		protected:
 			/// <summary>Updates the menu bar.</summary>
 			void updateMenu() noexcept;
@@ -62,6 +68,10 @@ namespace hoffman::isaiah {
 			bool terrain_modifier_active {false};
 			/// <summary>The amount to add to the default terrain weights for each terrain.</summary>
 			int terrain_weights_adjust {0};
+			/// <summary>Show the ground weights of every square?</summary>
+			bool show_ground_weights {false};
+			/// <summary>Show the air weights of every square?</summary>
+			bool show_air_weights {false};
 			/// <summary>Stores the starting x-position of the mouse.</summary>
 			int start_gx {-1};
 			/// <summary>Stores the starting y-position of the mouse.</summary>
@@ -77,5 +87,8 @@ namespace hoffman::isaiah {
 			// The window's name
 			static constexpr auto window_name {L"Isaiah's tower defense - terrain editor"};
 		};
+
+		// Global state is not the best, but it tends to be the most trivial solution.
+		extern std::shared_ptr<TerrainEditor> g_my_editor;
 	}
 }

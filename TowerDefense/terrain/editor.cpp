@@ -24,6 +24,8 @@ using namespace std::literals::string_literals;
 
 namespace hoffman::isaiah {
 	namespace terrain_editor {
+		std::shared_ptr<TerrainEditor> g_my_editor {nullptr};
+
 		LRESULT CALLBACK TerrainEditor::windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			switch (msg) {
 			case WM_DESTROY:
@@ -39,7 +41,10 @@ namespace hoffman::isaiah {
 		
 		unsigned __stdcall terrain_editor_thread_init(void* data) {
 			auto* my_game = game::g_my_game.get();
-			auto my_editor = TerrainEditor {static_cast<HWND>(data), my_game->getMap()};
+			// Global state stuff...
+			terrain_editor::g_my_editor = std::make_shared<TerrainEditor>(static_cast<HWND>(data),
+				my_game->getMap());
+			auto& my_editor = *terrain_editor::g_my_editor;
 			HINSTANCE my_h_inst = nullptr;
 			if (!GetModuleHandleEx(0, nullptr, &my_h_inst)) {
 				winapi::handleWindowsError(L"TE Thread: Terrain editor creation");
@@ -226,6 +231,12 @@ namespace hoffman::isaiah {
 								this->terrain_weights_adjust = 0;
 							}
 							break;
+						case ID_TE_ACTIONS_TOGGLE_GROUND_WEIGHTS:
+							this->show_ground_weights = !this->show_ground_weights;
+							break;
+						case ID_TE_ACTIONS_TOGGLE_AIR_WEIGHTS:
+							this->show_air_weights = !this->show_air_weights;
+							break;
 						case ID_TE_TERRAIN_TYPES_NONE:
 						case ID_TE_TERRAIN_TYPES_GRASS:
 						case ID_TE_TERRAIN_TYPES_SWAMP:
@@ -378,7 +389,7 @@ namespace hoffman::isaiah {
 						ReleaseMutex(sync_mutex);
 					}
 					HRESULT hr = my_renderer->render(game::g_my_game, this->start_gx, this->start_gy,
-						this->end_gx, this->end_gy);
+						this->end_gx, this->end_gy, true);
 					if (hr == D2DERR_RECREATE_TARGET) {
 						my_resources->discardDeviceResources();
 						my_resources->createDeviceResources(this->hwnd);
