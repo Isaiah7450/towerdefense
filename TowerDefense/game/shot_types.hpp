@@ -42,11 +42,15 @@ namespace hoffman::isaiah {
 			/// <summary>Applies the projectile's effect to the enemy that was directly
 			/// hit by the projectile.</summary>
 			/// <param name="e">The enemy directly hit by the projectile.</param>
-			void doHit(Enemy& e) const;
+			/// <param name="tower_dmg_multiplier">The damage multiplier from the tower that
+			/// the shot originated from.</param>
+			void doHit(Enemy& e, double tower_dmg_multiplier) const;
 			/// <summary>Applies the projectile's splash effect to the enemies that were
 			/// indirectly hit by the projectile.</summary>
 			/// <param name="e">An enemy indirectly hit by the projectile.</param>
-			virtual void doSplashHit(Enemy& e) const;
+			/// <param name="tower_dmg_multiplier">The damage multiplier from the tower that
+			/// the shot originated from.</param>
+			virtual void doSplashHit(Enemy& e, double tower_dmg_multiplier) const;
 
 			// Getters
 			double getDamage() const noexcept {
@@ -183,7 +187,7 @@ namespace hoffman::isaiah {
 			}
 
 			// Overrides ShotBaseType::doSplashHit()
-			void doSplashHit(Enemy& e) const final;
+			void doSplashHit(Enemy& e, double tower_dmg_multiplier) const final;
 			// Overrides ShotBaseType::isSplashEffectType()
 			bool isSplashEffectType() const noexcept override {
 				return affects_splash;

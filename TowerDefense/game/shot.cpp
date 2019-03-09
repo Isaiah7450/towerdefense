@@ -34,7 +34,7 @@ namespace hoffman::isaiah {
 			for (; i < enemies.size(); ++i) {
 				auto& e = enemies[i];
 				if (this->intersects(*e)) {
-					this->base_type->doHit(*e);
+					this->base_type->doHit(*e, this->origin_tower.getDamageMultiplier());
 					break;
 				}
 			}
@@ -47,7 +47,7 @@ namespace hoffman::isaiah {
 						const double edy = std::abs(this->getGameY() - e->getGameY());
 						const double e_dist = std::sqrt(edx * edx + edy * edy);
 						if (e_dist <= this->base_type->getImpactRadius()) {
-							this->base_type->doSplashHit(*e);
+							this->base_type->doSplashHit(*e, this->origin_tower.getDamageMultiplier());
 						}
 					}
 				}
@@ -62,7 +62,7 @@ namespace hoffman::isaiah {
 					&& gmap.getTerrainGraph(false).getNode(igx, igy).isBlocked()
 				: true;
 			return i < enemies.size() || is_on_blocked_space
-				|| std::sqrt(tdx * tdx + tdy * tdy) > this->origin_tower.getBaseType()->getFiringRange()
+				|| std::sqrt(tdx * tdx + tdy * tdy) > this->origin_tower.getFiringRange()
 				|| this->getGameX() < 0 || this->getGameY() < 0
 				|| this->getGameX() >= gmap.getTerrainGraph(false).getWidth()
 				|| this->getGameY() >= gmap.getTerrainGraph(false).getWidth();

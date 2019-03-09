@@ -25,10 +25,10 @@ namespace hoffman::isaiah {
 				renderer.setOutlineColor(graphics::Color {1.f, 0.f, 0.f, 0.8f});
 				renderer.outlineEllipse(renderer.createEllipse(static_cast<float>(this->getScreenX()),
 					static_cast<float>(this->getScreenY()),
-					static_cast<float>(this->getBaseType()->getFiringRange() * graphics::getGameSquareWidth()),
-					static_cast<float>(this->getBaseType()->getFiringRange() * graphics::getGameSquareHeight())));
+					static_cast<float>(this->getFiringRange() * graphics::getGameSquareWidth()),
+					static_cast<float>(this->getFiringRange() * graphics::getGameSquareHeight())));
 			}
-			if (this->getBaseType()->getVolleyShots() == 0) {
+			if (this->getVolleyShots() == 0) {
 				return;
 			}
 			// Draw ammunition bar
@@ -37,9 +37,9 @@ namespace hoffman::isaiah {
 			constexpr const graphics::Color bar_filling_color {1.f, 0.f, 1.f, 0.9f};
 			constexpr const graphics::Color bar_reloading_color {0.3f, 0.6f, 0.6f, 0.7f};
 			const float shots_fired_percent = static_cast<float>(this->shots_fired_since_reload)
-				/ static_cast<float>(this->getBaseType()->getVolleyShots());
+				/ static_cast<float>(this->getVolleyShots());
 			const float reload_time_percent = static_cast<float>(this->frames_to_reload)
-				/ static_cast<float>(math::convertMillisecondsToFrames(this->getBaseType()->getReloadDelay()));
+				/ static_cast<float>(math::convertMillisecondsToFrames(this->getReloadDelay()));
 			const float bar_max_width = 0.7f * graphics::getGameSquareWidth<float>();
 			const float bar_height = 0.15f * graphics::getGameSquareHeight<float>();
 			const float ammo_bar_offset = 8.f * graphics::screen_height / 645.f;
@@ -81,7 +81,7 @@ namespace hoffman::isaiah {
 			--this->frames_til_next_shot;
 			if (this->frames_til_next_shot <= 0.0) {
 				this->frames_til_next_shot += math::convertMillisecondsToFrames(1000.0
-					/ this->getBaseType()->getFiringSpeed());
+					/ this->getFiringSpeed());
 				auto target = this->findTarget(enemies);
 				if (!target) {
 					// Take the time to reload a single shot instead of firing
@@ -91,10 +91,10 @@ namespace hoffman::isaiah {
 				}
 				else {
 					++this->shots_fired_since_reload;
-					if (this->shots_fired_since_reload >= this->getBaseType()->getVolleyShots()
-						&& this->getBaseType()->getVolleyShots() != 0) {
+					if (this->shots_fired_since_reload >= this->getVolleyShots()
+						&& this->getVolleyShots() != 0) {
 						this->must_reload = true;
-						this->frames_to_reload += math::convertMillisecondsToFrames(this->getBaseType()->getReloadDelay());
+						this->frames_to_reload += math::convertMillisecondsToFrames(this->getReloadDelay());
 					}
 					return this->createShot(target);
 				}
@@ -108,7 +108,7 @@ namespace hoffman::isaiah {
 				== TargetingStrategyProtocols::Highest;
 			// The fall-back value is the enemy that is closest/farthest from the tower
 			// but within its firing range.
-			double fallback_winning_value = use_highest ? 0.0 : this->getBaseType()->getFiringRange() + 1.0;
+			double fallback_winning_value = use_highest ? 0.0 : this->getFiringRange() + 1.0;
 			const Enemy* fallback_winner {nullptr};
 			// Used for the statistics and names targeting strategy
 			[[maybe_unused]] double target_winning_value = use_highest ? 0.0 : 1e20;
@@ -130,7 +130,7 @@ namespace hoffman::isaiah {
 				const double gdx = math::get_abs(signed_gdx);
 				const double gdy = std::abs(signed_gdy);
 				const double gdist = std::sqrt(gdx * gdx + gdy * gdy);
-				if (gdist <= this->getBaseType()->getFiringRange()) {
+				if (gdist <= this->getFiringRange()) {
 					// Valid target
 					if (my_strat == TargetingStrategyTypes::Distances || !target_winner) {
 						if ((use_highest && gdist > fallback_winning_value)
@@ -217,6 +217,47 @@ namespace hoffman::isaiah {
 			// Note that the y-axis is inverted, so we need to correct the angle used here.
 			return std::make_unique<Shot>(this->device_resources, stype, graphics::Color {1.f, 0.f, 1.f, 1.f},
 				*this, -this->getBaseType()->getFiringMethod().getAngles().at(this->angle_index));
+		}
+
+		// Don't forget to keep this version and TowerType's version synced.
+		double Tower::getAverageDamagePerShot() const noexcept {
+			double sum = 0.0;
+			for (const auto& st : this->getBaseType()->getShotTypes()) {
+				sum += st.first->getExpectedRawDamage() * st.second;
+			}
+			return sum;
+		}
+
+		double Tower::getAverageShotRating() const noexcept {
+			double sum = 0.0;
+			for (const auto& st : this->getBaseType()->getShotTypes()) {
+				sum += st.first->getRating() * st.second;
+			}
+			return sum;
+		}
+
+		void Tower::updateRating() noexcept {
+			if (this->getBaseType()->isWall()) {
+				this->value = this->getBaseType()->getRating();
+				return;
+			}
+			const auto speed_range_multipliers = this->getRateOfFire()
+				* (this->getFiringArea() / 2.5);
+			const auto behavior_modifier = (this->getBaseType()->getFiringMethod().getMethod()
+				== FiringMethodTypes::Default ? 0.0 : -2.5)
+				+ (this->getBaseType()->getTargetingStrategy().getStrategy() 
+				== TargetingStrategyTypes::Distances ? 0.0 : 3.5);
+			const auto my_dps_idea = this->getAverageDamagePerShot() * speed_range_multipliers;
+			const auto my_effect_idea = (this->getAverageShotRating() - this->getAverageDamagePerShot())
+				* speed_range_multipliers;
+			if (my_dps_idea > my_effect_idea) {
+				this->rating = (my_dps_idea * 0.65 + my_effect_idea * 0.35)
+					+ behavior_modifier;
+			}
+			else {
+				this->rating = (my_dps_idea * 0.35 + my_effect_idea * 0.65)
+					+ behavior_modifier;
+			}
 		}
 	}
 }

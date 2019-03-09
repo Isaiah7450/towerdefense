@@ -312,8 +312,8 @@ namespace hoffman::isaiah {
 				const auto& t = this->towers[i];
 				if (static_cast<int>(std::floor(t->getGameX())) == gx
 					&& static_cast<int>(std::floor(t->getGameY())) == gy) {
-					// (Refunds => 1/2 original price unrounded)
-					this->player.changeMoney(t->getBaseType()->getCost() / 2.0);
+					// (Refunds => 1/2 value unrounded)
+					this->player.changeMoney(t->getCost() / 2.0);
 					this->getMap().getFiterGraph(false).getNode(gx, gy).setBlockage(false);
 					this->getMap().getFiterGraph(true).getNode(gx, gy).setBlockage(false);
 					this->towers.erase(towers.begin() + i);

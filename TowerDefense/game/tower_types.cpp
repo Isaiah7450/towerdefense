@@ -15,6 +15,7 @@
 
 namespace hoffman::isaiah {
 	namespace game {
+		// Don't forget to keep this version and Tower's version synced.
 		double TowerType::getAverageDamagePerShot() const noexcept {
 			// (This is a weighted average.)
 			double sum = 0.0;
@@ -34,6 +35,7 @@ namespace hoffman::isaiah {
 		}
 
 		double TowerType::getRating() const noexcept {
+			if (this->isWall()) return 1.0;
 			const auto speed_range_multipliers = this->getRateOfFire()
 				* (this->getFiringArea() / 2.5);
 			const auto behavior_modifier = (this->getFiringMethod().getMethod() == FiringMethodTypes::Default ? 0.0 : -2.5)

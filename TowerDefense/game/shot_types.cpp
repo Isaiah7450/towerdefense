@@ -12,17 +12,19 @@
 
 namespace hoffman::isaiah {
 	namespace game {
-		void ShotBaseType::doHit(Enemy& e) const {
-			e.takeDamage(this->getActualDamage(e.getBaseType().isFlying()), this->getPiercing());
+		void ShotBaseType::doHit(Enemy& e, double tower_dmg_multiplier) const {
+			e.takeDamage(this->getActualDamage(e.getBaseType().isFlying())
+				* tower_dmg_multiplier, this->getPiercing());
 			this->apply(e);
 		}
 
-		void ShotBaseType::doSplashHit(Enemy& e) const {
-			e.takeDamage(this->getActualSplashDamage(e.getBaseType().isFlying()), this->getPiercing());
+		void ShotBaseType::doSplashHit(Enemy& e, double tower_dmg_multiplier) const {
+			e.takeDamage(this->getActualSplashDamage(e.getBaseType().isFlying())
+				* tower_dmg_multiplier, this->getPiercing());
 		}
 
-		void ShotEffectType::doSplashHit(Enemy& e) const {
-			ShotBaseType::doSplashHit(e);
+		void ShotEffectType::doSplashHit(Enemy& e, double tower_dmg_multiplier) const {
+			ShotBaseType::doSplashHit(e, tower_dmg_multiplier);
 			if (this->isSplashEffectType()) {
 				this->apply(e);
 			}

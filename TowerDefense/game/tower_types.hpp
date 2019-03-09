@@ -7,6 +7,7 @@
 #include <vector>
 #include <utility>
 #include <algorithm>
+#include <variant>
 #include "./../globals.hpp"
 #include "./../graphics/graphics.hpp"
 #include "./game_object_type.hpp"
@@ -20,7 +21,23 @@ namespace hoffman::isaiah {
 	namespace game {
 		// Forward declarations
 		class ShotBaseType;
+		class Tower;
+		// Enumrations
+		/// <summary>Enumeration of upgrades that can be performed to a tower.</summary>
+		enum class TowerUpgradeTypes {
+			Damage, Speed, Range, Ammo, Delay, Strategy, Sentinel_DO_NOT_USE
+		};
+	}
 
+	inline std::wstring operator*(game::TowerUpgradeTypes upgrade_type) noexcept {
+		constexpr const std::array<const wchar_t*,
+			static_cast<int>(game::TowerUpgradeTypes::Sentinel_DO_NOT_USE)> my_upgrade_strs {
+			L"Damage", L"Speed", L"Range", L"Ammo", L"Reload Delay", L"Strategy"
+		};
+		return my_upgrade_strs.at(static_cast<int>(upgrade_type));
+	}
+
+	namespace game {
 		/// <summary>Enumeration constants that represents the methods that
 		/// a tower uses to fire projectiles.</summary>
 		enum class FiringMethodTypes {
@@ -140,6 +157,34 @@ namespace hoffman::isaiah {
 			std::vector<std::wstring> target_names;
 		};
 
+		/// <summary>Represents information about an upgrade.</summary>
+		class TowerUpgradeInfo {
+		public:
+			TowerUpgradeInfo(int lv, double dmg, double spd, double rng, double ammo,
+				double delay) :
+				level {lv},
+				damage_change {dmg},
+				speed_change {spd},
+				range_change {rng},
+				ammo_change {ammo},
+				delay_change {delay} {
+			}
+		private:
+			/// <summary>The level of the upgrade.</summary>
+			int level;
+			// Note: Negative values are allowed. Effective range is -1.00 < x < infinity.
+			/// <summary>The % change in the tower's damage.</summary>
+			double damage_change;
+			/// <summary>The % change in the tower's firing speed.</summary>
+			double speed_change;
+			/// <summary>The % change in the tower's firing range.</summary>
+			double range_change;
+			/// <summary>The % change in the tower's volley shots.</summary>
+			double ammo_change;
+			/// <summary>The % change in the tower's reload delay.</summary>
+			double delay_change;
+		};
+
 		/// <summary>The class for all towers in the game, including walls.</summary>
 		class TowerType : public GameObjectType {
 		public:
@@ -200,6 +245,8 @@ namespace hoffman::isaiah {
 			virtual bool isWall() const noexcept {
 				return false;
 			}
+			// Note: For the most part, all of these should be very close to the same
+			//       as the versions in Tower.
 			/// <returns>The expected amount of raw damage output by the tower per shot on average.</returns>
 			double getAverageDamagePerShot() const noexcept;
 			/// <returns>The weighted average of the tower's shot types.</returns>
@@ -234,11 +281,10 @@ namespace hoffman::isaiah {
 				}
 				return this->getCostAdjustment() + this->getRating() / 10.5 + 1.0;
 			}
-		protected:
-			// Getters
 			int getCostAdjustment() const noexcept {
 				return this->cost_adjustment;
 			}
+		protected:
 		private:
 			/// <summary>The firing method used by the tower.</summary>
 			std::shared_ptr<FiringMethod> firing_method;
