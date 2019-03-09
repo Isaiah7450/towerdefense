@@ -160,14 +160,16 @@ namespace hoffman::isaiah {
 			// Draw terrain
 			my_game->getMap().draw(*this, in_editor);
 			// Draw shots, towers, and enemies.
-			for (const auto& s : my_game->shots) {
-				s->draw(*this);
-			}
-			for (const auto& t : my_game->towers) {
-				t->draw(*this);
-			}
-			for (const auto& e : my_game->enemies) {
-				e->draw(*this);
+			if (!in_editor) {
+				for (const auto& s : my_game->shots) {
+					s->draw(*this);
+				}
+				for (const auto& t : my_game->towers) {
+					t->draw(*this);
+				}
+				for (const auto& e : my_game->enemies) {
+					e->draw(*this);
+				}
 			}
 #if 0
 			my_game->level = 999;
