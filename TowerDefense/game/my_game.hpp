@@ -70,6 +70,9 @@ namespace hoffman::isaiah {
 		class MyGame {
 			friend class graphics::Renderer2D;
 		public:
+			static constexpr const wchar_t* ground_terrain_filename = L"./resources/graphs/ground_graph.txt";
+			static constexpr const wchar_t* air_terrain_filename = L"./resources/graphs/air_graph.txt";
+
 			MyGame(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, int clevel,
 				std::wistream& ground_terrain_file, std::wistream& air_terrain_file);
 			~MyGame() noexcept;

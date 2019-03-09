@@ -94,7 +94,11 @@ namespace hoffman::isaiah {
 			}
 			this->is_paused = false;
 			this->in_level = false;
-			this->map->resetOtherGraphs();
+			std::wifstream ground_terrain_file {game::MyGame::ground_terrain_filename};
+			std::wifstream air_terrain_file {game::MyGame::air_terrain_filename};
+			if (ground_terrain_file.good() && air_terrain_file.good()) {
+				this->map = std::make_shared<GameMap>(ground_terrain_file, air_terrain_file);
+			}
 			this->my_level_enemy_count = 0;
 			this->did_lose_life = false;
 			this->win_streak = 0;
