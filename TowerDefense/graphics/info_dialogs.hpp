@@ -115,16 +115,19 @@ namespace hoffman::isaiah::winapi {
 	private:
 	};
 
-	/// <summary>Displays information about a tower that can be upgraded.</summary>
-	class TowerUpgradeInfoDialog : public InfoDialogBase {
+	/// <summary>Displays information about a placed tower.</summary>
+	class TowerPlacedInfoDialog : public InfoDialogBase {
 	public:
 		/// <param name="owner">Handle to the window that owns this dialog box.</param>
 		/// <param name="h_inst">The hInstance parameter given by the WinMain function.</param>
-		TowerUpgradeInfoDialog(HWND owner, HINSTANCE h_inst, const game::Tower& t);
+		/// <param name="t">The tower to show info for.</param>
+		TowerPlacedInfoDialog(HWND owner, HINSTANCE h_inst, game::Tower& t);
 	protected:
 		// Implements InfoDialogBase::initDialog().
 		void initDialog(HWND hwnd) override;
 	private:
+		/// <summary>The tower whose info is being displayed.</summary>
+		game::Tower& my_tower;
 	};
 
 	/// <summary>Displays additional information about shots that stun.</summary>

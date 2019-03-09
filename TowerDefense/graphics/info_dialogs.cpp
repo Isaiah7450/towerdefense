@@ -14,6 +14,7 @@
 #include "./../game/shot_types.hpp"
 #include "./../game/status_effects.hpp"
 #include "./../game/tower_types.hpp"
+#include "./../game/tower.hpp"
 using namespace std::literals::string_literals;
 namespace hoffman::isaiah::winapi {
 	InfoDialogBase::InfoDialogBase(HINSTANCE h_inst, const game::GameObjectType& object_type) :
@@ -266,6 +267,80 @@ namespace hoffman::isaiah::winapi {
 		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(0)
 			<< my_ttype.getRating();
 		SetDlgItemText(hwnd, IDC_INFO_TOWER_RATING, my_stream.str().c_str());
+		my_stream.str(L"");
+	}
+
+	TowerPlacedInfoDialog::TowerPlacedInfoDialog(HWND owner, HINSTANCE h_inst, game::Tower& t) :
+		InfoDialogBase {h_inst, *t.getBaseType()},
+		my_tower {t} {
+		DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_TOWER_PLACED),
+			owner, InfoDialogBase::infoDialogProc, reinterpret_cast<LPARAM>(this));
+	}
+
+	void TowerPlacedInfoDialog::initDialog(HWND hwnd) {
+		this->setCommonControls(hwnd);
+		// Add ammo types.
+		const auto hdlg_ammo = GetDlgItem(hwnd, IDC_INFO_TOWER_AMMO_TYPES);
+		std::wstringstream my_stream {};
+		for (const auto& st_pair : this->my_tower.getBaseType()->getShotTypes()) {
+			my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(0)
+				<< (st_pair.second * 100) << L"%";
+			const std::wstring ammo_string = st_pair.first->getName() + L": " + my_stream.str();
+			my_stream.str(L"");
+			SendMessage(hdlg_ammo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(ammo_string.c_str()));
+		}
+		if (!this->my_tower.getBaseType()->isWall()) {
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_METHOD,
+				this->my_tower.getBaseType()->getFiringMethod().getReferenceName().c_str());
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_TARGETING_STRATEGY,
+				this->my_tower.getBaseType()->getTargetingStrategy().getReferenceName().c_str());
+		}
+		else {
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_METHOD, L"Not Applicable");
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_TARGETING_STRATEGY, L"Not Applicable");
+			SendMessage(hdlg_ammo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Not Applicable"));
+		}
+		SendMessage(hdlg_ammo, CB_SETCURSEL, 0, 0);
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< this->my_tower.getFiringSpeed() << L" / s";
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_SPEED, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< this->my_tower.getFiringRange() << L" cs";
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_RANGE, my_stream.str().c_str());
+		my_stream.str(L"");
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_VOLLEY_SHOTS, std::to_wstring(this->my_tower.getVolleyShots()).c_str());
+		my_stream << this->my_tower.getReloadDelay() << L" ms";
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_RELOAD_DELAY, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< this->my_tower.getAverageDamagePerShot();
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_EXPECTED_SHOT_DAMAGE, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< this->my_tower.getAverageShotRating();
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_AVG_SHOT_RATING, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< this->my_tower.getRateOfFire() << L" / s";
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_RATE_OF_FIRE, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(2)
+			<< this->my_tower.getExpectedDPS() << L" dmg / s";
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_EXPECTED_DPS, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << L"$" << std::setiosflags(std::ios::fixed) << std::setprecision(2)
+			<< this->my_tower.getCost();
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_COST, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(0)
+			<< this->my_tower.getRating();
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_RATING, my_stream.str().c_str());
+		my_stream.str(L"");
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_PLACED_LEVEL, std::to_wstring(this->my_tower.getLevel()).c_str());
+		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
+			<< (this->my_tower.getDamageMultiplier() * 100.0) << L"%";
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_PLACED_DAMAGE_MULTI, my_stream.str().c_str());
 		my_stream.str(L"");
 	}
 

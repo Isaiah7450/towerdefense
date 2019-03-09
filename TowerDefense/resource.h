@@ -11,8 +11,8 @@
 #define IDD_INFO_SHOT_SLOW                      2003
 #define IDD_INFO_SHOT_DOT                       2004
 #define IDD_INFO_TOWER                          3001
-#define IDD_INFO_PLACED_TOWER                   3101
-#define IDD_INFO_UPGRADE_TOWER                  3102
+#define IDD_INFO_TOWER_PLACED                   3101
+#define IDD_INFO_TOWER_UPGRADE                  3102
 
 #define IDC_INFO_BASE_NAME                      10001
 #define IDC_INFO_BASE_DESC                      10002
@@ -76,6 +76,19 @@
 #define IDC_INFO_TOWER_AVG_SHOT_RATING          13054
 #define IDC_INFO_TOWER_COST                     13055
 #define IDC_INFO_TOWER_RATING                   13099
+#define IDC_INFO_TOWER_PLACED_LEVEL             13101
+#define IDC_INFO_TOWER_PLACED_DAMAGE_MULTI      13102
+#define IDC_INFO_TOWER_PLACED_UPGRADE_A         13103
+#define IDC_INFO_TOWER_PLACED_UPGRADE_B         13104
+#define IDC_INFO_TOWER_PLACED_SELL              13105
+#define IDC_INFO_TOWER_UPGRADE_LEVEL            13201
+#define IDC_INFO_TOWER_UPGRADE_COST             13202
+#define IDC_INFO_TOWER_UPGRADE_DAMAGE           13203
+#define IDC_INFO_TOWER_UPGRADE_SPEED            13204
+#define IDC_INFO_TOWER_UPGRADE_RANGE            13205
+#define IDC_INFO_TOWER_UPGRADE_AMMO             13206
+#define IDC_INFO_TOWER_UPGRADE_DELAY            13207
+#define IDC_INFO_TOWER_UPGRADE_DO_UPGRADE       13208
 
 #define ID_MM_FILE_NEW_GAME                     40101
 #define ID_MM_FILE_LOAD_GAME                    40102

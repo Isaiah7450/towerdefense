@@ -172,6 +172,9 @@ namespace hoffman::isaiah {
 			std::vector<std::unique_ptr<Enemy>>& getEnemies() noexcept {
 				return this->enemies;
 			}
+			std::vector<std::unique_ptr<Tower>>& getTowers() noexcept {
+				return this->towers;
+			}
 			bool isPaused() const noexcept {
 				return this->is_paused;
 			}

@@ -489,6 +489,29 @@ namespace hoffman::isaiah {
 						}
 						break;
 					}
+					case WM_LBUTTONDBLCLK:
+					{
+						// Display info about placed towers.
+						if (!game::g_my_game->isInLevel()) {
+							auto gx = static_cast<int>(graphics::convertToGameX(GET_X_LPARAM(msg.lParam)));
+							auto gy = static_cast<int>(graphics::convertToGameY(GET_Y_LPARAM(msg.lParam)));
+							const bool pause_state = game::g_my_game->isPaused();
+							if (!pause_state) {
+								game::g_my_game->togglePause();
+							}
+							for (auto& t : game::g_my_game->getTowers()) {
+								if (static_cast<int>(t->getGameX()) == gx
+									&& static_cast<int>(t->getGameY()) == gy) {
+									const TowerPlacedInfoDialog my_dialog {hwnd, this->h_instance, *t};
+									break;
+								}
+							}
+							if (pause_state != game::g_my_game->isPaused()) {
+								game::g_my_game->togglePause();
+							}
+						}
+						break;
+					}
 					case WM_LBUTTONDOWN:
 					{
 						// Obtain start coordinates
