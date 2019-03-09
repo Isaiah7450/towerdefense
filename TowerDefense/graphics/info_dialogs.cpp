@@ -11,6 +11,7 @@
 #include "./info_dialogs.hpp"
 #include "./../globals.hpp"
 #include "./../game/enemy_type.hpp"
+#include "./../game/my_game.hpp"
 #include "./../game/shot_types.hpp"
 #include "./../game/status_effects.hpp"
 #include "./../game/tower_types.hpp"
@@ -72,6 +73,23 @@ namespace hoffman::isaiah::winapi {
 						L" the value of the type field in your report).",
 						L"Error!", MB_OK | MB_ICONWARNING);
 				}
+				break;
+			}
+			// Tower-specific code:
+			case IDC_INFO_TOWER_PLACED_UPGRADE_A:
+			case IDC_INFO_TOWER_PLACED_UPGRADE_B:
+			{
+				auto my_dialog_class = reinterpret_cast<TowerPlacedInfoDialog*>(
+					GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				DBG_UNREFERENCED_LOCAL_VARIABLE(my_dialog_class);
+				break;
+			}
+			case IDC_INFO_TOWER_PLACED_SELL:
+			{
+				auto my_dialog_class = reinterpret_cast<TowerPlacedInfoDialog*>(
+					GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				my_dialog_class->doSell();
+				EndDialog(hwnd, IDOK);
 				break;
 			}
 			}
@@ -337,11 +355,22 @@ namespace hoffman::isaiah::winapi {
 			<< this->my_tower.getRating();
 		SetDlgItemText(hwnd, IDC_INFO_TOWER_RATING, my_stream.str().c_str());
 		my_stream.str(L"");
-		SetDlgItemText(hwnd, IDC_INFO_TOWER_PLACED_LEVEL, std::to_wstring(this->my_tower.getLevel()).c_str());
+		my_stream << this->my_tower.getLevel() << L" / " << this->my_tower.getBaseType()->getMaxLevel();
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_PLACED_LEVEL, my_stream.str().c_str());
+		my_stream.str(L"");
 		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
 			<< (this->my_tower.getDamageMultiplier() * 100.0) << L"%";
 		SetDlgItemText(hwnd, IDC_INFO_TOWER_PLACED_DAMAGE_MULTI, my_stream.str().c_str());
 		my_stream.str(L"");
+		if (this->my_tower.getLevel() >= this->my_tower.getBaseType()->getMaxLevel()) {
+			EnableWindow(GetDlgItem(hwnd, IDC_INFO_TOWER_PLACED_UPGRADE_A), FALSE);
+			EnableWindow(GetDlgItem(hwnd, IDC_INFO_TOWER_PLACED_UPGRADE_B), FALSE);
+		}
+	}
+
+	void TowerPlacedInfoDialog::doSell() {
+		game::g_my_game->sellTower(static_cast<int>(this->my_tower.getGameX()),
+			static_cast<int>(this->my_tower.getGameY()));
 	}
 
 	ShotStunInfoDialog::ShotStunInfoDialog(HWND owner, HINSTANCE h_inst, const game::ShotBaseType& stype) :

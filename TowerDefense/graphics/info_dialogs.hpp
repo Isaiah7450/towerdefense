@@ -122,6 +122,8 @@ namespace hoffman::isaiah::winapi {
 		/// <param name="h_inst">The hInstance parameter given by the WinMain function.</param>
 		/// <param name="t">The tower to show info for.</param>
 		TowerPlacedInfoDialog(HWND owner, HINSTANCE h_inst, game::Tower& t);
+		/// <summary>Sells the tower that this info box was designed to show info for.</summary>
+		void doSell();
 	protected:
 		// Implements InfoDialogBase::initDialog().
 		void initDialog(HWND hwnd) override;
