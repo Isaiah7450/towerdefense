@@ -383,6 +383,10 @@ namespace hoffman::isaiah {
 						}
 						case ID_MM_DEVELOP_TERRAIN_EDITOR:
 						{
+							// Temporary fix; I want a better long-term solution to the solid black
+							// screen when opening the terrain editor with towers on the map.
+							// (The likely issue is due to synchronization and limited resources.)
+							game::g_my_game->resetState();
 							terrain_editor_thread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0,
 								terrain_editor::terrain_editor_thread_init, static_cast<void*>(hwnd), 0, nullptr));
 							// I do not care when the editor thread ends...
