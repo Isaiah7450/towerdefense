@@ -738,6 +738,12 @@ namespace hoffman::isaiah {
 					throw util::file::DataFileException {L"The frequencies for all shots combined must not exceed 1.0."s,
 						my_parser->getLine()};
 				}
+				my_parser->readKeyValue(L"max_level"s);
+				int max_lv = static_cast<int>(my_parser->parseNumber());
+				if (max_lv < 1 || max_lv > 99) {
+					throw util::file::DataFileException {L"Max level must be between 1 and 99 inclusive."s,
+						my_parser->getLine()};
+				}
 				my_parser->readKeyValue(L"firing_speed"s);
 				double fs = my_parser->parseNumber();
 				if (fs < 0.1 || fs > 90.0) {
@@ -769,7 +775,7 @@ namespace hoffman::isaiah {
 				my_parser->readKeyValue(L"cost_adjust"s);
 				int cost_adj = static_cast<int>(my_parser->parseNumber());
 				auto my_tower_type = std::make_shared<TowerType>(n, d, c, st, fmethod, tstrategy,
-					std::move(my_tower_shots), fs, fr, vs, rd, cost_adj);
+					std::move(my_tower_shots), fs, fr, vs, rd, cost_adj, max_lv);
 				this->tower_types.emplace_back(std::move(my_tower_type));
 			} while (my_parser->getNext());
 		}

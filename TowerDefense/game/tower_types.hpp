@@ -197,7 +197,7 @@ namespace hoffman::isaiah {
 			TowerType(std::wstring n, std::wstring d, graphics::Color c, graphics::shapes::ShapeTypes st,
 				std::shared_ptr<FiringMethod> fmethod, std::shared_ptr<TargetingStrategy> tstrategy,
 				std::vector<std::pair<std::shared_ptr<ShotBaseType>, double>>&& stypes,
-				double fs, double fr, int vs, int rd, int cost) :
+				double fs, double fr, int vs, int rd, int cost, int max_lv) :
 				GameObjectType {n, d, c, st},
 				firing_method {fmethod},
 				targeting_strategy {tstrategy},
@@ -206,7 +206,8 @@ namespace hoffman::isaiah {
 				firing_range {fr},
 				volley_shots {vs},
 				reload_delay {rd},
-				cost_adjustment {cost} {
+				cost_adjustment {cost},
+				max_level {max_lv} {
 			}
 
 			// Getters and similar
@@ -245,6 +246,12 @@ namespace hoffman::isaiah {
 			virtual bool isWall() const noexcept {
 				return false;
 			}
+			int getCostAdjustment() const noexcept {
+				return this->cost_adjustment;
+			}
+			int getMaxLevel() const noexcept {
+				return this->max_level;
+			}
 			// Note: For the most part, all of these should be very close to the same
 			//       as the versions in Tower.
 			/// <returns>The expected amount of raw damage output by the tower per shot on average.</returns>
@@ -281,9 +288,6 @@ namespace hoffman::isaiah {
 				}
 				return this->getCostAdjustment() + this->getRating() / 10.5 + 1.0;
 			}
-			int getCostAdjustment() const noexcept {
-				return this->cost_adjustment;
-			}
 		protected:
 		private:
 			/// <summary>The firing method used by the tower.</summary>
@@ -308,6 +312,9 @@ namespace hoffman::isaiah {
 			int reload_delay;
 			/// <summary>The amount by which the tower's cost is adjusted.</summary>
 			int cost_adjustment;
+			// Upgrade-related stuff:
+			/// <summary>The maximum number of times this tower can be upgraded.</summary>
+			int max_level;
 		};
 
 		// The inheritance scheme is more for simplicity/convenience
@@ -316,7 +323,7 @@ namespace hoffman::isaiah {
 		class WallType : public TowerType {
 		public:
 			WallType(std::wstring n, std::wstring d, graphics::Color c, graphics::shapes::ShapeTypes st, int cost) :
-				TowerType {n, d, c, st, nullptr, nullptr, {}, 0.0, 0.0, 0, 0, cost} {
+				TowerType {n, d, c, st, nullptr, nullptr, {}, 0.0, 0.0, 0, 0, cost, 1} {
 			}
 			// Overrides TowerType::isWall()
 			bool isWall() const noexcept final {
