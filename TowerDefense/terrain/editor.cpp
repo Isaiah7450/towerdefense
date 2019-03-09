@@ -131,8 +131,17 @@ namespace hoffman::isaiah {
 						switch (msg.wParam) {
 						case ID_TE_FILE_NEW_MAP:
 						{
-							this->map_name += L"1";
-							// FIXME: Synchronization Issue
+							// Remove .txt.
+							this->map_name.erase(this->map_name.end() - 4, this->map_name.end());
+							const wchar_t last_num = this->map_name.at(this->map_name.size() - 1);
+							if (last_num >= L'0' && last_num <= L'9') {
+								this->map_name.pop_back();
+								this->map_name.push_back((last_num + 1));
+							}
+							else {
+								this->map_name.push_back(L'0');
+							}
+							this->map_name += L".txt";
 							WaitForSingleObject(sync_mutex, INFINITE);
 							// Reset map to all mountainous terrain
 							this->getMap().getTerrainGraph(false).clearGrid(pathfinding::GraphNode::blocked_space_weight);
