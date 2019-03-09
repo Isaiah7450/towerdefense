@@ -74,7 +74,7 @@ Version 3.0.1:
                                                      to 800 ms.
 - Did I ever release this version? Probably not--oh well.
 
-Version 3.1.0:
+Version 3.1.0: (Released March 8, 2019)
 - Bug Fixes:
  + A few code analysis (i.e.: code quality checks; not game-breaking by
    any means, but best practices) warnings/errors have been fixed.
@@ -202,3 +202,11 @@ Version 3.1.0:
    effect as this information was not used for anything in-game.)
  + Relaxed move speed restriction on shots.
  + Added max level field to the towers file (for later use).
+
+Version 3.1.0b: (Released March 9, 2019)
+- Bug Fixes:
+ + Fixed the default naming of new maps in the terrain editor.
+ + Fixed black editor screen due to synchronization issues.
+ + Fixed not loading correct map when loading a new game.
+ + Fixed shots disappearing when its y coordinate is large due
+   to a programming oversight.
