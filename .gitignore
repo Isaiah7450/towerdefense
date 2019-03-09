@@ -3,6 +3,7 @@ bin/other/**/
 bin/other/*.*
 bin/test_resources/*.*
 bin/userdata/*.*
+bin/screenshots/*.*
 !bin/other/version.txt
 */doc/**/
 */obj/**/
