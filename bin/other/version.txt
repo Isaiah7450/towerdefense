@@ -202,32 +202,3 @@ Version 3.1.0:
    effect as this information was not used for anything in-game.)
  + Relaxed move speed restriction on shots.
  + Added max level field to the towers file (for later use).
-
-Version 3.1.0b: (Released March 9, 2019)
-- Bug Fixes:
- + Fixed the default naming of new maps in the terrain editor.
- + Fixed black editor screen due to synchronization issues.
- + Fixed not loading correct map when loading a new game.
- + Fixed shots disappearing when its y coordinate is large due
-   to a programming oversight.
-
-Version 3.1.0c: (Released March 10, 2019)
-- Bug Fixes:
- + Fixed a shot off the grid causing a crash due to a programming oversight.
-
-Version 3.2.0: (Not Released Yet)
-- Bug Fixes:
- + Fixed black editor screen due to synchronization issues.
-- Balance Changes:
- + Some of the buffs for Red General and Red King expanded to affect more
-   troops.
-- New Stuff:
- + The location where ground troops enter the map is now clearly indicated
-   with a white "GS" label.
- + You can now toggle the display of terrain weights in the terrain editor.
- + Levels 31-35 added.
-- Misc Changes:
- + Changed the default map to a harder layout. If you wish to play with the
-   easier older map, you can go to ./resources/graphs/backups/easy challenge
-   and copy the maps there to ./resources/graphs (replacing the pre-existing
-   maps.)
