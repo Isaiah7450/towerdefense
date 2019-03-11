@@ -209,3 +209,9 @@ Version 3.1.0b: (Released March 9, 2019)
  + Fixed not loading correct map when loading a new game.
  + Fixed shots disappearing when its y coordinate is large due
    to a programming oversight.
+
+Version 3.1.0c: (Released March 10, 2019)
+- Bug Fixes:
+ + Fixed a crash due to a programming oversight when a shot goes off the grid.
+- New Stuff:
+ + Added levels 31-35.
