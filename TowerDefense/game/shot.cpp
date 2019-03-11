@@ -56,8 +56,9 @@ namespace hoffman::isaiah {
 			const double tdy = std::abs(this->getGameY() - this->origin_tower.getGameY());
 			const int igx = static_cast<int>(std::floor(this->getGameX()));
 			const int igy = static_cast<int>(std::floor(this->getGameY()));
-			const bool is_on_blocked_space = igx >= 0 && igy >= 0
-				&& igx < graphics::screen_width && igy < graphics::screen_height
+			const bool is_on_blocked_space = (igx >= 0 && igy >= 0
+				&& igx < gmap.getTerrainGraph(false).getWidth()
+				&& igy < gmap.getTerrainGraph(false).getHeight())
 				? gmap.getTerrainGraph(true).getNode(igx, igy).isBlocked()
 					&& gmap.getTerrainGraph(false).getNode(igx, igy).isBlocked()
 				: true;
