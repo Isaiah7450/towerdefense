@@ -649,7 +649,7 @@ namespace hoffman::isaiah {
 					}
 					ReleaseMutex(sync_mutex);
 					// Sleep a little bit
-					Sleep(0);
+					Sleep(1);
 				}
 			}
 			CloseHandle(update_thread);
