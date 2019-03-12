@@ -189,12 +189,12 @@ namespace hoffman::isaiah {
 			// Functions that help construction
 			/// <returns>The enemy's starting health adjusted for the level, difficulty, and challenge level.</returns>
 			static double getAdjustedHealth(double base_hp, int level, double difficulty, int challenge_level) noexcept {
-				return math::get_max(0.0, (base_hp + (level - 1.0)) * ((difficulty + challenge_level) / 10.0 + 0.8));
+				return base_hp + math::get_max(0.0, 0.05 * (level - 1.0) * challenge_level + 0.001 * (difficulty - 1.0));
 			}
 			/// <returns>The enemy's starting armor health adjusted for the level, difficulty, and challenge level.</returns>
 			static double getAdjustedArmorHealth(double base_ahp, int level, double difficulty, int challenge_level) noexcept {
-				return base_ahp > 0 ? math::get_min(9999999.0, base_ahp + (level - 1.0)
-					* ((difficulty + challenge_level) / 12.5 + 0.84)) : 0;
+				return base_ahp > 0 ? math::get_min(base_ahp * (challenge_level + 2.0) + level,
+					base_ahp + ((level - 1.0) * 0.05) * ((difficulty + challenge_level) / 12.5 + 0.84)) : 0;
 			}
 			/// <returns>The enemy's starting speed adjusted for the level, difficulty, and challenge level.</returns>
 			static double getAdjustedSpeed(double base_speed, int level, double difficulty, int challenge_level) noexcept {
