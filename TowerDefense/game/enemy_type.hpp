@@ -329,7 +329,7 @@ namespace hoffman::isaiah {
 			int getDamage() const noexcept {
 				return this->damage;
 			}
-			double getBaseHP() const noexcept {
+			double getBaseHealth() const noexcept {
 				return this->base_health;
 			}
 			double getBaseArmorHP() const noexcept {
@@ -377,24 +377,24 @@ namespace hoffman::isaiah {
 				return this->getBaseArmorHP() * (1.0 / (1.0 - this->getArmorReduce()));
 			}
 			/// <returns>The effective health of the enemy, which is an estimate of how much
-			/// damage the enemy can withstand before dying.</returns>
+			/// damage the enemy can withstand before dying (ignoring piercing).</returns>
 			double getEffectiveHealth() const noexcept {
-				return this->getBaseArmorHP() + this->getBaseHP();
+				return this->getEffectiveArmorHealth() + this->getBaseHealth();
 			}
 			/// <returns>The proportion of the enemy's lifespan that the enemy spends walking
 			/// (expressed as a decimal, not a %).</returns>
 			double getWalkingPercent() const noexcept {
-				return this->getBaseHP() * this->getPainTolerance() / this->getEffectiveHealth();
+				return 1.0 - this->getRunningPercent() - this->getInjuredPercent();
 			}
 			/// <returns>The proportion of the enemy's lifespan that the enemy spends running
 			/// (expressed as a decimal, not a %).</returns>
 			double getRunningPercent() const noexcept {
-				return this->getEffectiveArmorHealth() / this->getEffectiveHealth();
+				return this->getBaseHealth() / this->getEffectiveHealth() - this->getInjuredPercent();
 			}
 			/// <returns>The proportion of the enemy's lifespan that the enemy spends injured
 			/// (expressed as a decimal, not a %).</returns>
 			double getInjuredPercent() const noexcept {
-				return this->getBaseHP() * (1.0 - this->getPainTolerance()) / this->getEffectiveHealth();
+				return this->getBaseHealth() * (1.0 - this->getPainTolerance()) / this->getEffectiveHealth();
 			}
 			/// <returns>A rating value that factors in several of the enemy's core statistics.
 			/// This does not factor in special abilities like buffs.</returns>
