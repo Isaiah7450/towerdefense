@@ -196,6 +196,11 @@ namespace hoffman::isaiah {
 				return base_ahp > 0 ? math::get_min(9999999.0, base_ahp + (level - 1.0)
 					* ((difficulty + challenge_level) / 12.5 + 0.84)) : 0;
 			}
+			/// <returns>The enemy's starting speed adjusted for the level, difficulty, and challenge level.</returns>
+			static double getAdjustedSpeed(double base_speed, int level, double difficulty, int challenge_level) noexcept {
+				return base_speed + math::get_min(base_speed / 2.0, (level - 1) * challenge_level * 0.001)
+					+ math::get_max(0.0, math::get_min(base_speed / 2.0, (difficulty - 1.0) * 0.0025));
+			}
 			/// <summary>Creates the enemy's actual buffs from the templates stored in its type.</summary>
 			void addEnemyBuffs() noexcept {
 				for (auto& b : this->getBaseType().getBuffTypes()) {
@@ -219,17 +224,30 @@ namespace hoffman::isaiah {
 			}
 			// Setters/Changers
 			// Getters
+			/// <returns>The base walking speed of the enemy. (Base Speed).</returns>
+			double getBaseWalkingSpeed() const noexcept {
+				return this->walking_speed;
+			}
+			/// <returns>The base running speed of the enemy. (Base Speed).</returns>
+			double getBaseRunningSpeed() const noexcept {
+				return this->running_speed;
+
+			}
+			/// <returns>The base injured speed of the enemy. (Base Speed).</returns>
+			double getBaseInjuredSpeed() const noexcept {
+				return this->injured_speed;
+			}
 			/// <returns>The raw walking speed of the enemy. (Base Speed * Boosts)</returns>
 			double getRawWalkingSpeed() const noexcept {
-				return this->getBaseType().getBaseWalkingSpeed() * this->getWalkingSpeedBoost();
+				return this->getBaseWalkingSpeed() * this->getWalkingSpeedBoost();
 			}
 			/// <returns>The raw running speed of the enemy. (Base Speed * Boosts)</returns>
 			double getRawRunningSpeed() const noexcept {
-				return this->getBaseType().getBaseRunningSpeed() * this->getRunningSpeedBoost();
+				return this->getBaseRunningSpeed() * this->getRunningSpeedBoost();
 			}
 			/// <returns>The raw injured speed of the enemy. (Base Speed * Boosts)</returns>
 			double getRawInjuredSpeed() const noexcept {
-				return this->getBaseType().getBaseInjuredSpeed() * this->getInjuredSpeedBoost();
+				return this->getBaseInjuredSpeed() * this->getInjuredSpeedBoost();
 			}
 			/// <returns>True if the enemy's health has reached a critical level
 			/// (as defined by their pain tolerance).</returns>
@@ -268,6 +286,12 @@ namespace hoffman::isaiah {
 			/// <summary>The maximum amount of damage to the enemy's armor that the enemy can
 			/// sustain before the armor perishes.</summary>
 			double maximum_armor_health;
+			/// <summary>The enemy's base walking speed after considering difficulty modifiers.</summary>
+			double walking_speed;
+			/// <summary>The enemy's base running speed after considering difficulty modifiers.</summary>
+			double running_speed;
+			/// <summary>The enemy's base injured speed after considering difficulty modifiers.</summary>
+			double injured_speed;
 			/// <summary>The current pathfinding strategy being employed by the enemy.</summary>
 			pathfinding::HeuristicStrategies current_strat;
 			/// <summary>Can the enemy currently move diagonally?</summary>
