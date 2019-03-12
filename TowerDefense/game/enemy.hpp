@@ -219,6 +219,9 @@ namespace hoffman::isaiah {
 					case BuffTypes::Purify:
 						this->buffs.emplace_back(std::make_unique<PurifyBuff>(dynamic_cast<PurifyBuff&>(*b)));
 						break;
+					case BuffTypes::Repair:
+						this->buffs.emplace_back(std::make_unique<RepairBuff>(dynamic_cast<RepairBuff&>(*b)));
+						break;
 					}
 				}
 			}
