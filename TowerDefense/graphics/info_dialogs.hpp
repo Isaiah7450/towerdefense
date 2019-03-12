@@ -5,6 +5,7 @@
 #include <Windows.h>
 #include <memory>
 #include <string>
+#include "./../globals.hpp"
 
 namespace hoffman::isaiah::game {
 	// Forward declarations.
@@ -19,24 +20,9 @@ namespace hoffman::isaiah::game {
 }
 
 namespace hoffman::isaiah::winapi {
-	/// <summary>Interface for informative dialog boxes.</summary>
-	class IInfoDialog {
-	public:
-		IInfoDialog() noexcept = default;
-		// Rule of 5 and virtual dtor:
-		virtual ~IInfoDialog() noexcept = default;
-		IInfoDialog(const IInfoDialog&) = default;
-		IInfoDialog(IInfoDialog&&) = default;
-		IInfoDialog& operator=(const IInfoDialog&) = default;
-		IInfoDialog& operator=(IInfoDialog&&) = default;
-	protected:
-		/// <summary>Initializes the dialog.</summary>
-		/// <param name="hwnd">Handle to the dialog box window.</param>
-		virtual void initDialog(HWND hwnd) = 0;
-	};
 
 	/// <summary>The base class for info dialog boxes.</summary>
-	class InfoDialogBase : public IInfoDialog {
+	class InfoDialogBase : public IDialog {
 	public:
 		// Dialog box procedure.
 		static INT_PTR CALLBACK infoDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);

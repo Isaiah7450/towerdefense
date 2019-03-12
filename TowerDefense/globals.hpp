@@ -1,6 +1,8 @@
 #pragma once
 // File Author: Isaiah Hoffman
 // File Created: March 13, 2018
+#include "./targetver.hpp"
+#include <Windows.h>
 #include <array>
 #include <string>
 
@@ -9,6 +11,22 @@ namespace hoffman::isaiah {
 		// Global constants
 		constexpr const auto main_class_name {L"my_game"};
 		constexpr const auto main_window_name {L"Isaiah's tower defense game"};
+		// Interfaces/enums:
+		/// <summary>Interface for dialog boxes.</summary>
+		class IDialog {
+		public:
+			IDialog() noexcept = default;
+			// Rule of 5 and virtual dtor:
+			virtual ~IDialog() noexcept = default;
+			IDialog(const IDialog&) = default;
+			IDialog(IDialog&&) = default;
+			IDialog& operator=(const IDialog&) = default;
+			IDialog& operator=(IDialog&&) = default;
+		protected:
+			/// <summary>Initializes the dialog.</summary>
+			/// <param name="hwnd">Handle to the dialog box window.</param>
+			virtual void initDialog(HWND hwnd) = 0;
+		};
 		// Prototypes
 		/// <summary>Attempts to provide a human-readable error message
 		/// if an error occurs while trying to initialize the program.</summary>

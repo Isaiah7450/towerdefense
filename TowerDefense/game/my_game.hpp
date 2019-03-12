@@ -70,14 +70,17 @@ namespace hoffman::isaiah {
 		class MyGame {
 			friend class graphics::Renderer2D;
 		public:
-			static constexpr const wchar_t* ground_terrain_filename = L"./resources/graphs/ground_graph.txt";
-			static constexpr const wchar_t* air_terrain_filename = L"./resources/graphs/air_graph.txt";
+			/// <summary>The name of the ground terrain file to load.</summary>
+			static inline std::wstring ground_terrain_filename {L"./resources/graphs/ground_graph_intermediate.txt"};
+			/// <summary>The name of the air terrain file to load.</summary>
+			static inline std::wstring air_terrain_filename {L"./resources/graphs/air_graph_intermediate.txt"};
 
 			MyGame(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, int clevel,
 				std::wistream& ground_terrain_file, std::wistream& air_terrain_file);
 			~MyGame() noexcept;
 			/// <summary>Resets the game's state.</summary>
-			void resetState();
+			/// <param name="new_challenge">The new challenge level to set.</param>
+			void resetState(int new_challenge);
 			/// <summary>Updates the state of the game by one tick.</summary>
 			void update();
 			/// <summary>Updates the state of the game in some way for debugging reasons.</summary>

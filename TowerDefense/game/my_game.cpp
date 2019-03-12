@@ -8,6 +8,7 @@
 #include <fstream>
 #include <vector>
 #include <utility>
+#include "./../resource.h"
 #include "./../file_util.hpp"
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
@@ -79,10 +80,24 @@ namespace hoffman::isaiah {
 #endif
 		}
 
-		void MyGame::resetState() {
+		void MyGame::resetState(int new_challenge) {
 			this->player = Player {};
 			this->level = 1;
 			this->difficulty = 1.0;
+			this->challenge_level = new_challenge - ID_CHALLENGE_LEVEL_EASY;
+			constexpr const auto air_terrain_filename_base = L"./resources/graphs/air_graph_";
+			constexpr const auto ground_terrain_filename_base = L"./resources/graphs/ground_graph_";
+			switch (new_challenge) {
+			case ID_CHALLENGE_LEVEL_EASY:
+				MyGame::air_terrain_filename = air_terrain_filename_base + L"beginner.txt"s;
+				MyGame::ground_terrain_filename = ground_terrain_filename_base + L"beginner.txt"s;
+				break;
+			case ID_CHALLENGE_LEVEL_NORMAL:
+			default:
+				MyGame::air_terrain_filename = air_terrain_filename_base + L"intermediate.txt"s;
+				MyGame::ground_terrain_filename = ground_terrain_filename_base + L"intermediate.txt"s;
+				break;
+			}
 			this->my_level = nullptr;
 			this->my_level_enemy_count = 0;
 			this->my_level_enemy_killed = 0;
@@ -94,8 +109,8 @@ namespace hoffman::isaiah {
 			}
 			this->is_paused = false;
 			this->in_level = false;
-			std::wifstream ground_terrain_file {game::MyGame::ground_terrain_filename};
-			std::wifstream air_terrain_file {game::MyGame::air_terrain_filename};
+			std::wifstream ground_terrain_file {MyGame::ground_terrain_filename};
+			std::wifstream air_terrain_file {MyGame::air_terrain_filename};
 			if (ground_terrain_file.good() && air_terrain_file.good()) {
 				this->map = std::make_shared<GameMap>(ground_terrain_file, air_terrain_file);
 			}

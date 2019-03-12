@@ -244,6 +244,7 @@
     <ClCompile Include="game\enemy_type.cpp" />
     <ClCompile Include="graphics\info_dialogs.cpp" />
     <ClInclude Include="graphics\info_dialogs.hpp" />
+    <ClInclude Include="graphics\other_dialogs.hpp" />
     <ClInclude Include="graphics\shapes.hpp" />
     <ClInclude Include="main.hpp" />
     <ClInclude Include="ih_math.hpp" />
@@ -272,6 +273,7 @@
     <ClCompile Include="game\tower_types.cpp" />
     <ClCompile Include="graphics\graphics.cpp" />
     <ClCompile Include="graphics\graphics_DX.cpp" />
+    <ClCompile Include="graphics\other_dialogs.cpp" />
     <ClCompile Include="graphics\shapes.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pathfinding\graph_node.cpp" />

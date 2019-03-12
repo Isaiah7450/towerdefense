@@ -17,6 +17,7 @@
 #include "./graphics/graphics_DX.hpp"
 #include "./graphics/graphics.hpp"
 #include "./graphics/info_dialogs.hpp"
+#include "./graphics/other_dialogs.hpp"
 #include "./pathfinding/grid.hpp"
 #include "./game/enemy.hpp"
 #include "./game/enemy_type.hpp"
@@ -83,22 +84,6 @@ namespace hoffman::isaiah {
 				my_game->init_tower_types();
 				my_game->load_global_level_data();
 				my_game->load_global_misc_data();
-				std::wifstream default_save_file {game::default_save_file_name};
-				if (!default_save_file.bad() && !default_save_file.fail()) {
-					try {
-						my_game->loadGame(default_save_file);
-					}
-					catch (...) {
-						MessageBox(nullptr, L"Error: Corrupted saved file! Reverting to new game.", L"Corrupted Save",
-							MB_OK | MB_ICONERROR);
-						// Reset state and save over the corrupted file...
-						my_game->resetState();
-						std::wofstream save_file {game::default_save_file_name};
-						if (!save_file.bad() && !save_file.fail()) {
-							my_game->saveGame(save_file);
-						}
-					}
-				}
 				// Force creation of message queue
 				MSG msg;
 				PeekMessage(&msg, nullptr, WM_USER, WM_USER, PM_NOREMOVE);
@@ -113,10 +98,15 @@ namespace hoffman::isaiah {
 						{
 							switch (msg.wParam) {
 							case ID_MM_FILE_NEW_GAME:
+							{
 								WaitForSingleObject(sync_mutex, INFINITE);
-								my_game->resetState();
+								const auto my_clevel_dialog = *reinterpret_cast<const ChallengeLevelDialog*>(msg.lParam);
+								if (my_clevel_dialog.getChallengeLevel() != IDCANCEL) {
+									my_game->resetState(my_clevel_dialog.getChallengeLevel());
+								}
 								ReleaseMutex(sync_mutex);
 								break;
+							}
 							case ID_MM_FILE_SAVE_GAME:
 							{
 								std::wofstream save_file {game::default_save_file_name};
@@ -262,6 +252,7 @@ namespace hoffman::isaiah {
 			}
 			// Create renderer
 			auto my_renderer = std::make_unique<graphics::Renderer2D>(my_resources);
+
 			// Create game state
 			std::wifstream ground_terrain_file {game::MyGame::ground_terrain_filename};
 			std::wifstream air_terrain_file {game::MyGame::air_terrain_filename};
@@ -308,6 +299,29 @@ namespace hoffman::isaiah {
 				winapi::handleWindowsError(L"Update thread creation");
 			}
 			WaitForSingleObject(update_thread_init_event, INFINITE);
+			// Load save data.
+			std::wifstream default_save_file {game::default_save_file_name};
+			if (!default_save_file.bad() && !default_save_file.fail()) {
+				try {
+					game::g_my_game->loadGame(default_save_file);
+				}
+				catch (...) {
+					MessageBox(nullptr, L"Error: Corrupted saved file! Reverting to new game.", L"Corrupted Save",
+						MB_OK | MB_ICONERROR);
+					// Reset state and save over the corrupted file...
+					game::g_my_game->resetState(ID_CHALLENGE_LEVEL_NORMAL);
+					std::wofstream save_file {game::default_save_file_name};
+					if (!save_file.bad() && !save_file.fail()) {
+						game::g_my_game->saveGame(save_file);
+					}
+				}
+			}
+			else {
+				// Do difficulty selection.
+				const auto my_clevel_dialog = winapi::ChallengeLevelDialog {hwnd, this->h_instance};
+				game::g_my_game->resetState(my_clevel_dialog.getChallengeLevel() > IDCANCEL
+					? my_clevel_dialog.getChallengeLevel() : ID_CHALLENGE_LEVEL_NORMAL);
+			}
 			my_renderer->updateHealthOption(hwnd, game::g_my_game->getHealthBuyCost());
 			my_renderer->createTowerMenu(hwnd, game::g_my_game->getAllTowerTypes());
 			my_renderer->createShotMenu(hwnd, game::g_my_game->getAllShotTypes());
@@ -330,7 +344,8 @@ namespace hoffman::isaiah {
 						switch (msg.wParam) {
 						case ID_MM_FILE_NEW_GAME:
 						{
-							PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
+							const auto my_clevel_dialog = winapi::ChallengeLevelDialog {hwnd, this->h_instance};
+							PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, reinterpret_cast<LPARAM>(&my_clevel_dialog));
 							break;
 						}
 						case ID_MM_FILE_SAVE_GAME:

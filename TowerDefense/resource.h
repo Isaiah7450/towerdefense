@@ -14,6 +14,8 @@
 #define IDD_INFO_TOWER_PLACED                   3101
 #define IDD_INFO_TOWER_UPGRADE                  3102
 
+#define IDD_CHALLENGE_LEVEL                     4001
+
 #define IDC_INFO_BASE_NAME                      10001
 #define IDC_INFO_BASE_DESC                      10002
 
@@ -89,6 +91,10 @@
 #define IDC_INFO_TOWER_UPGRADE_AMMO             13206
 #define IDC_INFO_TOWER_UPGRADE_DELAY            13207
 #define IDC_INFO_TOWER_UPGRADE_DO_UPGRADE       13208
+
+#define IDC_CHALLENGE_LEVEL_SELECTOR            20001
+#define ID_CHALLENGE_LEVEL_EASY                 20051
+#define ID_CHALLENGE_LEVEL_NORMAL               20052
 
 #define ID_MM_FILE_NEW_GAME                     40101
 #define ID_MM_FILE_LOAD_GAME                    40102

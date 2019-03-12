@@ -114,7 +114,7 @@ namespace hoffman::isaiah::winapi {
 	void EnemyInfoDialog::initDialog(HWND hwnd) {
 		this->setCommonControls(hwnd);
 		const auto& my_etype = dynamic_cast<const game::EnemyType&>(this->getType());
-		this->hp_string = std::to_wstring(static_cast<int>(my_etype.getBaseHP()));
+		this->hp_string = std::to_wstring(static_cast<int>(my_etype.getBaseHealth()));
 		this->ahp_string = std::to_wstring(static_cast<int>(my_etype.getBaseArmorHP()));
 		std::wstringstream my_stream {};
 		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
