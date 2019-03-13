@@ -97,7 +97,7 @@ namespace hoffman::isaiah {
 		// To conserve CPU, the program only redraws the screen once a frame
 		// where the following number dictates the number of graphical frames
 		// in a second.
-		constexpr const int graphics_framerate = 50;
+		constexpr const int graphics_framerate = 55;
 		// This framerate controls how often the game state is updated
 		// per second.
 		constexpr const int logic_framerate = 120;
