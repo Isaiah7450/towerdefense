@@ -85,8 +85,8 @@ namespace hoffman::isaiah {
 			this->level = 1;
 			this->difficulty = 1.0;
 			this->challenge_level = new_challenge - ID_CHALLENGE_LEVEL_EASY;
-			constexpr const auto air_terrain_filename_base = L"./resources/graphs/air_graph_";
-			constexpr const auto ground_terrain_filename_base = L"./resources/graphs/ground_graph_";
+			const auto air_terrain_filename_base = this->resources_folder_path + L"graphs/air_graph_";
+			const auto ground_terrain_filename_base = this->resources_folder_path + L"graphs/ground_graph_";
 			switch (new_challenge) {
 			case ID_CHALLENGE_LEVEL_EASY:
 				MyGame::air_terrain_filename = air_terrain_filename_base + L"beginner.txt"s;

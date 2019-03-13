@@ -79,6 +79,7 @@ namespace hoffman::isaiah {
 				}
 				// Initialize the game's state
 				auto my_game = game::g_my_game;
+				my_game->load_config_data();
 				my_game->init_enemy_types();
 				my_game->init_shot_types();
 				my_game->init_tower_types();

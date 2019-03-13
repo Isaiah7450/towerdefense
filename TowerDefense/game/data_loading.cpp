@@ -1,5 +1,7 @@
 // File Author: Isaiah Hoffman
 // File Created: May 24, 2018
+#include "./../targetver.hpp"
+#include <shlobj.h>
 #include <algorithm>
 #include <iostream>
 #include <fstream>
@@ -25,8 +27,34 @@ using namespace std::literals::string_literals;
 
 namespace hoffman::isaiah {
 	namespace game {
+
+		void MyGame::load_config_data() {
+			[[maybe_unused]] std::wifstream config_file {L"./config/config.ini"s};
+			if (config_file.fail() || config_file.bad()) {
+				// Fail silently.
+				return;
+			}
+#if defined(_WIN32) || defined(_WIN64)
+			util::file::DataFileParser my_parser {config_file};
+			// Globals section
+			my_parser.expectToken(util::file::TokenTypes::Section, L"global"s);
+			my_parser.readKeyValue(L"version");
+			my_parser.expectToken(util::file::TokenTypes::Number, L"1");
+			my_parser.readKeyValue(L"use_appdata_folder");
+			const bool use_appdata_folder = my_parser.parseBoolean();
+			if (use_appdata_folder) {
+				wchar_t* appdata_folder_path;
+				if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &appdata_folder_path))) {
+					this->resources_folder_path = appdata_folder_path + L"/Isaiah Hoffman/tower defense/resources/"s;
+					this->userdata_folder_path = appdata_folder_path + L"/Isaiah Hoffman/tower defense/resources/"s;
+					CoTaskMemFree(appdata_folder_path);
+				}
+			}
+#endif // _WIN32 || _WIN64
+		}
+
 		void MyGame::load_global_misc_data() {
-			std::wifstream data_file {L"./resources/other.ini"s};
+			std::wifstream data_file {this->resources_folder_path + L"other.ini"s};
 			if (data_file.fail() || data_file.bad()) {
 				throw util::file::DataFileException {L"Could not load the enemy data file (enemies.ini)."s, 0};
 			}
@@ -47,7 +75,7 @@ namespace hoffman::isaiah {
 #pragma warning(push)
 #pragma warning(disable: 4996) // I presume this is deprecated warning? Too bad I didn't document this originally.
 		void MyGame::init_enemy_types() {
-			std::wifstream data_file {L"./resources/enemies.ini"s};
+			std::wifstream data_file {this->resources_folder_path + L"enemies.ini"s};
 			if (data_file.fail() || data_file.bad()) {
 				throw util::file::DataFileException {L"Could not load the enemy data file (enemies.ini)."s, 0};
 			}
@@ -330,7 +358,7 @@ namespace hoffman::isaiah {
 		}
 
 		void MyGame::init_shot_types() {
-			std::wifstream data_file {L"./resources/shots.ini"};
+			std::wifstream data_file {this->resources_folder_path + L"shots.ini"};
 			if (data_file.bad() || data_file.fail()) {
 				throw util::file::DataFileException {L"Could not open resources/shots.ini for reading."s, 0};
 			}
@@ -525,7 +553,7 @@ namespace hoffman::isaiah {
 		}
 
 		void MyGame::init_tower_types() {
-			std::wifstream data_file {L"./resources/towers.ini"};
+			std::wifstream data_file {this->resources_folder_path + L"towers.ini"};
 			if (data_file.bad() || data_file.fail()) {
 				throw util::file::DataFileException {L"Could not open resources/towers.ini for reading."s, 0};
 			}
@@ -781,7 +809,7 @@ namespace hoffman::isaiah {
 		}
 
 		void MyGame::load_global_level_data() {
-			std::wifstream data_file {L"./resources/levels/global.ini"};
+			std::wifstream data_file {this->resources_folder_path + L"levels/global.ini"};
 			if (data_file.bad() || data_file.fail()) {
 				throw util::file::DataFileException {L"Could not open resources/levels/global.ini for reading."s, 0};
 			}
@@ -795,11 +823,11 @@ namespace hoffman::isaiah {
 		}
 
 		void MyGame::load_level_data() {
-			std::wifstream data_file {L"./resources/levels/level"s + std::to_wstring(this->level) + L".ini"s};
+			std::wifstream data_file {this->resources_folder_path + L"levels/level"s + std::to_wstring(this->level) + L".ini"s};
 			if (data_file.bad() || data_file.fail()) {
-				data_file.open(L"./resources/levels/level"s + std::to_wstring(this->my_level_backup_number) + L".ini"s);
+				data_file.open(this->resources_folder_path + L"levels/level"s + std::to_wstring(this->my_level_backup_number) + L".ini"s);
 				if (data_file.bad() || data_file.fail()) {
-					throw util::file::DataFileException {L"Could not open ./resources/levels/level"s
+					throw util::file::DataFileException {L"Could not open resources/levels/level"s
 						+ std::to_wstring(this->level) + L".ini for reading!"s, 0};
 				}
 			}

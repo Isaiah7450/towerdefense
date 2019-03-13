@@ -87,6 +87,8 @@ namespace hoffman::isaiah {
 			/// <param name="cause">The reason to update the game state.</param>
 			void debugUpdate(DebugUpdateStates cause);
 			// Note: Defined in data_loading.cpp
+			/// <summary>Loads application data.</summary>
+			void load_config_data();
 			/// <summary>Initializes the list of enemy types in this game.</summary>
 			void init_enemy_types();
 			/// <summary>Initializes the list of shot types in this game.</summary>
@@ -273,6 +275,10 @@ namespace hoffman::isaiah {
 			double hp_buy_cost {0};
 			/// <summary>The cost to buy health is multiplied by this number each time.</summary>
 			double hp_buy_multiplier {1.00};
+			/// <summary>Stores the path to the resources folder.</summary>
+			std::wstring resources_folder_path {L"./resources/"};
+			/// <summary>Stores the path to the userdata folder.</summary>
+			std::wstring userdata_folder_path {L"./userdata/"};
 			// Testing things
 			std::shared_ptr<pathfinding::Pathfinder> ground_test_pf {nullptr};
 			std::shared_ptr<pathfinding::Pathfinder> air_test_pf {nullptr};
