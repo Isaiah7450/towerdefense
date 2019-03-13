@@ -118,7 +118,7 @@ namespace hoffman::isaiah {
 				if (this->getBaseType()->isWall()) {
 					return;
 				}
-				this->value = this->getBaseType()->getCostAdjustment() + this->getRating() / 10.5 + 1.0;
+				this->value = this->getBaseType()->getCostAdjustment() + this->getRating() / 8.4 + 1.0;
 			}
 		protected:
 			/// <summary>Finds a target enemy for the tower.</summary>

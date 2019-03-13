@@ -286,7 +286,7 @@ namespace hoffman::isaiah {
 				if (this->isWall()) {
 					return static_cast<double>(this->cost_adjustment);
 				}
-				return this->getCostAdjustment() + this->getRating() / 10.5 + 1.0;
+				return this->getCostAdjustment() + this->getRating() / 8.4 + 1.0;
 			}
 		protected:
 		private:
