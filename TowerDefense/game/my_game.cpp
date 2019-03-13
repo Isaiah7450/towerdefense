@@ -128,7 +128,6 @@ namespace hoffman::isaiah {
 			static LARGE_INTEGER last_update_time = LARGE_INTEGER {0};
 			auto my_times = winapi::MainWindow::getElapsedTime(last_update_time);
 			if (my_times.second.QuadPart < math::getMicrosecondsInSecond() / game::logic_framerate) {
-				Sleep(0);
 				return;
 			}
 			last_update_time = my_times.first;
