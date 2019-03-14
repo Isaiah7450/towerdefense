@@ -131,7 +131,7 @@ namespace hoffman::isaiah {
 			}
 			ResetEvent(draw_event);
 			// Do processing...
-			for (int i = 0; i < this->update_speed; ++i) {
+			for (int k = 0; k < this->update_speed; ++k) {
 				// Update level
 				if (this->my_level) {
 					this->my_level->update();
