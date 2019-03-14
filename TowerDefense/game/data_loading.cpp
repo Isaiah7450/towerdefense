@@ -29,7 +29,8 @@ namespace hoffman::isaiah {
 	namespace game {
 
 		void MyGame::load_config_data() {
-			[[maybe_unused]] std::wifstream config_file {L"./config/config.ini"s};
+			constexpr const auto config_file_name = L"./config/config.ini";
+			[[maybe_unused]] std::wifstream config_file {config_file_name};
 			if (config_file.fail() || config_file.bad()) {
 				// Fail silently.
 				return;
@@ -43,11 +44,52 @@ namespace hoffman::isaiah {
 			my_parser.readKeyValue(L"use_appdata_folder");
 			const bool use_appdata_folder = my_parser.parseBoolean();
 			if (use_appdata_folder) {
-				wchar_t* appdata_folder_path;
+				wchar_t* appdata_folder_path = nullptr;
 				if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &appdata_folder_path))) {
-					this->resources_folder_path = appdata_folder_path + L"/Isaiah Hoffman/tower defense/resources/"s;
-					this->userdata_folder_path = appdata_folder_path + L"/Isaiah Hoffman/tower defense/resources/"s;
+					CreateDirectory((appdata_folder_path + L"/Isaiah Hoffman/"s).c_str(), nullptr);
+					std::wstring my_path = appdata_folder_path + L"/Isaiah Hoffman/tower_defense/"s;
 					CoTaskMemFree(appdata_folder_path);
+					CreateDirectory(my_path.c_str(), nullptr);
+					this->resources_folder_path = my_path + L"resources/"s;
+					CreateDirectory(this->resources_folder_path.c_str(), nullptr);
+					CreateDirectory((this->resources_folder_path + L"levels/").c_str(), nullptr);
+					CreateDirectory((this->resources_folder_path + L"graphs/").c_str(), nullptr);
+					this->userdata_folder_path = my_path + L"userdata/"s;
+					CreateDirectory(this->userdata_folder_path.c_str(), nullptr);
+					my_parser.readKeyValue(L"do_copy");
+					if (my_parser.parseBoolean()) {
+						// Copy needed files.
+						// This is really lazy code, but no real harm done.
+						for (int i = 1; i < 9999; ++i) {
+							const std::wstring level_str = L"levels/level" + std::to_wstring(i) + L".ini";
+							CopyFile((L"./resources/" + level_str).c_str(), (this->resources_folder_path + level_str).c_str(), FALSE);
+						}
+						const std::wstring my_resources[] = {
+							L"enemies.ini", L"enemies.ini.format", L"shots.ini", L"shots.ini.format", L"towers.ini",
+							L"towers.ini.format", L"upgrades.ini", L"upgrades.ini.format", L"other.ini",
+							L"levels/global.ini", L"levels/level0.ini.format", L"levels/levels.xlsx",
+							L"graphs/air_graph_beginner.txt", L"graphs/air_graph_intermediate.txt",
+							L"graphs/air_graph_experienced.txt", L"graphs/air_graph_expert.txt",
+							L"graphs/ground_graph_beginner.txt", L"graphs/ground_graph_intermediate.txt",
+							L"graphs/ground_graph_experienced.txt", L"graphs/ground_graph_expert.txt"
+						};
+						for (const auto res_str : my_resources) {
+							CopyFile((L"./resources/" + res_str).c_str(), (this->resources_folder_path + res_str).c_str(), FALSE);
+						}
+						config_file.close();
+						std::wofstream my_config_writer {config_file_name, std::ios_base::out | std::ios_base::trunc};
+						if (my_config_writer.fail() || my_config_writer.bad()) {
+							// Fail silently.
+							return;
+						}
+						my_config_writer << L"# Stores information about where other resources are located.\n"
+							<< L"[global]\n" << L"version = 1\n"
+							<< L"# Whether or not to resolve file paths to the execution directory\n"
+							<< L"# or to the Windows-specific application data folder.\n"
+							<< L"use_appdata_folder = true\n"
+							<< L"# Whether or not to copy the files in program files to the application\n"
+							<< L"# data folder.\n" << L"do_copy = false\n";
+					}
 				}
 			}
 #endif // _WIN32 || _WIN64
