@@ -239,7 +239,7 @@ namespace hoffman::isaiah {
 			this->is_paused = false;
 			if (!this->isInLevel() && this->player.isAlive()) {
 				// Automatically save the player's progress...
-				std::wofstream save_file {game::default_save_file_name};
+				std::wofstream save_file {this->getUserDataPath() + game::default_save_file_name};
 				if (!save_file.fail() && !save_file.bad()) {
 					this->saveGame(save_file);
 				}
