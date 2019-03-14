@@ -171,6 +171,11 @@ Section "-Tower Defense Solution Files" SectionSolutionSource
   SetOutPath "$1"
   File "${myPath}\.gitignore"
   File "${myPath}\towerdefense.sln"  
+  File "${myPath}\.gitattributes"
+  File "${myPath}\my_debug_defaults.prop"
+  File "${myPath}\my_defaults.prop"
+  File "${myPath}\my_release_defaults.prop"
+  File "${myPath}\tower_defense.ruleset"
   !undef myPath
 SectionEnd
 Section "-Tower Defense Installer Files"
