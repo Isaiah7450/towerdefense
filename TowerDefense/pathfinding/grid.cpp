@@ -183,10 +183,14 @@ namespace hoffman::isaiah {
 			// Make it clearer which points are the start locations.
 			const auto cs_width = graphics::getGameSquareWidth<FLOAT>();
 			const auto cs_height = graphics::getGameSquareHeight<FLOAT>();
-			const auto ground_start_lx = static_cast<FLOAT>(graphics::convertToScreenX(ground_start_node->getGameX()));
-			const auto ground_start_ty = static_cast<FLOAT>(graphics::convertToScreenY(ground_start_node->getGameY()));
-			renderer.drawText(L"GS", white_color, renderer.createRectangle(ground_start_lx,
-				ground_start_ty, cs_width, cs_height));
+			const auto ground_start_lsx = static_cast<FLOAT>(graphics::convertToScreenX(ground_start_node->getGameX()));
+			const auto ground_start_tsy = static_cast<FLOAT>(graphics::convertToScreenY(ground_start_node->getGameY()));
+			renderer.drawText(L"GS", white_color, renderer.createRectangle(ground_start_lsx,
+				ground_start_tsy, cs_width, cs_height));
+			const auto air_start_lsx = static_cast<FLOAT>(graphics::convertToScreenX(air_start_node->getGameX()));
+			const auto air_start_tsy = static_cast<FLOAT>(graphics::convertToScreenY(air_start_node->getGameY()));
+			renderer.drawText(L"AS", white_color, renderer.createRectangle(air_start_lsx,
+				air_start_tsy, cs_width, cs_height));
 		}
 
 		void GameMap::draw(const graphics::Renderer2D& renderer, bool in_editor) const noexcept {
