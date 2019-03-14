@@ -53,13 +53,13 @@ namespace hoffman::isaiah {
 
 			// Setters/Changers
 			void multiplyWalkingBoost(double amt) noexcept {
-				this->speed_boosts[0] = math::get_max(0.05, this->getWalkingSpeedBoost() * amt);
+				this->speed_boosts[0] = math::get_max(0.10, this->getWalkingSpeedBoost() * amt);
 			}
 			void multiplyRunningBoost(double amt) noexcept {
-				this->speed_boosts[1] = math::get_max(0.05, this->getRunningSpeedBoost() * amt);
+				this->speed_boosts[1] = math::get_max(0.10, this->getRunningSpeedBoost() * amt);
 			}
 			void multiplyInjuredBoost(double amt) noexcept {
-				this->speed_boosts[2] = math::get_max(0.05, this->getInjuredSpeedBoost() * amt);
+				this->speed_boosts[2] = math::get_max(0.10, this->getInjuredSpeedBoost() * amt);
 			}
 			/// <param name="amt">Amount to multiply all of the
 			/// enemies' speed boosts by (as a decimal percent).</param>
