@@ -79,6 +79,10 @@ namespace hoffman::isaiah {
 			/// <param name="hwnd">Handle to the parent window.</param>
 			/// <param name="new_price">The new price to buy health.</param>
 			void updateHealthOption(HWND hwnd, int new_price) const noexcept;
+			/// <summary>Updates the text for the change speed option.</summary>
+			/// <param name="hwnd">Handle to the parent window.</param>
+			/// <param name="new_update_speed">The new speed to update the game at.</param>
+			void updateSpeedOption(HWND hwnd, int new_update_speed) const noexcept;
 			/// <summary>Recreates the tower menu with the current list of towers.</summary>
 			/// <param name="hwnd">Handle to the parent window.</param>
 			/// <param name="towers">The list of tower types that the player can choose from.</param>

@@ -104,8 +104,9 @@
 #define ID_MM_ACTIONS_TOGGLE_PAUSE              40201
 #define ID_MM_ACTIONS_NEXT_WAVE                 40202
 #define ID_MM_ACTIONS_BUY_HEALTH                40203
-#define ID_MM_ACTIONS_ENEMY_INFO_MODE           40204
-#define ID_MM_ACTIONS_TOWER_INFO_MODE           40205
+#define ID_MM_ACTIONS_CHANGE_SPEED              40204
+#define ID_MM_ACTIONS_ENEMY_INFO_MODE           40205
+#define ID_MM_ACTIONS_TOWER_INFO_MODE           40206
 #define ID_MM_TOWERS_INFO                       40301
 #define ID_MM_TOWERS_NONE                       40302
 #define ID_MM_TOWERS_BUY_TOWER                  40398

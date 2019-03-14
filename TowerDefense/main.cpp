@@ -330,6 +330,7 @@ namespace hoffman::isaiah {
 					? my_clevel_dialog.getChallengeLevel() : ID_CHALLENGE_LEVEL_NORMAL);
 			}
 			my_renderer->updateHealthOption(hwnd, game::g_my_game->getHealthBuyCost());
+			my_renderer->updateSpeedOption(hwnd, game::g_my_game->getNextUpdateSpeed());
 			my_renderer->createTowerMenu(hwnd, game::g_my_game->getAllTowerTypes());
 			my_renderer->createShotMenu(hwnd, game::g_my_game->getAllShotTypes());
 			my_renderer->createEnemyMenu(hwnd, game::g_my_game->getAllEnemyTypes(),
@@ -378,9 +379,16 @@ namespace hoffman::isaiah {
 						}
 						case ID_MM_ACTIONS_BUY_HEALTH:
 						{
-							// TODO: Move the "buyHealth()" part into the update thread.
 							game::g_my_game->buyHealth();
 							my_renderer->updateHealthOption(hwnd, game::g_my_game->getHealthBuyCost());
+							break;
+						}
+						case ID_MM_ACTIONS_CHANGE_SPEED:
+						{
+							WaitForSingleObject(sync_mutex, INFINITE);
+							game::g_my_game->changeUpdateSpeed();
+							my_renderer->updateSpeedOption(hwnd, game::g_my_game->getNextUpdateSpeed());
+							ReleaseMutex(sync_mutex);
 							break;
 						}
 						case ID_MM_TOWERS_INFO:

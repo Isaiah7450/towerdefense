@@ -124,7 +124,6 @@ namespace hoffman::isaiah {
 			if (this->is_paused || !this->in_level) {
 				return;
 			}
-
 			// Set lock
 			auto draw_event = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT("can_draw"));
 			if (!draw_event) {
@@ -132,89 +131,92 @@ namespace hoffman::isaiah {
 			}
 			ResetEvent(draw_event);
 			// Do processing...
-			// Update level
-			if (this->my_level) {
-				this->my_level->update();
-			}
-			// Update enemies
-			std::vector<int> enemies_to_remove {};
-			for (unsigned int i = 0; i < this->enemies.size(); ++i) {
-				if (this->enemies[i]->update()) {
-					if (this->enemies[i]->isAlive()) {
-						this->did_lose_life = true;
-						this->player.changeHealth(-this->enemies[i]->getBaseType().getDamage());
-						if (!this->player.isAlive()) {
-							this->is_paused = true;
-							this->in_level = false;
+			for (int i = 0; i < this->update_speed; ++i) {
+				// Update level
+				if (this->my_level) {
+					this->my_level->update();
+				}
+				// Update enemies
+				std::vector<int> enemies_to_remove {};
+				for (unsigned int i = 0; i < this->enemies.size(); ++i) {
+					if (this->enemies[i]->update()) {
+						if (this->enemies[i]->isAlive()) {
+							this->did_lose_life = true;
+							this->player.changeHealth(-this->enemies[i]->getBaseType().getDamage());
+							if (!this->player.isAlive()) {
+								this->is_paused = true;
+								this->in_level = false;
+							}
 						}
+						else {
+							++this->my_level_enemy_killed;
+							// Alter influence score on Normal challenge level and higher
+							auto& my_node = this->getMap().getInfluenceGraph(
+								this->enemies[i]->getBaseType().isFlying()).getNode(
+									static_cast<int>(std::floor(this->enemies[i]->getGameX())),
+									static_cast<int>(std::floor(this->enemies[i]->getGameY())));
+							my_node.setWeight(my_node.getWeight() + 1);
+						}
+						enemies_to_remove.emplace_back(i);
 					}
-					else {
-						++this->my_level_enemy_killed;
-						// Alter influence score on Normal challenge level and higher
-						auto& my_node = this->getMap().getInfluenceGraph(
-							this->enemies[i]->getBaseType().isFlying()).getNode(
-								static_cast<int>(std::floor(this->enemies[i]->getGameX())),
-								static_cast<int>(std::floor(this->enemies[i]->getGameY())));
-						my_node.setWeight(my_node.getWeight() + 1);
+				}
+				for (unsigned int i = 0; i < enemies_to_remove.size(); ++i) {
+					// Remove dead/goal enemies (yes, the parenthesis are required...)
+					this->enemies.erase(this->enemies.begin() + (enemies_to_remove[i] - i));
+				}
+				// Update shots
+				std::vector<int> shots_to_remove {};
+				for (unsigned int i = 0; i < this->shots.size(); ++i) {
+					if (this->shots[i]->update(*this->map, this->enemies)) {
+						shots_to_remove.emplace_back(i);
 					}
-					enemies_to_remove.emplace_back(i);
 				}
-			}
-			for (unsigned int i = 0; i < enemies_to_remove.size(); ++i) {
-				// Remove dead/goal enemies (yes, the parenthesis are required...)
-				this->enemies.erase(this->enemies.begin() + (enemies_to_remove[i] - i));
-			}
-			// Update shots
-			std::vector<int> shots_to_remove {};
-			for (unsigned int i = 0; i < this->shots.size(); ++i) {
-				if (this->shots[i]->update(*this->map, this->enemies)) {
-					shots_to_remove.emplace_back(i);
+				for (unsigned int i = 0; i < shots_to_remove.size(); ++i) {
+					// Remove shots that collided or that should otherwise be erased
+					this->shots.erase(this->shots.begin() + (shots_to_remove[i] - i));
 				}
-			}
-			for (unsigned int i = 0; i < shots_to_remove.size(); ++i) {
-				// Remove shots that collided or that should otherwise be erased
-				this->shots.erase(this->shots.begin() + (shots_to_remove[i] - i));
-			}
-			// Update towers
-			for (auto& t : this->towers) {
-				auto ret_value = t->update(this->enemies);
-				if (ret_value) {
-					this->shots.emplace_back(std::move(ret_value));
-				}
-			}
-			// Determine if the level is finished
-			if (this->my_level && !this->my_level->hasEnemiesLeft() && this->enemies.empty()) {
-				// Award reward money
-				const double kill_percent = static_cast<double>(this->my_level_enemy_killed / this->my_level_enemy_count);
-				const int max_reward_money = static_cast<int>(((this->level < 5 ?
-					100 : this->level < 10 ?
-					85 : this->level < 15 ?
-					75 : this->level < 20 ?
-					65 : this->level < 25 ?
-					55 : this->level < 30 ?
-					50 : this->level < 35 ?
-					45 : this->level < 40 ?
-					40 : this->level < 45 ?
-					35 : this->level < 50 ?
-					30 : this->level < 75 ?
-					25 : this->level < 100 ?
-					20 : 15) + this->difficulty)
-						* (1.25 + this->getChallengeLevel() / 4.0))
-					+ (this->level % 5 == 4 ? 15 : 0)
-					+ (this->level % 10 == 9 ? 25 : 0);
-				this->player.changeMoney(max_reward_money * kill_percent);
-				this->my_level_enemy_count = 0;
-				this->my_level_enemy_killed = 0;
-				// Reset game state
+				// Update towers
 				for (auto& t : this->towers) {
-					t->resetTower();
+					auto ret_value = t->update(this->enemies);
+					if (ret_value) {
+						this->shots.emplace_back(std::move(ret_value));
+					}
 				}
-				this->shots.clear();
-				// Update difficulty
-				this->updateDifficulty();
-				++this->level;
-				this->did_lose_life = false;
-				this->in_level = false;
+				// Determine if the level is finished
+				if (this->my_level && !this->my_level->hasEnemiesLeft() && this->enemies.empty()) {
+					// Award reward money
+					const double kill_percent = static_cast<double>(this->my_level_enemy_killed
+						/ this->my_level_enemy_count);
+					const int max_reward_money = static_cast<int>(((this->level < 5 ?
+						100 : this->level < 10 ?
+						85 : this->level < 15 ?
+						75 : this->level < 20 ?
+						65 : this->level < 25 ?
+						55 : this->level < 30 ?
+						50 : this->level < 35 ?
+						45 : this->level < 40 ?
+						40 : this->level < 45 ?
+						35 : this->level < 50 ?
+						30 : this->level < 75 ?
+						25 : this->level < 100 ?
+						20 : 15) + this->difficulty)
+						* (1.25 + this->getChallengeLevel() / 4.0))
+						+ (this->level % 5 == 4 ? 15 : 0)
+						+ (this->level % 10 == 9 ? 25 : 0);
+					this->player.changeMoney(max_reward_money * kill_percent);
+					this->my_level_enemy_count = 0;
+					this->my_level_enemy_killed = 0;
+					// Reset game state
+					for (auto& t : this->towers) {
+						t->resetTower();
+					}
+					this->shots.clear();
+					// Update difficulty
+					this->updateDifficulty();
+					++this->level;
+					this->did_lose_life = false;
+					this->in_level = false;
+				}
 			}
 			// Remove lock
 			SetEvent(draw_event);
@@ -265,6 +267,10 @@ namespace hoffman::isaiah {
 			this->player.changeMoney(-this->hp_buy_cost);
 			this->hp_buy_cost *= this->hp_buy_multiplier;
 			this->player.changeHealth(this->hp_gained_per_buy);
+		}
+
+		void MyGame::changeUpdateSpeed() {
+			this->update_speed = this->getNextUpdateSpeed();
 		}
 
 		void MyGame::buyTower(int gx, int gy) {

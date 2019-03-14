@@ -46,6 +46,24 @@ namespace hoffman::isaiah {
 			DrawMenuBar(hwnd);
 		}
 
+		void Renderer2D::updateSpeedOption(HWND hwnd, int new_update_speed) const noexcept {
+			auto my_menu = GetSubMenu(GetMenu(hwnd), 1);
+			MENUITEMINFO my_info {};
+			my_info.cbSize = sizeof(MENUITEMINFO);
+			my_info.fMask = MIIM_DATA | MIIM_STRING;
+			GetMenuItemInfo(my_menu, ID_MM_ACTIONS_CHANGE_SPEED, FALSE, &my_info);
+			std::wstring new_string = L"";
+			if (new_update_speed == 1) {
+				new_string = L"Reset Speed to 1x";
+			}
+			else {
+				new_string = L"Increase Speed to " + std::to_wstring(new_update_speed) + L"x";
+			}
+			my_info.dwTypeData = new_string.data();
+			SetMenuItemInfo(my_menu, ID_MM_ACTIONS_CHANGE_SPEED, FALSE, &my_info);
+			DrawMenuBar(hwnd);
+		}
+
 		void Renderer2D::createTowerMenu(HWND hwnd,
 			const std::vector<std::shared_ptr<game::TowerType>>& towers) const noexcept {
 			auto my_menu = GetSubMenu(GetMenu(hwnd), 2);

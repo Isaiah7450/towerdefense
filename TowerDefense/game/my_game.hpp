@@ -128,6 +128,8 @@ namespace hoffman::isaiah {
 			}
 			/// <summary>Attempts to buy health for the player.</summary>
 			void buyHealth();
+			/// <summary>Changes the speed at which the game is updated.</summary>
+			void changeUpdateSpeed();
 			/// <summary>Attempts to buy and place a tower at the given game coordinates.</summary>
 			/// <param name="gx">The x-location of the place to build (in game coordinate squares).</param>
 			/// <param name="gy">The y-location of the place to build (in game coordinate squares).</param>
@@ -202,6 +204,19 @@ namespace hoffman::isaiah {
 			}
 			std::wstring getUserDataPath() const noexcept {
 				return this->userdata_folder_path;
+			}
+			/// <returns>The new speed that the game will update at based on the current update speed.</returns>
+			int getNextUpdateSpeed() const noexcept {
+				switch (this->update_speed) {
+				case 1:
+					return 2;
+				case 2:
+					return 3;
+				case 3:
+					return 5;
+				default:
+					return 1;
+				}
 			}
 		protected:
 			/// <summary>Updates the value of the dynamic difficulty variable.</summary>
@@ -278,6 +293,8 @@ namespace hoffman::isaiah {
 			double hp_buy_cost {0};
 			/// <summary>The cost to buy health is multiplied by this number each time.</summary>
 			double hp_buy_multiplier {1.00};
+			/// <summary>The number of times to update the game per logical frame.</summary>
+			int update_speed {1};
 			/// <summary>Stores the path to the resources folder.</summary>
 			std::wstring resources_folder_path {L"./resources/"};
 			/// <summary>Stores the path to the userdata folder.</summary>
