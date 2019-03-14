@@ -339,5 +339,11 @@ namespace hoffman::isaiah {
 				}
 			}
 		}
+
+		void MyGame::toggleAllRadii() noexcept {
+			for (auto& t : this->towers) {
+				t->toggleShowCoverage();
+			}
+		}
 	}
 }

@@ -143,6 +143,8 @@ namespace hoffman::isaiah {
 			void toggleShowPaths() noexcept {
 				this->show_test_paths = !this->show_test_paths;
 			}
+			/// <summary>Inverts the showing of a tower's shooting range for all towers.</summary>
+			void toggleAllRadii() noexcept;
 			/// <summary>Sets an enemy type as "seen" before.</summary>
 			/// <param name="name">The name of the type seen.</param>
 			void setEnemyTypeAsSeen(std::wstring name) noexcept {

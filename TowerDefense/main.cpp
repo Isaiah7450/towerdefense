@@ -126,6 +126,11 @@ namespace hoffman::isaiah {
 								my_game->startWave();
 								ReleaseMutex(sync_mutex);
 								break;
+							case ID_MM_ACTIONS_TOGGLE_ALL_RADII:
+								WaitForSingleObject(sync_mutex, INFINITE);
+								my_game->toggleAllRadii();
+								ReleaseMutex(sync_mutex);
+								break;
 							case ID_MM_TOWERS_BUY_TOWER:
 							{
 								auto my_gx = static_cast<int>(GET_X_LPARAM(msg.lParam));
@@ -389,6 +394,11 @@ namespace hoffman::isaiah {
 							game::g_my_game->changeUpdateSpeed();
 							my_renderer->updateSpeedOption(hwnd, game::g_my_game->getNextUpdateSpeed());
 							ReleaseMutex(sync_mutex);
+							break;
+						}
+						case ID_MM_ACTIONS_TOGGLE_ALL_RADII:
+						{
+							PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
 							break;
 						}
 						case ID_MM_TOWERS_INFO:
