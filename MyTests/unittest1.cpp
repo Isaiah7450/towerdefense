@@ -169,6 +169,8 @@ public:
 		auto influence_graph = pathfinding::Grid {5, 5};
 		auto pathfinder_a = pathfinding::Pathfinder {terrain_graph_a, filter_graph_a, influence_graph, false,
 			pathfinding::HeuristicStrategies::Manhattan};
+		auto pathfinder_b = pathfinding::Pathfinder {terrain_graph_a, filter_graph_a, influence_graph, true,
+			pathfinding::HeuristicStrategies::Diagonal};
 		try {
 			auto path = pathfinder_a.findPath(1.0);
 			Assert::AreEqual(size_t {13}, path.size());
@@ -180,6 +182,10 @@ public:
 			Assert::AreEqual(size_t {3}, path.size());
 			path = pathfinder_a.findPath(1.0, 3, 1, 4, 4);
 			Assert::AreEqual(size_t {5}, path.size());
+			path = pathfinder_b.findPath(1.0, 2, 0, 2, 2);
+			Assert::AreEqual(size_t {3}, path.size());
+			path = pathfinder_b.findPath(1.0, 0, 0, 0, 0);
+			Assert::AreEqual(size_t {1}, path.size());
 		}
 		catch (...) {
 			Assert::Fail(L"An exception was thrown.");
