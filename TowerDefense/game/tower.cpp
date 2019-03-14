@@ -22,7 +22,7 @@ namespace hoffman::isaiah {
 			GameObject::draw(renderer);
 			// Draw radius if appropriate
 			if (!this->getBaseType()->isWall() && this->show_coverage) {
-				renderer.setOutlineColor(graphics::Color {1.f, 0.f, 0.f, 0.8f});
+				renderer.setOutlineColor(graphics::Color {0.7f, 0.f, 0.f, 0.8f});
 				renderer.outlineEllipse(renderer.createEllipse(static_cast<float>(this->getScreenX()),
 					static_cast<float>(this->getScreenY()),
 					static_cast<float>(this->getFiringRange() * graphics::getGameSquareWidth()),
