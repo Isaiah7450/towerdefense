@@ -18,7 +18,7 @@ namespace hoffman::isaiah {
 
 		/// <summary>Enumeration of valid types of buffs.</summary>
 		enum class BuffTypes {
-			Intelligence, Speed, Healer, Purify, Repair
+			Intelligence, Speed, Healer, Purify, Repair, Forcefield
 		};
 
 		// Note that any functions declared here that
@@ -145,6 +145,7 @@ namespace hoffman::isaiah {
 		private:
 		};
 
+		/// <summary>Class that represents a buff where an enemy's speed is is increased.</summary>
 		class SpeedBuff : public TemporaryBuffBase {
 		public:
 			/// <param name="wb">The percentage increase to the enemy's walking speed boost.</param>
@@ -266,7 +267,7 @@ namespace hoffman::isaiah {
 			int max_cured;
 		};
 
-		/// <summary>Class that represents a buff where the enemy heals
+		/// <summary>Class that represents a buff where the enemy repairs armor of
 		/// applicable enemies by a static amount every so often.</summary>
 		class RepairBuff : public BuffBase {
 		public:
@@ -300,6 +301,46 @@ namespace hoffman::isaiah {
 		private:
 			/// <summary>The amount that surrounding enemies' armor are repaired by each turn.</summary>
 			double repair_amount;
+		};
+
+		/// <summary>Class that represents a buff where incoming damage is reduced for awhile.</summary>
+		class ForcefieldBuff : public TemporaryBuffBase {
+		public:
+			/// <param name="shp">The amount of health the generated shield possesses.</param>
+			/// <param name="sa">The amount of damage absorbed by the shield.</param>
+			ForcefieldBuff(std::vector<std::wstring> target_names, double br, int ms_ticks, int bd,
+				double shp, double sa) :
+				TemporaryBuffBase {target_names, br, ms_ticks, bd},
+				shield_health {shp},
+				shield_absorb {sa} {
+			}
+			// Implements BuffBase::getRating()
+			double getRating() const noexcept {
+				return this->getBaseRating() * this->getShieldAbsorb();
+			}
+			// Implements BuffBase::getType()
+			BuffTypes getType() const noexcept override {
+				return BuffTypes::Forcefield;
+			}
+			// Implements BuffBase::getName()
+			std::wstring getName() const noexcept override {
+				return L"Forcefield";
+			}
+			// Getters
+			double getShieldHealth() const noexcept {
+				return this->shield_health;
+			}
+			double getShieldAbsorb() const noexcept {
+				return this->shield_absorb;
+			}
+		protected:
+			// Implements BuffBase::apply()
+			void apply(Enemy& target) override;
+		private:
+			/// <summary>The amount of health the generated shield possesses.</summary>
+			double shield_health;
+			/// <summary>The amount of damage the shield absorbs directly.</summary>
+			double shield_absorb;
 		};
 
 		/// <summary>Template type used to create new enemies.</summary>

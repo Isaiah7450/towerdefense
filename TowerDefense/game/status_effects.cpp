@@ -117,5 +117,11 @@ namespace hoffman::isaiah {
 			--this->frames_until_expire;
 			return this->frames_until_expire <= 0;
 		}
+
+		bool ShieldEffect::update(Enemy& e) {
+			e.degradeShield(this->shield_dmg_per_tick);
+			--this->frames_until_expire;
+			return this->frames_until_expire <= 0 || e.getShieldHealth() <= 0.0;
+		}
 	}
 }

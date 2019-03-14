@@ -84,6 +84,24 @@ namespace hoffman::isaiah {
 			/// <param name="diag_move">Whether the enemy is now allowed to move diagonally or not.</param>
 			void changeStrategy(const GameMap& gmap,
 				pathfinding::HeuristicStrategies new_strat, bool diag_move);
+			/// <summary>Creates or extends a shield effect for the enemy.</summary>
+			/// <param name="shp">The starting health of the shield.</param>
+			/// <param name="sa">The damage absorption of the shield.</param>
+			void addShield(double shp, double sa) noexcept {
+				this->shield_health += shp;
+				this->shield_max_health += shp;
+				this->shield_absorb = math::get_min(sa, this->getShieldAbsorb());
+			}
+			/// <summary>Deals damage directly to the enemy's shield.</summary>
+			/// <param name="dmg">The amount of damage to inflict.</param>
+			void degradeShield(double dmg) noexcept {
+				this->shield_health -= dmg;
+				if (this->shield_health <= 0) {
+					this->shield_absorb = 0;
+					this->shield_health = 0;
+					this->shield_max_health = 0;
+				}
+			}
 			// Getters
 			const EnemyType& getBaseType() const noexcept {
 				return *this->base_type;
@@ -173,6 +191,15 @@ namespace hoffman::isaiah {
 				return this->isInjured() ? this->getCurrentInjuredSpeed() :
 					this->isRunning() ? this->getCurrentRunningSpeed() : this->getCurrentWalkingSpeed();
 			}
+			double getShieldHealth() const noexcept {
+				return this->shield_health;
+			}
+			double getMaxShieldHealth() const noexcept {
+				return this->shield_max_health;
+			}
+			double getShieldAbsorb() const noexcept {
+				return this->shield_absorb;
+			}
 			pathfinding::HeuristicStrategies getCurrentStrategy() const noexcept {
 				return this->current_strat;
 			}
@@ -222,6 +249,9 @@ namespace hoffman::isaiah {
 					case BuffTypes::Repair:
 						this->buffs.emplace_back(std::make_unique<RepairBuff>(dynamic_cast<RepairBuff&>(*b)));
 						break;
+					case BuffTypes::Forcefield:
+						this->buffs.emplace_back(std::make_unique<ForcefieldBuff>(dynamic_cast<ForcefieldBuff&>(*b)));
+						break;
 					}
 				}
 			}
@@ -234,7 +264,6 @@ namespace hoffman::isaiah {
 			/// <returns>The base running speed of the enemy. (Base Speed).</returns>
 			double getBaseRunningSpeed() const noexcept {
 				return this->running_speed;
-
 			}
 			/// <returns>The base injured speed of the enemy. (Base Speed).</returns>
 			double getBaseInjuredSpeed() const noexcept {
@@ -307,6 +336,12 @@ namespace hoffman::isaiah {
 			bool dot_active {false};
 			/// <summary>Is a stun effect active?</summary>
 			bool stun_active {false};
+			/// <summary>The amount of health in the shield until it expires.</summary>
+			double shield_health {0.0};
+			/// <summary>The maximum amount of damage the shield can withstand.</summary>
+			double shield_max_health {0.0};
+			/// <summary>The amount of damage absorbed directly by the shield.</summary>
+			double shield_absorb {0.0};
 			// Buffs
 			/// <summary>The list of passive buffs that this enemy possesses.</summary>
 			std::vector<std::unique_ptr<BuffBase>> buffs;

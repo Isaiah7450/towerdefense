@@ -12,7 +12,7 @@ namespace hoffman::isaiah {
 
 		/// <summary>Enumeration of possible status effects.</summary>
 		enum class StatusEffects {
-			DoT, Smart, Slow, Stun, Speed_Boost
+			DoT, Smart, Slow, Stun, Speed_Boost, Forcefield
 		};
 
 		/// <summary>Base class for all status effects.</summary>
@@ -48,7 +48,6 @@ namespace hoffman::isaiah {
 	}
 
 	namespace game {
-
 		// Use DoTDamageTypes::Heal to use this as a healing effect
 		/// <summary>Class that represents a status effect that deals
 		/// damage over time.</summary>
@@ -208,6 +207,31 @@ namespace hoffman::isaiah {
 			double running_boost;
 			/// <summary>The percent increase (as a decimal) to the enemy's injured speed.</summary>
 			double injured_boost;
+		};
+
+		/// <summary>Represents the shield status effect.</summary>
+		class ShieldEffect : public StatusEffectBase {
+		public:
+			/// <param name="ms_til_expires">The number of milliseconds until the
+			/// status effect expires.</param>
+			/// <param name="sh">The amount of health in the shield.</param>
+			ShieldEffect(double ms_til_expires, double sh) :
+				frames_until_expire {math::convertMillisecondsToFrames(ms_til_expires)},
+				shield_dmg_per_tick {0} {
+				this->shield_dmg_per_tick = sh / this->frames_until_expire;
+			}
+		protected:
+			// Implements StatusEffectBase::update()
+			bool update(Enemy& e) override;
+			// Implements StatusEffectBase::isPositiveEffect()
+			bool isPositiveEffect() const noexcept override {
+				return true;
+			}
+		private:
+			/// <summary>The number of frames until the effect expires.</summary>
+			double frames_until_expire;
+			/// <summary>The amount by which the enemy's shield degrades each frame.</summary>
+			double shield_dmg_per_tick;
 		};
 	}
 }

@@ -259,6 +259,7 @@ namespace hoffman::isaiah {
 						: my_token.second == L"Healer"s ? BuffTypes::Healer
 						: my_token.second == L"Purify"s ? BuffTypes::Purify
 						: my_token.second == L"Repair"s ? BuffTypes::Repair
+						: my_token.second == L"Forcefield"s ? BuffTypes::Forcefield
 						: throw util::file::DataFileException {L"Expected the type of the buff."s
 							L" Valid values include: Intelligence, Speed, Healer, Purify, Repair"s, my_parser->getLine()};
 					my_token = my_parser->readKeyValue(L"targets"s);
@@ -285,7 +286,8 @@ namespace hoffman::isaiah {
 					}
 					[[maybe_unused]] int buff_duration {};
 					// Duration is common to many buffs, so I don't switch on it.
-					if (buff_type == BuffTypes::Intelligence || buff_type == BuffTypes::Speed) {
+					if (buff_type == BuffTypes::Intelligence || buff_type == BuffTypes::Speed
+						|| buff_type == BuffTypes::Forcefield) {
 						my_token = my_parser->readKeyValue(L"duration"s);
 						buff_duration = static_cast<int>(util::file::parseNumber(my_token, my_parser->getLine()));
 						if (buff_duration < 10) {
@@ -366,9 +368,20 @@ namespace hoffman::isaiah {
 							throw util::file::DataFileException {L"Repair amount should be positive."s,
 								my_parser->getLine()};
 						}
-						auto heal_buff = std::make_shared<HealerBuff>(buff_target_groups.at(buff_group),
+						auto repair_buff = std::make_shared<HealerBuff>(buff_target_groups.at(buff_group),
 							buff_radius, buff_delay, buff_repair);
-						my_buffs.emplace_back(std::move(heal_buff));
+						my_buffs.emplace_back(std::move(repair_buff));
+						break;
+					}
+					case BuffTypes::Forcefield:
+					{
+						my_parser->readKeyValue(L"shield_health");
+						const double buff_shield_hp = my_parser->parseNumber();
+						my_parser->readKeyValue(L"shield_absorb");
+						const double buff_shield_absorb = my_parser->parseNumber();
+						auto shield_buff = std::make_shared<ForcefieldBuff>(buff_target_groups.at(buff_group),
+							buff_radius, buff_delay, buff_duration, buff_shield_hp, buff_shield_absorb);
+						my_buffs.emplace_back(std::move(shield_buff));
 						break;
 					}
 					} // End switch, this looks weird but is correct

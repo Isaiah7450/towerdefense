@@ -91,6 +91,12 @@ namespace hoffman::isaiah {
 			target.repair(this->getRepairAmount());
 		}
 
+		void ForcefieldBuff::apply(Enemy& target) {
+			target.addShield(this->getShieldHealth(), this->getShieldAbsorb());
+			auto my_shield_effect = std::make_unique<ShieldEffect>(this->getBuffDuration(), this->getShieldHealth());
+			target.addStatus(std::move(my_shield_effect));
+		}
+
 		// enemy.hpp
 		Enemy::Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
 			std::shared_ptr<EnemyType> etype, graphics::Color o_color,
@@ -204,6 +210,7 @@ namespace hoffman::isaiah {
 			constexpr const graphics::Color bar_empty_color {0.7f, 0.7f, 0.7f, 1.0f};
 			constexpr const graphics::Color health_fill_color {0.8f, 0.0f, 0.0f, 0.9f};
 			constexpr const graphics::Color armor_fill_color {0.0f, 0.0f, 0.8f, 0.9f};
+			constexpr const graphics::Color shield_fill_color {0.0, 0.8f, 0.8f, 0.9f};
 			const double hp_percent = this->getHealthPercentage();
 			const float bar_max_width = 0.4f * graphics::getGameSquareWidth<float>();
 			const float bar_height = 0.115f * graphics::getGameSquareHeight<float>();
@@ -234,9 +241,33 @@ namespace hoffman::isaiah {
 				renderer.setFillColor(armor_fill_color);
 				renderer.fillRectangle(ahp_bar_filled_rc);
 			}
+			if (this->getShieldHealth() > 0) {
+				const double shp_percent = this->getShieldHealth() / this->getMaxShieldHealth();
+				const float shp_bar_offset = hp_bar_offset + bar_height + 0.85f * graphics::screen_height / 645.f;
+				const float shp_bar_start_x = hp_bar_start_x;
+				const float shp_bar_end_x = static_cast<float>(shp_bar_start_x + shp_percent * bar_max_width);
+				const float shp_bar_start_y = static_cast<float>(this->getScreenY()) - bar_height / 2.f - shp_bar_offset;
+				const float shp_bar_end_y = shp_bar_start_y + bar_height;
+				const D2D1_RECT_F shp_bar_filled_rc {shp_bar_start_x, shp_bar_start_y, shp_bar_end_x, shp_bar_end_y};
+				/*const D2D1_RECT_F shp_bar_outline_rc {shp_bar_start_x, shp_bar_start_y, shp_bar_start_x + bar_max_width,
+					shp_bar_end_y};*/
+				renderer.setFillColor(shield_fill_color);
+				renderer.fillRectangle(shp_bar_filled_rc);
+			}
 		}
 
 		void Enemy::takeDamage(double dmg, double wap, bool bypass_armor_completely) {
+			// Forcefield effect.
+			if (this->getShieldHealth() > 0 && !bypass_armor_completely) {
+				const auto absorbed_dmg = dmg > this->getShieldAbsorb() ? this->getShieldAbsorb() : dmg;
+				dmg -= absorbed_dmg;
+				this->shield_health -= absorbed_dmg;
+				if (this->getShieldHealth() <= 0) {
+					this->shield_health = 0;
+					this->shield_max_health = 0;
+					this->shield_absorb = 0;
+				}
+			}
 			if (this->hasArmor()) {
 				// Damage to armor => Base Damage * ((1.0 - Armor Reduce) + Piercing)
 				// to a maximum of the base damage amount
