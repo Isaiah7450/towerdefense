@@ -110,7 +110,7 @@ namespace hoffman::isaiah {
 							}
 							case ID_MM_FILE_SAVE_GAME:
 							{
-								std::wofstream save_file {game::default_save_file_name};
+								std::wofstream save_file {game::g_my_game->getUserDataPath() + game::default_save_file_name};
 								if (save_file.fail() || save_file.bad()) {
 									MessageBox(nullptr, L"Could not save game.", L"Save failed!", MB_ICONEXCLAMATION | MB_OK);
 								}
@@ -301,7 +301,7 @@ namespace hoffman::isaiah {
 			}
 			WaitForSingleObject(update_thread_init_event, INFINITE);
 			// Load save data.
-			std::wifstream default_save_file {game::default_save_file_name};
+			std::wifstream default_save_file {game::g_my_game->getUserDataPath() + game::default_save_file_name};
 			if (!default_save_file.bad() && !default_save_file.fail()) {
 				try {
 					game::g_my_game->loadGame(default_save_file);

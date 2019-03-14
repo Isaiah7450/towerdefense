@@ -200,6 +200,9 @@ namespace hoffman::isaiah {
 			int getHealthBuyCost() const noexcept {
 				return static_cast<int>(std::ceil(this->hp_buy_cost));
 			}
+			std::wstring getUserDataPath() const noexcept {
+				return this->userdata_folder_path;
+			}
 		protected:
 			/// <summary>Updates the value of the dynamic difficulty variable.</summary>
 			void updateDifficulty() noexcept {

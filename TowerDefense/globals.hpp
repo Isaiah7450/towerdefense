@@ -115,7 +115,7 @@ namespace hoffman::isaiah {
 #endif // _M_X64
 #endif // defined(DEBUG) || defined(_DEBUG)
 		// The name of the default save file.
-		constexpr const wchar_t* default_save_file_name = L"./userdata/" MY_PROJECT_FORMAT L"_xe8t6418hdefj.dat";
+		constexpr const wchar_t* default_save_file_name = MY_PROJECT_FORMAT L"_xe8t6418hdefj.dat";
 	}
 #undef MY_PROJECT_FORMAT
 }
