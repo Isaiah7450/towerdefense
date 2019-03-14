@@ -124,13 +124,7 @@ namespace hoffman::isaiah {
 			if (this->is_paused || !this->in_level) {
 				return;
 			}
-			// Check time before updating...
-			static LARGE_INTEGER last_update_time = LARGE_INTEGER {0};
-			auto my_times = winapi::MainWindow::getElapsedTime(last_update_time);
-			if (my_times.second.QuadPart < math::getMicrosecondsInSecond() / game::logic_framerate) {
-				return;
-			}
-			last_update_time = my_times.first;
+
 			// Set lock
 			auto draw_event = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT("can_draw"));
 			if (!draw_event) {

@@ -167,7 +167,13 @@ namespace hoffman::isaiah {
 							update_event, sync_mutex
 						};
 						WaitForMultipleObjects(2, update_handles, true, INFINITE);
-						my_game->update();
+						// Check time before updating...
+						static LARGE_INTEGER last_update_time = LARGE_INTEGER {0};
+						auto my_times = winapi::MainWindow::getElapsedTime(last_update_time);
+						if (my_times.second.QuadPart >= math::getMicrosecondsInSecond() / game::logic_framerate) {
+							last_update_time = my_times.first;
+							my_game->update();
+						}
 						ReleaseMutex(sync_mutex);
 					}
 				}
