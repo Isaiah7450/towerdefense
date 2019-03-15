@@ -111,7 +111,7 @@ namespace hoffman::isaiah {
 						if (total_weight < GraphNode::blocked_space_weight
 							|| terrain_node == this->getStartNode()
 							|| terrain_node == this->getGoalNode()) {
-							my_neighbors.push_back(terrain_node);
+							my_neighbors.emplace_back(terrain_node);
 						}
 					}
 				} // End inner for
