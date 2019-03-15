@@ -136,10 +136,8 @@ Section "Resource Files" SectionResources
   File ".\..\resources\levels\levels.xlsx"
   File ".\..\resources\levels\global.ini"
   SetOutPath $R0\resources\graphs
-  File ".\..\resources\graphs\air_graph_beginner.txt"
-  File ".\..\resources\graphs\air_graph_intermediate.txt"
-  File ".\..\resources\graphs\ground_graph_beginner.txt"
-  File ".\..\resources\graphs\ground_graph_intermediate.txt"
+  File ".\..\resources\graphs\air_graph_*.txt"
+  File ".\..\resources\graphs\ground_graph_*.txt"
 SectionEnd
 SectionGroupEnd
 

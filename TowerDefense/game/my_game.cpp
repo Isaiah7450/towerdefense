@@ -92,6 +92,14 @@ namespace hoffman::isaiah {
 				MyGame::air_terrain_filename = air_terrain_filename_base + L"beginner.txt"s;
 				MyGame::ground_terrain_filename = ground_terrain_filename_base + L"beginner.txt"s;
 				break;
+			case ID_CHALLENGE_LEVEL_HARD:
+				MyGame::air_terrain_filename = air_terrain_filename_base + L"experienced.txt"s;
+				MyGame::ground_terrain_filename = ground_terrain_filename_base + L"experienced.txt"s;
+				break;
+			case ID_CHALLENGE_LEVEL_EXPERT:
+				MyGame::air_terrain_filename = air_terrain_filename_base + L"expert.txt"s;
+				MyGame::ground_terrain_filename = ground_terrain_filename_base + L"expert.txt"s;
+				break;
 			case ID_CHALLENGE_LEVEL_NORMAL:
 			default:
 				MyGame::air_terrain_filename = air_terrain_filename_base + L"intermediate.txt"s;

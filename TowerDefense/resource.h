@@ -95,6 +95,8 @@
 #define IDC_CHALLENGE_LEVEL_SELECTOR            20001
 #define ID_CHALLENGE_LEVEL_EASY                 20051
 #define ID_CHALLENGE_LEVEL_NORMAL               20052
+#define ID_CHALLENGE_LEVEL_HARD                 20053
+#define ID_CHALLENGE_LEVEL_EXPERT               20054
 
 #define ID_MM_FILE_NEW_GAME                     40101
 #define ID_MM_FILE_LOAD_GAME                    40102
