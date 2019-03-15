@@ -1,0 +1,58 @@
+# Level Data File Format Specification
+# Lines that begin with hashes (#) or semicolons (;) are considered to be
+# comments, and they are ignored by the parser.
+
+# The first thing that comes in the file is the global section header
+# which defines things that are global to the level.
+[global]
+# This number is the format version of the data file (so that backwards
+# compatibility can be maintained if I update the format.)
+# You should set this number to 1 for now.
+version = 1
+# The is the amount of time (in milliseconds) between the spawning of waves
+# in the level. Generally speaking, you don't want all the waves spawning
+# at once, so values in the range of 1000ms to 10000ms are generally
+# reasonable for this setting. Most levels simply set it to 5000ms.
+wave_spawn_delay = 5000
+
+# For each wave in the level, you must define a [wave] section.
+# Note that you should define these in the order you wish for
+# them to spawn, but also note that another wave may start
+# spawning before this wave is finished spawning.
+[wave]
+# This is the delay between the spawning of groups in the wave.
+# Again, you do not want all the groups to begin spawning enemies
+# all at once, so values in the range of 500ms to 5000ms are
+# recommended for this setting. 1500ms to 3000ms are typical values.
+group_spawn_delay = 2500
+# Next, you define the groups that this wave is composed of, in
+# the order that you wish for them to begin spawning in.
+# You use the object format (i.e.: the braces) here.
+groups = {
+	# You need a pair of braces ({ and }) for each group in the wave.
+	{
+		# This is the name of the enemy to spawn in the wave.
+		enemy_name = "My Name"
+		# By default, 2, 3, 4, or 5 enemies are spawned in each
+		# group depending on the challenge level of the game.
+		# This number indicates the number of additional enemies
+		# to spawn in this group.
+		extra_count = 0
+		# This is the delay (in milliseconds) between the spawning
+		# of enemies in this group. You can set this low, but it
+		# is probably better to space out the spawning some. This
+		# probably helps with performance, and it definitely makes
+		# it easier on the player. Values between 100ms and 1500ms
+		# are reasonable for this setting. While the optimal "normal"
+		# density varies based on the enemy's speed, values between
+		# 400ms and 800ms should work well.
+		enemy_spawn_delay = 200
+	}
+	# If you want to add more groups, simply add more braces
+	# and add the same three properties as above (enemy_name, extra_count
+	# and enemy_spawn_delay) for each group.
+}
+# And to add more waves, you add a new [wave] header and make it just like
+# this one.
+
+# And that's it for this file! Pretty simple, eh?
