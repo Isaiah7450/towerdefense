@@ -193,8 +193,8 @@ namespace hoffman::isaiah {
 				// Determine if the level is finished
 				if (this->my_level && !this->my_level->hasEnemiesLeft() && this->enemies.empty()) {
 					// Award reward money
-					const double kill_percent = static_cast<double>(this->my_level_enemy_killed
-						/ this->my_level_enemy_count);
+					const double kill_percent = static_cast<double>(this->my_level_enemy_killed)
+						/ this->my_level_enemy_count;
 					const int max_reward_money = static_cast<int>(((this->level < 5 ?
 						100 : this->level < 10 ?
 						85 : this->level < 15 ?
