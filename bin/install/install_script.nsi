@@ -164,15 +164,15 @@ Section "-Tower Defense Solution Files" SectionSolutionSource
   SectionIn 2 RO
   CreateDirectory "$1\.git"
   SetOutPath "$1\.git"
-  !define myPath "..\..\"
+  !define myPath "..\.."
   File /a /r "${myPath}\.git\*.*"
   SetOutPath "$1"
   File "${myPath}\.gitignore"
   File "${myPath}\towerdefense.sln"  
   File "${myPath}\.gitattributes"
-  File "${myPath}\my_debug_defaults.prop"
-  File "${myPath}\my_defaults.prop"
-  File "${myPath}\my_release_defaults.prop"
+  File "${myPath}\my_debug_defaults.props"
+  File "${myPath}\my_defaults.props"
+  File "${myPath}\my_release_defaults.props"
   File "${myPath}\tower_defense.ruleset"
   !undef myPath
 SectionEnd
