@@ -218,46 +218,5 @@ namespace hoffman::isaiah {
 			return std::make_unique<Shot>(this->device_resources, stype, graphics::Color {1.f, 0.f, 1.f, 1.f},
 				*this, -this->getBaseType()->getFiringMethod().getAngles().at(this->angle_index));
 		}
-
-		// Don't forget to keep this version and TowerType's version synced.
-		double Tower::getAverageDamagePerShot() const noexcept {
-			double sum = 0.0;
-			for (const auto& st : this->getBaseType()->getShotTypes()) {
-				sum += st.first->getExpectedRawDamage() * st.second;
-			}
-			return sum;
-		}
-
-		double Tower::getAverageShotRating() const noexcept {
-			double sum = 0.0;
-			for (const auto& st : this->getBaseType()->getShotTypes()) {
-				sum += st.first->getRating() * st.second;
-			}
-			return sum;
-		}
-
-		void Tower::updateRating() noexcept {
-			if (this->getBaseType()->isWall()) {
-				this->value = this->getBaseType()->getRating();
-				return;
-			}
-			const auto speed_range_multipliers = this->getRateOfFire()
-				* (this->getFiringArea() / 2.5);
-			const auto behavior_modifier = (this->getBaseType()->getFiringMethod().getMethod()
-				== FiringMethodTypes::Default ? 0.0 : -2.5)
-				+ (this->getBaseType()->getTargetingStrategy().getStrategy() 
-				== TargetingStrategyTypes::Distances ? 0.0 : 3.5);
-			const auto my_dps_idea = this->getAverageDamagePerShot() * speed_range_multipliers;
-			const auto my_effect_idea = (this->getAverageShotRating() - this->getAverageDamagePerShot())
-				* speed_range_multipliers;
-			if (my_dps_idea > my_effect_idea) {
-				this->rating = (my_dps_idea * 0.65 + my_effect_idea * 0.35)
-					+ behavior_modifier;
-			}
-			else {
-				this->rating = (my_dps_idea * 0.35 + my_effect_idea * 0.65)
-					+ behavior_modifier;
-			}
-		}
 	}
 }

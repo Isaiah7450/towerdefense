@@ -11,6 +11,7 @@
 #include "./../graphics/graphics_DX.hpp"
 #include "./game_object.hpp"
 #include "./tower_types.hpp"
+#include "./game_formulas.hpp"
 
 namespace hoffman::isaiah {
 	namespace game {
@@ -84,41 +85,34 @@ namespace hoffman::isaiah {
 			// Note: For the most part, all of these should be very close to the same
 			//       as the versions in TowerType.
 			double getFiringArea() const noexcept {
-				return this->getBaseType()->getFiringMethod().getMethod() == FiringMethodTypes::Default
-					? this->getFiringRange() * this->getFiringRange() * math::pi
-					: this->getFiringRange() * this->getFiringRange()
-					* (this->getBaseType()->getFiringMethod().getMaximumAngle()
-						- this->getBaseType()->getFiringMethod().getMinimumAngle()) / 2.0;
+				return towers::getFiringArea(this->getFiringRange(), this->getBaseType()->getFiringMethod(), this->getBaseType()->isWall());
 			}
 			/// <returns>The expected amount of raw damage output by the tower per shot on average.</returns>
-			double getAverageDamagePerShot() const noexcept;
+			double getAverageDamagePerShot() const noexcept {
+				return towers::getAverageDamagePerShot(this->getBaseType()->getShotTypes(), this->getDamageMultiplier());
+			}
 			/// <returns>The weighted average of the tower's shot types.</returns>
-			double getAverageShotRating() const noexcept;
+			double getAverageShotRating() const noexcept {
+				return towers::getAverageShotRating(this->getBaseType()->getShotTypes());
+			}
 			/// <returns>The tower's average rate of fire as the average number of shots fired per second.</returns>
 			double getRateOfFire() const noexcept {
-				if (this->getBaseType()->isWall()) {
-					return 0;
-				}
-				if (this->getVolleyShots() == 0 || this->getReloadDelay() == 0) {
-					return this->getFiringSpeed();
-				}
-				const double secs_to_reload = this->getReloadDelay() / 1000.0;
-				const double total_cycle_time = (1.0 / this->getFiringSpeed())
-					* this->getVolleyShots() + secs_to_reload;
-				return static_cast<double>(this->getVolleyShots()) / total_cycle_time;
+				return towers::getRateOfFire(this->getFiringRange(), this->getVolleyShots(), this->getReloadDelay(), this->getBaseType()->isWall());
 			}
 			/// <returns>The tower's expected DPS.</returns>
 			double getExpectedDPS() const noexcept {
-				return this->getAverageDamagePerShot() * this->getRateOfFire();
+				return towers::getExpectedDPS(this->getAverageDamagePerShot(), this->getRateOfFire());
 			}
 			/// <summary>Updates the stored rating value of the tower.</summary>
-			void updateRating() noexcept;
+			void updateRating() noexcept {
+				this->rating = towers::getRating(this->getRateOfFire(), this->getFiringArea(),
+					this->getBaseType()->getFiringMethod(), this->getBaseType()->getTargetingStrategy(),
+					this->getAverageDamagePerShot(), this->getAverageShotRating(), this->getBaseType()->isWall());
+			}
 			/// <summary>Updates the stored cost (i.e.: value) of the tower.</summary>
 			void updateValue() noexcept {
-				if (this->getBaseType()->isWall()) {
-					return;
-				}
-				this->value = this->getBaseType()->getCostAdjustment() + this->getRating() / 8.4 + 1.0;
+				this->value = towers::getCost(this->getRating(), this->getBaseType()->getCostAdjustment(),
+					this->getBaseType()->isWall());
 			}
 		protected:
 			/// <summary>Finds a target enemy for the tower.</summary>

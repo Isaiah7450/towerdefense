@@ -227,6 +227,7 @@
     <ClInclude Include="file_util.hpp" />
     <ClInclude Include="game\enemy.hpp" />
     <ClInclude Include="game\enemy_type.hpp" />
+    <ClInclude Include="game\game_formulas.hpp" />
     <ClInclude Include="game\game_level.hpp" />
     <ClInclude Include="game\game_object.hpp" />
     <ClInclude Include="game\game_object_type.hpp" />
@@ -242,6 +243,7 @@
     <ClInclude Include="graphics\graphics.hpp" />
     <ClInclude Include="graphics\graphics_DX.hpp" />
     <ClCompile Include="game\enemy_type.cpp" />
+    <ClCompile Include="game\game_formulas.cpp" />
     <ClCompile Include="graphics\info_dialogs.cpp" />
     <ClInclude Include="graphics\info_dialogs.hpp" />
     <ClInclude Include="graphics\other_dialogs.hpp" />
