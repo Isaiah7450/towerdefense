@@ -202,3 +202,193 @@ Version 3.1.0:
    effect as this information was not used for anything in-game.)
  + Relaxed move speed restriction on shots.
  + Added max level field to the towers file (for later use).
+
+Version 3.1.0c: (Released March 10, 2019)
+- Bug Fixes:
+ + Fixed an issue where shots disappearing off the grid caused a crash due to
+   an oversight.
+- New Stuff:
+ + Added levels 31-35.
+
+Version 3.1.1: (Not Released Yet)
+- Bug Fixes:
+ + Fixed black editor screen due to synchronization issues.
+ + Fixed some incorrect formulas when calculating the ratings of enemies.
+ + Fixed some buffs not activating like they're suppoosed to do.
+ + Fixed not receiving money if you lose life during a round.
+ + It is much harder to cause the score counter at the end of the game to
+   overflow.
+- Balance Changes:
+ + Some of the buffs for Red General and Red King expanded to affect more
+   troops.
+ + Rebalanced the dynamic difficulty scaling.
+ + Minimum speed multipliers for enemies increased from 5% to 10%.
+ + Made some major changes to enemy buffs, some of which may not be documented
+   below.
+  * Added buffs to Blue Guardian, Blue General, Red Vengeful King, and Blue King.
+ + More rebalancing of the money curve (overall money has gone down).
+ + Red Foot Soldier: Health increased from 13 to 16.
+ + Red Mounted Soldier: Health increased from 11 to 14.
+ + Red Mounted Soldier: Walking Speed increased from 2.125 to 2.200 tiles
+                        per second.
+ + Red Mounted Soldier: Injured Speed increased from 1.250 to 1.275 tiles
+                        per second.
+ + Red Guardian: Health increased from 26 to 35.
+ + Red King: Health increased from 125 to 156.
+ + Red King: Removed "Red Group B" (Intelligence 1) buff.
+ + Red Vengeful King: Health increased from 550 to 999.
+ + Red Vengeful King: Damage increased from 20 to 24.
+ + Green Scout: Health increased from 19 to 29.
+ + Green Scout: Walking Speed increased from 3.250 to 3.700 tiles per second.
+ + Green Scout: Running Speed increased from 3.250 to 3.700 tiles per second.
+ + Green Scout: Injured Speed increased from 1.750 to 2.000 tiles per second.
+ + Green Soldier: Health increased from 33 to 55.
+ + Green Soldier: Armor Health increased from 17 to 22.
+ + Green Soldier: Walking Speed increased from 2.400 to 2.850 tiles per
+                  second.
+ + Green Soldier: Running Speed increased from 2.500 to 3.000 tiles per
+                  second.
+ + Green Soldier: Injured Speed increased from 1.350 to 1.750 tiles per
+                  second.
+ + Green Guardian: Health increased from 71 to 109.
+ + Green Guardian: Armor Health increased from 28 to 38.
+ + Green Guardian: Walking Speed increased from 1.875 to 2.363 tiles per
+                   second.
+ + Green Guardian: Running Speed increased from 2.250 to 2.675 tiles per
+                   second.
+ + Green Guardian: Injured Speed increased from 1.300 to 1.530 tiles per
+                   second.
+ + Green Motivator: Health increased from 27 to 48.
+ + Green Motivator: Walking Speed increased from 2.700 to 2.903 tiles per
+                    second.
+ + Green Motivator: Running Speed increased from 2.700 to 2.903 tiles per
+                    second.
+ + Green Motivator: Injured Speed increased from 1.750 to 1.881 tiles per
+                    second.
+ + Green Motivator: "Green Motivation Group" (Speed 1) delay increased
+                    from 3200ms to 3500ms.
+ + Green Motivator: "Green Motivation Group" (Speed 1) injured speed boost
+                    increased from 33% to 40%.
+ + Green General: Health increased from 203 to 270.
+ + Green General: Armor Health increased from 41 to 55.
+ + Green General: Walking Speed increased from 1.900 to 2.490 tiles per
+                  second.
+ + Green General: Running Speed increased from 2.325 to 2.717 tiles per
+                  second.
+ + Green General: Injured Speed increased from 1.350 to 1.777 tiles per
+                  second.
+ + Green Queen: Health increased from 315 to 419.
+ + Green Queen: Armor Health increased from 100 to 133.
+ + Green Queen: Walking Speed increased from 2.650 to 2.900 tiles per
+                second.
+ + Green Queen: Running Speed increased from 2.900 to 3.200 tiles per
+                second.
+ + Green Queen: Injured Speed increased from 2.333 to 2.532 tiles per
+                second.
+ + Purple Scout: Health increased from 17 to 24.
+ + Purple Scout: Strategy changed from Euclidean to Diagonal.
+ + Purple Soldier: Health increased from 30 to 42.
+ + Purple Soldier: Armor Health increased from 22 to 31.
+ + Purple Guardian: Health increased from 94 to 132.
+ + Purple Guardian: Armor Health increased from 24 to 33.
+ + Purple Medic: Health increased from 31 to 39.
+ + Purple Medic: Armor Health increased from 6 to 8.
+ + Purple Medic: Walking Speed decreased from 2.300 to 2.200 tiles per second.
+ + Purple Medic: Running Speed decreased from 2.500 to 2.350 tiles per second.
+ + Purple Medic: "Purple Medic Group" (Healer 1) heal amount decreased
+                 from 7.5 to 6.0.
+ + Purple Medic: "Green and Purple Unity Group" (Healer 1) heal amount
+                 decreased from 5.0 to 4.0.
+ + Purple General: Health increased from 241 to 337.
+ + Purple General: Armor Health increased from 36 to 51.
+ + Purple Queen: Health increased from 475 to 665.
+ + Purple Queen: Armor Health increased 83 to 116.
+ + Blue Scout: Health increased from 22 to 35.
+ + Blue Scout: Armor Health increased from 3 to 5.
+ + Blue Soldier: Health increased from 40 to 64.
+ + Blue Soldier: Armor Health increased from 45 to 72.
+ + Blue Guardian: Health increased from 125 to 200.
+ + Blue Guardian: Armor Health increased from 85 to 136.
+ + Blue Quartermaster: Health increased from 90 to 144.
+ + Blue Quartermaster: Armor Health increased from 10 to 16.
+ + Blue General: Health increased from 210 to 346.
+ + Blue General: Armor Health increased from 150 to 248.
+ + Blue King: Armor Health decreased from 999 to 499.
+ + Decreased the damage of all towers by 25%. (Note: All future damage values
+   are relative to this decrease.)
+ + Flak I: Splash damage decreased from 0.38 to 0.20.
+ + Flak II: Splash damage decreased from 0.56 to 0.33.
+ + Suppression Flak: Stun duration decreased from 350ms to 300ms.
+ + Ice Artillery: Splash damage decreased from 1.50 to 1.25.
+ + Ice Artillery: Slow factor decreased from 67% to 50%.
+ + Ice Artillery: Slow duration decreased from 4250ms to 3500ms.
+ + Grenade: Piercing decreased from 25% to 15%.
+ + Grenade: Impact radius decreased from 2.25 tiles to 1.50 tiles.
+ + Big Bang: Damage decreased from 1.50 to 1.25.
+ + Big Bang: Impact radius increased from 3.00 tiles to 5.00 tiles.
+ + Big Bang: Splash damage decreased from 0.56 to 0.33.
+ + Big Bang: Air multiplier increased from 100% to 105%.
+ + Big Bang: Stun chance decreased from 85% to 75%.
+ + Big Bang: Stun duration decreased from 120ms to 50ms.
+ + Charged Blast: Piercing decreased from 75% to 40%.
+ + Charged Blast: Impact radius decreased from 1.2 tiles to 0.75 tiles.
+ + Goo Bomb: Damage decreased from 0.38 to 0.25.
+ + Goo Bomb: Slow factor decreased from 25% to 20%.
+ + Goo Bomb: Slow duration decreased from 750ms to 600ms.
+ + Goo Bomb: Slow multi-chance decreased from 10% to 3%.
+ + Frost Spray: Damage decreased from 3.00 to 2.00.
+ + Frost Spray: Piercing decreased from 5% to 0%.
+ + Frost Spray: Slow factor decreased from 40% to 33%.
+ + Frost Spray: Slow multi-chance decreased from 33% to 10%.
+ + Lava Spray: Damage decreased from 3.75 to 3.33.
+ + Lava Spray: Piercing decreased from 30% to 20%.
+ + Miracle Spray: Damage decreased from 2.63 to 2.40.
+ + Splash Tower: Firing speed increased from 4.00 shots per second to 4.50
+                 shots per second.
+ + Splash Tower: Volley shots increased from 25 to 40.
+ + Splash Tower: Reload delay increased from 3000ms to 3350ms.
+ + Splash Tower: Cost changed from $99 to $96.
+ + Spray Tower NE: Firing speed increased from 25.00 shots per second to 40.00
+                   shots per second.
+ + Spray Tower NE: Volley shots increased from 20 to 40.
+ + Spray Tower NE: Reload delay increased from 550ms to 2000ms.
+ + Spray Tower SE: Firing speed increased from 25.00 shots per second to 40.00
+                   shots per second.
+ + Spray Tower SE: Volley shots increased from 20 to 40.                   
+ + Spray Tower SE: Reload delay increased from 550ms to 2000ms.
+ + Utility Tower: Cost changed from $90 to $96.
+ + Utility Tower: Firing speed decreased from 4.33 shots per second to 4.00
+                  shots per second.
+- New Stuff:
+ + The location where ground troops enter the map is now clearly indicated
+   with a white "GS" label. Likewise, the entry point for air troops is
+   marked by a white "AS" label.
+ + You can now toggle the display of terrain weights in the terrain editor.
+ + Added levels 36-50. Redid many of the earlier levels.
+ + Added global difficulty selector.
+  * Added 3 new maps. The old map is associated with the beginner difficulty.
+  * Four levels are offered: Beginner, Intermediate, Experienced, and Expert.
+ + Added ability to speed up the game by 2x, 3x, or 5x.
+- Misc Changes:
+ + Made some changes that hopefully result in more consistent overall
+   performance in the program.
+ + Changed color of Red Mounted Soldier to be darker.
+ + Changed color of Red General to be darker.
+ + Changed color of Vengeful Red King to have less blue.
+ + Renamed Vengeful Red King to Red Vengeful King. (Note: This will likely
+   break save files unfortunately.)
+ + Changed color of Green Motivator to be darker.
+ + Changed color of Green General to be darker.
+ + Changed color of Green Queen to be lighter.
+ + Changed description of Purple Guardian slightly.
+ + Changed color of Purple Medic to be darker.
+ + Changed shape of Purple Medic.
+ + Changed color of Purple Queen to be lighter.
+ + Changed color of Blue Quartermaster to be darker.
+ + Changed color of Blue General to be darker.
+ + Added a few enemies.
+ + Added an installer. As a result of this, some major changes to the way
+   files are stored have been made.
+ + Darkened the color of the ellipses used for "Show Coverage" a little bit.
+ + You can now show/hide a tower's radius during a level.
+ 
