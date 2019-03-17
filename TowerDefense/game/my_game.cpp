@@ -283,10 +283,6 @@ namespace hoffman::isaiah {
 		}
 
 		void MyGame::buyTower(int gx, int gy) {
-			if (this->isInLevel() || !this->player.isAlive()) {
-				// Can't build while enemies are attacking or if dead
-				return;
-			}
 			if (this->getMap().getFiterGraph(false).getNode(gx, gy).isBlocked()
 				&& this->getMap().getFiterGraph(true).getNode(gx, gy).isBlocked()) {
 				// Toggle radius
@@ -295,6 +291,10 @@ namespace hoffman::isaiah {
 						t->toggleShowCoverage();
 					}
 				}
+				return;
+			}
+			if (this->isInLevel() || !this->player.isAlive()) {
+				// Can't build while enemies are attacking or if dead
 				return;
 			}
 			if (this->getSelectedTower() < 0
