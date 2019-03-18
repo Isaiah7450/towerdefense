@@ -10,6 +10,7 @@
 #include "./../graphics/graphics.hpp"
 #include "./../graphics/shapes.hpp"
 #include "./game_object_type.hpp"
+#include "./game_formulas.hpp"
 
 namespace hoffman::isaiah {
 	namespace game {
@@ -79,10 +80,8 @@ namespace hoffman::isaiah {
 			/// <returns>The basic rating of the buff as determined by its
 			/// radius of influence, time between activations, and the number of enemies it affects.</returns>
 			virtual double getBaseRating() const noexcept {
-				return (this->getRadius() * this->getRadius()
-					* math::get_max(1.0, math::pi - std::sqrt(this->getTargetNames().size())))
-					* this->getAverageInfluenceRating()
-					/ (this->getTimeBetweenApplications() / 1000.0);
+				return enemy_buffs::buff_base::getBaseRating(this->getRadius(), this->getTimeBetweenApplications(),
+					this->getTargetNames().size(), this->getAverageInfluenceRating());
 			}
 			/// <param name="caller">The invoker of the buff.</param>
 			/// <param name="target">The potential target of the buff.</param>
@@ -113,7 +112,7 @@ namespace hoffman::isaiah {
 		protected:
 			// Overrides BuffBase::getBaseRating()
 			double getBaseRating() const noexcept override {
-				return BuffBase::getBaseRating() * (this->getBuffDuration() / 1000.0);
+				return enemy_buffs::temp_buff_base::getBaseRating(BuffBase::getBaseRating(), this->getBuffDuration());
 			}
 		private:
 			/// <summary>The duration of the buff in milliseconds.</summary>
@@ -137,7 +136,7 @@ namespace hoffman::isaiah {
 			}
 			// Implements BuffBase::getRating()
 			double getRating() const noexcept override {
-				return this->getBaseRating() * math::get_sqrt(2.0);
+				return enemy_buffs::smart_buff::getRating(this->getBaseRating());
 			}
 		protected:
 			// Implements BuffBase::apply()
@@ -169,8 +168,8 @@ namespace hoffman::isaiah {
 			}
 			// Implements BuffBase::getRating()
 			double getRating() const noexcept override {
-				return this->getBaseRating() * (1.0 + this->getWalkingBoost() * 0.5
-					+ this->getRunningBoost() * 0.3 + this->getInjuredBoost() * 0.2);
+				return enemy_buffs::speed_buff::getRating(this->getBaseRating(), this->getWalkingBoost(),
+					this->getRunningBoost(), this->getInjuredBoost());
 			}
 			// Getters
 			double getWalkingBoost() const noexcept {
@@ -218,8 +217,7 @@ namespace hoffman::isaiah {
 			}
 			// Implements BuffBase::getRating()
 			double getRating() const noexcept {
-				// 1.3 is a "fudge" factor.
-				return this->getBaseRating() * this->getHealAmount() * 1.3;
+				return enemy_buffs::healer_buff::getRating(this->getBaseRating(), this->getHealAmount());
 			}
 			// Getters
 			double getHealAmount() const noexcept {
@@ -252,8 +250,7 @@ namespace hoffman::isaiah {
 			}
 			// Implements BuffBase::getRating()
 			double getRating() const noexcept override {
-				// 0.40 is a "fudge" factor based on the usefulness of this effect.
-				return this->getBaseRating() * std::sqrt(this->getMaxEffectsRemoved()) * 0.40;
+				return enemy_buffs::purify_buff::getRating(this->getBaseRating(), this->getMaxEffectsRemoved());
 			}
 			// Getters
 			int getMaxEffectsRemoved() const noexcept {
@@ -288,8 +285,7 @@ namespace hoffman::isaiah {
 			}
 			// Implements BuffBase::getRating()
 			double getRating() const noexcept {
-				// 1.4 is a "fudge" factor based on the usefulness of this buff.
-				return this->getBaseRating() * this->getRepairAmount() * 1.4;
+				return enemy_buffs::repair_buff::getRating(this->getBaseRating(), this->getRepairAmount());
 			}
 			// Getters
 			double getRepairAmount() const noexcept {
@@ -316,7 +312,7 @@ namespace hoffman::isaiah {
 			}
 			// Implements BuffBase::getRating()
 			double getRating() const noexcept {
-				return this->getBaseRating() * this->getShieldAbsorb();
+				return enemy_buffs::forcefield_buff::getRating(this->getBaseRating(), this->getShieldHealth(), this->getShieldAbsorb());
 			}
 			// Implements BuffBase::getType()
 			BuffTypes getType() const noexcept override {
@@ -415,70 +411,56 @@ namespace hoffman::isaiah {
 			/// <returns>The effective armor health of the enemy, which is an estimate of how much
 			/// damage the enemy can withstand before their armor is rendered ineffective.</returns>
 			double getEffectiveArmorHealth() const noexcept {
-				return this->getBaseArmorHP() * (1.0 / (1.0 - this->getArmorReduce()));
+				return enemies::getEffectiveArmorHealth(this->getBaseArmorHP(), this->getArmorReduce());
 			}
 			/// <returns>The effective health of the enemy, which is an estimate of how much
 			/// damage the enemy can withstand before dying (ignoring piercing).</returns>
 			double getEffectiveHealth() const noexcept {
-				return this->getEffectiveArmorHealth() + this->getBaseHealth();
+				return enemies::getEffectiveHealth(this->getBaseHealth(), this->getEffectiveArmorHealth());
 			}
 			/// <returns>The proportion of the enemy's lifespan that the enemy spends walking
 			/// (expressed as a decimal, not a %).</returns>
 			double getWalkingPercent() const noexcept {
-				return 1.0 - this->getRunningPercent() - this->getInjuredPercent();
+				return enemies::getWalkingPercent(this->getRunningPercent(), this->getInjuredPercent());
 			}
 			/// <returns>The proportion of the enemy's lifespan that the enemy spends running
 			/// (expressed as a decimal, not a %).</returns>
 			double getRunningPercent() const noexcept {
-				return this->getBaseHealth() / this->getEffectiveHealth() - this->getInjuredPercent();
+				return enemies::getRunningPercent(this->getInjuredPercent(), this->getBaseHealth(), this->getEffectiveHealth());
 			}
 			/// <returns>The proportion of the enemy's lifespan that the enemy spends injured
 			/// (expressed as a decimal, not a %).</returns>
 			double getInjuredPercent() const noexcept {
-				return this->getBaseHealth() * (1.0 - this->getPainTolerance()) / this->getEffectiveHealth();
+				return enemies::getInjuredPercent(this->getBaseHealth(), this->getEffectiveHealth(), this->getPainTolerance());
 			}
 			/// <returns>A rating value that factors in several of the enemy's core statistics.
 			/// This does not factor in special abilities like buffs.</returns>
 			double getBaseRating() const noexcept {
-				// Basically, these are the number of tiles an enemy will cross if they take 1 damage
-				// for each tile they cross.
-				const double tiles_while_walking = this->getWalkingPercent() * this->getBaseWalkingSpeed()
-					* this->getEffectiveHealth();
-				const double tiles_while_running = this->getRunningPercent() * this->getBaseRunningSpeed()
-					* this->getEffectiveHealth();
-				const double tiles_while_injured = this->getInjuredPercent() * this->getBaseInjuredSpeed()
-					* this->getEffectiveHealth();
-				// The final rating is equivalent to the total number of tiles travelled across the
-				// enemy's entire lifespan (under the assumption of receiving 1 damage per tile)
-				// multiplied by the damage, flying, and diagonal movement multipliers.
-				return (tiles_while_walking + tiles_while_running + tiles_while_injured)
-					* this->getDiagonalMultiplier() * this->getFlyingMultiplier();
+				return enemies::getBaseRating(this->getBaseWalkingSpeed(), this->getBaseRunningSpeed(), this->getBaseInjuredSpeed(),
+					this->getWalkingPercent(), this->getRunningPercent(), this->getInjuredPercent(), this->getEffectiveHealth(),
+					this->getDiagonalMultiplier(), this->getFlyingMultiplier(), this->getDamageMultiplier());
 			}
 			/// <returns>Another rating that focuses primarily on the enemy's special abilities.</returns>
 			double getExtraRating() const noexcept {
-				double base_buff_ratings = 0.0;
-				for (const auto& b : this->buff_types) {
-					base_buff_ratings += b->getRating();
-				}
-				return base_buff_ratings * std::sqrt(std::sqrt(this->getBuffTypesCount()));
+				return enemies::getExtraRating(this->getBuffTypes());
 			}
 			/// <returns>Returns the enemy's full rating.</returns>
 			double getRating() const noexcept {
-				return this->getBaseRating() + this->getExtraRating();
+				return enemies::getRating(this->getBaseRating(), this->getExtraRating());
 			}
 		protected:
 			/// <returns>The impact that the amount of damage an enemy can potentially deal has on
 			/// an enemy's rating.</returns>
 			double getDamageMultiplier() const noexcept {
-				return std::sqrt(this->getDamage());
+				return enemies::getDamageMultiplier(this->getDamage());
 			}
 			/// <returns>The impact that being able to move diagonally has on an enemy's rating.</returns>
 			double getDiagonalMultiplier() const noexcept {
-				return this->canMoveDiagonally() ? 1.15 : 1.00;
+				return enemies::getDiagonalMultiplier(this->canMoveDiagonally());
 			}
 			/// <returns>The impact that flying has on an enemy's rating.</returns>
 			double getFlyingMultiplier() const noexcept {
-				return this->isFlying() ? 1.08 : 1.00;
+				return enemies::getFlyingMultiplier(this->isFlying());
 			}
 		private:
 			/// <summary>The amount of damage the enemy deals to the player if it reaches the goal.</summary>

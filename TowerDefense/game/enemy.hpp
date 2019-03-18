@@ -212,6 +212,8 @@ namespace hoffman::isaiah {
 			const std::vector<std::unique_ptr<StatusEffectBase>>& getActiveStatuses() const noexcept {
 				return this->status_effects;
 			}
+			// Calculated getters:
+
 		protected:
 			// Functions that help construction
 			/// <returns>The enemy's starting health adjusted for the level, difficulty, and challenge level.</returns>

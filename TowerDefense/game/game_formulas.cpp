@@ -2,9 +2,13 @@
 // Created: March 17, 2019
 #include "./game_formulas.hpp"
 #include <cmath>
+#include <map>
+#include <memory>
 #include <utility>
 #include <vector>
 #include "./../ih_math.hpp"
+#include "./enemy.hpp"
+#include "./enemy_type.hpp"
 #include "./shot_types.hpp"
 #include "./tower_types.hpp"
 
@@ -48,6 +52,29 @@ namespace hoffman::isaiah::game {
 				return (my_dps_idea * 0.35 + my_effect_idea * 0.65)
 					+ behavior_modifier;
 			}
+		}
+	}
+
+	namespace enemy_buffs {
+		namespace buff_base {
+			double getAverageInfluenceRating(std::vector<std::wstring> target_names,
+				const std::map<std::wstring, std::shared_ptr<EnemyType>>& etypes) {
+				double total_rating = 0.0;
+				for (const auto& ename : target_names) {
+					total_rating += etypes.at(ename)->getBaseRating();
+				}
+				return total_rating / static_cast<double>(target_names.size());
+			}
+		}
+	}
+
+	namespace enemies {
+		double getExtraRating(const std::vector<std::shared_ptr<BuffBase>>& buffs) noexcept {
+			double sum_buff_ratings = 0.0;
+			for (const auto& b : buffs) {
+				sum_buff_ratings += b->getRating();
+			}
+			return sum_buff_ratings * std::cbrt(buffs.size());
 		}
 	}
 }
