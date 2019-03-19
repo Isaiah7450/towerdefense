@@ -95,6 +95,8 @@ namespace hoffman::isaiah {
 			void init_shot_types();
 			/// <summary>Initializes the list of tower types in this game.</summary>
 			void init_tower_types();
+			/// <summary>Loads the upgrade data for towers.</summary>
+			void load_tower_upgrades_data();
 			/// <summary>Loads miscellaneous data global to the application.</summary>
 			void load_global_misc_data();
 			/// <summary>Loads data that applies to all levels.</summary>

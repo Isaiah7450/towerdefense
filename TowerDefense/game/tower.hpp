@@ -63,7 +63,7 @@ namespace hoffman::isaiah {
 			int getLevel() const noexcept {
 				return this->level;
 			}
-			int getUpgradePath() const noexcept {
+			unsigned int getUpgradePath() const noexcept {
 				return this->upgrade_path;
 			}
 			double getDamageMultiplier() const noexcept {
@@ -153,7 +153,7 @@ namespace hoffman::isaiah {
 			/// <summary>The level of the tower.</summary>
 			int level {1};
 			/// <summary>The choices the user has made regarding upgrading the tower stored in binary.</summary>
-			int upgrade_path {0};
+			unsigned int upgrade_path {0U};
 			/// <summary>The tower's rating.</summary>
 			double rating;
 			/// <summary>The tower's value.</summary>

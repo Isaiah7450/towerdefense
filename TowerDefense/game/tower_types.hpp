@@ -203,19 +203,19 @@ namespace hoffman::isaiah {
 			}
 			// Note taht stacked upgrades give additive bonuses, not multiplicative.
 			double getDamageMultiplier() const noexcept {
-				return this->damage_change;
+				return 1.0 + this->damage_change;
 			}
 			double getSpeedMultiplier() const noexcept {
-				return this->speed_change;
+				return 1.0 + this->speed_change;
 			}
 			double getRangeMultiplier() const noexcept {
-				return this->range_change;
+				return 1.0 + this->range_change;
 			}
 			double getAmmoMultiplier() const noexcept {
-				return this->ammo_change;
+				return 1.0 + this->ammo_change;
 			}
 			double getDelayMultiplier() const noexcept {
-				return this->delay_change;
+				return 1.0 + this->delay_change;
 			}
 		private:
 			/// <summary>The level of the upgrade.</summary>
@@ -265,6 +265,11 @@ namespace hoffman::isaiah {
 				reload_delay {rd},
 				cost_adjustment {cost},
 				max_level {max_lv} {
+			}
+
+			// Setters/Changers:
+			void addUpgradeInfo(TowerUpgradeInfo upgrade_info) noexcept {
+				this->upgrades.emplace_back(upgrade_info);
 			}
 
 			// Getters and similar
@@ -360,6 +365,8 @@ namespace hoffman::isaiah {
 			// Upgrade-related stuff:
 			/// <summary>The maximum number of times this tower can be upgraded.</summary>
 			int max_level;
+			/// <summary>Stores the tower's upgrade progression data.</summary>
+			std::vector<TowerUpgradeInfo> upgrades {};
 		};
 
 		// The inheritance scheme is more for simplicity/convenience

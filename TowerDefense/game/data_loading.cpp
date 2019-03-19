@@ -66,7 +66,7 @@ namespace hoffman::isaiah {
 						}
 						const std::wstring my_resources[] = {
 							L"enemies.ini", L"enemies.ini.format", L"shots.ini", L"shots.ini.format", L"towers.ini",
-							L"towers.ini.format", L"upgrades.ini", L"upgrades.ini.format", L"other.ini",
+							L"towers.ini.format", L"tower_upgrades.ini", L"tower_upgrades.ini.format", L"other.ini",
 							L"levels/global.ini", L"levels/level0.ini.format", L"levels/levels.xlsx",
 							L"graphs/air_graph_beginner.txt", L"graphs/air_graph_intermediate.txt",
 							L"graphs/air_graph_experienced.txt", L"graphs/air_graph_expert.txt",
@@ -861,6 +861,109 @@ namespace hoffman::isaiah {
 					std::move(my_tower_shots), fs, fr, vs, rd, cost_adj, max_lv);
 				this->tower_types.emplace_back(std::move(my_tower_type));
 			} while (my_parser->getNext());
+		}
+
+		void MyGame::load_tower_upgrades_data() {
+			std::wifstream data_file {this->resources_folder_path + L"tower_upgrades.ini"};
+			if (data_file.bad() || data_file.fail()) {
+				throw util::file::DataFileException {L"Could not open resources/towers.ini for reading."s, 0};
+			}
+			util::file::DataFileParser my_parser {data_file};
+			// Global section
+			my_parser.expectToken(util::file::TokenTypes::Section, L"global"s);
+			my_parser.readKeyValue(L"version"s);
+			my_parser.expectToken(util::file::TokenTypes::Number, L"1"s);
+			my_parser.getNext();
+			do {
+				// Upgrade section(s)
+				my_parser.expectToken(util::file::TokenTypes::Section, L"upgrade"s);
+				my_parser.readKeyValue(L"for");
+				const std::wstring tower_name = my_parser.parseString();
+				TowerType* my_ttype = nullptr;
+				for (auto& ttype : this->getAllTowerTypes()) {
+					if (ttype->getName() == tower_name) {
+						my_ttype = ttype.get();
+						break;
+					}
+				}
+				if (my_ttype == nullptr) {
+					throw util::file::DataFileException {L"Tower name not found: " + tower_name + L".", my_parser.getLine()};
+				}
+				my_parser.readKeyValue(L"upgrades");
+				my_parser.expectToken(util::file::TokenTypes::Object, L"{"s);
+				my_parser.getNext();
+				while (my_parser.matchToken(util::file::TokenTypes::Object, L"{"s)) {
+					my_parser.readKeyValue(L"upgrade_level");
+					const int upgrade_level = static_cast<int>(my_parser.parseNumber());
+					if (upgrade_level < 2) {
+						throw util::file::DataFileException {L"Upgrade level must be greater than or equal to 2.", my_parser.getLine()};
+					}
+					else if (upgrade_level > my_ttype->getMaxLevel()) {
+						throw util::file::DataFileException {L"Upgrade level cannot exceed " + std::to_wstring(my_ttype->getMaxLevel())
+							+ L" for " + tower_name + L".", my_parser.getLine()};
+					}
+					my_parser.readKeyValue(L"upgrade_option");
+					const unsigned int upgrade_option_number = static_cast<unsigned int>(my_parser.parseNumber());
+					if (upgrade_option_number > 1U) {
+						throw util::file::DataFileException {L"Upgrade option should be either 0 or 1.", my_parser.getLine()};
+					}
+					const TowerUpgradeOption upgrade_option = upgrade_option_number == 0
+						? TowerUpgradeOption::One : TowerUpgradeOption::Two;
+					my_parser.readKeyValue(L"special_type");
+					if (!my_parser.matchTokenType(util::file::TokenTypes::Identifier)) {
+						throw util::file::DataFileException {L"Expected an identifier (no quotes).", my_parser.getLine()};
+					}
+					const std::wstring upgrade_special_str = my_parser.getToken();
+					const TowerUpgradeSpecials upgrade_special = upgrade_special_str == L"None"
+						? TowerUpgradeSpecials::None : upgrade_special_str == L"Extra_Cash"
+						? TowerUpgradeSpecials::Extra_Cash : upgrade_special_str == L"Multishot"
+						? TowerUpgradeSpecials::Multishot : upgrade_special_str == L"Mega_Missile"
+						? TowerUpgradeSpecials::Mega_Missile : upgrade_special_str == L"Fast_Reload"
+						? TowerUpgradeSpecials::Fast_Reload : throw util::file::DataFileException {L"Invalid upgrade special type provided.",
+						my_parser.getLine()};
+					my_parser.readKeyValue(L"special_chance");
+					const double upgrade_special_chance = my_parser.parseNumber();
+					if (upgrade_special_chance < 0) {
+						throw util::file::DataFileException {L"Special chance must be non-negative.", my_parser.getLine()};
+					}
+					my_parser.readKeyValue(L"special_power");
+					const double upgrade_special_power = my_parser.parseNumber();
+					// I should validate special power but I don't see a real reason to do it right now.
+					my_parser.readKeyValue(L"damage_change");
+					const double upgrade_damage_change = my_parser.parseNumber();
+					if (upgrade_damage_change <= -1.0) {
+						throw util::file::DataFileException {L"Damage change must be greater than -1.0.", my_parser.getLine()};
+					}
+					my_parser.readKeyValue(L"speed_change");
+					const double upgrade_speed_change = my_parser.parseNumber();
+					if (upgrade_speed_change <= -1.0) {
+						throw util::file::DataFileException {L"Speed change must be greater than -1.0.", my_parser.getLine()};
+					}
+					my_parser.readKeyValue(L"range_change");
+					const double upgrade_range_change = my_parser.parseNumber();
+					if (upgrade_range_change <= -1.0) {
+						throw util::file::DataFileException {L"Range change must be greater than -1.0.", my_parser.getLine()};
+					}
+					my_parser.readKeyValue(L"ammo_change");
+					const double upgrade_ammo_change = my_parser.parseNumber();
+					if (upgrade_ammo_change <= -1.0) {
+						throw util::file::DataFileException {L"Ammo change must be greater than -1.0.", my_parser.getLine()};
+					}
+					my_parser.readKeyValue(L"delay_change");
+					const double upgrade_delay_change = my_parser.parseNumber();
+					if (upgrade_delay_change <= -1.0) {
+						throw util::file::DataFileException {L"Delay change must be greater than -1.0.", my_parser.getLine()};
+					}
+					my_ttype->addUpgradeInfo(TowerUpgradeInfo {upgrade_level, upgrade_option, upgrade_damage_change, upgrade_speed_change,
+						upgrade_range_change, upgrade_ammo_change, upgrade_delay_change, upgrade_special, upgrade_special_chance,
+						upgrade_special_power});
+					my_parser.getNext();
+					my_parser.expectToken(util::file::TokenTypes::Object, L"}"s);
+					my_parser.getNext();
+				}
+				my_parser.expectToken(util::file::TokenTypes::Object, L"}"s);
+			} while (my_parser.getNext());
+
 		}
 
 		void MyGame::load_global_level_data() {

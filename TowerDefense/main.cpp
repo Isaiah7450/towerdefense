@@ -83,6 +83,7 @@ namespace hoffman::isaiah {
 				my_game->init_enemy_types();
 				my_game->init_shot_types();
 				my_game->init_tower_types();
+				my_game->load_tower_upgrades_data();
 				my_game->load_global_level_data();
 				my_game->load_global_misc_data();
 				// Force creation of message queue
