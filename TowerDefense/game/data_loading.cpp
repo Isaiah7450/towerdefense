@@ -5,8 +5,8 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>
-#include <string>
 #include <utility>
+#include <string>
 #include <map>
 #include <vector>
 #include <stdexcept>
@@ -965,7 +965,7 @@ namespace hoffman::isaiah {
 				// Can't save now...
 				return;
 			}
-			save_file << L"V: " << 1 << L"\n";
+			save_file << L"V: " << 2 << L"\n";
 			save_file << L"C: " << this->challenge_level << L" D: " << this->difficulty
 				<< L" L: " << this->level << L"\n";
 			save_file << L"H: " << this->player.getHealth() << L" M: " << this->player.getMoney() << L"\n";
@@ -979,7 +979,7 @@ namespace hoffman::isaiah {
 			// Output towers as well.
 			for (const auto& t : this->towers) {
 				save_file << L"T: " << t->getBaseType()->getName() << L"\n\tT: " << t->getGameX() << L" "
-					<< t->getGameY() << L"\n";
+					<< t->getGameY() << L" " << t->getLevel() << L" " << t->getUpgradePath() << L"\n";
 			}
 			// Output seen enemies.
 			for (const auto& seen_e : this->enemies_seen) {
@@ -993,7 +993,7 @@ namespace hoffman::isaiah {
 			std::wstring buffer {};
 			int version;
 			save_file >> buffer >> version;
-			if (version == 1) {
+			if (version == 1 || version == 2) {
 				save_file >> buffer >> this->challenge_level >> buffer >> this->difficulty
 					>> buffer >> this->level;
 				int player_health;
@@ -1040,6 +1040,13 @@ namespace hoffman::isaiah {
 						}
 						auto my_tower = std::make_unique<Tower>(this->getDeviceResources(), my_type,
 							graphics::Color {0.f, 0.f, 0.f, 1.f}, tower_gx, tower_gy);
+						if (version >= 2) {
+							// Special code to handle upgrades (while not breaking old files.)
+							int tower_lv;
+							int tower_path;
+							save_file >> tower_lv >> tower_path;
+							my_tower->setTowerUpgradeStatus(tower_lv, tower_path);
+						}
 						this->addTower(std::move(my_tower));
 						auto my_floored_gx = static_cast<int>(std::floor(tower_gx));
 						auto my_floored_gy = static_cast<int>(std::floor(tower_gy));

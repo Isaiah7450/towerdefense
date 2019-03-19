@@ -50,6 +50,11 @@ namespace hoffman::isaiah {
 			/// <param name="enemies">The list of living enemies.</param>
 			/// <returns>The shot created by the tower or nullptr if no shot was created.</returns>
 			std::unique_ptr<Shot> update(const std::vector<std::unique_ptr<Enemy>>& enemies);
+			// Setters
+			void setTowerUpgradeStatus(int new_level, int new_path) noexcept {
+				this->level = new_level;
+				this->upgrade_path = new_path;
+			}
 			// Getters
 			const std::shared_ptr<TowerType>& getBaseType() const noexcept {
 				return this->base_type;
@@ -57,6 +62,9 @@ namespace hoffman::isaiah {
 			// Upgrade getters:
 			int getLevel() const noexcept {
 				return this->level;
+			}
+			int getUpgradePath() const noexcept {
+				return this->upgrade_path;
 			}
 			double getDamageMultiplier() const noexcept {
 				return this->dmg_multiplier;
@@ -144,6 +152,8 @@ namespace hoffman::isaiah {
 			// Upgrade related stuff.
 			/// <summary>The level of the tower.</summary>
 			int level {1};
+			/// <summary>The choices the user has made regarding upgrading the tower stored in binary.</summary>
+			int upgrade_path {0};
 			/// <summary>The tower's rating.</summary>
 			double rating;
 			/// <summary>The tower's value.</summary>
