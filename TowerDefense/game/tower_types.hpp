@@ -158,22 +158,78 @@ namespace hoffman::isaiah {
 			std::vector<std::wstring> target_names;
 		};
 
+		/// <summary>Enumeration of the options that a player can select for a tower.</summary>
+		enum class TowerUpgradeOption {
+			One, Two
+		};
+		/// <summary>Enumeration of special effects for upgraded towers.</summary>
+		enum class TowerUpgradeSpecials {
+			None, Extra_Cash, Multishot, Mega_Missile, Fast_Reload
+		};
+
 		/// <summary>Represents information about an upgrade.</summary>
 		class TowerUpgradeInfo {
 		public:
-			TowerUpgradeInfo(int lv, double dmg, double spd, double rng, double ammo,
-				double delay) :
+			TowerUpgradeInfo(int lv, TowerUpgradeOption path, double dmg, double spd, double rng, double ammo,
+				double delay, TowerUpgradeSpecials special = TowerUpgradeSpecials::None, double schance = 0,
+				double spower = 0) :
 				level {lv},
+				option {path},
+				special_effect {special},
+				special_chance {schance},
+				special_power {spower},
 				damage_change {dmg},
 				speed_change {spd},
 				range_change {rng},
 				ammo_change {ammo},
 				delay_change {delay} {
 			}
+
+			// Getters
+			int getLevel() const noexcept {
+				return this->level;
+			}
+			TowerUpgradeOption getOption() const noexcept {
+				return this->option;
+			}
+			TowerUpgradeSpecials getSpecial() const noexcept {
+				return this->special_effect;
+			}
+			double getSpecialChance() const noexcept {
+				return this->special_chance;
+			}
+			double getSpecialPower() const noexcept {
+				return this->special_power;
+			}
+			// Note taht stacked upgrades give additive bonuses, not multiplicative.
+			double getDamageMultiplier() const noexcept {
+				return this->damage_change;
+			}
+			double getSpeedMultiplier() const noexcept {
+				return this->speed_change;
+			}
+			double getRangeMultiplier() const noexcept {
+				return this->range_change;
+			}
+			double getAmmoMultiplier() const noexcept {
+				return this->ammo_change;
+			}
+			double getDelayMultiplier() const noexcept {
+				return this->delay_change;
+			}
 		private:
 			/// <summary>The level of the upgrade.</summary>
 			int level;
+			/// <summary>Which user option the upgrade corresponds with.</summary>
+			TowerUpgradeOption option;
+			/// <summary>The special effect to add/upgrade.</summary>
+			TowerUpgradeSpecials special_effect;
+			/// <summary>The chance that the special effect will occur.</summary>
+			double special_chance;
+			/// <summary>The special effect's power.</summary>
+			double special_power;
 			// Note: Negative values are allowed. Effective range is -1.00 < x < infinity.
+			// Also note that values are additive here when stacking upgrades.
 			/// <summary>The % change in the tower's damage.</summary>
 			double damage_change;
 			/// <summary>The % change in the tower's firing speed.</summary>
