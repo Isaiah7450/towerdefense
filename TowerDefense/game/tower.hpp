@@ -150,7 +150,7 @@ namespace hoffman::isaiah {
 			}
 			/// <returns>The tower's average rate of fire as the average number of shots fired per second.</returns>
 			double getRateOfFire() const noexcept {
-				return towers::getRateOfFire(this->getFiringRange(), this->getVolleyShots(), this->getReloadDelay(), this->getBaseType()->isWall());
+				return towers::getRateOfFire(this->getFiringSpeed(), this->getVolleyShots(), this->getReloadDelay(), this->getBaseType()->isWall());
 			}
 			/// <returns>The tower's expected DPS.</returns>
 			double getExpectedDPS() const noexcept {
