@@ -366,6 +366,16 @@ namespace hoffman::isaiah::winapi {
 			EnableWindow(GetDlgItem(hwnd, IDC_INFO_TOWER_PLACED_UPGRADE_A), FALSE);
 			EnableWindow(GetDlgItem(hwnd, IDC_INFO_TOWER_PLACED_UPGRADE_B), FALSE);
 		}
+		int high_level = 0;
+		for (const auto& upgrade : this->my_tower.getBaseType()->getUpgrades()) {
+			if (upgrade.getLevel() > high_level) {
+				high_level = upgrade.getLevel();
+			}
+		}
+		if (high_level <= this->my_tower.getLevel()) {
+			EnableWindow(GetDlgItem(hwnd, IDC_INFO_TOWER_PLACED_UPGRADE_A), FALSE);
+			EnableWindow(GetDlgItem(hwnd, IDC_INFO_TOWER_PLACED_UPGRADE_B), FALSE);
+		}
 	}
 
 	void TowerPlacedInfoDialog::doSell() {
