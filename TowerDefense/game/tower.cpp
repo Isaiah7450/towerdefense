@@ -1,9 +1,11 @@
 // File Author: Isaiah Hoffman
 // File Created: June 4, 2018
+#include <algorithm>
 #include <cmath>
-#include <string>
-#include <vector>
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 #include "./../graphics/graphics.hpp"
@@ -15,6 +17,7 @@
 #include "./shot.hpp"
 #include "./tower_types.hpp"
 #include "./tower.hpp"
+#include "./my_game.hpp"
 
 namespace hoffman::isaiah {
 	namespace game {
@@ -66,9 +69,10 @@ namespace hoffman::isaiah {
 			}
 		}
 
-		std::unique_ptr<Shot> Tower::update(const std::vector<std::unique_ptr<Enemy>>& enemies) {
+		std::vector<std::unique_ptr<Shot>> Tower::update(const std::vector<std::unique_ptr<Enemy>>& enemies) {
+			std::vector<std::unique_ptr<Shot>> my_shots {};
 			if (this->getBaseType()->isWall()) {
-				return nullptr;
+				return my_shots;
 			}
 			if (this->must_reload) {
 				--this->frames_to_reload;
@@ -76,7 +80,7 @@ namespace hoffman::isaiah {
 					this->must_reload = false;
 					this->shots_fired_since_reload = 0;
 				}
-				else return nullptr;
+				else return my_shots;
 			}
 			--this->frames_til_next_shot;
 			if (this->frames_til_next_shot <= 0.0) {
@@ -93,13 +97,32 @@ namespace hoffman::isaiah {
 					++this->shots_fired_since_reload;
 					if (this->shots_fired_since_reload >= this->getVolleyShots()
 						&& this->getVolleyShots() != 0) {
-						this->must_reload = true;
 						this->frames_to_reload += math::convertMillisecondsToFrames(this->getReloadDelay());
+						// Fast reload effect.
+						const auto my_fast_reload_ability = this->upgrade_specials.find(TowerUpgradeSpecials::Fast_Reload);
+						if (my_fast_reload_ability != this->upgrade_specials.cend()) {
+							const auto my_roll = rng::distro_uniform(rng::gen);
+							if (my_roll <= my_fast_reload_ability->second.first) {
+								this->frames_to_reload *= math::get_max(1.0 - my_fast_reload_ability->second.second, 0.0);
+							}
+						}
+						this->must_reload = this->frames_to_reload > 0;
 					}
-					return this->createShot(target);
+					// Multishot effect.
+					const auto my_multishot_ability = this->upgrade_specials.find(TowerUpgradeSpecials::Multishot);
+					if (my_multishot_ability != this->upgrade_specials.cend()) {
+						const auto my_roll = rng::distro_uniform(rng::gen);
+						if (my_roll <= my_multishot_ability->second.first) {
+							for (int i = 0; i < static_cast<int>(my_multishot_ability->second.second); ++i) {
+								my_shots.emplace_back(this->createShot(target));
+							}
+						}
+					}
+					my_shots.emplace_back(this->createShot(target));
+					return my_shots;
 				}
 			}
-			return nullptr;
+			return my_shots;
 		}
 
 		const Enemy* Tower::findTarget(const std::vector<std::unique_ptr<Enemy>>& enemies) const {
@@ -195,6 +218,15 @@ namespace hoffman::isaiah {
 				if (roll <= running_total) {
 					stype = st_pair.first;
 					break;
+				}
+			}
+			// Mega missile special ability.
+			const auto my_mega_missile_ability = this->upgrade_specials.find(TowerUpgradeSpecials::Mega_Missile);
+			if (my_mega_missile_ability != this->upgrade_specials.cend()) {
+				const auto ability_roll = rng::distro_uniform(rng::gen);
+				if (ability_roll <= my_mega_missile_ability->second.first) {
+					// Probably should try to refactor this to not use global state in the future.
+					stype = game::g_my_game->getShotType(L"Mega Missile");
 				}
 			}
 			if (!stype) {

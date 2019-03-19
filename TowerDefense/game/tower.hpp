@@ -50,7 +50,7 @@ namespace hoffman::isaiah {
 			/// <summary>Advances the tower's state by one logical frame.</summary>
 			/// <param name="enemies">The list of living enemies.</param>
 			/// <returns>The shot created by the tower or nullptr if no shot was created.</returns>
-			std::unique_ptr<Shot> update(const std::vector<std::unique_ptr<Enemy>>& enemies);
+			std::vector<std::unique_ptr<Shot>> update(const std::vector<std::unique_ptr<Enemy>>& enemies);
 			
 			/// <summary>Upgrades a tower from its previous level to the new level. (Note: Do not use
 			///          to upgrade multiple times. Use setTowerUpgradeStatus instead.)</summary>
@@ -105,6 +105,11 @@ namespace hoffman::isaiah {
 			}
 			unsigned int getUpgradePath() const noexcept {
 				return this->upgrade_path;
+			}
+			/// <returns>The tower's special abilities gained from upgrades. For the pair:
+			/// 1st => Chance, 2nd => Power.</returns>
+			const std::map<TowerUpgradeSpecials, std::pair<double, double>>& getUpgradeSpecials() {
+				return this->upgrade_specials;
 			}
 			double getDamageMultiplier() const noexcept {
 				return this->dmg_multiplier;
@@ -194,7 +199,7 @@ namespace hoffman::isaiah {
 			int level {1};
 			/// <summary>The choices the user has made regarding upgrading the tower stored in binary.</summary>
 			unsigned int upgrade_path {0U};
-			/// <summary>The tower's upgrades specials.</summary>
+			/// <summary>The tower's upgrades specials. For the pair: 1st => Chance, 2nd => Power</summary>
 			std::map<TowerUpgradeSpecials, std::pair<double, double>> upgrade_specials {};
 			/// <summary>The tower's rating.</summary>
 			double rating;

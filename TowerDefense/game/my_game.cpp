@@ -20,6 +20,7 @@
 #include "./enemy_type.hpp"
 #include "./enemy.hpp"
 #include "./game_level.hpp"
+#include "./game_util.hpp"
 #include "./my_game.hpp"
 #include "./shot_types.hpp"
 #include "./shot.hpp"
@@ -186,8 +187,8 @@ namespace hoffman::isaiah {
 				// Update towers
 				for (auto& t : this->towers) {
 					auto ret_value = t->update(this->enemies);
-					if (ret_value) {
-						this->shots.emplace_back(std::move(ret_value));
+					for (auto& s : ret_value) {
+						this->shots.emplace_back(std::move(s));
 					}
 				}
 				// Determine if the level is finished
@@ -217,6 +218,14 @@ namespace hoffman::isaiah {
 					this->my_level_enemy_killed = 0;
 					// Reset game state
 					for (auto& t : this->towers) {
+						// Also take the time to reward extra cash if appropriate.
+						const auto my_extra_cash_ability = t->getUpgradeSpecials().find(TowerUpgradeSpecials::Extra_Cash);
+						if (my_extra_cash_ability != t->getUpgradeSpecials().cend()) {
+							const auto my_roll = rng::distro_uniform(rng::gen);
+							if (my_roll <= my_extra_cash_ability->second.first) {
+								this->player.changeMoney(my_extra_cash_ability->second.second);
+							}
+						}
 						t->resetTower();
 					}
 					this->shots.clear();
