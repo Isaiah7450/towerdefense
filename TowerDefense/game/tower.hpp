@@ -6,6 +6,7 @@
 #include <memory>
 #include <array>
 #include <variant>
+#include <utility>
 #include "./../globals.hpp"
 #include "./../graphics/graphics.hpp"
 #include "./../graphics/graphics_DX.hpp"
@@ -50,10 +51,49 @@ namespace hoffman::isaiah {
 			/// <param name="enemies">The list of living enemies.</param>
 			/// <returns>The shot created by the tower or nullptr if no shot was created.</returns>
 			std::unique_ptr<Shot> update(const std::vector<std::unique_ptr<Enemy>>& enemies);
-			// Setters
-			void setTowerUpgradeStatus(int new_level, int new_path) noexcept {
+			
+			/// <summary>Upgrades a tower from its previous level to the new level. (Note: Do not use
+			///          to upgrade multiple times. Use setTowerUpgradeStatus instead.)</summary>
+			/// <param name="new_level">The new level of the tower.</param>
+			/// <param name="upgrade_option">The upgrade option of the tower.</param>
+			void upgradeTower(int new_level, TowerUpgradeOption upgrade_option) {
+				const auto my_upgrades = this->getBaseType()->getUpgrades();
 				this->level = new_level;
-				this->upgrade_path = new_path;
+				this->upgrade_path |= (1U << static_cast<unsigned>(new_level - 1)) * static_cast<int>(upgrade_option);
+				for (const auto& upgrade : my_upgrades) {
+					if (upgrade.getLevel() == new_level && upgrade.getOption() == upgrade_option) {
+						this->dmg_multiplier += upgrade.getDamageChange();
+						this->fire_speed_multiplier += upgrade.getSpeedChange();
+						this->fire_range_multiplier += upgrade.getRangeChange();
+						this->volley_shots_multiplier += upgrade.getAmmoChange();
+						this->reload_delay_multiplier += upgrade.getDelayChange();
+						// Update the special with the highest values.
+						auto my_iterator = this->upgrade_specials.find(upgrade.getSpecial());
+						if (my_iterator == this->upgrade_specials.end()) {
+							this->upgrade_specials.emplace(upgrade.getSpecial(), std::make_pair<double, double>(upgrade.getSpecialChance(),
+								upgrade.getSpecialPower()));
+						}
+						else {
+							if (my_iterator->second.first < upgrade.getSpecialChance()) {
+								my_iterator->second.first = upgrade.getSpecialChance();
+							}
+							if (my_iterator->second.second < upgrade.getSpecialPower()) {
+								my_iterator->second.second = upgrade.getSpecialPower();
+							}
+						}
+						this->updateRating();
+						this->updateValue();
+						break;
+					}
+				}
+			}
+			// Setters
+			void setTowerUpgradeStatus(int new_level, unsigned int new_path) noexcept {
+				for (int i = 2; i <= new_level; ++i) {
+					const TowerUpgradeOption my_option = ((new_path >> (i - 1)) & 1) == 0
+						? TowerUpgradeOption::One : TowerUpgradeOption::Two;
+					this->upgradeTower(i, my_option);
+				}
 			}
 			// Getters
 			const std::shared_ptr<TowerType>& getBaseType() const noexcept {
@@ -154,6 +194,8 @@ namespace hoffman::isaiah {
 			int level {1};
 			/// <summary>The choices the user has made regarding upgrading the tower stored in binary.</summary>
 			unsigned int upgrade_path {0U};
+			/// <summary>The tower's upgrades specials.</summary>
+			std::map<TowerUpgradeSpecials, std::pair<double, double>> upgrade_specials {};
 			/// <summary>The tower's rating.</summary>
 			double rating;
 			/// <summary>The tower's value.</summary>

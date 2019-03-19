@@ -202,20 +202,20 @@ namespace hoffman::isaiah {
 				return this->special_power;
 			}
 			// Note taht stacked upgrades give additive bonuses, not multiplicative.
-			double getDamageMultiplier() const noexcept {
-				return 1.0 + this->damage_change;
+			double getDamageChange() const noexcept {
+				return this->damage_change;
 			}
-			double getSpeedMultiplier() const noexcept {
-				return 1.0 + this->speed_change;
+			double getSpeedChange() const noexcept {
+				return this->speed_change;
 			}
-			double getRangeMultiplier() const noexcept {
-				return 1.0 + this->range_change;
+			double getRangeChange() const noexcept {
+				return this->range_change;
 			}
-			double getAmmoMultiplier() const noexcept {
-				return 1.0 + this->ammo_change;
+			double getAmmoChange() const noexcept {
+				return this->ammo_change;
 			}
-			double getDelayMultiplier() const noexcept {
-				return 1.0 + this->delay_change;
+			double getDelayChange() const noexcept {
+				return this->delay_change;
 			}
 		private:
 			/// <summary>The level of the upgrade.</summary>
@@ -310,6 +310,9 @@ namespace hoffman::isaiah {
 			}
 			int getMaxLevel() const noexcept {
 				return this->max_level;
+			}
+			const std::vector<TowerUpgradeInfo>& getUpgrades() const noexcept {
+				return this->upgrades;
 			}
 			// Note: For the most part, all of these should be very close to the same
 			//       as the versions in Tower.
