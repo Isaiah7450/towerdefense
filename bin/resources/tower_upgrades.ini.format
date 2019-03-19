@@ -1,0 +1,144 @@
+# Tower upgrades file.
+# Annotated example configuration file.
+[global]
+# The configuration file version. It should be set to 1 for now.
+version = 1
+
+# For each tower that can be upgraded, you should include an [upgrade]
+# section. While you can have multiple for each tower, it is highly
+# recommended to keep all upgrades for a single tower in a single
+# section.
+[upgrade]
+# Which tower does this upgrade section apply to?
+for = "Cheap Tower"
+# Tells the parser that the following data is in object form.
+upgrades = {
+	# Each individual upgrade should be enclosed in braces.
+	{
+		# The tower level that this information applies to.
+		upgrade_level = 2
+		# In-game, players can choose one of two upgrades.
+		# If they choose option A, then they choose the upgrade
+		# where this value is 0.
+		# If they choose option B, then they choose the upgrade
+		# where this value is 1.
+		upgrade_option = 0
+		# Some upgrades may grant the tower new special abilities.
+		# This field indicates the type of special ability.
+		# None indicates that the upgrade does not grant/change any
+		# special abilities.
+		special_type = None
+		# Most special abilities do not occur 100% of the time. This
+		# specifies the likelihood that the ability activates.
+		# Also note how while many of these values are percentages, you
+		# still express them as decimals; a value of 10.0 means
+		# 1000%, not 10% here. For 10%, you would use 0.10.
+		special_chance = 0.00
+		# Most special abilities can have different levels of power based
+		# on this field. More on this later. (Generally speaking, a higher
+		# value here indicates a more powerful ability.)
+		special_power = 0.00
+		# The percent increase in the tower's damage. Note that for upgrades,
+		# all multipliers stack **additively** not multiplicatively. For
+		# example, if damage_change is 0.05 (or 5%) at level 2 for a tower
+		# and damage_change is 0.25 (or 25%) at level 3, the actual
+		# damage multiplier will be 1.30 (or 130%) when the tower is upgraded
+		# to level 3, *not* (1.0 + 0.05)(1.0 + 0.25) = 1.3125 (or ~131%).
+		# It is also worth noting that negative values are perfectly acceptable
+		# for these fields.
+		damage_change = 0.050
+		# The percent increase in the tower's firing speed.
+		speed_change = 0.050
+		# The percent increase in the tower's firing range.
+		range_change = 0.000
+		# The percent increase in the tower's ammo capacity.
+		# (I.e.: The number of shots the tower can fire before it has to spend
+		# time reloading.)
+		ammo_change = 0.000
+		# The percent increase in the tower's reload delay. Since
+		# higher reload times mean lower rates of fire, positive values
+		# here decrease the overall strength of towers rather than
+		# increasing the overall strength like the other fields do.
+		delay_change = 0.000
+	},
+	{
+		# Note that it is completely fine to collapse whitespace;
+		# the parser is not too particularly picky about commas
+		# and/or whitespace. Use them as needed to preserve readability.
+		# It is important to have both an upgrade_option = 0 and
+		# upgrade_option = 1 upgrade for each upgrade level.
+		# Also, try to avoid repeating upgrade level and upgrade option
+		# combos. The game will only use the first one and ignore the
+		# rest, and it may not inform you that you have duplicates.
+		upgrade_level = 2, upgrade_option = 1
+		special_type = None, special_chance = 0.00, special_power = 0.00
+		damage_change = 0.000, speed_change = 0.000, range_change = 0.000
+		ammo_change = 0.075, delay_change = -0.050
+	},
+	{
+		upgrade_level = 3, upgrade_option = 0
+		# This special type indicates that for each tower that possesses
+		# this ability at the end of a level, the player has a chance
+		# to receive additional money.
+		special_type = Extra_Cash
+		# The % chance that the player will get additional money at the
+		# end of a level.
+		special_chance = 0.50
+		# The amount of extra money the player will get if the special effect
+		# activates. A value of 10.00 indicates that the player receives
+		# an extra $10 at the end of the round if the special activates.
+		special_power = 10.00
+		damage_change = 0.000, speed_change = 0.000, range_change = 0.000
+		ammo_change = 0.000, delay_change = 0.000
+	},
+	{
+		upgrade_level = 3, upgrade_option = 1
+		# This special type indicates that the tower has a chance of
+		# generating extra shots at no cost whenever it shoots.
+		special_type = Multishot
+		# The % chance that the tower will fire additional shots in
+		# a single tick. (Note that this is an "all-or-nothing" kind
+		# of thing.)
+		special_chance = 0.50
+		# The number of additional shots that will be generated if the
+		# ability activates. Again, the this is an "all-or-nothing" kind
+		# of thing--either it generates this many extra shots or
+		# it generates no extra shots. **DO NOT SPECIFY A FRACTIONAL PART
+		# HERE.** It will be ignored. A value of 1 indicates that
+		# the tower will spawn 1 extra shot.
+		special_power = 1.00
+		damage_change = 0.000, speed_change = 0.000, range_change = 0.000
+		ammo_change = 0.000, delay_change = 0.000
+	},
+	{
+		upgrade_level = 4, upgrade_option = 0
+		# This special type indicates that the tower may replace a normal
+		# shot with the special "Mega Missile" shot. (Note that this ability
+		# specifically uses the shot named "Mega Missile" in the shots.ini
+		# file.)
+		special_type = Mega_Missile
+		# The % chance that a shot type will be replaced by the "Mega Missile"
+		# shot type.
+		special_chance = 0.50
+		# This field has no relevance to this special ability.
+		special_power = 0.00
+		damage_change = 0.000, speed_change = 0.000, range_change = 0.000
+		ammo_change = 0.000, delay_change = 0.000
+	},
+	{
+		upgrade_level = 4, upgrade_option = 1
+		# This special type indicates that when a tower has to reload, the
+		# reload delay time may be decreased.
+		special_type = Fast_Reload
+		# The % chance that the tower will reload faster. (This value is
+		# a "once per volley" thing; it is not checked each time the tower
+		# is spending time to reload.)
+		special_chance = 0.50
+		# The % decrease in reload time. 0.00 indicates no change; 1.00
+		# indicates that the tower reloads instantly. Values like 0.25
+		# means the tower spends 25% less time reloadding.
+		special_power = 10.00
+		damage_change = 0.000, speed_change = 0.000, range_change = 0.000
+		ammo_change = 0.000, delay_change = 0.000
+	}
+}
