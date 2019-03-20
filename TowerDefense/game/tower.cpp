@@ -30,6 +30,15 @@ namespace hoffman::isaiah {
 					static_cast<float>(this->getScreenY()),
 					static_cast<float>(this->getFiringRange() * graphics::getGameSquareWidth()),
 					static_cast<float>(this->getFiringRange() * graphics::getGameSquareHeight())));
+				// Also paint upgrade level.
+				constexpr const graphics::Color text_color {1.f, 0.2f, 1.f, 1.f};
+				if (this->getLevel() > 1) {
+					renderer.drawText(std::to_wstring(this->getLevel()), text_color,
+						renderer.createRectangle(static_cast<float>(graphics::convertToScreenX(this->getGameX() - 0.5)),
+							static_cast<float>(graphics::convertToScreenY(this->getGameY() - 0.5)),
+							static_cast<float>(graphics::getGameSquareWidth()),
+							static_cast<float>(graphics::getGameSquareHeight())));
+				}
 			}
 			if (this->getVolleyShots() == 0) {
 				return;
