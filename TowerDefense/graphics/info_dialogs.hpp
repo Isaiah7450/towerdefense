@@ -18,6 +18,7 @@ namespace hoffman::isaiah::game {
 	class GameObjectType;
 	class Tower;
 	enum class TowerUpgradeOption;
+	class TowerUpgradeInfo;
 }
 
 namespace hoffman::isaiah::winapi {
@@ -137,10 +138,10 @@ namespace hoffman::isaiah::winapi {
 		// Implements InfoDialogBase::initDialog().
 		void initDialog(HWND hwnd) override;
 	private:
-		/// <summary>The chosen upgrade option.</summary>
-		game::TowerUpgradeOption upgrade_option;
 		/// <summary>The tower whose info is being displayed.</summary>
 		game::Tower& my_tower;
+		/// <summary>The actual upgrade being displayed.</summary>
+		const game::TowerUpgradeInfo* my_upgrade {nullptr};
 	};
 
 	/// <summary>Displays additional information about shots that stun.</summary>

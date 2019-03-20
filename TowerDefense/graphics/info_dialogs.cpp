@@ -83,8 +83,12 @@ namespace hoffman::isaiah::winapi {
 					GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				const auto chosen_option = LOWORD(wparam) == IDC_INFO_TOWER_PLACED_UPGRADE_A
 					? game::TowerUpgradeOption::One : game::TowerUpgradeOption::Two;
+				const auto old_level = my_dialog_class->getTower().getLevel();
 				TowerUpgradeInfoDialog my_upgrade_dialog {hwnd, my_dialog_class->getApplicationHandle(), my_dialog_class->getTower(),
 					chosen_option};
+				if (my_dialog_class->getTower().getLevel() > old_level) {
+					EndDialog(hwnd, IDOK);
+				}
 				break;
 			}
 			case IDC_INFO_TOWER_PLACED_SELL:
@@ -502,10 +506,21 @@ namespace hoffman::isaiah::winapi {
 
 	TowerUpgradeInfoDialog::TowerUpgradeInfoDialog(HWND owner, HINSTANCE h_inst, game::Tower& t, game::TowerUpgradeOption upgrade_opt) :
 		InfoDialogBase {h_inst, *t.getBaseType()},
-		my_tower {t},
-		upgrade_option {upgrade_opt} {
-		DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_TOWER_UPGRADE),
-			owner, InfoDialogBase::infoDialogProc, reinterpret_cast<LPARAM>(this));
+		my_tower {t} {
+		const auto upgrade_level = this->my_tower.getLevel() + 1;
+		for (const auto& upgrade : this->my_tower.getBaseType()->getUpgrades()) {
+			if (upgrade_level == upgrade.getLevel() && upgrade_opt == upgrade.getOption()) {
+				this->my_upgrade = &upgrade;
+				break;
+			}
+		}
+		if (!this->my_upgrade) {
+			MessageBox(owner, L"Error: Could not find tower upgrade information.", L"Upgrade Dialog Creation Failed", MB_OK | MB_ICONWARNING);
+		}
+		else {
+			DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_TOWER_UPGRADE),
+				owner, InfoDialogBase::infoDialogProc, reinterpret_cast<LPARAM>(this));
+		}
 	}
 
 	void TowerUpgradeInfoDialog::initDialog(HWND hwnd) {
@@ -513,7 +528,7 @@ namespace hoffman::isaiah::winapi {
 	}
 
 	void TowerUpgradeInfoDialog::doUpgrade() {
-		// TODO: Implement.
+		this->my_tower.upgradeTower(this->my_upgrade->getLevel(), this->my_upgrade->getOption());
 	}
 }
 
