@@ -15,6 +15,10 @@
 #include "./game_formulas.hpp"
 
 namespace hoffman::isaiah {
+	namespace winapi {
+		class TowerUpgradeInfoDialog;
+	}
+
 	namespace game {
 		// Forward declarations
 		class Enemy;
@@ -22,6 +26,7 @@ namespace hoffman::isaiah {
 
 		/// <summary>Class that represents a tower (or a wall).</summary>
 		class Tower : public GameObject {
+			friend class winapi::TowerUpgradeInfoDialog;
 		public:
 			Tower(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
 				std::shared_ptr<TowerType> ttype, graphics::Color o_color, double build_gx, double build_gy) :

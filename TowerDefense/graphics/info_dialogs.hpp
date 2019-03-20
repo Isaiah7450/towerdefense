@@ -3,6 +3,7 @@
 // Created: March 5, 2019
 #include "./../targetver.hpp"
 #include <Windows.h>
+#include <map>
 #include <memory>
 #include <string>
 #include "./../globals.hpp"
@@ -28,6 +29,18 @@ namespace hoffman::isaiah::winapi {
 	public:
 		// Dialog box procedure.
 		static INT_PTR CALLBACK infoDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+		// Other:
+		/// <summary>Adds a color value for a control.</summary>
+		/// <param name="control_id">The id of the control that is custom-colored.</param>
+		/// <param name="color">The color to draw that control with.</param>
+		void addControlColor(int control_id, COLORREF color) {
+			this->my_draw_colors[control_id] = color;
+		}
+		// Getters
+		const std::map<int, COLORREF>& getControlColorMap() const noexcept {
+			return this->my_draw_colors;
+		}
+
 	protected:
 		/// <summary>Creates a new info dialog box.</summary>
 		/// <param name="h_inst">The hInstance parameter given by the WinMain function.</param>
@@ -36,7 +49,6 @@ namespace hoffman::isaiah::winapi {
 		/// <summary>Sets text and other controls that are common to many info boxes.</summary>
 		/// <param name="hwnd">The handle to the dialog box window.</param>
 		void setCommonControls(HWND hwnd) const noexcept;
-
 		// Getters
 		HINSTANCE getApplicationHandle() const noexcept {
 			return this->h_instance;
@@ -49,6 +61,8 @@ namespace hoffman::isaiah::winapi {
 		HINSTANCE h_instance;
 		/// <summary>The object type to display info for.</summary>
 		const game::GameObjectType& my_type;
+		/// <summary>Key => Control ID; Value => New color to use.</summary>
+		std::map<int, COLORREF> my_draw_colors;
 	};
 	
 	/// <summary>Displays information about an enemy.</summary>

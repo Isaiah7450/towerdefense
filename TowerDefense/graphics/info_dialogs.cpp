@@ -11,6 +11,7 @@
 #include "./info_dialogs.hpp"
 #include "./../globals.hpp"
 #include "./../game/enemy_type.hpp"
+#include "./../game/game_formulas.hpp"
 #include "./../game/my_game.hpp"
 #include "./../game/shot_types.hpp"
 #include "./../game/status_effects.hpp"
@@ -109,6 +110,21 @@ namespace hoffman::isaiah::winapi {
 			}
 			}
 			break;
+		case WM_CTLCOLORSTATIC:
+		{
+			auto my_dialog_class = reinterpret_cast<InfoDialogBase*>(
+				GetWindowLongPtr(hwnd, GWLP_USERDATA));
+			HDC hdc_static = reinterpret_cast<HDC>(wparam);
+			static const HBRUSH background_brush = GetSysColorBrush(CTLCOLOR_DLG);
+			for (const auto& control_pair : my_dialog_class->getControlColorMap()) {
+				if (GetDlgCtrlID(reinterpret_cast<HWND>(lparam)) == control_pair.first) {
+					SetTextColor(hdc_static, control_pair.second);
+					SetBkMode(hdc_static, TRANSPARENT);
+					return reinterpret_cast<INT_PTR>(background_brush);
+				}
+			}
+			break;
+		}
 		default:
 			return FALSE;
 		}
@@ -525,6 +541,101 @@ namespace hoffman::isaiah::winapi {
 	}
 
 	void TowerUpgradeInfoDialog::initDialog(HWND hwnd) {
+		std::wstringstream my_stream {};
+		SetDlgItemText(hwnd, IDC_INFO_BASE_NAME, this->my_tower.getBaseType()->getName().c_str());
+		switch (this->my_upgrade->getSpecial()) {
+		case game::TowerUpgradeSpecials::None:
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_UPGRADE_SPECIAL_DESC, L"This upgrade does not provide the tower"
+				L" with any new special abilities.");
+			break;
+		case game::TowerUpgradeSpecials::Extra_Cash:
+			my_stream << L"At the end of each level, this tower has a " << std::setiosflags(std::ios_base::fixed)
+				<< std::setprecision(0) << (this->my_upgrade->getSpecialChance() * 100.0) << L"% chance to add an extra $"
+				<< std::setiosflags(std::ios_base::fixed) << std::setprecision(2) << this->my_upgrade->getSpecialPower()
+				<< L" to the money you receive at the end of the level.";
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_UPGRADE_SPECIAL_DESC, my_stream.str().c_str());
+			break;
+		case game::TowerUpgradeSpecials::Multishot:
+			my_stream << L"Each time this tower fires a shot, it has a " << std::setiosflags(std::ios_base::fixed)
+				<< std::setprecision(0) << (this->my_upgrade->getSpecialChance() * 100.0) << L"% chance to generate "
+				<< std::setiosflags(std::ios_base::fixed) << std::setprecision(0) << this->my_upgrade->getSpecialPower()
+				<< L" additional shot(s) at no additional cost.";
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_UPGRADE_SPECIAL_DESC, my_stream.str().c_str());
+			break;
+		case game::TowerUpgradeSpecials::Mega_Missile:
+			my_stream << L"Each time this tower fires a shot, it has a " << std::setiosflags(std::ios_base::fixed)
+				<< std::setprecision(0) << (this->my_upgrade->getSpecialChance() * 100.0) << L"% chance to replace"
+				<< L" the shot with a powerful 'Mega Missile'.";
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_UPGRADE_SPECIAL_DESC, my_stream.str().c_str());
+			break;
+		case game::TowerUpgradeSpecials::Fast_Reload:
+			my_stream << L"Each time this tower has to reload, there is a " << std::setiosflags(std::ios_base::fixed)
+				<< std::setprecision(0) << (this->my_upgrade->getSpecialChance() * 100.0) << L"% chance to have its"
+				L" reload time reduced by " << std::setiosflags(std::ios_base::fixed) << std::setprecision(0)
+				<< (this->my_upgrade->getSpecialPower() * 100.0) << L"%.";
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_UPGRADE_SPECIAL_DESC, my_stream.str().c_str());
+			break;
+		default:
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_UPGRADE_SPECIAL_DESC, L"Description unavailable. Please report to developer.");
+			break;
+		}
+		my_stream.str(L"");
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_UPGRADE_LEVEL, std::to_wstring(this->my_upgrade->getLevel()).c_str());
+		my_stream << L"$" << std::setiosflags(std::ios_base::fixed) << std::setprecision(2) << this->upgrade_cost;
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_UPGRADE_COST, my_stream.str().c_str());
+		my_stream.str(L"");
+		static const COLORREF red_color {RGB(128, 0, 0)};
+		static const COLORREF blue_color {RGB(0, 0, 128)};
+		static const COLORREF green_color {RGB(0, 128, 0)};
+		const auto my_change_field_lambda = [this, &my_stream, &hwnd](int resource_id, double new_value) noexcept {
+			my_stream << std::setiosflags(std::ios_base::fixed) << std::setprecision(1)
+				<< (new_value * 100.0) << L"%";
+			SetDlgItemText(hwnd, resource_id, my_stream.str().c_str());
+			my_stream.str(L"");
+		};
+		const auto my_color_choose_lambda = [this, &hwnd](int resource_id, double old_value, double new_value, bool invert_colors = false) noexcept {
+			if (new_value > old_value) {
+				this->addControlColor(resource_id, invert_colors ? red_color : green_color);
+			}
+			else if (new_value < old_value) {
+				this->addControlColor(resource_id, invert_colors ? green_color : red_color);
+			}
+			else {
+				this->addControlColor(resource_id, blue_color);
+			}
+			RedrawWindow(GetDlgItem(hwnd, resource_id), nullptr, nullptr, RDW_INVALIDATE);
+		};
+		const double old_speed_multi = this->my_tower.fire_speed_multiplier;
+		const double old_range_multi = this->my_tower.fire_range_multiplier;
+		const double old_ammo_multi = this->my_tower.volley_shots_multiplier;
+		const double old_delay_multi = this->my_tower.reload_delay_multiplier;
+		const double old_dmg_multi = this->my_tower.dmg_multiplier;
+		const double new_speed_multi = old_speed_multi + this->my_upgrade->getSpeedChange();
+		const double new_range_multi = old_range_multi + this->my_upgrade->getRangeChange();
+		const double new_ammo_multi = old_ammo_multi + this->my_upgrade->getAmmoChange();
+		const double new_delay_multi = old_delay_multi + this->my_upgrade->getDelayChange();
+		const double new_dmg_multi = old_dmg_multi + this->my_upgrade->getDamageChange();
+		my_change_field_lambda(IDC_INFO_TOWER_UPGRADE_SPEED, new_speed_multi);
+		my_color_choose_lambda(IDC_INFO_TOWER_UPGRADE_SPEED, old_speed_multi, new_speed_multi);
+		my_change_field_lambda(IDC_INFO_TOWER_UPGRADE_RANGE, new_range_multi);
+		my_color_choose_lambda(IDC_INFO_TOWER_UPGRADE_RANGE, old_range_multi, new_range_multi);
+		my_change_field_lambda(IDC_INFO_TOWER_UPGRADE_AMMO, new_ammo_multi);
+		my_color_choose_lambda(IDC_INFO_TOWER_UPGRADE_AMMO, old_ammo_multi, new_ammo_multi);
+		my_change_field_lambda(IDC_INFO_TOWER_UPGRADE_DELAY, new_delay_multi);
+		my_color_choose_lambda(IDC_INFO_TOWER_UPGRADE_DELAY, old_delay_multi, new_delay_multi, true);
+		my_change_field_lambda(IDC_INFO_TOWER_UPGRADE_DAMAGE, new_dmg_multi);
+		my_color_choose_lambda(IDC_INFO_TOWER_UPGRADE_DAMAGE, old_dmg_multi, new_dmg_multi);
+		const auto old_dps = this->my_tower.getExpectedDPS();
+		const auto new_dps = game::towers::getExpectedDPS(game::towers::getAverageDamagePerShot(this->my_tower.getBaseType()->getShotTypes(),
+			new_dmg_multi), game::towers::getRateOfFire(this->my_tower.getBaseType()->getFiringSpeed() * new_speed_multi,
+				static_cast<int>(this->my_tower.getBaseType()->getVolleyShots() * new_ammo_multi),
+				static_cast<int>(this->my_tower.getBaseType()->getReloadDelay() * new_delay_multi),
+				this->my_tower.getBaseType()->isWall()));
+		my_stream << std::setiosflags(std::ios_base::fixed) << std::setprecision(2)
+			<< new_dps << L" dmg / s";
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_UPGRADE_EXPECTED_DPS, my_stream.str().c_str());
+		my_stream.str(L"");
+		my_color_choose_lambda(IDC_INFO_TOWER_UPGRADE_EXPECTED_DPS, old_dps, new_dps);
 		// Not enough money to buy, so don't give the option.
 		if (game::g_my_game->getPlayerCash() < this->upgrade_cost) {
 			EnableWindow(GetDlgItem(hwnd, IDC_INFO_TOWER_UPGRADE_DO_UPGRADE), FALSE);
