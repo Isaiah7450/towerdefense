@@ -290,9 +290,6 @@ namespace hoffman::isaiah {
 			}
 			/// <returns>The approximate area covered by the tower.</returns>
 			double getFiringArea() const noexcept {
-				// Using the min-max angles for the tower is probably bad
-				// but whatever; this is basically your formula for
-				// the area of a circular sector (except in radians rather than degrees)
 				return towers::getFiringArea(this->getFiringRange(), this->getFiringMethod(), this->isWall());
 			}
 			int getVolleyShots() const noexcept {
