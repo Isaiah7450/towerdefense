@@ -67,10 +67,10 @@ InstType /NOCUSTOM
 !insertmacro MUI_LANGUAGE "English"
 ; Version Information
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "Isaiah's Tower defense Game Installer"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "3.1.1.0"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "3.2.0.0"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "Isaiah Hoffman"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© Isaiah Hoffman 2017"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "1.1.1.0"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "1.2.0.0"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "An installer program for Isaiah Hoffman's tower defense game."
 VIAddVersionKey /LANG=${LANG_ENGLISH} "InternalName" "tower_defense_setup.exe"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "OriginalFilename" "tower_defense_setup.exe"
@@ -130,6 +130,8 @@ Section "Resource Files" SectionResources
   File ".\..\resources\shots.ini.format"
   File ".\..\resources\towers.ini"
   File ".\..\resources\towers.ini.format"
+  File ".\..\resources\tower_upgrades.ini"
+  File ".\..\resources\tower_upgrades.ini.format"
   File ".\..\resources\other.ini"
   SetOutPath $R0\resources\levels
   File /x ..\resources\levels\level0.ini.format "..\resources\levels\level*.ini"
