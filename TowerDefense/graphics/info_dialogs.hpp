@@ -142,6 +142,8 @@ namespace hoffman::isaiah::winapi {
 		game::Tower& my_tower;
 		/// <summary>The actual upgrade being displayed.</summary>
 		const game::TowerUpgradeInfo* my_upgrade {nullptr};
+		/// <summary>The cost of the upgrade.</summary>
+		double upgrade_cost {0.0};
 	};
 
 	/// <summary>Displays additional information about shots that stun.</summary>

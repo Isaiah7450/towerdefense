@@ -511,6 +511,7 @@ namespace hoffman::isaiah::winapi {
 		for (const auto& upgrade : this->my_tower.getBaseType()->getUpgrades()) {
 			if (upgrade_level == upgrade.getLevel() && upgrade_opt == upgrade.getOption()) {
 				this->my_upgrade = &upgrade;
+				this->upgrade_cost = upgrade.getCostPercent() * this->my_tower.getCost() + 1.0;
 				break;
 			}
 		}
@@ -524,10 +525,14 @@ namespace hoffman::isaiah::winapi {
 	}
 
 	void TowerUpgradeInfoDialog::initDialog(HWND hwnd) {
-		UNREFERENCED_PARAMETER(hwnd);
+		// Not enough money to buy, so don't give the option.
+		if (game::g_my_game->getPlayerCash() < this->upgrade_cost) {
+			EnableWindow(GetDlgItem(hwnd, IDC_INFO_TOWER_UPGRADE_DO_UPGRADE), FALSE);
+		}
 	}
 
 	void TowerUpgradeInfoDialog::doUpgrade() {
+		game::g_my_game->changePlayerCash(-this->upgrade_cost);
 		this->my_tower.upgradeTower(this->my_upgrade->getLevel(), this->my_upgrade->getOption());
 	}
 }

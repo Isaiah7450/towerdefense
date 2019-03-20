@@ -23,6 +23,8 @@ upgrades = {
 		# If they choose option B, then they choose the upgrade
 		# where this value is 1.
 		upgrade_option = 0
+		# The percentage of the tower's current value that the upgrade costs.
+		upgrade_cost_percent = 0.10
 		# Some upgrades may grant the tower new special abilities.
 		# This field indicates the type of special ability.
 		# None indicates that the upgrade does not grant/change any
@@ -70,13 +72,13 @@ upgrades = {
 		# Also, try to avoid repeating upgrade level and upgrade option
 		# combos. The game will only use the first one and ignore the
 		# rest, and it may not inform you that you have duplicates.
-		upgrade_level = 2, upgrade_option = 1
+		upgrade_level = 2, upgrade_option = 1, upgrade_cost_percent = 0.10
 		special_type = None, special_chance = 0.00, special_power = 0.00
 		damage_change = 0.000, speed_change = 0.000, range_change = 0.000
 		ammo_change = 0.075, delay_change = -0.050
 	},
 	{
-		upgrade_level = 3, upgrade_option = 0
+		upgrade_level = 3, upgrade_option = 0, upgrade_cost_percent = 0.10
 		# This special type indicates that for each tower that possesses
 		# this ability at the end of a level, the player has a chance
 		# to receive additional money.
@@ -92,7 +94,7 @@ upgrades = {
 		ammo_change = 0.000, delay_change = 0.000
 	},
 	{
-		upgrade_level = 3, upgrade_option = 1
+		upgrade_level = 3, upgrade_option = 1, upgrade_cost_percent = 0.10
 		# This special type indicates that the tower has a chance of
 		# generating extra shots at no cost whenever it shoots.
 		special_type = Multishot
@@ -111,7 +113,7 @@ upgrades = {
 		ammo_change = 0.000, delay_change = 0.000
 	},
 	{
-		upgrade_level = 4, upgrade_option = 0
+		upgrade_level = 4, upgrade_option = 0, upgrade_cost_percent = 0.10
 		# This special type indicates that the tower may replace a normal
 		# shot with the special "Mega Missile" shot. (Note that this ability
 		# specifically uses the shot named "Mega Missile" in the shots.ini
@@ -126,7 +128,7 @@ upgrades = {
 		ammo_change = 0.000, delay_change = 0.000
 	},
 	{
-		upgrade_level = 4, upgrade_option = 1
+		upgrade_level = 4, upgrade_option = 1, upgrade_cost_percent = 0.10
 		# This special type indicates that when a tower has to reload, the
 		# reload delay time may be decreased.
 		special_type = Fast_Reload

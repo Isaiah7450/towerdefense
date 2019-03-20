@@ -909,6 +909,11 @@ namespace hoffman::isaiah {
 					}
 					const TowerUpgradeOption upgrade_option = upgrade_option_number == 0
 						? TowerUpgradeOption::One : TowerUpgradeOption::Two;
+					my_parser.readKeyValue(L"upgrade_cost_percent");
+					const double upgrade_cost_percent = my_parser.parseNumber();
+					if (upgrade_cost_percent <= 0) {
+						throw util::file::DataFileException {L"Upgrade cost percent should be positive.", my_parser.getLine()};
+					}
 					my_parser.readKeyValue(L"special_type");
 					if (!my_parser.matchTokenType(util::file::TokenTypes::Identifier)) {
 						throw util::file::DataFileException {L"Expected an identifier (no quotes).", my_parser.getLine()};
@@ -954,9 +959,9 @@ namespace hoffman::isaiah {
 					if (upgrade_delay_change <= -1.0) {
 						throw util::file::DataFileException {L"Delay change must be greater than -1.0.", my_parser.getLine()};
 					}
-					my_ttype->addUpgradeInfo(TowerUpgradeInfo {upgrade_level, upgrade_option, upgrade_damage_change, upgrade_speed_change,
-						upgrade_range_change, upgrade_ammo_change, upgrade_delay_change, upgrade_special, upgrade_special_chance,
-						upgrade_special_power});
+					my_ttype->addUpgradeInfo(TowerUpgradeInfo {upgrade_level, upgrade_option, upgrade_cost_percent,
+						upgrade_damage_change, upgrade_speed_change, upgrade_range_change, upgrade_ammo_change,
+						upgrade_delay_change, upgrade_special, upgrade_special_chance, upgrade_special_power});
 					my_parser.getNext();
 					my_parser.expectToken(util::file::TokenTypes::Object, L"}"s);
 					my_parser.getNext();

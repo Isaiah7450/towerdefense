@@ -152,6 +152,10 @@ namespace hoffman::isaiah {
 			void setEnemyTypeAsSeen(std::wstring name) noexcept {
 				this->enemies_seen.at(name) = true;
 			}
+			/// <param name="amt">The amount of money to add (or remove) from the player.</param>
+			void changePlayerCash(double amt) noexcept {
+				this->player.changeMoney(amt);
+			}
 			// Getters
 			std::shared_ptr<graphics::DX::DeviceResources2D> getDeviceResources() const noexcept {
 				return this->device_resources;
@@ -208,6 +212,10 @@ namespace hoffman::isaiah {
 			}
 			std::wstring getUserDataPath() const noexcept {
 				return this->userdata_folder_path;
+			}
+			/// <returns>The amount of money the player possesses.</returns>
+			double getPlayerCash() const noexcept {
+				return this->player.getMoney();
 			}
 			/// <returns>The new speed that the game will update at based on the current update speed.</returns>
 			int getNextUpdateSpeed() const noexcept {

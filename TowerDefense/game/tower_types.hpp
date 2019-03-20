@@ -170,11 +170,13 @@ namespace hoffman::isaiah {
 		/// <summary>Represents information about an upgrade.</summary>
 		class TowerUpgradeInfo {
 		public:
-			TowerUpgradeInfo(int lv, TowerUpgradeOption path, double dmg, double spd, double rng, double ammo,
+			/// <param name="cp">The percentage of the tower's current cost that the upgrade costs.</param>
+			TowerUpgradeInfo(int lv, TowerUpgradeOption path, double cp, double dmg, double spd, double rng, double ammo,
 				double delay, TowerUpgradeSpecials special = TowerUpgradeSpecials::None, double schance = 0,
 				double spower = 0) :
 				level {lv},
 				option {path},
+				cost_percent {cp},
 				special_effect {special},
 				special_chance {schance},
 				special_power {spower},
@@ -191,6 +193,9 @@ namespace hoffman::isaiah {
 			}
 			TowerUpgradeOption getOption() const noexcept {
 				return this->option;
+			}
+			double getCostPercent() const noexcept {
+				return this->cost_percent;
 			}
 			TowerUpgradeSpecials getSpecial() const noexcept {
 				return this->special_effect;
@@ -222,6 +227,8 @@ namespace hoffman::isaiah {
 			int level;
 			/// <summary>Which user option the upgrade corresponds with.</summary>
 			TowerUpgradeOption option;
+			/// <summary>The percentage of the tower's current cost that the upgrade costs.</summary>
+			double cost_percent;
 			/// <summary>The special effect to add/upgrade.</summary>
 			TowerUpgradeSpecials special_effect;
 			/// <summary>The chance that the special effect will occur.</summary>
