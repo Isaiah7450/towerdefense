@@ -17,6 +17,7 @@ namespace hoffman::isaiah::game {
 	class TowerType;
 	class GameObjectType;
 	class Tower;
+	enum class TowerUpgradeOption;
 }
 
 namespace hoffman::isaiah::winapi {
@@ -110,10 +111,34 @@ namespace hoffman::isaiah::winapi {
 		TowerPlacedInfoDialog(HWND owner, HINSTANCE h_inst, game::Tower& t);
 		/// <summary>Sells the tower that this info box was designed to show info for.</summary>
 		void doSell();
+		// Getters
+		game::Tower& getTower() {
+			return this->my_tower;
+		}
 	protected:
 		// Implements InfoDialogBase::initDialog().
 		void initDialog(HWND hwnd) override;
 	private:
+		/// <summary>The tower whose info is being displayed.</summary>
+		game::Tower& my_tower;
+	};
+
+	/// <summary>Displays information about a tower upgrade.</summary>
+	class TowerUpgradeInfoDialog : public InfoDialogBase {
+	public:
+		/// <param name="owner">Handle to the window that owns this dialog box.</param>
+		/// <param name="h_inst">The hInstance parameter given by the WinMain function.</param>
+		/// <param name="t">The tower to show info for.</param>
+		/// <param name="upgrade_opt">The chosen upgrade option.</param>
+		TowerUpgradeInfoDialog(HWND owner, HINSTANCE h_inst, game::Tower& t, game::TowerUpgradeOption upgrade_opt);
+		/// <summary>Upgrades the tower.</summary>
+		void doUpgrade();
+	protected:
+		// Implements InfoDialogBase::initDialog().
+		void initDialog(HWND hwnd) override;
+	private:
+		/// <summary>The chosen upgrade option.</summary>
+		game::TowerUpgradeOption upgrade_option;
 		/// <summary>The tower whose info is being displayed.</summary>
 		game::Tower& my_tower;
 	};

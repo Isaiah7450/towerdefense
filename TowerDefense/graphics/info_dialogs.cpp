@@ -81,7 +81,10 @@ namespace hoffman::isaiah::winapi {
 			{
 				auto my_dialog_class = reinterpret_cast<TowerPlacedInfoDialog*>(
 					GetWindowLongPtr(hwnd, GWLP_USERDATA));
-				DBG_UNREFERENCED_LOCAL_VARIABLE(my_dialog_class);
+				const auto chosen_option = LOWORD(wparam) == IDC_INFO_TOWER_PLACED_UPGRADE_A
+					? game::TowerUpgradeOption::One : game::TowerUpgradeOption::Two;
+				TowerUpgradeInfoDialog my_upgrade_dialog {hwnd, my_dialog_class->getApplicationHandle(), my_dialog_class->getTower(),
+					chosen_option};
 				break;
 			}
 			case IDC_INFO_TOWER_PLACED_SELL:
@@ -89,6 +92,14 @@ namespace hoffman::isaiah::winapi {
 				auto my_dialog_class = reinterpret_cast<TowerPlacedInfoDialog*>(
 					GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				my_dialog_class->doSell();
+				EndDialog(hwnd, IDOK);
+				break;
+			}
+			case IDC_INFO_TOWER_UPGRADE_DO_UPGRADE:
+			{
+				auto my_dialog_class = reinterpret_cast<TowerUpgradeInfoDialog*>(
+					GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				my_dialog_class->doUpgrade();
 				EndDialog(hwnd, IDOK);
 				break;
 			}
@@ -487,6 +498,22 @@ namespace hoffman::isaiah::winapi {
 			<< my_stype.getExtraRating();
 		SetDlgItemText(hwnd, IDC_INFO_SHOT_BASE_EXTRA_RATING, my_stream.str().c_str());
 		my_stream.str(L"");
+	}
+
+	TowerUpgradeInfoDialog::TowerUpgradeInfoDialog(HWND owner, HINSTANCE h_inst, game::Tower& t, game::TowerUpgradeOption upgrade_opt) :
+		InfoDialogBase {h_inst, *t.getBaseType()},
+		my_tower {t},
+		upgrade_option {upgrade_opt} {
+		DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_TOWER_UPGRADE),
+			owner, InfoDialogBase::infoDialogProc, reinterpret_cast<LPARAM>(this));
+	}
+
+	void TowerUpgradeInfoDialog::initDialog(HWND hwnd) {
+		UNREFERENCED_PARAMETER(hwnd);
+	}
+
+	void TowerUpgradeInfoDialog::doUpgrade() {
+		// TODO: Implement.
 	}
 }
 
