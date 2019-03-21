@@ -25,6 +25,7 @@ namespace hoffman::isaiah::winapi {
 	}
 
 	INT_PTR CALLBACK InfoDialogBase::infoDialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+		[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret cast.
 		switch (msg) {
 		case WM_INITDIALOG:
 		{
@@ -129,6 +130,7 @@ namespace hoffman::isaiah::winapi {
 			return FALSE;
 		}
 		return TRUE;
+		}
 	}
 
 	void InfoDialogBase::setCommonControls(HWND hwnd) const noexcept {
@@ -199,8 +201,10 @@ namespace hoffman::isaiah::winapi {
 
 	ShotBaseInfoDialog::ShotBaseInfoDialog(HWND owner, HINSTANCE h_inst, const game::ShotBaseType& stype) :
 		InfoDialogBase {h_inst, stype} {
+		[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret cast.
 		DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_SHOT_BASE),
 			owner, InfoDialogBase::infoDialogProc, reinterpret_cast<LPARAM>(this));
+		}
 	}
 
 	void ShotBaseInfoDialog::initDialog(HWND hwnd) {
@@ -261,8 +265,10 @@ namespace hoffman::isaiah::winapi {
 
 	TowerInfoDialog::TowerInfoDialog(HWND owner, HINSTANCE h_inst, const game::TowerType& ttype) :
 		InfoDialogBase {h_inst, ttype} {
+		[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpet cast.
 		DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_TOWER),
 			owner, InfoDialogBase::infoDialogProc, reinterpret_cast<LPARAM>(this));
+		}
 	}
 
 	void TowerInfoDialog::initDialog(HWND hwnd) {
@@ -278,7 +284,9 @@ namespace hoffman::isaiah::winapi {
 				<< (st_pair.second * 100) << L"%";
 			const std::wstring ammo_string = st_pair.first->getName() + L": " + my_stream.str();
 			my_stream.str(L"");
+			[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
 			SendMessage(hdlg_ammo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(ammo_string.c_str()));
+			}
 		}
 		SendMessage(hdlg_ammo, CB_SETCURSEL, 0, 0);
 		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
@@ -322,8 +330,10 @@ namespace hoffman::isaiah::winapi {
 	TowerPlacedInfoDialog::TowerPlacedInfoDialog(HWND owner, HINSTANCE h_inst, game::Tower& t) :
 		InfoDialogBase {h_inst, *t.getBaseType()},
 		my_tower {t} {
+		[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
 		DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_TOWER_PLACED),
 			owner, InfoDialogBase::infoDialogProc, reinterpret_cast<LPARAM>(this));
+		}
 	}
 
 	void TowerPlacedInfoDialog::initDialog(HWND hwnd) {
@@ -336,7 +346,9 @@ namespace hoffman::isaiah::winapi {
 				<< (st_pair.second * 100) << L"%";
 			const std::wstring ammo_string = st_pair.first->getName() + L": " + my_stream.str();
 			my_stream.str(L"");
+			[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
 			SendMessage(hdlg_ammo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(ammo_string.c_str()));
+			}
 		}
 		if (!this->my_tower.getBaseType()->isWall()) {
 			SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_METHOD,
@@ -347,7 +359,9 @@ namespace hoffman::isaiah::winapi {
 		else {
 			SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_METHOD, L"Not Applicable");
 			SetDlgItemText(hwnd, IDC_INFO_TOWER_TARGETING_STRATEGY, L"Not Applicable");
+			[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
 			SendMessage(hdlg_ammo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Not Applicable"));
+			}
 		}
 		SendMessage(hdlg_ammo, CB_SETCURSEL, 0, 0);
 		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
@@ -416,8 +430,10 @@ namespace hoffman::isaiah::winapi {
 
 	ShotStunInfoDialog::ShotStunInfoDialog(HWND owner, HINSTANCE h_inst, const game::ShotBaseType& stype) :
 		InfoDialogBase {h_inst, stype} {
+		[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
 		DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_SHOT_STUN),
 			owner, InfoDialogBase::infoDialogProc, reinterpret_cast<LPARAM>(this));
+		}
 	}
 
 	void ShotStunInfoDialog::initDialog(HWND hwnd) {
@@ -442,8 +458,10 @@ namespace hoffman::isaiah::winapi {
 
 	ShotSlowInfoDialog::ShotSlowInfoDialog(HWND owner, HINSTANCE h_inst, const game::ShotBaseType& stype) :
 		InfoDialogBase {h_inst, stype} {
+		[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpet_cast.
 		DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_SHOT_SLOW),
 			owner, InfoDialogBase::infoDialogProc, reinterpret_cast<LPARAM>(this));
+		}
 	}
 
 	void ShotSlowInfoDialog::initDialog(HWND hwnd) {
@@ -468,8 +486,10 @@ namespace hoffman::isaiah::winapi {
 
 	ShotDoTInfoDialog::ShotDoTInfoDialog(HWND owner, HINSTANCE h_inst, const game::ShotBaseType& stype) :
 		InfoDialogBase {h_inst, stype} {
+		[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
 		DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_SHOT_DOT),
 			owner, InfoDialogBase::infoDialogProc, reinterpret_cast<LPARAM>(this));
+		}
 	}
 
 	void ShotDoTInfoDialog::initDialog(HWND hwnd) {
@@ -535,8 +555,10 @@ namespace hoffman::isaiah::winapi {
 			MessageBox(owner, L"Error: Could not find tower upgrade information.", L"Upgrade Dialog Creation Failed", MB_OK | MB_ICONWARNING);
 		}
 		else {
+			[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
 			DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_TOWER_UPGRADE),
 				owner, InfoDialogBase::infoDialogProc, reinterpret_cast<LPARAM>(this));
+			}
 		}
 	}
 

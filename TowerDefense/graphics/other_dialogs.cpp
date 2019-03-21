@@ -18,8 +18,10 @@ namespace hoffman::isaiah::winapi {
 		case WM_INITDIALOG:
 		{
 			SetWindowLongPtr(hwnd, GWLP_USERDATA, lparam);
+			[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
 			const auto my_dialog_class = reinterpret_cast<ChallengeLevelDialog*>(lparam);
 			my_dialog_class->initDialog(hwnd);
+			}
 			return TRUE;
 		}
 		case WM_COMMAND:
@@ -43,10 +45,12 @@ namespace hoffman::isaiah::winapi {
 
 	void ChallengeLevelDialog::initDialog(HWND hwnd) {
 		auto dlg_clevel = GetDlgItem(hwnd, IDC_CHALLENGE_LEVEL_SELECTOR);
+		[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
 		SendMessage(dlg_clevel, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Beginner"));
 		SendMessage(dlg_clevel, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Intermediate"));
 		SendMessage(dlg_clevel, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Experienced"));
 		SendMessage(dlg_clevel, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Expert"));
 		SendMessage(dlg_clevel, CB_SETCURSEL, 1, 0);
+		}
 	}
 }

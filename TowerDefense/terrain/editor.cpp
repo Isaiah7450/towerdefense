@@ -62,11 +62,13 @@ namespace hoffman::isaiah {
 		void TerrainEditor::createWindow(HINSTANCE h_inst) noexcept {
 			static bool ran_once = false;
 			if (!ran_once) {
+				[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
 				WNDCLASSEX wcex {sizeof(WNDCLASSEX), CS_DBLCLKS, TerrainEditor::windowProc,
 					0, 0, h_inst, nullptr, LoadCursor(nullptr, IDC_ARROW), reinterpret_cast<HBRUSH>(COLOR_BACKGROUND+1),
 					nullptr, TerrainEditor::class_name, nullptr};
 				if (!RegisterClassEx(&wcex)) {
 					winapi::handleWindowsError(L"TE Thread: Class registration");
+				}
 				}
 				ran_once = true;
 			}

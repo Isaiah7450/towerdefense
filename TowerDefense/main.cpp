@@ -102,9 +102,11 @@ namespace hoffman::isaiah {
 							case ID_MM_FILE_NEW_GAME:
 							{
 								WaitForSingleObject(sync_mutex, INFINITE);
+								[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpet_cast.
 								const auto my_clevel_dialog = *reinterpret_cast<const ChallengeLevelDialog*>(msg.lParam);
 								if (my_clevel_dialog.getChallengeLevel() != IDCANCEL) {
 									my_game->resetState(my_clevel_dialog.getChallengeLevel());
+								}
 								}
 								ReleaseMutex(sync_mutex);
 								break;
@@ -207,10 +209,12 @@ namespace hoffman::isaiah {
 			LPVOID lpMsgBuf {nullptr};
 			LPVOID lpDisplayBuf {nullptr};
 			const DWORD dw = GetLastError();
+			[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cst.
 			FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM
 				| FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, dw,
 				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPWSTR>(&lpMsgBuf), 0,
 				nullptr);
+			}
 			// Display the error message and exit the process
 			lpDisplayBuf = LocalAlloc(LMEM_ZEROINIT,
 				lstrlen(static_cast<LPWSTR>(lpMsgBuf)) + lpszFunction.size() + 120 * sizeof(TCHAR));
@@ -229,6 +233,7 @@ namespace hoffman::isaiah {
 		MainWindow::MainWindow(HINSTANCE h_inst) :
 			h_instance {h_inst} {
 			// Register window class
+			[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
 			WNDCLASSEX wnd_class {
 				sizeof(WNDCLASSEX), CS_DBLCLKS, MainWindow::windowProc, 0, 0, this->h_instance, nullptr,
 				LoadCursor(nullptr, IDC_ARROW), reinterpret_cast<HBRUSH>(COLOR_BACKGROUND+1),
@@ -236,6 +241,7 @@ namespace hoffman::isaiah {
 			};
 			if (!RegisterClassEx(&wnd_class)) {
 				winapi::handleWindowsError(L"Registration of window class");
+			}
 			}
 			// Keep reference to menu
 			this->h_menu = LoadMenu(this->h_instance, MAKEINTRESOURCE(IDR_MAIN_MENU));
@@ -303,8 +309,11 @@ namespace hoffman::isaiah {
 				CloseHandle(draw_event);
 				winapi::handleWindowsError(L"Update thread ready creation");
 			}
+#pragma warning(push)
+#pragma warning(disable: 26490) // C26490 => Do not use reinterpret_cast.
 			HANDLE update_thread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, winapi::update_thread_init,
 				nullptr, 0, nullptr));
+#pragma warning(pop)
 			if (!update_thread || update_thread == INVALID_HANDLE_VALUE) {
 				CloseHandle(update_event);
 				CloseHandle(draw_event);
@@ -359,7 +368,9 @@ namespace hoffman::isaiah {
 						case ID_MM_FILE_NEW_GAME:
 						{
 							const auto my_clevel_dialog = winapi::ChallengeLevelDialog {hwnd, this->h_instance};
+							[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
 							PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, reinterpret_cast<LPARAM>(&my_clevel_dialog));
+							}
 							break;
 						}
 						case ID_MM_FILE_SAVE_GAME:
@@ -422,6 +433,7 @@ namespace hoffman::isaiah {
 						}
 						case ID_MM_DEVELOP_TERRAIN_EDITOR:
 						{
+							[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
 							terrain_editor_thread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0,
 								terrain_editor::terrain_editor_thread_init, static_cast<void*>(hwnd), 0, nullptr));
 							// I do not care when the editor thread ends...
@@ -429,6 +441,7 @@ namespace hoffman::isaiah {
 								CloseHandle(terrain_editor_thread);
 							}
 							terrain_editor_thread = nullptr;
+							}
 							break;
 						}
 						case ID_MM_DEVELOP_SHOW_TEST_PATHS:
