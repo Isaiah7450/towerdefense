@@ -43,7 +43,7 @@ namespace hoffman::isaiah::game {
 			const auto behavior_modifier = (fm.getMethod() == FiringMethodTypes::Default ? 0.0 : -2.5)
 				+ (ts.getStrategy() == TargetingStrategyTypes::Distances ? 0.0 : 3.5);
 			const auto my_dps_idea = avg_dmg * speed_range_multipliers;
-			const auto my_effect_idea = (avg_shot_rating - avg_dmg) * speed_range_multipliers;
+			const auto my_effect_idea = max(0.0, (avg_shot_rating - avg_dmg)) * speed_range_multipliers;
 			if (my_dps_idea > my_effect_idea) {
 				return (my_dps_idea * 0.65 + my_effect_idea * 0.35)
 					+ behavior_modifier;
