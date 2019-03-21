@@ -33,7 +33,7 @@ namespace hoffman::isaiah {
 			/// <returns>True if the enemy should be removed; otherwise, false.</returns>
 			bool update();
 			// Overrides GameObject::draw
-			void draw(const graphics::Renderer2D& renderer) const noexcept;
+			void draw(const graphics::Renderer2D& renderer) const noexcept override;
 
 			/// <summary>Deals damage to the enemy.</summary>
 			/// <param name="dmg">The base amount of damage for the enemy to receive.</param>

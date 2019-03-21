@@ -216,7 +216,7 @@ namespace hoffman::isaiah {
 				return L"Healing";
 			}
 			// Implements BuffBase::getRating()
-			double getRating() const noexcept {
+			double getRating() const noexcept override {
 				return enemy_buffs::healer_buff::getRating(this->getBaseRating(), this->getHealAmount());
 			}
 			// Getters
@@ -284,7 +284,7 @@ namespace hoffman::isaiah {
 				return L"Repairing";
 			}
 			// Implements BuffBase::getRating()
-			double getRating() const noexcept {
+			double getRating() const noexcept override {
 				return enemy_buffs::repair_buff::getRating(this->getBaseRating(), this->getRepairAmount());
 			}
 			// Getters
@@ -311,7 +311,7 @@ namespace hoffman::isaiah {
 				shield_absorb {sa} {
 			}
 			// Implements BuffBase::getRating()
-			double getRating() const noexcept {
+			double getRating() const noexcept override {
 				return enemy_buffs::forcefield_buff::getRating(this->getBaseRating(), this->getShieldHealth(), this->getShieldAbsorb());
 			}
 			// Implements BuffBase::getType()

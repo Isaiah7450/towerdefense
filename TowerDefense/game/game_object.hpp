@@ -15,7 +15,7 @@ namespace hoffman::isaiah {
 				graphics::Color o_color, graphics::Color f_color, double cgx, double cgy, double gw, double gh);
 
 			// Implements graphics::Drawable::draw()
-			void draw(const graphics::Renderer2D& renderer) const noexcept {
+			void draw(const graphics::Renderer2D& renderer) const noexcept override {
 				this->sprite->draw(renderer);
 			}
 
