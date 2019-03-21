@@ -391,4 +391,25 @@ Version 3.1.1: (Released March 16, 2019)
    files are stored have been made.
  + Darkened the color of the ellipses used for "Show Coverage" a little bit.
  + You can now show/hide a tower's radius during a level.
- 
+
+Version 3.2.0: (Released March 20, 2019)
+- Bug Fixes:
+ + Adjusted the rating formula for enemies yet again. (It is amazing how many
+   times one can get this wrong.)
+- Balance Changes:
+- New Stuff:
+ + Another chapter has been added to the playing guide. It is not exactly
+   complete, but it should give you a better idea of how the game works.
+ + You can now upgrade towers. (Note: At this point, all the features from the
+   Java version have been implemented in some way in this version of the
+   game.)
+   * Upgrading towers changes a tower's statistics. Most upgrades help
+     emphasize a certain aspect of a tower; you must consider the benefits
+     of an upgrade carefully.
+   * Some upgrades grant a tower special effects.
+   * For each upgrade level, there are two choices.
+- Misc Changes:
+ + The save file format has changed. The game will still read version 1 save
+   files; however, subsequent files will have version 2. (This change
+   was needed to accomodate tower upgrades.)
+ + Destroyer Tower's max level decreased to 4 from 5.
