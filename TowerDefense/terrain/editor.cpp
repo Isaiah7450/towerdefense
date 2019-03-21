@@ -53,7 +53,7 @@ namespace hoffman::isaiah {
 			try {
 				my_editor.run();
 			}
-			catch (std::runtime_error& e) {
+			catch (const std::runtime_error& e) {
 				MessageBoxA(my_editor.getHWND(), e.what(), "TE Thread Error", MB_OK);
 			}
 			return 0;
@@ -265,8 +265,8 @@ namespace hoffman::isaiah {
 					case WM_LBUTTONDOWN:
 					{
 						// Obtain start coordinates
-						auto gx = static_cast<int>(graphics::convertToGameX(GET_X_LPARAM(msg.lParam)));
-						auto gy = static_cast<int>(graphics::convertToGameY(GET_Y_LPARAM(msg.lParam)));
+						const auto gx = static_cast<int>(graphics::convertToGameX(GET_X_LPARAM(msg.lParam)));
+						const auto gy = static_cast<int>(graphics::convertToGameY(GET_Y_LPARAM(msg.lParam)));
 						if (this->getMap().getTerrainGraph(false).verifyCoordinates(gx, gy)) {
 							this->start_gx = gx;
 							this->start_gy = gy;
@@ -278,8 +278,8 @@ namespace hoffman::isaiah {
 					{
 						if (msg.wParam == MK_LBUTTON) {
 							// Update end coordinates
-							auto gx = static_cast<int>(graphics::convertToGameX(GET_X_LPARAM(msg.lParam)));
-							auto gy = static_cast<int>(graphics::convertToGameY(GET_Y_LPARAM(msg.lParam)));
+							const auto gx = static_cast<int>(graphics::convertToGameX(GET_X_LPARAM(msg.lParam)));
+							const auto gy = static_cast<int>(graphics::convertToGameY(GET_Y_LPARAM(msg.lParam)));
 							if (this->getMap().getTerrainGraph(false).verifyCoordinates(gx, gy)) {
 								this->end_gx = gx;
 								this->end_gy = gy;
@@ -297,8 +297,8 @@ namespace hoffman::isaiah {
 					case WM_LBUTTONUP:
 					{
 						// Update end coordinates
-						auto new_gx = static_cast<int>(graphics::convertToGameX(GET_X_LPARAM(msg.lParam)));
-						auto new_gy = static_cast<int>(graphics::convertToGameY(GET_Y_LPARAM(msg.lParam)));
+						const auto new_gx = static_cast<int>(graphics::convertToGameX(GET_X_LPARAM(msg.lParam)));
+						const auto new_gy = static_cast<int>(graphics::convertToGameY(GET_Y_LPARAM(msg.lParam)));
 						this->end_gx = math::get_max(new_gx, this->start_gx);
 						this->end_gy = math::get_max(new_gy, this->start_gy);
 						this->start_gx = math::get_min(this->start_gx, new_gx);
@@ -399,7 +399,7 @@ namespace hoffman::isaiah {
 						game::g_my_game->debugUpdate(game::DebugUpdateStates::Terrain_Changed);
 						ReleaseMutex(sync_mutex);
 					}
-					HRESULT hr = my_renderer->render(game::g_my_game, this->start_gx, this->start_gy,
+					const HRESULT hr = my_renderer->render(game::g_my_game, this->start_gx, this->start_gy,
 						this->end_gx, this->end_gy, true);
 					if (hr == D2DERR_RECREATE_TARGET) {
 						my_resources->discardDeviceResources();

@@ -33,7 +33,7 @@ namespace hoffman::isaiah {
 
 		bool Shape2DBase::intersect(const Shape2DBase& other_shape) const noexcept {
 			D2D1_GEOMETRY_RELATION relationship {};
-			HRESULT hr = this->transformed_geometry->CompareWithGeometry(
+			const HRESULT hr = this->transformed_geometry->CompareWithGeometry(
 				other_shape.transformed_geometry, D2D1::Matrix3x2F::Identity(), &relationship);
 			return SUCCEEDED(hr) && relationship > D2D1_GEOMETRY_RELATION::D2D1_GEOMETRY_RELATION_DISJOINT;
 		}

@@ -118,7 +118,7 @@ namespace hoffman::isaiah {
 
 		void Renderer2D::updateSelectedTower(HWND hwnd, int selected_tower) const noexcept {
 			auto my_menu = GetSubMenu(GetMenu(hwnd), 2);
-			auto num_items = GetMenuItemCount(my_menu);
+			const auto num_items = GetMenuItemCount(my_menu);
 			CheckMenuRadioItem(my_menu, ID_MM_TOWERS_NONE, ID_MM_TOWERS_NONE + num_items, selected_tower,
 				MF_BYCOMMAND);
 			DrawMenuBar(hwnd);
@@ -159,7 +159,7 @@ namespace hoffman::isaiah {
 			UNREFERENCED_PARAMETER(my_game);
 			// Check time before rendering
 			static LARGE_INTEGER last_update_time = LARGE_INTEGER {0};
-			auto my_times = winapi::MainWindow::getElapsedTime(last_update_time);
+			const auto my_times = winapi::MainWindow::getElapsedTime(last_update_time);
 			if (my_times.second.QuadPart < math::getMicrosecondsInSecond() / game::graphics_framerate) {
 				Sleep(1);
 				return S_OK;

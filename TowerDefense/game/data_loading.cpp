@@ -1156,8 +1156,8 @@ namespace hoffman::isaiah {
 							my_tower->setTowerUpgradeStatus(tower_lv, tower_path);
 						}
 						this->addTower(std::move(my_tower));
-						auto my_floored_gx = static_cast<int>(std::floor(tower_gx));
-						auto my_floored_gy = static_cast<int>(std::floor(tower_gy));
+						const auto my_floored_gx = static_cast<int>(std::floor(tower_gx));
+						const auto my_floored_gy = static_cast<int>(std::floor(tower_gy));
 						this->getMap().getFiterGraph(false).getNode(my_floored_gx, my_floored_gy).setBlockage(true);
 						this->getMap().getFiterGraph(true).getNode(my_floored_gx, my_floored_gy).setBlockage(true);
 					}

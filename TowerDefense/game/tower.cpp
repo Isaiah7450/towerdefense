@@ -188,7 +188,7 @@ namespace hoffman::isaiah {
 						}
 					} // Names Targeting Strategy
 					else if (my_strat == TargetingStrategyTypes::Statistics) {
-						auto test_stat = this->getBaseType()->getTargetingStrategy().getTestStatistic();
+						const auto test_stat = this->getBaseType()->getTargetingStrategy().getTestStatistic();
 						const double e_stat_value =
 							test_stat == TargetingStrategyStatistics::Damage ? e->getBaseType().getDamage() :
 							test_stat == TargetingStrategyStatistics::Health ? e->getHealth() :
