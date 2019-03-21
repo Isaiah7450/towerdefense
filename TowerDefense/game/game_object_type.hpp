@@ -11,7 +11,12 @@ namespace hoffman::isaiah {
 		class GameObjectType {
 		public:
 			// Use default destructor... But make it virtual since we're inheriting...
-			virtual ~GameObjectType() = default;
+			virtual ~GameObjectType() noexcept = default;
+			// Rule of 5.
+			GameObjectType(const GameObjectType&) noexcept = delete;
+			GameObjectType(GameObjectType&&) noexcept = default;
+			GameObjectType& operator=(const GameObjectType&) noexcept = delete;
+			GameObjectType& operator=(GameObjectType&&) noexcept = default;
 			// Getters
 			std::wstring getName() const noexcept {
 				return this->name;

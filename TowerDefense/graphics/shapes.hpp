@@ -24,6 +24,10 @@ namespace hoffman::isaiah {
 				SafeRelease(&this->path_geometry);
 				SafeRelease(&this->transformed_geometry);
 			}
+			Shape2DBase(const Shape2DBase&) = delete;
+			Shape2DBase(Shape2DBase&&) = default;
+			Shape2DBase& operator=(const Shape2DBase&) = delete;
+			Shape2DBase& operator=(Shape2DBase&&) = default;
 			// (Note: Derived classes can override the default implementation
 			// given in this class if necessary.)
 			// Overrides IDrawable::draw

@@ -37,7 +37,13 @@ namespace hoffman::isaiah {
 				buff_radius {br},
 				frames_between_buff_ticks {math::convertMillisecondsToFrames(ms_ticks)} {
 			}
-			virtual ~BuffBase() noexcept;
+			virtual ~BuffBase() noexcept = default;
+			// Rule of 5:
+			BuffBase(const BuffBase&) noexcept = delete;
+			BuffBase(BuffBase&&) noexcept = default;
+			BuffBase& operator=(const BuffBase&) noexcept = delete;
+			BuffBase& operator=(BuffBase&&) noexcept = default;
+
 			/// <returns>Returns the buff's type. (Useful for switch statements.)</returns>
 			virtual BuffTypes getType() const noexcept = 0;
 			// Generally speaking, this should be the same as the enumration constant

@@ -78,6 +78,11 @@ namespace hoffman::isaiah {
 			MyGame(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, int clevel,
 				std::wistream& ground_terrain_file, std::wistream& air_terrain_file);
 			~MyGame() noexcept;
+			// Rule of 5:
+			MyGame(const MyGame&) = delete;
+			MyGame(MyGame&&);
+			MyGame& operator=(const MyGame&) = delete;
+			MyGame& operator=(MyGame&&);
 			/// <summary>Resets the game's state.</summary>
 			/// <param name="new_challenge">The new challenge level to set.</param>
 			void resetState(int new_challenge);

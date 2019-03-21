@@ -7,7 +7,6 @@
 
 namespace hoffman::isaiah {
 	namespace game {
-		StatusEffectBase::~StatusEffectBase() = default;
 
 		bool DoTEffect::update(Enemy& e) {
 			++this->frames_since_last_tick;

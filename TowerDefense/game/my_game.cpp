@@ -51,6 +51,8 @@ namespace hoffman::isaiah {
 		}
 
 		MyGame::~MyGame() noexcept = default;
+		MyGame::MyGame(MyGame&&) = default;
+		MyGame& MyGame::operator=(MyGame&&) = default;
 
 		void MyGame::debugUpdate(DebugUpdateStates cause) {
 #if defined(DEBUG) || defined(_DEBUG)

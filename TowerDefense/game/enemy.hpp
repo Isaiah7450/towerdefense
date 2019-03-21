@@ -237,22 +237,22 @@ namespace hoffman::isaiah {
 					// than getting into some weird cloning stuff
 					switch (b->getType()) {
 					case BuffTypes::Intelligence:
-						this->buffs.emplace_back(std::make_unique<SmartBuff>(dynamic_cast<SmartBuff&>(*b)));
+						this->buffs.emplace_back(std::make_unique<SmartBuff>(std::move(dynamic_cast<SmartBuff&>(*b))));
 						break;
 					case BuffTypes::Speed:
-						this->buffs.emplace_back(std::make_unique<SpeedBuff>(dynamic_cast<SpeedBuff&>(*b)));
+						this->buffs.emplace_back(std::make_unique<SpeedBuff>(std::move(dynamic_cast<SpeedBuff&>(*b))));
 						break;
 					case BuffTypes::Healer:
-						this->buffs.emplace_back(std::make_unique<HealerBuff>(dynamic_cast<HealerBuff&>(*b)));
+						this->buffs.emplace_back(std::make_unique<HealerBuff>(std::move(dynamic_cast<HealerBuff&>(*b))));
 						break;
 					case BuffTypes::Purify:
-						this->buffs.emplace_back(std::make_unique<PurifyBuff>(dynamic_cast<PurifyBuff&>(*b)));
+						this->buffs.emplace_back(std::make_unique<PurifyBuff>(std::move(dynamic_cast<PurifyBuff&>(*b))));
 						break;
 					case BuffTypes::Repair:
-						this->buffs.emplace_back(std::make_unique<RepairBuff>(dynamic_cast<RepairBuff&>(*b)));
+						this->buffs.emplace_back(std::make_unique<RepairBuff>(std::move(dynamic_cast<RepairBuff&>(*b))));
 						break;
 					case BuffTypes::Forcefield:
-						this->buffs.emplace_back(std::make_unique<ForcefieldBuff>(dynamic_cast<ForcefieldBuff&>(*b)));
+						this->buffs.emplace_back(std::make_unique<ForcefieldBuff>(std::move(dynamic_cast<ForcefieldBuff&>(*b))));
 						break;
 					}
 				}

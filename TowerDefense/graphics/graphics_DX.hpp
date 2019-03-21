@@ -34,6 +34,10 @@ namespace hoffman::isaiah {
 				SafeRelease(&this->write_factory);
 				SafeRelease(&this->factory);
 			}
+			DeviceResources2D(const DeviceResources2D&) = delete;
+			DeviceResources2D(DeviceResources2D&&) = default;
+			DeviceResources2D& operator=(const DeviceResources2D&) = delete;
+			DeviceResources2D& operator=(DeviceResources2D&&) = default;
 			/// <summary>Creates resources that are independent of the underlying devices.</summary>
 			void createDeviceIndependentResources();
 			/// <summary>Create resources that are dependent upon the underlying device.</summary>

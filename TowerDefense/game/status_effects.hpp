@@ -18,7 +18,13 @@ namespace hoffman::isaiah {
 		/// <summary>Base class for all status effects.</summary>
 		class StatusEffectBase {
 		public:
-			virtual ~StatusEffectBase();
+			virtual ~StatusEffectBase() noexcept = default;
+			// Rule of 5:
+			StatusEffectBase(const StatusEffectBase&) noexcept = default;
+			StatusEffectBase(StatusEffectBase&&) noexcept = default;
+			StatusEffectBase& operator=(const StatusEffectBase&) noexcept = default;
+			StatusEffectBase& operator=(StatusEffectBase&&) noexcept = default;
+			StatusEffectBase() noexcept = default;
 			/// <summary>This function clears harmful effects when the status effect finishes.</summary>
 			virtual void clearEffects(Enemy& e) {
 				UNREFERENCED_PARAMETER(e);

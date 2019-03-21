@@ -21,8 +21,6 @@ using namespace std::literals::string_literals;
 namespace hoffman::isaiah {
 	namespace game {
 		// enemy_type.hpp
-		BuffBase::~BuffBase() noexcept = default;
-
 		void BuffBase::update(Enemy& caller, std::vector<std::unique_ptr<Enemy>>& targets) {
 			++this->frames_since_last_tick;
 			if (this->isTimeToApply()) {
