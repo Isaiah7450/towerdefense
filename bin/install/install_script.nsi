@@ -134,7 +134,8 @@ Section "Resource Files" SectionResources
   File ".\..\resources\tower_upgrades.ini.format"
   File ".\..\resources\other.ini"
   SetOutPath $R0\resources\levels
-  File /x ..\resources\levels\level0.ini.format "..\resources\levels\level*.ini"
+  File /a /r "..\resources\levels\level*.ini"
+  File ".\..\resources\levels\level0.ini.format"
   File ".\..\resources\levels\levels.xlsx"
   File ".\..\resources\levels\global.ini"
   SetOutPath $R0\resources\graphs
