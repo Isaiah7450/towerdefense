@@ -21,7 +21,7 @@ using namespace std::literals::string_literals;
 namespace hoffman::isaiah {
 	namespace game {
 		// enemy_type.hpp
-		void BuffBase::update(Enemy& caller, std::vector<std::unique_ptr<Enemy>>& targets) {
+		void BuffBase::update(const Enemy& caller, std::vector<std::unique_ptr<Enemy>>& targets) {
 			++this->frames_since_last_tick;
 			if (this->isTimeToApply()) {
 				this->frames_since_last_tick -= this->frames_between_buff_ticks;

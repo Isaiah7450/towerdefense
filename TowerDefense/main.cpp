@@ -223,7 +223,7 @@ namespace hoffman::isaiah {
 				ExitProcess(dw);
 			}
 			StringCchPrintf(static_cast<LPTSTR>(lpDisplayBuf), LocalSize(lpDisplayBuf) / sizeof(TCHAR),
-				TEXT("%s failed with error %d: %s"), lpszFunction.c_str(), dw, static_cast<LPWSTR>(lpMsgBuf));
+				TEXT("%s failed with error %d: %s"), lpszFunction.c_str(), static_cast<int>(dw), static_cast<LPWSTR>(lpMsgBuf));
 			MessageBox(nullptr, static_cast<LPWSTR>(lpDisplayBuf), TEXT("Error"), MB_OK);
 			LocalFree(lpMsgBuf);
 			LocalFree(lpDisplayBuf);

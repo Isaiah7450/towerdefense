@@ -20,7 +20,7 @@ namespace hoffman::isaiah {
 		class Shape2DBase : public graphics::IDrawable {
 		public:
 			/// <summary>Virtual destructor that releases COM objects.</summary>
-			virtual ~Shape2DBase() noexcept {
+			~Shape2DBase() noexcept {
 				SafeRelease(&this->path_geometry);
 				SafeRelease(&this->transformed_geometry);
 			}

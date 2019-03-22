@@ -53,7 +53,7 @@ namespace hoffman::isaiah {
 			/// <summary>Updates the state of the buff by one logic frame.</summary>
 			/// <param name="caller">The enemy that naturally radiates the buff.</param>
 			/// <param name="enemies">All of the enemies in the game.</param>
-			void update(Enemy& caller, std::vector<std::unique_ptr<Enemy>>& enemies);
+			void update(const Enemy& caller, std::vector<std::unique_ptr<Enemy>>& enemies);
 
 			// Getters
 			std::vector<std::wstring> getTargetNames() const noexcept {

@@ -45,7 +45,7 @@ namespace hoffman::isaiah::winapi {
 				// Shot-specific code:
 			case IDC_INFO_SHOT_BASE_VIEW_TYPE_INFO:
 			{
-				const auto my_dialog_class = reinterpret_cast<InfoDialogBase*>(
+				const auto my_dialog_class = reinterpret_cast<const InfoDialogBase*>(
 					GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				const auto& my_stype = dynamic_cast<const game::ShotBaseType&>(my_dialog_class->getType());
 				switch (my_stype.getType()) {
@@ -113,7 +113,7 @@ namespace hoffman::isaiah::winapi {
 			break;
 		case WM_CTLCOLORSTATIC:
 		{
-			auto my_dialog_class = reinterpret_cast<InfoDialogBase*>(
+			const auto my_dialog_class = reinterpret_cast<const InfoDialogBase*>(
 				GetWindowLongPtr(hwnd, GWLP_USERDATA));
 			HDC hdc_static = reinterpret_cast<HDC>(wparam);
 			static const HBRUSH background_brush = GetSysColorBrush(CTLCOLOR_DLG);

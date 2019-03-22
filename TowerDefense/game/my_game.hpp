@@ -14,6 +14,13 @@ namespace hoffman::isaiah {
 		class Pathfinder;
 	}
 
+	namespace graphics {
+		class Renderer2D;
+		namespace DX {
+			class DeviceResources2D;
+		}
+	}
+
 	namespace game {
 		// Forward declarations
 		class GameMap;
