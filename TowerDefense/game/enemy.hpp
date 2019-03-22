@@ -227,7 +227,7 @@ namespace hoffman::isaiah {
 			}
 			/// <returns>The enemy's starting speed adjusted for the level, difficulty, and challenge level.</returns>
 			static double getAdjustedSpeed(double base_speed, int level, double difficulty, int challenge_level) noexcept {
-				return base_speed + math::get_min(base_speed / 2.0, (level - 1) * challenge_level * 0.001)
+				return base_speed + math::get_min(base_speed / 2.0, static_cast<double>(level - 1) * challenge_level * 0.001)
 					+ math::get_max(0.0, math::get_min(base_speed / 2.0, (difficulty - 1.0) * 0.0025));
 			}
 			/// <summary>Creates the enemy's actual buffs from the templates stored in its type.</summary>

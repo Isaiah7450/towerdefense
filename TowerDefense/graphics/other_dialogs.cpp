@@ -28,7 +28,7 @@ namespace hoffman::isaiah::winapi {
 			switch (LOWORD(wparam)) {
 			case IDOK:
 			{
-				const int my_clevel = static_cast<int>(SendMessage(GetDlgItem(hwnd, IDC_CHALLENGE_LEVEL_SELECTOR), CB_GETCURSEL, 0, 0));
+				const uintptr_t my_clevel = SendMessage(GetDlgItem(hwnd, IDC_CHALLENGE_LEVEL_SELECTOR), CB_GETCURSEL, 0, 0);
 				EndDialog(hwnd, ID_CHALLENGE_LEVEL_EASY + my_clevel);
 				break;
 			}

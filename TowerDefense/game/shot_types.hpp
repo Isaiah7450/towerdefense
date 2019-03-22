@@ -240,7 +240,7 @@ namespace hoffman::isaiah {
 			}
 			/// <returns>The total amount of time the DoT effect lasts for in **seconds**.</returns>
 			double getDoTTotalDuration() const noexcept {
-				return (this->getMillisecondsBetweenTicks() * this->getTotalTicks()) / 1000.0;
+				return static_cast<double>(this->getMillisecondsBetweenTicks()) * this->getTotalTicks() / 1000.0;
 			}
 			/// <returns>The average damage per second dealt to a single enemy.</returns>
 			double getDoTDPS() const noexcept {

@@ -143,7 +143,7 @@ namespace hoffman::isaiah {
 				case HeuristicStrategies::Diagonal:
 					// Diagonal shortcut which is generally used
 					// when one can move in 8 directions.
-					this->h = static_cast<double>(dx + dy) + (std::sqrt(2) - 2) * math::get_min(dx, dy) * h_modifier;
+					this->h = (static_cast<double>(dx) + dy) + (std::sqrt(2) - 2) * math::get_min(dx, dy) * h_modifier;
 					break;
 				case HeuristicStrategies::Max_Dx_Dy:
 					// A variant on diagonal shortcut where the cost of moving diagonally is
@@ -154,7 +154,7 @@ namespace hoffman::isaiah {
 				default:
 					// Default behavior is to use Manhattan which is
 					// generally used when one can travel only in the 4 cardinal directions.
-					this->h = static_cast<double>(dx + dy) * h_modifier;
+					this->h = (static_cast<double>(dx) + dy) * h_modifier;
 					break;
 				}
 			}

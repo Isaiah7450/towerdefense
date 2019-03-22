@@ -72,7 +72,7 @@ namespace hoffman::isaiah {
 				DeleteMenu(my_menu, 2, MF_BYPOSITION);
 			}
 			// Add menu items
-			for (unsigned int i = 0; i < towers.size(); ++i) {
+			for (uintptr_t i = 0; i < towers.size(); ++i) {
 				std::wstring my_tower_str = towers[i]->getName() + L": $"s
 					+ std::to_wstring(static_cast<int>(std::ceil(towers[i]->getCost())));
 				AppendMenu(my_menu, MF_STRING, ID_MM_TOWERS_NONE + i + 1, my_tower_str.c_str());
@@ -88,7 +88,7 @@ namespace hoffman::isaiah {
 				DeleteMenu(my_menu, 0, MF_BYPOSITION);
 			}
 			// Add menu items
-			unsigned int i = 0;
+			uintptr_t i = 0;
 			for (const auto& stype : shots) {
 				AppendMenu(my_menu, MF_STRING, ID_MM_SHOTS_PLACEHOLDER + i, stype.first.c_str());
 				++i;
@@ -104,7 +104,7 @@ namespace hoffman::isaiah {
 				DeleteMenu(my_menu, 0, MF_BYPOSITION);
 			}
 			// Add menu items
-			unsigned int i = 0;
+			uintptr_t i = 0;
 			for (const auto& etype : enemies) {
 				if (seen_before.at(etype.first)) {
 					AppendMenu(my_menu, MF_STRING, ID_MM_ENEMIES_PLACEHOLDER + i, etype.first.c_str());
