@@ -149,7 +149,11 @@ namespace hoffman::isaiah {
 			double getAverageDamagePerShot() const noexcept {
 				return towers::getAverageDamagePerShot(this->getBaseType()->getShotTypes(), this->getDamageMultiplier());
 			}
-			/// <returns>The weighted average of the tower's shot types.</returns>
+			/// <returns>The weighted average effect rating of the tower's shot types.</returns>
+			double getAverageShotEffectRating() const noexcept {
+				return towers::getAverageShotEffectRating(this->getBaseType()->getShotTypes());
+			}
+			/// <returns>The weighted average rating of the tower's shot types.</returns>
 			double getAverageShotRating() const noexcept {
 				return towers::getAverageShotRating(this->getBaseType()->getShotTypes());
 			}
@@ -163,9 +167,9 @@ namespace hoffman::isaiah {
 			}
 			/// <summary>Updates the stored rating value of the tower.</summary>
 			void updateRating() noexcept {
-				this->rating = towers::getRating(this->getRateOfFire(), this->getFiringArea(),
+				this->rating = towers::getRating(this->getRateOfFire(), this->getFiringRange(), this->getFiringArea(),
 					this->getBaseType()->getFiringMethod(), this->getBaseType()->getTargetingStrategy(),
-					this->getAverageDamagePerShot(), this->getAverageShotRating(), this->getBaseType()->isWall());
+					this->getAverageDamagePerShot(), this->getAverageShotEffectRating(), this->getBaseType()->isWall());
 			}
 			/// <summary>Updates the stored cost (i.e.: value) of the tower.</summary>
 			void updateValue() noexcept {

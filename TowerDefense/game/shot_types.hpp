@@ -89,18 +89,20 @@ namespace hoffman::isaiah {
 			double getAverageExtraTargets() const noexcept {
 				return this->getImpactRadius() * this->getImpactRadius() * math::pi;
 			}
-			/// <returns>The shot's expected average damage factoring in both multipliers
-			/// and splash damage.</returns>
-			double getExpectedRawDamage() const noexcept {
-				return this->getExpectedBaseDamage() * this->getDamageMultiplierRating();
-			}
-			/// <returns>The shot's total rating which also considers its special effects.</returns>
-			double getRating() const noexcept {
-				return this->getBaseRating() + this->getExtraRating();
+			/// <returns>The shot's basic rating which considers its core stats only. (It's basically
+			/// an estimate of the shot's damage potential.)</returns>
+			double getBaseRating() const noexcept {
+				return this->getExpectedBaseDamage() * this->getDamageMultiplierRating()
+					* (1.0 + this->getPiercing() / 2.0);
 			}
 			/// <returns>The shot's extra rating which considers its special effects primarily.</returns>
 			virtual double getExtraRating() const noexcept {
 				return 0;
+			}
+			/// <returns>The shot's total rating which considers both its stats (i.e.: damage capability)
+			/// and its special effects (such as stun, slow, etc.)</returns>
+			double getRating() const noexcept {
+				return this->getBaseRating() + this->getExtraRating() + (this->getSpeed() * 0.01);
 			}
 
 			/// <returns>True if the shot's effect also applies to enemies indirectly hit.</returns>
@@ -130,11 +132,6 @@ namespace hoffman::isaiah {
 			/// <returns>The amount that the damage multipliers contribute the shot's rating as a whole.</returns>
 			double getDamageMultiplierRating() const noexcept {
 				return this->getAirMultiplier() * 0.33 + this->getGroundMultiplier() * 0.67;
-			}
-			/// <returns>The shot's basic rating which considers its core stats only.</returns>
-			double getBaseRating() const noexcept {
-				return this->getExpectedBaseDamage() * this->getDamageMultiplierRating()
-					* (1.0 + this->getPiercing() / 2.0) + (this->getSpeed() * 0.01);
 			}
 
 		private:

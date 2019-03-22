@@ -247,7 +247,7 @@ namespace hoffman::isaiah::winapi {
 		SetDlgItemText(hwnd, IDC_INFO_SHOT_BASE_NUM_TARGETS, my_stream.str().c_str());
 		my_stream.str(L"");
 		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
-			<< my_stype.getExpectedRawDamage();
+			<< my_stype.getBaseRating();
 		SetDlgItemText(hwnd, IDC_INFO_SHOT_BASE_RAW_DAMAGE, my_stream.str().c_str());
 		my_stream.str(L"");
 		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
@@ -306,8 +306,8 @@ namespace hoffman::isaiah::winapi {
 		SetDlgItemText(hwnd, IDC_INFO_TOWER_EXPECTED_SHOT_DAMAGE, my_stream.str().c_str());
 		my_stream.str(L"");
 		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
-			<< my_ttype.getAverageShotRating();
-		SetDlgItemText(hwnd, IDC_INFO_TOWER_AVG_SHOT_RATING, my_stream.str().c_str());
+			<< my_ttype.getAverageShotEffectRating();
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_AVG_SHOT_EFFECT_RATING, my_stream.str().c_str());
 		my_stream.str(L"");
 		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
 			<< my_ttype.getRateOfFire() << L" / s";
@@ -381,8 +381,8 @@ namespace hoffman::isaiah::winapi {
 		SetDlgItemText(hwnd, IDC_INFO_TOWER_EXPECTED_SHOT_DAMAGE, my_stream.str().c_str());
 		my_stream.str(L"");
 		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
-			<< this->my_tower.getAverageShotRating();
-		SetDlgItemText(hwnd, IDC_INFO_TOWER_AVG_SHOT_RATING, my_stream.str().c_str());
+			<< this->my_tower.getAverageShotEffectRating();
+		SetDlgItemText(hwnd, IDC_INFO_TOWER_AVG_SHOT_EFFECT_RATING, my_stream.str().c_str());
 		my_stream.str(L"");
 		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
 			<< this->my_tower.getRateOfFire() << L" / s";

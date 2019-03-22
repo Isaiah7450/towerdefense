@@ -23,10 +23,13 @@ namespace hoffman::isaiah::game {
 		double getFiringArea(double fr, const FiringMethod& fm, bool is_wall) noexcept;
 		/// <param name="stypes">The shot types and related frequencies that the tower fires.</param>
 		/// <param name="dm">The tower's damage multiplier.</param>
-		/// <returns>The expected amount of raw damage output by the tower per shot on average.</returns>
+		/// <returns>The expected amount of damage output by the twoer.</returns>
 		double getAverageDamagePerShot(const std::vector<std::pair<std::shared_ptr<ShotBaseType>, double>>& stypes, double dm) noexcept;
 		/// <param name="stypes">The shot types and related frequencies that the tower fires.</param>
-		/// <returns>The weighted average of the tower's shot types.</returns>
+		/// <returns>The weighted average of the tower's shot types' effect ratings.</returns>
+		double getAverageShotEffectRating(const std::vector<std::pair<std::shared_ptr<ShotBaseType>, double>>& stypes) noexcept;
+		/// <param name="stypes">The shot types and related frequencies that the tower fires.</param>
+		/// <returns>The weighted average of the tower's shot types' ratings.</returns>
 		double getAverageShotRating(const std::vector<std::pair<std::shared_ptr<ShotBaseType>, double>>& stypes) noexcept;
 		/// <param name="fs">The tower's firing speed in shots / second.</param>
 		/// <param name="vs">The tower's volley shots.</param>
@@ -51,21 +54,22 @@ namespace hoffman::isaiah::game {
 			return avg_dmg * rate_of_fire;
 		}
 		/// <param name="rate_of_fire">The rate of fire of the tower.</param>
+		/// <param name="firing_range'>The firing range of the tower.</param>
 		/// <param name="firing_area">The total firing area covered by the tower.</param>
 		/// <param name="fm">The firing method of the tower.</param>
 		/// <param name="ts">The targeting strategy of the tower.</param>
 		/// <param name="avg_dmg">The expected damage per shot of the tower.</param>
-		/// <param name="avg_shot_rating">The average shot rating of the tower.</param>
+		/// <param name="avg_effect_rating">The average shot effect rating of the tower.</param>
 		/// <param name="is_wall">Is this tower considered a wall?</param>
 		/// <returns>The tower's overall rating.</returns>
-		double getRating(double rate_of_fire, double firing_area, const FiringMethod& fm, const TargetingStrategy& ts,
-			double avg_dmg, double avg_shot_rating, bool is_wall) noexcept;
+		double getRating(double rate_of_fire, double firing_range, double firing_area, const FiringMethod& fm, const TargetingStrategy& ts,
+			double avg_dmg, double avg_effect_rating, bool is_wall) noexcept;
 		/// <param name="rating">The tower's rating.</param>
 		/// <param name="cost_adjust">The tower's cost adjustment.</param>
 		/// <param name="is_wall">Is this tower considered a wall?</param>
 		/// <returns>The cost of the tower.</returns>
 		inline double getCost(double rating, int cost_adjust, bool is_wall) noexcept {
-			return is_wall ? static_cast<double>(cost_adjust) : cost_adjust + rating / 8.4 + 1.0;
+			return is_wall ? static_cast<double>(cost_adjust) : cost_adjust + rating / 8.2 + 1.0;
 		}
 	}
 

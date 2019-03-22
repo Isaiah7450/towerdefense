@@ -324,7 +324,11 @@ namespace hoffman::isaiah {
 			double getAverageDamagePerShot() const noexcept {
 				return towers::getAverageDamagePerShot(this->getShotTypes(), 1.0);
 			}
-			/// <returns>The weighted average of the tower's shot types.</returns>
+			/// <returns>The weighted average effect rating of the tower's shot types.</returns>
+			double getAverageShotEffectRating() const noexcept {
+				return towers::getAverageShotEffectRating(this->getShotTypes());
+			}
+			/// <returns>The weighted average rating of the tower's shot types.</returns>
 			double getAverageShotRating() const noexcept {
 				return towers::getAverageShotRating(this->getShotTypes());
 			}
@@ -338,8 +342,9 @@ namespace hoffman::isaiah {
 			}
 			/// <returns>The tower's overall rating.</returns>
 			double getRating() const noexcept {
-				return towers::getRating(this->getRateOfFire(), this->getFiringArea(), this->getFiringMethod(), this->getTargetingStrategy(),
-					this->getAverageDamagePerShot(), this->getAverageShotRating(), this->isWall());
+				return towers::getRating(this->getRateOfFire(), this->getFiringRange(), this->getFiringArea(),
+					this->getFiringMethod(), this->getTargetingStrategy(),
+					this->getAverageDamagePerShot(), this->getAverageShotEffectRating(), this->isWall());
 			}
 			/// <returns>The cost of the tower.</returns>
 			double getCost() const noexcept {

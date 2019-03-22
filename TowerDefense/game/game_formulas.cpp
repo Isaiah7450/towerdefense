@@ -23,9 +23,17 @@ namespace hoffman::isaiah::game {
 		double getAverageDamagePerShot(const std::vector<std::pair<std::shared_ptr<ShotBaseType>, double>>& stypes, double dm) noexcept {
 			double sum = 0.0;
 			for (const auto& st : stypes) {
-				sum += st.first->getExpectedRawDamage() * st.second;
+				sum += st.first->getBaseRating() * st.second;
 			}
 			return sum * dm;
+		}
+
+		double getAverageShotEffectRating(const std::vector<std::pair<std::shared_ptr<ShotBaseType>, double>>& stypes) noexcept {
+			double sum = 0.0;
+			for (const auto& st : stypes) {
+				sum += st.first->getExtraRating() * st.second;
+			}
+			return sum;
 		}
 
 		double getAverageShotRating(const std::vector<std::pair<std::shared_ptr<ShotBaseType>, double>>& stypes) noexcept {
@@ -36,20 +44,25 @@ namespace hoffman::isaiah::game {
 			return sum;
 		}
 
-		double getRating(double rate_of_fire, double firing_area, const FiringMethod& fm, const TargetingStrategy& ts,
-			double avg_dmg, double avg_shot_rating, bool is_wall) noexcept {
+		double getRating(double rate_of_fire, double firing_range, double firing_area, const FiringMethod& fm, const TargetingStrategy& ts,
+			double avg_dmg, double avg_effect_rating, bool is_wall) noexcept {
+			UNREFERENCED_PARAMETER(firing_area);
 			if (is_wall) return 1.0;
-			const auto speed_range_multipliers = rate_of_fire * (firing_area / 2.5);
+			const auto my_coverage_angle = fm.getMethod() == FiringMethodTypes::Default ? 2.0 * math::pi
+				: (fm.getMaximumAngle() - fm.getMinimumAngle());
+//			const auto my_range_modifier = my_coverage_angle * (firing_range * std::log(firing_range - 1.0 + math::e));
+			const auto my_range_modifier = my_coverage_angle * (firing_range * std::sqrt(firing_range));
+			const auto speed_range_multipliers = rate_of_fire * (my_range_modifier / 2.5);
 			const auto behavior_modifier = (fm.getMethod() == FiringMethodTypes::Default ? 0.0 : -2.5)
 				+ (ts.getStrategy() == TargetingStrategyTypes::Distances ? 0.0 : 3.5);
-			const auto my_dps_idea = avg_dmg * speed_range_multipliers;
-			const auto my_effect_idea = max(0.0, (avg_shot_rating - avg_dmg)) * speed_range_multipliers;
-			if (my_dps_idea > my_effect_idea) {
-				return (my_dps_idea * 0.65 + my_effect_idea * 0.35)
+			const auto my_damage_value = avg_dmg;
+			const auto my_effect_value = avg_effect_rating * 1.33;
+			if (my_damage_value > avg_effect_rating) {
+				return (my_damage_value * 0.65 + my_effect_value * 0.65) * speed_range_multipliers
 					+ behavior_modifier;
 			}
 			else {
-				return (my_dps_idea * 0.35 + my_effect_idea * 0.65)
+				return (my_damage_value * 0.40 + my_effect_value * 0.60) * speed_range_multipliers
 					+ behavior_modifier;
 			}
 		}
