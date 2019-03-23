@@ -1,5 +1,8 @@
 # Tower upgrades file.
 # Annotated example configuration file.
+# This file has yet to be updated for some of the changes that occurred in
+# versions past 3.2.0. In particular, the changes became multis, and have
+# a range of 0 < multi < infinity instead of -1 < multi < infinity.
 [global]
 # The configuration file version. It should be set to 1 for now.
 version = 1
