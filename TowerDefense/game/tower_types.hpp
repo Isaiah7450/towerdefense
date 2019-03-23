@@ -180,11 +180,11 @@ namespace hoffman::isaiah {
 				special_effect {special},
 				special_chance {schance},
 				special_power {spower},
-				damage_change {dmg},
-				speed_change {spd},
-				range_change {rng},
-				ammo_change {ammo},
-				delay_change {delay} {
+				damage_multiplier {dmg},
+				speed_multiplier {spd},
+				range_multiplier {rng},
+				ammo_multiplier {ammo},
+				delay_multiplier {delay} {
 			}
 
 			// Getters
@@ -206,21 +206,20 @@ namespace hoffman::isaiah {
 			double getSpecialPower() const noexcept {
 				return this->special_power;
 			}
-			// Note taht stacked upgrades give additive bonuses, not multiplicative.
-			double getDamageChange() const noexcept {
-				return this->damage_change;
+			double getDamageMultiplier() const noexcept {
+				return this->damage_multiplier;
 			}
-			double getSpeedChange() const noexcept {
-				return this->speed_change;
+			double getSpeedMultiplier() const noexcept {
+				return this->speed_multiplier;
 			}
-			double getRangeChange() const noexcept {
-				return this->range_change;
+			double getRangeMultiplier() const noexcept {
+				return this->range_multiplier;
 			}
-			double getAmmoChange() const noexcept {
-				return this->ammo_change;
+			double getAmmoMultiplier() const noexcept {
+				return this->ammo_multiplier;
 			}
-			double getDelayChange() const noexcept {
-				return this->delay_change;
+			double getDelayMultiplier() const noexcept {
+				return this->delay_multiplier;
 			}
 		private:
 			/// <summary>The level of the upgrade.</summary>
@@ -235,18 +234,17 @@ namespace hoffman::isaiah {
 			double special_chance;
 			/// <summary>The special effect's power.</summary>
 			double special_power;
-			// Note: Negative values are allowed. Effective range is -1.00 < x < infinity.
-			// Also note that values are additive here when stacking upgrades.
-			/// <summary>The % change in the tower's damage.</summary>
-			double damage_change;
-			/// <summary>The % change in the tower's firing speed.</summary>
-			double speed_change;
-			/// <summary>The % change in the tower's firing range.</summary>
-			double range_change;
-			/// <summary>The % change in the tower's volley shots.</summary>
-			double ammo_change;
-			/// <summary>The % change in the tower's reload delay.</summary>
-			double delay_change;
+			// Upgrades stack multiplicatively.
+			/// <summary>The % by which damage is multiplied.</summary>
+			double damage_multiplier;
+			/// <summary>The % by which firing speed is multiplied.</summary>
+			double speed_multiplier;
+			/// <summary>The % by which firing range is multiplied.</summary>
+			double range_multiplier;
+			/// <summary>The % by which ammo is multiplied.</summary>
+			double ammo_multiplier;
+			/// <summary>The % by which reload delay is multiplied.</summary>
+			double delay_multiplier;
 		};
 
 		/// <summary>The class for all towers in the game, including walls.</summary>

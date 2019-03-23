@@ -67,11 +67,11 @@ namespace hoffman::isaiah {
 				this->upgrade_path |= (1U << static_cast<unsigned>(new_level - 1)) * static_cast<int>(upgrade_option);
 				for (const auto& upgrade : my_upgrades) {
 					if (upgrade.getLevel() == new_level && upgrade.getOption() == upgrade_option) {
-						this->dmg_multiplier += upgrade.getDamageChange();
-						this->fire_speed_multiplier += upgrade.getSpeedChange();
-						this->fire_range_multiplier += upgrade.getRangeChange();
-						this->volley_shots_multiplier += upgrade.getAmmoChange();
-						this->reload_delay_multiplier += upgrade.getDelayChange();
+						this->dmg_multiplier *= upgrade.getDamageMultiplier();
+						this->fire_speed_multiplier *= upgrade.getSpeedMultiplier();
+						this->fire_range_multiplier *= upgrade.getRangeMultiplier();
+						this->volley_shots_multiplier *= upgrade.getAmmoMultiplier();
+						this->reload_delay_multiplier *= upgrade.getDelayMultiplier();
 						// Update the special with the highest values.
 						auto my_iterator = this->upgrade_specials.find(upgrade.getSpecial());
 						if (my_iterator == this->upgrade_specials.end()) {

@@ -934,34 +934,34 @@ namespace hoffman::isaiah {
 					my_parser.readKeyValue(L"special_power");
 					const double upgrade_special_power = my_parser.parseNumber();
 					// I should validate special power but I don't see a real reason to do it right now.
-					my_parser.readKeyValue(L"damage_change");
-					const double upgrade_damage_change = my_parser.parseNumber();
-					if (upgrade_damage_change <= -1.0) {
-						throw util::file::DataFileException {L"Damage change must be greater than -1.0.", my_parser.getLine()};
+					my_parser.readKeyValue(L"damage_multi");
+					const double upgrade_damage_multi = my_parser.parseNumber();
+					if (upgrade_damage_multi <= 0) {
+						throw util::file::DataFileException {L"Damage multi must be greater than 0.", my_parser.getLine()};
 					}
-					my_parser.readKeyValue(L"speed_change");
-					const double upgrade_speed_change = my_parser.parseNumber();
-					if (upgrade_speed_change <= -1.0) {
-						throw util::file::DataFileException {L"Speed change must be greater than -1.0.", my_parser.getLine()};
+					my_parser.readKeyValue(L"speed_multi");
+					const double upgrade_speed_multi = my_parser.parseNumber();
+					if (upgrade_speed_multi <= -0) {
+						throw util::file::DataFileException {L"Speed multi must be greater than 0.", my_parser.getLine()};
 					}
-					my_parser.readKeyValue(L"range_change");
-					const double upgrade_range_change = my_parser.parseNumber();
-					if (upgrade_range_change <= -1.0) {
-						throw util::file::DataFileException {L"Range change must be greater than -1.0.", my_parser.getLine()};
+					my_parser.readKeyValue(L"range_multi");
+					const double upgrade_range_multi = my_parser.parseNumber();
+					if (upgrade_range_multi <= 0) {
+						throw util::file::DataFileException {L"Range multi must be greater than 0.", my_parser.getLine()};
 					}
-					my_parser.readKeyValue(L"ammo_change");
-					const double upgrade_ammo_change = my_parser.parseNumber();
-					if (upgrade_ammo_change <= -1.0) {
-						throw util::file::DataFileException {L"Ammo change must be greater than -1.0.", my_parser.getLine()};
+					my_parser.readKeyValue(L"ammo_multi");
+					const double upgrade_ammo_multi = my_parser.parseNumber();
+					if (upgrade_ammo_multi <= 0) {
+						throw util::file::DataFileException {L"Ammo multi must be greater than 0.", my_parser.getLine()};
 					}
-					my_parser.readKeyValue(L"delay_change");
-					const double upgrade_delay_change = my_parser.parseNumber();
-					if (upgrade_delay_change <= -1.0) {
-						throw util::file::DataFileException {L"Delay change must be greater than -1.0.", my_parser.getLine()};
+					my_parser.readKeyValue(L"delay_multi");
+					const double upgrade_delay_multi = my_parser.parseNumber();
+					if (upgrade_delay_multi <= 0) {
+						throw util::file::DataFileException {L"Delay multi must be greater than 0.", my_parser.getLine()};
 					}
 					my_ttype->addUpgradeInfo(TowerUpgradeInfo {upgrade_level, upgrade_option, upgrade_cost_percent,
-						upgrade_damage_change, upgrade_speed_change, upgrade_range_change, upgrade_ammo_change,
-						upgrade_delay_change, upgrade_special, upgrade_special_chance, upgrade_special_power});
+						upgrade_damage_multi, upgrade_speed_multi, upgrade_range_multi, upgrade_ammo_multi,
+						upgrade_delay_multi, upgrade_special, upgrade_special_chance, upgrade_special_power});
 					my_parser.getNext();
 					my_parser.expectToken(util::file::TokenTypes::Object, L"}"s);
 					my_parser.getNext();

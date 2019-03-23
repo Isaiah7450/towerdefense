@@ -632,11 +632,11 @@ namespace hoffman::isaiah::winapi {
 		const double old_ammo_multi = this->my_tower.volley_shots_multiplier;
 		const double old_delay_multi = this->my_tower.reload_delay_multiplier;
 		const double old_dmg_multi = this->my_tower.dmg_multiplier;
-		const double new_speed_multi = old_speed_multi + this->my_upgrade->getSpeedChange();
-		const double new_range_multi = old_range_multi + this->my_upgrade->getRangeChange();
-		const double new_ammo_multi = old_ammo_multi + this->my_upgrade->getAmmoChange();
-		const double new_delay_multi = old_delay_multi + this->my_upgrade->getDelayChange();
-		const double new_dmg_multi = old_dmg_multi + this->my_upgrade->getDamageChange();
+		const double new_speed_multi = old_speed_multi * this->my_upgrade->getSpeedMultiplier();
+		const double new_range_multi = old_range_multi * this->my_upgrade->getRangeMultiplier();
+		const double new_ammo_multi = old_ammo_multi * this->my_upgrade->getAmmoMultiplier();
+		const double new_delay_multi = old_delay_multi * this->my_upgrade->getDelayMultiplier();
+		const double new_dmg_multi = old_dmg_multi * this->my_upgrade->getDamageMultiplier();
 		my_change_field_lambda(IDC_INFO_TOWER_UPGRADE_SPEED, new_speed_multi);
 		my_color_choose_lambda(IDC_INFO_TOWER_UPGRADE_SPEED, old_speed_multi, new_speed_multi);
 		my_change_field_lambda(IDC_INFO_TOWER_UPGRADE_RANGE, new_range_multi);
