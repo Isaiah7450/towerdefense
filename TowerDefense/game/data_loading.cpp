@@ -1073,10 +1073,11 @@ namespace hoffman::isaiah {
 				// Can't save now...
 				return;
 			}
-			save_file << L"V: " << 2 << L"\n";
+			save_file << L"V: " << 3 << L"\n";
 			save_file << L"C: " << this->challenge_level << L" D: " << this->difficulty
 				<< L" L: " << this->level << L"\n";
-			save_file << L"H: " << this->player.getHealth() << L" M: " << this->player.getMoney() << L"\n";
+			save_file << L"H: " << this->player.getHealth() << L" K: " << this->hp_buy_cost
+				<< L" M: " << this->player.getMoney() << L"\n";
 			save_file << L"W: " << this->win_streak << L" L: " << this->lose_streak << L"\n";
 			// Output terrain map
 			save_file << this->getMap().getTerrainGraph(false) << L"\n";
@@ -1101,12 +1102,18 @@ namespace hoffman::isaiah {
 			std::wstring buffer {};
 			int version;
 			save_file >> buffer >> version;
-			if (version == 1 || version == 2) {
+			if (version >= 1 && version <= 3) {
 				save_file >> buffer >> this->challenge_level >> buffer >> this->difficulty
 					>> buffer >> this->level;
 				int player_health;
 				double player_cash;
-				save_file >> buffer >> player_health >> buffer >> player_cash;
+				if (version <= 2) {
+					save_file >> buffer >> player_health >> buffer >> player_cash;
+				}
+				else {
+					save_file >> buffer >> player_health >> buffer >> this->hp_buy_cost
+						>> buffer >> player_cash;
+				}
 				this->player = Player {player_cash, player_health};
 				save_file >> buffer >> this->win_streak >> buffer >> this->lose_streak;
 				// Terrain map
