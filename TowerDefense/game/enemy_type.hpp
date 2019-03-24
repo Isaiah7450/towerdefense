@@ -39,9 +39,9 @@ namespace hoffman::isaiah {
 			}
 			virtual ~BuffBase() noexcept = default;
 			// Rule of 5:
-			BuffBase(const BuffBase&) noexcept = delete;
+			BuffBase(const BuffBase&) = default;
 			BuffBase(BuffBase&&) noexcept = default;
-			BuffBase& operator=(const BuffBase&) noexcept = delete;
+			BuffBase& operator=(const BuffBase&) = default;
 			BuffBase& operator=(BuffBase&&) noexcept = default;
 
 			/// <returns>Returns the buff's type. (Useful for switch statements.)</returns>
