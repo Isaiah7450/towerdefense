@@ -212,9 +212,12 @@ namespace hoffman::isaiah {
 						20 : this->level < 100 ?
 						15 : 10)) * (1.00 + this->getChallengeLevel() / 4.0)
 						+ std::sqrt(this->difficulty))
-						+ (this->level % 25 == 24 ? 60 :
-							this->level % 10 == 9 ? 30 :
-							this->level % 5 == 4 ? 10 : 0);
+						+ (this->level < 99
+							? (this->level == 98 ? 200
+								: this->level % 25 == 24 ? 60
+								: this->level % 10 == 9 ? 30
+								: this->level % 5 == 4 ? 10 : 0)
+							: 0);
 					this->player.changeMoney(max_reward_money * kill_percent);
 					this->my_level_enemy_count = 0;
 					this->my_level_enemy_killed = 0;
