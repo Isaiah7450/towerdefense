@@ -332,7 +332,7 @@ namespace hoffman::isaiah {
 						MB_OK | MB_ICONERROR);
 					// Reset state and save over the corrupted file...
 					game::g_my_game->resetState(ID_CHALLENGE_LEVEL_NORMAL);
-					std::wofstream save_file {game::default_save_file_name};
+					std::wofstream save_file {game::g_my_game->getUserDataPath() + game::default_save_file_name};
 					if (!save_file.bad() && !save_file.fail()) {
 						game::g_my_game->saveGame(save_file);
 					}
