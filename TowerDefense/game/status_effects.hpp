@@ -18,13 +18,15 @@ namespace hoffman::isaiah {
 		/// <summary>Base class for all status effects.</summary>
 		class StatusEffectBase {
 		public:
+			StatusEffectBase(StatusEffects my_effect_type) noexcept :
+				effect_type {my_effect_type} {
+			}
 			virtual ~StatusEffectBase() noexcept = default;
 			// Rule of 5:
 			StatusEffectBase(const StatusEffectBase&) noexcept = default;
 			StatusEffectBase(StatusEffectBase&&) noexcept = default;
 			StatusEffectBase& operator=(const StatusEffectBase&) noexcept = default;
 			StatusEffectBase& operator=(StatusEffectBase&&) noexcept = default;
-			StatusEffectBase() noexcept = default;
 			/// <summary>This function clears harmful effects when the status effect finishes.</summary>
 			virtual void clearEffects(Enemy& e) {
 				UNREFERENCED_PARAMETER(e);
@@ -34,9 +36,15 @@ namespace hoffman::isaiah {
 			/// <param name="e">The enemy that this is being called for.</param>
 			/// <returns>True if the status effect should be removed from the enemy.</returns>
 			virtual bool update(Enemy& e) = 0;
+			// Getters
+			StatusEffects getStatusEffectType() const noexcept {
+				return this->effect_type;
+			}
 			/// <returns>True if the status effect is considered beneficial to the enemy; otherwise, false.</returns>
 			virtual bool isPositiveEffect() const noexcept = 0;
 		private:
+			/// <summary>The status effect type.</summary>
+			StatusEffects effect_type;
 		};
 
 		/// <summary>Enumeration of possible DoT damage types.</summary>
@@ -64,6 +72,7 @@ namespace hoffman::isaiah {
 			/// <param name="ms_tick">The amount of time (in ms) between ticks.</param>
 			/// <param name="t_ticks">The total number of ticks.</param>
 			DoTEffect(DoTDamageTypes dt, double dmg_tick, int ms_tick, int t_ticks) :
+				StatusEffectBase {StatusEffects::DoT},
 				type {dt},
 				dmg_per_tick {dmg_tick},
 				frames_between_ticks {math::convertMillisecondsToFrames(ms_tick)},
@@ -96,6 +105,7 @@ namespace hoffman::isaiah {
 			/// expires.</param>
 			SmartStrategyEffect(int ms_til_expires, pathfinding::HeuristicStrategies new_strat,
 				bool diag_move_change) :
+				StatusEffectBase {StatusEffects::Smart},
 				frames_until_expire {math::convertMillisecondsToFrames(ms_til_expires)},
 				strat {new_strat},
 				diag_change {diag_move_change} {
@@ -136,6 +146,7 @@ namespace hoffman::isaiah {
 			/// <param name="sf">The slow-factor applied to the enemy; the enemy
 			/// will move this much slower.</param>
 			SlowEffect(double ms_til_expires, double sf) :
+				StatusEffectBase {StatusEffects::Slow},
 				frames_until_expire {math::convertMillisecondsToFrames(ms_til_expires)},
 				speed_multiplier {1.0 - sf} {
 			}
@@ -159,6 +170,7 @@ namespace hoffman::isaiah {
 		public:
 			/// <param name="ms_until_expires">The number of milliseconds until the effect expires.</param>
 			StunEffect(int ms_until_expires) :
+				StatusEffectBase {StatusEffects::Stun},
 				frames_until_expire {math::convertMillisecondsToFrames(ms_until_expires)} {
 			}
 			// Implements StatusEffectBase::onClear()
@@ -189,6 +201,7 @@ namespace hoffman::isaiah {
 			/// <param name="ib">The percentage increase to the enemy's injured speed boost.
 			/// (Expressed as a decimal, and note that 1.0 will be added to this value.)</param>
 			SpeedBoostEffect(int ms_until_expires, double wb, double rb, double ib) :
+				StatusEffectBase {StatusEffects::Speed_Boost},
 				frames_until_expire {math::convertMillisecondsToFrames(ms_until_expires)},
 				walking_boost {1.0 + wb},
 				running_boost {1.0 + rb},
@@ -222,6 +235,7 @@ namespace hoffman::isaiah {
 			/// status effect expires.</param>
 			/// <param name="sh">The amount of health in the shield.</param>
 			ShieldEffect(double ms_til_expires, double sh) :
+				StatusEffectBase {StatusEffects::Forcefield},
 				frames_until_expire {math::convertMillisecondsToFrames(ms_til_expires)},
 				shield_dmg_per_tick {0} {
 				this->shield_dmg_per_tick = sh / this->frames_until_expire;

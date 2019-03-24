@@ -15,6 +15,7 @@
 #include "./enemy_type.hpp"
 #include "./enemy.hpp"
 #include "./game_object.hpp"
+#include "./game_util.hpp"
 #include "./my_game.hpp"
 #include "./status_effects.hpp"
 using namespace std::literals::string_literals;
@@ -96,6 +97,35 @@ namespace hoffman::isaiah {
 		}
 
 		// enemy.hpp
+		Enemy::StatusResistance::StatusResistance(StatusEffects effect, double resist, int ms_until_expire) noexcept :
+			status_effect {effect},
+			status_resist {resist},
+			frames_until_expire {math::convertMillisecondsToFrames(ms_until_expire)} {
+		}
+
+		void Enemy::StatusResistance::update() {
+			if (this->frames_until_expire > 0) {
+				--this->frames_until_expire;
+				if (this->frames_until_expire <= 0) {
+					this->status_resist = 0;
+					this->frames_until_expire = 0;
+				}
+			}
+		}
+
+		void Enemy::StatusResistance::increaseResist() {
+			++this->num_times;
+			if (this->isActive()) {
+				this->frames_until_expire *= 2.0;
+				this->status_resist *= 2.0;
+				this->status_resist += 0.02 * this->num_times;
+			}
+			else {
+				this->frames_until_expire = math::convertMillisecondsToFrames(1000);
+				this->status_resist = 0.1 + 0.03 * this->num_times;
+			}
+		}
+
 		Enemy::Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
 			std::shared_ptr<EnemyType> etype, graphics::Color o_color,
 			const GameMap& gmap, int level, double difficulty, int challenge_level) :
@@ -159,6 +189,10 @@ namespace hoffman::isaiah {
 			if (!this->isAlive()) {
 				return true;
 			}
+			// Update status resistances.
+			for (auto& my_resist : this->status_resists) {
+				my_resist.second.update();
+			}
 			// Apply buffs
 			for (auto& b : this->buffs) {
 				b->update(*this, game::g_my_game->getEnemies());
@@ -167,6 +201,18 @@ namespace hoffman::isaiah {
 			std::vector<int> statuses_to_remove {};
 			for (unsigned int i = 0; i < this->status_effects.size(); ++i) {
 				if (this->status_effects[i]->update(*this)) {
+					const auto* my_status = this->status_effects[i].get();
+					const auto my_effect_type = my_status->getStatusEffectType();
+					if (!my_status->isPositiveEffect()) {
+						// Check for status resistances.
+						auto my_iterator = this->status_resists.find(my_effect_type);
+						if (my_iterator == this->status_resists.end()) {
+							this->status_resists.emplace(my_effect_type, Enemy::StatusResistance {my_effect_type, 0.10, 1000});
+						}
+						else {
+							my_iterator->second.increaseResist();
+						}
+					}
 					statuses_to_remove.emplace_back(i);
 				}
 			}
@@ -296,6 +342,18 @@ namespace hoffman::isaiah {
 		}
 
 		void Enemy::addStatus(std::unique_ptr<StatusEffectBase>&& effect) {
+			if (!effect->isPositiveEffect()) {
+				const auto my_iterator = this->status_resists.find(effect->getStatusEffectType());
+				if (my_iterator != this->status_resists.end()) {
+					const auto resist_chance = my_iterator->second.isActive()
+						? my_iterator->second.getResistance() : 0;
+					const auto my_roll = rng::distro_uniform(rng::gen);
+					if (my_roll <= resist_chance) {
+						// Enemy resists the status affliction!
+						return;
+					}
+				}
+			}
 			this->status_effects.emplace_back(std::move(effect));
 		}
 

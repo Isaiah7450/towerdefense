@@ -18,10 +18,42 @@ namespace hoffman::isaiah {
 	namespace game {
 		// Forward declaration
 		class StatusEffectBase;
+		enum class StatusEffects;
 
 		/// <summary>Class that represents an actual enemy in the game.</summary>
 		class Enemy : public GameObject {
 		public:
+			/// <summary>Stores information about a enemy's resistance to a status affliction.</summary>
+			class StatusResistance {
+			public:
+				/// <param name="effect">The status effect type.</param>
+				/// <param name="resist">The percentage resistance.</param>
+				/// <param name="ms_until_expires">The number of milliseconds until the resistance expires.</param>
+				StatusResistance(StatusEffects effect, double resist, int ms_until_expire) noexcept;
+				/// <summary>Updates the status resistance.</summary>
+				void update();
+				/// <summary>Increase the value of the enemy's resistance.</summary>
+				void increaseResist();
+				// Getters
+				/// <returns>True if the status effect resistance is active.</returns>
+				bool isActive() const noexcept {
+					return this->frames_until_expire > 0;
+				}
+				/// <returns>The enemy's resistance to the status effect.</returns>
+				double getResistance() const noexcept {
+					return this->status_resist;
+				}
+			private:
+				/// <summary>The status effect this structure is storing resistance information about.</summary>
+				StatusEffects status_effect;
+				/// <summary>The enemy's current resistance to the status affliction.</summary>
+				double status_resist;
+				/// <summary>The number of frames until the enemy's resistance to the status affliction expires.</summary>
+				double frames_until_expire;
+				/// <summary>The number of times the enemy has been inflicted by this status affliction.</summary>
+				int num_times {1};
+			};
+
 			Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
 				std::shared_ptr<EnemyType> etype, graphics::Color o_color,
 				const GameMap& gmap, int level, double difficulty, int challenge_level);
@@ -350,6 +382,8 @@ namespace hoffman::isaiah {
 			// Status ailments
 			/// <summary>The list of status effects that are currently affecting this enemy.</summary>
 			std::vector<std::unique_ptr<StatusEffectBase>> status_effects;
+			/// <summary>Keeps track of the enemy's resistance to status afflictions.</summary>
+			std::map<StatusEffects, Enemy::StatusResistance> status_resists;
 		};
 	}
 }
