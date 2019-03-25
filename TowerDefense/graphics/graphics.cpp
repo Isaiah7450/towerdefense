@@ -158,7 +158,10 @@ namespace hoffman::isaiah {
 			int mouse_end_gx, int mouse_end_gy, bool in_editor) const {
 			UNREFERENCED_PARAMETER(my_game);
 			// Check time before rendering
-			static LARGE_INTEGER last_update_time = LARGE_INTEGER {0};
+			static LARGE_INTEGER last_update_time {0};
+			if (last_update_time.QuadPart == 0) {
+				QueryPerformanceCounter(&last_update_time);
+			}
 			const auto my_times = winapi::MainWindow::getElapsedTime(last_update_time);
 			if (my_times.second.QuadPart < math::getMicrosecondsInSecond() / game::graphics_framerate) {
 				Sleep(1);

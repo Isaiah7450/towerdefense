@@ -46,7 +46,7 @@ namespace hoffman::isaiah {
 				elapsed_microseconds.QuadPart = current_time.QuadPart - start_time.QuadPart;
 				// Convert to microsecond
 				elapsed_microseconds.QuadPart *= 1000000;
-				elapsed_microseconds.QuadPart /= MainWindow::qpc_frequency.QuadPart;
+ 				elapsed_microseconds.QuadPart /= MainWindow::qpc_frequency.QuadPart;
 				return {current_time, elapsed_microseconds};
 			}
 		private:
