@@ -931,29 +931,23 @@ namespace hoffman::isaiah {
 			my_parser.readKeyValue(L"version"s);
 			my_parser.expectToken(util::file::TokenTypes::Number, L"1"s);
 			my_parser.readKeyValue(L"wave_spawn_delay"s);
-			int wave_spawn_delay = static_cast<int>(my_parser.parseNumber());
-			if (wave_spawn_delay < 200 || wave_spawn_delay > 20000) {
-				throw util::file::DataFileException {L"Wave spawn delay should be between 200ms and 20000ms inclusive."s,
-					my_parser.getLine()};
-			}
+			const int wave_spawn_delay = static_cast<int>(my_parser.parseNumber());
+			util::file::DataFileParser::validateNumber(wave_spawn_delay, 200, 20'000, L"Wave spawn delay (ms)", my_parser.getLine(), true, true);
 			my_parser.getNext();
 			std::deque<std::unique_ptr<EnemyWave>> my_level_waves {};
 			do {
 				// [wave] sections
 				my_parser.expectToken(util::file::TokenTypes::Section, L"wave"s);
 				my_parser.readKeyValue(L"group_spawn_delay"s);
-				int group_spawn_delay = static_cast<int>(my_parser.parseNumber());
-				if (group_spawn_delay < 100 || group_spawn_delay > 7500) {
-					throw util::file::DataFileException {L"Group spawn delay should be between 100ms and 7500ms inclusive."s,
-						my_parser.getLine()};
-				}
+				const int group_spawn_delay = static_cast<int>(my_parser.parseNumber());
+				util::file::DataFileParser::validateNumber(group_spawn_delay, 100, 7'500, L"Group spawn delay (ms)", my_parser.getLine(), true, true);
 				std::deque<std::unique_ptr<EnemyGroup>> my_wave_groups {};
 				my_parser.readKeyValue(L"groups"s);
 				my_parser.expectToken(util::file::TokenTypes::Object, L"{"s);
 				my_parser.getNext();
 				do {
 					my_parser.readKeyValue(L"enemy_name"s);
-					std::wstring enemy_name = my_parser.parseString();
+					const std::wstring enemy_name = my_parser.parseString();
 					if (this->enemy_types.find(enemy_name) == this->enemy_types.end()) {
 						throw util::file::DataFileException {L"Enemy type not found: "s + enemy_name + L"."s,
 							my_parser.getLine()};
@@ -961,15 +955,12 @@ namespace hoffman::isaiah {
 					std::shared_ptr<EnemyType> etype = this->getEnemyType(enemy_name);
 					my_parser.readKeyValue(L"extra_count"s);
 					int enemy_count = static_cast<int>(my_parser.parseNumber()) + this->challenge_level + 2;
-					if (enemy_count - this->challenge_level - 2 < 0) {
-						throw util::file::DataFileException {L"Extra count should be non-negative."s, my_parser.getLine()};
-					}
+					util::file::DataFileParser::validateNumberMinBound(enemy_count - this->challenge_level - 2, 0,
+						L"Extra count", my_parser.getLine(), true);
 					my_parser.readKeyValue(L"enemy_spawn_delay"s);
-					int enemy_spawn_delay = static_cast<int>(my_parser.parseNumber());
-					if (enemy_spawn_delay < 10 || enemy_spawn_delay > 5000) {
-						throw util::file::DataFileException {L"Enemy spawn delay should be between 10ms and 5000ms inclusive."s,
-							my_parser.getLine()};
-					}
+					const int enemy_spawn_delay = static_cast<int>(my_parser.parseNumber());
+					util::file::DataFileParser::validateNumber(enemy_spawn_delay, 10, 5'000,
+						L"Enemy spawn delay (ms)", my_parser.getLine(), true, true);
 					std::queue<std::unique_ptr<Enemy>> my_enemy_spawns {};
 					if (etype->isUnique()) {
 						enemy_count -= this->getChallengeLevel() + 1;
