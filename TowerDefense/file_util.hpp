@@ -259,7 +259,7 @@ namespace hoffman::isaiah {
 					}
 				}
 				else if (value <= min_bound) {
-					throw DataFileException {prompt + L" must exceed " + std::to_string(min_bound) + L".", line};
+					throw DataFileException {prompt + L" must exceed " + std::to_wstring(min_bound) + L".", line};
 				}
 			}
 

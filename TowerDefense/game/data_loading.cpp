@@ -108,10 +108,13 @@ namespace hoffman::isaiah {
 			my_parser.expectToken(util::file::TokenTypes::Section, L"health_buying"s);
 			my_parser.readKeyValue(L"amount_gained");
 			this->hp_gained_per_buy = static_cast<int>(my_parser.parseNumber());
+			util::file::DataFileParser::validateNumberMinBound(this->hp_gained_per_buy, 0, L"Amount gained", my_parser.getLine(), true);
 			my_parser.readKeyValue(L"initial_cost");
 			this->hp_buy_cost = my_parser.parseNumber();
+			util::file::DataFileParser::validateNumberMinBound(this->hp_buy_cost, 0., L"Initial cost", my_parser.getLine(), false);
 			my_parser.readKeyValue(L"cost_multiplier");
 			this->hp_buy_multiplier = my_parser.parseNumber();
+			util::file::DataFileParser::validateNumberMinBound(this->hp_buy_multiplier, 1., L"Cost multiplier", my_parser.getLine(), true);
 		}
 
 #pragma warning(push)
@@ -123,137 +126,135 @@ namespace hoffman::isaiah {
 			}
 			// (I might eventually rewrite this so that all the legacy code is gone...)
 			// (But this will do for the time being.)
-			auto my_parser {std::make_unique<util::file::DataFileParser>(data_file)};
+			util::file::DataFileParser my_parser {data_file};
 			// Globals section
-			my_parser->expectToken(util::file::TokenTypes::Section, L"global"s);
-			auto my_token = my_parser->readKeyValue(L"version"s);
-			my_parser->expectToken(util::file::TokenTypes::Number, L"1"s);
+			my_parser.expectToken(util::file::TokenTypes::Section, L"global"s);
+			auto my_token = my_parser.readKeyValue(L"version"s);
+			my_parser.expectToken(util::file::TokenTypes::Number, L"1"s);
 			// Buff Targets section
-			my_parser->getNext();
-			my_parser->expectToken(util::file::TokenTypes::Section, L"buff_targets"s);
+			my_parser.getNext();
+			my_parser.expectToken(util::file::TokenTypes::Section, L"buff_targets"s);
 #pragma warning(push)
 #pragma warning(disable: 26444) // ES84: Avoid unnamed objects with custom construction/destruction. (No Idea...)
-			my_parser->readKeyValue(L"targets"s);
+			my_parser.readKeyValue(L"targets"s);
 #pragma warning(pop)
-			my_parser->expectToken(util::file::TokenTypes::Object, L"{"s);
+			my_parser.expectToken(util::file::TokenTypes::Object, L"{"s);
 			// Key => Group Name, Value => List of enemy names associated with that group name
 			std::map<std::wstring, std::vector<std::wstring>> buff_target_groups {};
 			while (true) {
-				my_parser->getNext();
-				if (my_parser->matchToken(util::file::TokenTypes::Object, L"}"s)) {
-					my_parser->getNext();
+				my_parser.getNext();
+				if (my_parser.matchToken(util::file::TokenTypes::Object, L"}"s)) {
+					my_parser.getNext();
 					break;
 				}
-				else if (!my_parser->matchTokenType(util::file::TokenTypes::Object)) {
+				else if (!my_parser.matchTokenType(util::file::TokenTypes::Object)) {
 					throw util::file::DataFileException {L"Expected either an opening or closing brace."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				}
 				// (Yes, this means the quotes are optional in some cases...)
-				std::wstring group_name = my_parser->readKeyValue(L"group_name"s).second;
-				my_token = my_parser->readKeyValue(L"target_names"s);
+				std::wstring group_name = my_parser.readKeyValue(L"group_name"s).second;
+				my_token = my_parser.readKeyValue(L"target_names"s);
 				if (!util::file::matchTokenType(util::file::TokenTypes::List, my_token.first)) {
 					throw util::file::DataFileException {L"Expected a list of names following the equal signs."s
-						L" (Start the list with < and end it with >.)"s, my_parser->getLine()};
+						L" (Start the list with < and end it with >.)"s, my_parser.getLine()};
 				}
-				std::vector<std::wstring> target_names = my_parser->readList();
+				std::vector<std::wstring> target_names = my_parser.readList();
 				buff_target_groups.emplace(group_name, target_names);
-				my_parser->getNext();
-				my_parser->expectToken(util::file::TokenTypes::Object, L"}"s);
+				my_parser.getNext();
+				my_parser.expectToken(util::file::TokenTypes::Object, L"}"s);
 			}
 			do {
 				// Enemy Sections
-				my_parser->expectToken(util::file::TokenTypes::Section, L"enemy"s);
-				my_token = my_parser->readKeyValue(L"name"s);
-				std::wstring n = util::file::parseString(my_token, my_parser->getLine());
-				my_token = my_parser->readKeyValue(L"desc"s);
-				std::wstring d = util::file::parseString(my_token, my_parser->getLine());
-				graphics::Color c = my_parser->readColor();
-				graphics::shapes::ShapeTypes st = my_parser->readShape();
-				my_token = my_parser->readKeyValue(L"damage"s);
-				int dmg = static_cast<int>(util::file::parseNumber(my_token, my_parser->getLine()));
-				if (dmg <= 0) {
-					throw util::file::DataFileException {L"Damage must be positive."s, my_parser->getLine()};
-				}
-				my_token = my_parser->readKeyValue(L"health"s);
-				double hp = util::file::parseNumber(my_token, my_parser->getLine());
+				my_parser.expectToken(util::file::TokenTypes::Section, L"enemy"s);
+				my_token = my_parser.readKeyValue(L"name"s);
+				const std::wstring n = util::file::parseString(my_token, my_parser.getLine());
+				my_token = my_parser.readKeyValue(L"desc"s);
+				const std::wstring d = util::file::parseString(my_token, my_parser.getLine());
+				const graphics::Color c = my_parser.readColor();
+				const graphics::shapes::ShapeTypes st = my_parser.readShape();
+				my_token = my_parser.readKeyValue(L"damage"s);
+				int dmg = static_cast<int>(util::file::parseNumber(my_token, my_parser.getLine()));
+				util::file::DataFileParser::validateNumberMinBound(dmg, 0, L"Damage", my_parser.getLine(), false);
+				my_token = my_parser.readKeyValue(L"health"s);
+				double hp = util::file::parseNumber(my_token, my_parser.getLine());
 				if (hp <= 0.0) {
-					throw util::file::DataFileException {L"Health must be positive."s, my_parser->getLine()};
+					throw util::file::DataFileException {L"Health must be positive."s, my_parser.getLine()};
 				}
-				my_token = my_parser->readKeyValue(L"armor_health"s);
-				double ahp = util::file::parseNumber(my_token, my_parser->getLine());
+				my_token = my_parser.readKeyValue(L"armor_health"s);
+				double ahp = util::file::parseNumber(my_token, my_parser.getLine());
 				if (ahp < 0.0) {
-					throw util::file::DataFileException {L"Armor health must be non-negative."s, my_parser->getLine()};
+					throw util::file::DataFileException {L"Armor health must be non-negative."s, my_parser.getLine()};
 				}
-				my_token = my_parser->readKeyValue(L"armor_reduce"s);
+				my_token = my_parser.readKeyValue(L"armor_reduce"s);
 				// Allowing ar == 1.0 is not good design.
-				double ar = util::file::parseNumber(my_token, my_parser->getLine());
+				double ar = util::file::parseNumber(my_token, my_parser.getLine());
 				if (ar < 0.0 || ar >= 1.0) {
 					throw util::file::DataFileException {L"Armor reduction must be between 0 and 1 inclusive-exclusive."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				}
-				my_token = my_parser->readKeyValue(L"pain_tolerance"s);
-				double pt = util::file::parseNumber(my_token, my_parser->getLine());
+				my_token = my_parser.readKeyValue(L"pain_tolerance"s);
+				double pt = util::file::parseNumber(my_token, my_parser.getLine());
 				if (pt <= 0.0 || pt >= 1.0) {
 					throw util::file::DataFileException {L"Pain tolerance must be between 0 and 1 exclusive."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				}
-				my_token = my_parser->readKeyValue(L"walking_speed"s);
-				double wspd = util::file::parseNumber(my_token, my_parser->getLine());
+				my_token = my_parser.readKeyValue(L"walking_speed"s);
+				double wspd = util::file::parseNumber(my_token, my_parser.getLine());
 				if (wspd < 0.5 || wspd > 25.0) {
 					throw util::file::DataFileException {L"Walking speed must be between 0.5 and 25.0 inclusive."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				}
 				// Not enforcing ispd <= wspd <= rspd because of interesting effects
 				// when that rule is not followed.
-				my_token = my_parser->readKeyValue(L"running_speed"s);
-				double rspd = util::file::parseNumber(my_token, my_parser->getLine());
+				my_token = my_parser.readKeyValue(L"running_speed"s);
+				double rspd = util::file::parseNumber(my_token, my_parser.getLine());
 				if (rspd > 25.0) {
 					throw util::file::DataFileException {L"Running speed must be between 0.5 and 25.0 inclusive."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				}
-				my_token = my_parser->readKeyValue(L"injured_speed"s);
-				double ispd = util::file::parseNumber(my_token, my_parser->getLine());
+				my_token = my_parser.readKeyValue(L"injured_speed"s);
+				double ispd = util::file::parseNumber(my_token, my_parser.getLine());
 				if (ispd < 0.5) {
 					throw util::file::DataFileException {L"Injured speed must be between 0.5 and 25.0 inclusive."s,
-					my_parser->getLine()};
+					my_parser.getLine()};
 				}
-				my_token = my_parser->readKeyValue(L"strategy"s);
+				my_token = my_parser.readKeyValue(L"strategy"s);
 				pathfinding::HeuristicStrategies strat =
 					my_token.second == L"Manhattan"s ? pathfinding::HeuristicStrategies::Manhattan
 					: my_token.second == L"Euclidean"s ? pathfinding::HeuristicStrategies::Euclidean
 					: my_token.second == L"Diagonal"s ? pathfinding::HeuristicStrategies::Diagonal
 					: my_token.second == L"Maximum"s ? pathfinding::HeuristicStrategies::Max_Dx_Dy
 					: throw util::file::DataFileException {L"Invalid strategy constant specified."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 #pragma warning(push)
 #pragma warning(disable: 26444) // ES84: Avoid unnamed objects with custom construction/destruction. (No Idea...)
-				my_parser->readKeyValue(L"can_move_diagonally"s);
-				bool move_diag = my_parser->parseBoolean();
-				my_parser->readKeyValue(L"is_flying"s);
-				bool fly = my_parser->parseBoolean();
-				my_parser->readKeyValue(L"is_unique"s);
-				bool unique = my_parser->parseBoolean();
-				my_parser->readKeyValue(L"buffs"s);
+				my_parser.readKeyValue(L"can_move_diagonally"s);
+				bool move_diag = my_parser.parseBoolean();
+				my_parser.readKeyValue(L"is_flying"s);
+				bool fly = my_parser.parseBoolean();
+				my_parser.readKeyValue(L"is_unique"s);
+				bool unique = my_parser.parseBoolean();
+				my_parser.readKeyValue(L"buffs"s);
 #pragma warning(pop)
-				if (!my_parser->matchToken(util::file::TokenTypes::Object, L"{"s)) {
+				if (!my_parser.matchToken(util::file::TokenTypes::Object, L"{"s)) {
 					throw util::file::DataFileException {L"Expected the start of an object definition."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				}
-				my_parser->getNext();
+				my_parser.getNext();
 				bool insert_succeeded = false;
 				// Case when we have {} next to buffs
-				if (my_parser->matchToken(util::file::TokenTypes::Object, L"}"s)) {
+				if (my_parser.matchToken(util::file::TokenTypes::Object, L"}"s)) {
 					auto my_type = std::make_unique<EnemyType>(n, d, c, st, dmg, hp, ahp, ar, pt,
 						wspd, rspd, ispd, strat, move_diag, fly, unique);
 					auto ret = this->enemy_types.emplace(n, std::move(my_type));
 					insert_succeeded = ret.second;
 				}
 				std::vector<std::shared_ptr<BuffBase>> my_buffs {};
-				while (!my_parser->matchToken(util::file::TokenTypes::Object, L"}"s)) {
-					if (!my_parser->matchToken(util::file::TokenTypes::Object, L"{"s)) {
-						throw util::file::DataFileException {L"Expected opening brace ({)."s, my_parser->getLine()};
+				while (!my_parser.matchToken(util::file::TokenTypes::Object, L"}"s)) {
+					if (!my_parser.matchToken(util::file::TokenTypes::Object, L"{"s)) {
+						throw util::file::DataFileException {L"Expected opening brace ({)."s, my_parser.getLine()};
 					}
-					my_token = my_parser->readKeyValue(L"type"s);
+					my_token = my_parser.readKeyValue(L"type"s);
 					BuffTypes buff_type = my_token.second == L"Intelligence"s ? BuffTypes::Intelligence
 						: my_token.second == L"Speed"s ? BuffTypes::Speed
 						: my_token.second == L"Healer"s ? BuffTypes::Healer
@@ -261,10 +262,10 @@ namespace hoffman::isaiah {
 						: my_token.second == L"Repair"s ? BuffTypes::Repair
 						: my_token.second == L"Forcefield"s ? BuffTypes::Forcefield
 						: throw util::file::DataFileException {L"Expected the type of the buff."s
-							L" Valid values include: Intelligence, Speed, Healer, Purify, Repair"s, my_parser->getLine()};
-					my_token = my_parser->readKeyValue(L"targets"s);
-					std::wstring buff_group = util::file::parseString(my_token, my_parser->getLine());
-					my_token = my_parser->readKeyValue(L"radius"s);
+							L" Valid values include: Intelligence, Speed, Healer, Purify, Repair"s, my_parser.getLine()};
+					my_token = my_parser.readKeyValue(L"targets"s);
+					std::wstring buff_group = util::file::parseString(my_token, my_parser.getLine());
+					my_token = my_parser.readKeyValue(L"radius"s);
 					try {
 						// Gotta find some way to tell the compiler NOT
 						// to optimize away this statement.
@@ -272,27 +273,27 @@ namespace hoffman::isaiah {
 					}
 					catch (const std::out_of_range&) {
 						throw util::file::DataFileException {L"Invalid target group name specified."s,
-							my_parser->getLine()};
+							my_parser.getLine()};
 					}
-					double buff_radius = util::file::parseNumber(my_token, my_parser->getLine());
+					double buff_radius = util::file::parseNumber(my_token, my_parser.getLine());
 					if (buff_radius <= 0.0) {
-						throw util::file::DataFileException {L"Buff radius must be positive."s, my_parser->getLine()};
+						throw util::file::DataFileException {L"Buff radius must be positive."s, my_parser.getLine()};
 					}
-					my_token = my_parser->readKeyValue(L"delay"s);
-					int buff_delay = static_cast<int>(util::file::parseNumber(my_token, my_parser->getLine()));
+					my_token = my_parser.readKeyValue(L"delay"s);
+					int buff_delay = static_cast<int>(util::file::parseNumber(my_token, my_parser.getLine()));
 					if (buff_delay < 10 || buff_delay > 60000) {
 						throw util::file::DataFileException {L"Buff delay must be between 10 and 60,000 inclusive."s,
-							my_parser->getLine()};
+							my_parser.getLine()};
 					}
 					[[maybe_unused]] int buff_duration {};
 					// Duration is common to many buffs, so I don't switch on it.
 					if (buff_type == BuffTypes::Intelligence || buff_type == BuffTypes::Speed
 						|| buff_type == BuffTypes::Forcefield) {
-						my_token = my_parser->readKeyValue(L"duration"s);
-						buff_duration = static_cast<int>(util::file::parseNumber(my_token, my_parser->getLine()));
+						my_token = my_parser.readKeyValue(L"duration"s);
+						buff_duration = static_cast<int>(util::file::parseNumber(my_token, my_parser.getLine()));
 						if (buff_duration < 10) {
 							throw util::file::DataFileException {L"Buff duration must be >= 10ms."s,
-								my_parser->getLine()};
+								my_parser.getLine()};
 						}
 					}
 					// Read buff-specific attributes
@@ -306,27 +307,27 @@ namespace hoffman::isaiah {
 					}
 					case BuffTypes::Speed:
 					{
-						my_token = my_parser->readKeyValue(L"walking_speed_boost"s);
-						const double buff_wspd = util::file::parseNumber(my_token, my_parser->getLine());
+						my_token = my_parser.readKeyValue(L"walking_speed_boost"s);
+						const double buff_wspd = util::file::parseNumber(my_token, my_parser.getLine());
 						if (buff_wspd < 0.0) {
 							throw util::file::DataFileException {L"Walking speed boost should be non-negative."s,
-								my_parser->getLine()};
+								my_parser.getLine()};
 						}
-						my_token = my_parser->readKeyValue(L"running_speed_boost"s);
-						const double buff_rspd = util::file::parseNumber(my_token, my_parser->getLine());
+						my_token = my_parser.readKeyValue(L"running_speed_boost"s);
+						const double buff_rspd = util::file::parseNumber(my_token, my_parser.getLine());
 						if (buff_rspd < 0.0) {
 							throw util::file::DataFileException {L"Running speed boost should be non-negative."s,
-								my_parser->getLine()};
+								my_parser.getLine()};
 						}
-						my_token = my_parser->readKeyValue(L"injured_speed_boost"s);
-						const double buff_ispd = util::file::parseNumber(my_token, my_parser->getLine());
+						my_token = my_parser.readKeyValue(L"injured_speed_boost"s);
+						const double buff_ispd = util::file::parseNumber(my_token, my_parser.getLine());
 						if (buff_ispd < 0.0) {
 							throw util::file::DataFileException {L"Injured speed boost should be non-negative."s,
-								my_parser->getLine()};
+								my_parser.getLine()};
 						}
 						if (buff_ispd == 0.0 && buff_rspd == 0. && buff_wspd == 0.) {
 							throw util::file::DataFileException {L"You should set at least one of the speed"s
-								L" boosts to a positive value!"s, my_parser->getLine()};
+								L" boosts to a positive value!"s, my_parser.getLine()};
 						}
 						auto speed_buff = std::make_shared<SpeedBuff>(buff_target_groups.at(buff_group),
 							buff_radius, buff_delay, buff_duration, buff_wspd, buff_rspd, buff_ispd);
@@ -335,11 +336,11 @@ namespace hoffman::isaiah {
 					}
 					case BuffTypes::Healer:
 					{
-						my_token = my_parser->readKeyValue(L"heal_amount"s);
-						const double buff_heal = util::file::parseNumber(my_token, my_parser->getLine());
+						my_token = my_parser.readKeyValue(L"heal_amount"s);
+						const double buff_heal = util::file::parseNumber(my_token, my_parser.getLine());
 						if (buff_heal <= 0.0) {
 							throw util::file::DataFileException {L"Heal amount should be positive."s,
-								my_parser->getLine()};
+								my_parser.getLine()};
 						}
 						auto heal_buff = std::make_shared<HealerBuff>(buff_target_groups.at(buff_group),
 							buff_radius, buff_delay, buff_heal);
@@ -348,12 +349,12 @@ namespace hoffman::isaiah {
 					}
 					case BuffTypes::Purify:
 					{
-						my_token = my_parser->readKeyValue(L"purify_max_effects"s);
+						my_token = my_parser.readKeyValue(L"purify_max_effects"s);
 						const int buff_cure_max = static_cast<int>(util::file::parseNumber(my_token,
-							my_parser->getLine()));
+							my_parser.getLine()));
 						if (buff_cure_max < 1) {
 							throw util::file::DataFileException {L"Purify max effects must be positive."s,
-								my_parser->getLine()};
+								my_parser.getLine()};
 						}
 						auto purify_buff = std::make_shared<PurifyBuff>(buff_target_groups.at(buff_group),
 							buff_radius, buff_delay, buff_cure_max);
@@ -362,11 +363,11 @@ namespace hoffman::isaiah {
 					}
 					case BuffTypes::Repair:
 					{
-						my_token = my_parser->readKeyValue(L"repair_amount"s);
-						const double buff_repair = util::file::parseNumber(my_token, my_parser->getLine());
+						my_token = my_parser.readKeyValue(L"repair_amount"s);
+						const double buff_repair = util::file::parseNumber(my_token, my_parser.getLine());
 						if (buff_repair <= 0.0) {
 							throw util::file::DataFileException {L"Repair amount should be positive."s,
-								my_parser->getLine()};
+								my_parser.getLine()};
 						}
 						auto repair_buff = std::make_shared<HealerBuff>(buff_target_groups.at(buff_group),
 							buff_radius, buff_delay, buff_repair);
@@ -375,25 +376,25 @@ namespace hoffman::isaiah {
 					}
 					case BuffTypes::Forcefield:
 					{
-						my_parser->readKeyValue(L"shield_health");
-						const double buff_shield_hp = my_parser->parseNumber();
-						my_parser->readKeyValue(L"shield_absorb");
-						const double buff_shield_absorb = my_parser->parseNumber();
+						my_parser.readKeyValue(L"shield_health");
+						const double buff_shield_hp = my_parser.parseNumber();
+						my_parser.readKeyValue(L"shield_absorb");
+						const double buff_shield_absorb = my_parser.parseNumber();
 						auto shield_buff = std::make_shared<ForcefieldBuff>(buff_target_groups.at(buff_group),
 							buff_radius, buff_delay, buff_duration, buff_shield_hp, buff_shield_absorb);
 						my_buffs.emplace_back(std::move(shield_buff));
 						break;
 					}
 					} // End switch, this looks weird but is correct
-					my_parser->getNext();
-					if (!my_parser->matchToken(util::file::TokenTypes::Object, L"}"s)) {
+					my_parser.getNext();
+					if (!my_parser.matchToken(util::file::TokenTypes::Object, L"}"s)) {
 						throw util::file::DataFileException {L"Expected closing brace (})."s,
-							my_parser->getLine()};
+							my_parser.getLine()};
 					}
-					my_parser->getNext();
-					if (!my_parser->matchTokenType(util::file::TokenTypes::Object)) {
+					my_parser.getNext();
+					if (!my_parser.matchTokenType(util::file::TokenTypes::Object)) {
 						throw util::file::DataFileException {L"Expected an opening or closing brace."s,
-							my_parser->getLine()};
+							my_parser.getLine()};
 					}
 				}
 				if (my_buffs.size() > 0) {
@@ -402,9 +403,9 @@ namespace hoffman::isaiah {
 					insert_succeeded = this->enemy_types.emplace(n, std::move(my_type)).second;
 				}
 				if (!insert_succeeded) {
-					throw util::file::DataFileException {L"Duplicate enemy name: "s + n + L"."s, my_parser->getLine()};
+					throw util::file::DataFileException {L"Duplicate enemy name: "s + n + L"."s, my_parser.getLine()};
 				}
-			} while (my_parser->getNext());
+			} while (my_parser.getNext());
 			// Add listing for "seen before".
 			for (const auto& etype : this->enemy_types) {
 				this->enemies_seen.emplace(etype.first, false);
