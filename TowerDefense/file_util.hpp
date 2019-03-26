@@ -210,6 +210,77 @@ namespace hoffman::isaiah {
 						+ L" Expected one of: "s + all_shapes + L"!"s, this->getLine()};
 			}
 
+			// Validates a number.
+			// value -> Value to check.
+			// min_value -> Minimum valid value.
+			// max_value -> Maximum valid value.
+			// prompt -> What is being validated.
+			// line -> Line number.
+			// inclusive_min -> Is the minimum bound valid?
+			// inclusive_max -> Is the maximum bound valid?
+			template <typename T>
+			static void validateNumber(T value, T min_value, T max_value, std::wstring prompt, int line,
+				bool inclusive_min, bool inclusive_max) {
+				if (inclusive_min && inclusive_max) {
+					if (value < min_value || value > max_value) {
+						throw DataFileException {prompt + L" should be between " + std::to_wstring(min_value)
+							+ L" and " + std::to_wstring(max_value) + L" (inclusive).", line};
+					}
+				}
+				else if (inclusive_min) {
+					if (value < min_value || value >= max_value) {
+						throw DataFileException {prompt + L" should be between " + std::to_wstring(min_value)
+							+ L" and " + std::to_wstring(max_value) + L" (inclusive-exclusive).", line};
+					}
+				}
+				else if (inclusive_max) {
+					if (value <= min_value || value > max_value) {
+						throw DataFileException {prompt + L" should be between " + std::to_wstring(min_value)
+							+ L" and " + std::to_wstring(max_value) + L" (exclusive-inclusive).", line};
+					}
+				}
+				else if (value <= min_value || value >= max_value) {
+					throw DataFileException {prompt + L" should be between " + std::to_wstring(min_value)
+						+ L" and " + std::to_wstring(max_value) + L" (exclusive).", line};
+				}
+			}
+
+			// Validates a number that only has a minimum bound.
+			// value -> Value to check.
+			// min_bound -> Minimum valid value.
+			// prompt -> What is being validated.
+			// line -> Line number.
+			// inclusive_min -> Is the minimum bound valid?
+			template <typename T>
+			static void validateNumberMinBound(T value, T min_bound, std::wstring prompt, int line, bool inclusive_min) {
+				if (inclusive_min) {
+					if (value < min_bound) {
+						throw DataFileException {prompt + L" must be at least " + std::to_wstring(min_bound) + L".", line};
+					}
+				}
+				else if (value <= min_bound) {
+					throw DataFileException {prompt + L" must exceed " + std::to_string(min_bound) + L".", line};
+				}
+			}
+
+			// Validates a number that only has a minimum bound.
+			// value -> Value to check.
+			// max_bound -> Maximum valid value.
+			// prompt -> What is being validated.
+			// line -> Line number.
+			// inclusive_max -> Is the maximum bound valid?
+			template <typename T>
+			static void validateNumberMaxBound(T value, T max_bound, std::wstring prompt, int line, bool inclusive_max) {
+				if (inclusive_max) {
+					if (value > max_bound) {
+						throw DataFileException {prompt + L" cannot exceed " + std::to_wstring(max_bound) + L".", line};
+					}
+				}
+				else if (value >= max_bound) {
+					throw DataFileException {prompt + L" must be under " + std::to_wstring(max_bound) + L".", line};
+				}
+			}
+
 			// Getters
 			std::wstring getToken() const noexcept {
 				return this->token;
