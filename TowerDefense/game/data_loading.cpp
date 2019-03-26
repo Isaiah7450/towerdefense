@@ -578,14 +578,14 @@ namespace hoffman::isaiah {
 			my_parser.getNext();
 			while (my_parser.matchToken(util::file::TokenTypes::Object, L"{"s)) {
 				my_parser.readKeyValue(L"name"s);
-				std::wstring fm_name = my_parser.parseString();
+				const std::wstring fm_name = my_parser.parseString();
 				my_parser.readKeyValue(L"method"s);
 				if (my_parser.getToken() == L"Default"s) {
 					auto my_fmethod = std::make_shared<FiringMethod>(fm_name, FiringMethodTypes::Default);
 					my_firing_methods.emplace(fm_name, std::move(my_fmethod));
 				}
 				else {
-					std::wstring fmethod_type_str = my_parser.getToken();
+					const std::wstring fmethod_type_str = my_parser.getToken();
 					my_parser.readKeyValue(L"angles"s);
 					auto fm_angle_strs = my_parser.readList();
 					std::vector<double> fm_angles {};
@@ -611,7 +611,8 @@ namespace hoffman::isaiah {
 					}
 					else {
 						my_parser.readKeyValue(L"duration"s);
-						int fm_duration = static_cast<int>(my_parser.parseNumber());
+						const int fm_duration = static_cast<int>(my_parser.parseNumber());
+						util::file::DataFileParser::validateNumberMinBound(fm_duration, 10, L"Duration (Firing method)", my_parser.getLine(), true);
 						auto my_fmethod = std::make_shared<FiringMethod>(fm_name, FiringMethodTypes::Pulse, fm_angles, fm_duration);
 						my_firing_methods.emplace(fm_name, std::move(my_fmethod));
 					}
@@ -630,17 +631,17 @@ namespace hoffman::isaiah {
 			my_parser.getNext();
 			while (my_parser.matchToken(util::file::TokenTypes::Object, L"{"s)) {
 				my_parser.readKeyValue(L"name"s);
-				std::wstring ts_name = my_parser.parseString();
+				const std::wstring ts_name = my_parser.parseString();
 				my_parser.readKeyValue(L"strategy"s);
-				std::wstring ts_strategy_str = my_parser.getToken();
-				TargetingStrategyTypes ts_strategy = ts_strategy_str == L"Distances"s ? TargetingStrategyTypes::Distances :
+				const std::wstring ts_strategy_str = my_parser.getToken();
+				const TargetingStrategyTypes ts_strategy = ts_strategy_str == L"Distances"s ? TargetingStrategyTypes::Distances :
 					ts_strategy_str == L"Statistics"s ? TargetingStrategyTypes::Statistics :
 					ts_strategy_str == L"Names"s ? TargetingStrategyTypes::Names :
 					throw util::file::DataFileException {L"Expected a valid targeting strategy: "s
 						L" Distances, Statistics, or Names."s, my_parser.getLine()};
 				my_parser.readKeyValue(L"protocol"s);
-				std::wstring ts_protocol_str = my_parser.getToken();
-				TargetingStrategyProtocols ts_protocol = ts_protocol_str == L"Lowest"s ? TargetingStrategyProtocols::Lowest :
+				const std::wstring ts_protocol_str = my_parser.getToken();
+				const TargetingStrategyProtocols ts_protocol = ts_protocol_str == L"Lowest"s ? TargetingStrategyProtocols::Lowest :
 					ts_protocol_str == L"Highest"s ? TargetingStrategyProtocols::Highest :
 					throw util::file::DataFileException {L"Expected a valid protocol: Lowest or Highest."s,
 						my_parser.getLine()};
@@ -653,9 +654,8 @@ namespace hoffman::isaiah {
 				}
 				case TargetingStrategyTypes::Statistics:
 				{
-					my_parser.readKeyValue(L"statistic"s);
-					std::wstring ts_stat_str = my_parser.getToken();
-					TargetingStrategyStatistics ts_stat = ts_stat_str == L"Damage"s ? TargetingStrategyStatistics::Damage :
+					const std::wstring ts_stat_str = my_parser.readKeyValue(L"statistic"s).second;
+					const TargetingStrategyStatistics ts_stat = ts_stat_str == L"Damage"s ? TargetingStrategyStatistics::Damage :
 						ts_stat_str == L"Health"s ? TargetingStrategyStatistics::Health :
 						ts_stat_str == L"Armor_Health"s ? TargetingStrategyStatistics::Armor_Health :
 						ts_stat_str == L"Armor_Reduce"s ? TargetingStrategyStatistics::Armor_Reduce :
@@ -671,7 +671,7 @@ namespace hoffman::isaiah {
 				{
 					// Note: I probably should verify the given names, but I'm not...
 					my_parser.readKeyValue(L"target_names");
-					auto ts_target_names = my_parser.readList();
+					const auto ts_target_names = my_parser.readList();
 					auto my_ts_strategy = std::make_shared<TargetingStrategy>(ts_name, ts_strategy, ts_protocol, ts_target_names);
 					my_targeting_strategies.emplace(ts_name, std::move(my_ts_strategy));
 					break;
@@ -686,16 +686,14 @@ namespace hoffman::isaiah {
 			my_parser.getNext();
 			my_parser.expectToken(util::file::TokenTypes::Section, L"wall"s);
 			my_parser.readKeyValue(L"name"s);
-			std::wstring wall_name = my_parser.parseString();
+			const std::wstring wall_name = my_parser.parseString();
 			my_parser.readKeyValue(L"desc"s);
-			std::wstring wall_desc = my_parser.parseString();
-			graphics::Color wall_color = my_parser.readColor();
-			graphics::shapes::ShapeTypes wall_shape = my_parser.readShape();
+			const std::wstring wall_desc = my_parser.parseString();
+			const graphics::Color wall_color = my_parser.readColor();
+			const graphics::shapes::ShapeTypes wall_shape = my_parser.readShape();
 			my_parser.readKeyValue(L"cost"s);
-			int wall_cost = static_cast<int>(my_parser.parseNumber());
-			if (wall_cost <= 0) {
-				throw util::file::DataFileException {L"The cost to build walls should be positive."s, my_parser.getLine()};
-			}
+			const int wall_cost = static_cast<int>(my_parser.parseNumber());
+			util::file::DataFileParser::validateNumberMinBound(wall_cost, 1, L"Cost (Wall)", my_parser.getLine(), true);
 			auto my_wall = std::make_shared<WallType>(wall_name, wall_desc, wall_color, wall_shape, wall_cost);
 			this->tower_types.emplace_back(std::move(my_wall));
 			// Trap section(s)
@@ -713,11 +711,11 @@ namespace hoffman::isaiah {
 				// Tower section(s)
 				my_parser.expectToken(util::file::TokenTypes::Section, L"tower"s);
 				my_parser.readKeyValue(L"name"s);
-				std::wstring n = my_parser.parseString();
+				const std::wstring n = my_parser.parseString();
 				my_parser.readKeyValue(L"desc"s);
-				std::wstring d = my_parser.parseString();
-				graphics::Color c = my_parser.readColor();
-				graphics::shapes::ShapeTypes st = my_parser.readShape();
+				const std::wstring d = my_parser.parseString();
+				const graphics::Color c = my_parser.readColor();
+				const graphics::shapes::ShapeTypes st = my_parser.readShape();
 				std::shared_ptr<FiringMethod> fmethod {nullptr};
 				try {
 					my_parser.readKeyValue(L"firing_method"s);
@@ -753,64 +751,43 @@ namespace hoffman::isaiah {
 							+ my_parser.parseString() + L"."s, my_parser.getLine()};
 					}
 					my_parser.readKeyValue(L"frequency"s);
-					double my_tower_shot_freq = my_parser.parseNumber();
+					const double my_tower_shot_freq = my_parser.parseNumber();
+					util::file::DataFileParser::validateNumber(my_tower_shot_freq, 0.0, 1.1, L"Frequency", my_parser.getLine(), false, false);
 					freq_total += my_tower_shot_freq;
-					if (my_tower_shot_freq <= 0.0) {
-						throw util::file::DataFileException {L"Shot frequency must be positive."s, my_parser.getLine()};
-					}
-					else if (freq_total > 1.02) {
-						// (1.02 was chosen due to precision shenanigans)
-						throw util::file::DataFileException {L"The frequencies for all shots must not exceed 1.0."s,
-							my_parser.getLine()};
-					}
 					my_tower_shots.emplace_back(std::move(my_tower_shot_type), my_tower_shot_freq);
 					my_parser.getNext();
 					my_parser.expectToken(util::file::TokenTypes::Object, L"}"s);
 					my_parser.getNext();
 				} while (my_parser.matchToken(util::file::TokenTypes::Object, L"{"s));
 				my_parser.expectToken(util::file::TokenTypes::Object, L"}"s);
-				if (freq_total < 1.00 || freq_total > 1.02) {
-					throw util::file::DataFileException {L"The frequencies for all shots combined must not exceed 1.0."s,
-						my_parser.getLine()};
-				}
+				// Not strictly equal due to floating-point inprecision.
+				util::file::DataFileParser::validateNumber(freq_total, 0.999, 1.05, L"Combined frequency", my_parser.getLine(), false, false);
 				my_parser.readKeyValue(L"max_level"s);
-				int max_lv = static_cast<int>(my_parser.parseNumber());
-				if (max_lv < 1 || max_lv > 99) {
-					throw util::file::DataFileException {L"Max level must be between 1 and 99 inclusive."s,
-						my_parser.getLine()};
-				}
+				const int max_lv = static_cast<int>(my_parser.parseNumber());
+				util::file::DataFileParser::validateNumber(max_lv, 1, 31, L"Max level", my_parser.getLine(), true, true);
 				my_parser.readKeyValue(L"firing_speed"s);
-				double fs = my_parser.parseNumber();
-				if (fs < 0.1 || fs > 90.0) {
-					throw util::file::DataFileException {L"Firing speed must be between 0.1 and 90.0 inclusive."s,
-						my_parser.getLine()};
-				}
+				const double fs = my_parser.parseNumber();
+				util::file::DataFileParser::validateNumber(fs, 0.1, 60.0, L"Firing speed", my_parser.getLine(), true, true);
 				my_parser.readKeyValue(L"firing_range"s);
-				double fr = my_parser.parseNumber();
-				if (fr < 0.5) {
-					throw util::file::DataFileException {L"Firing range must be at least 0.5."s,
-						my_parser.getLine()};
-				}
+				const double fr = my_parser.parseNumber();
+				util::file::DataFileParser::validateNumber(fr, 0.5, 30.5, L"Firing range", my_parser.getLine(), true, true);
 				my_parser.readKeyValue(L"volley_shots"s);
-				int vs = static_cast<int>(my_parser.parseNumber());
-				if (vs < 0) {
-					throw util::file::DataFileException {L"Volley shots must be non-negative."s,
-						my_parser.getLine()};
-				}
+				const int vs = static_cast<int>(my_parser.parseNumber());
+				util::file::DataFileParser::validateNumberMinBound(vs, 0, L"Volley shots", my_parser.getLine(), true);
 				my_parser.readKeyValue(L"reload_delay"s);
-				int rd = static_cast<int>(my_parser.parseNumber());
+				const int rd = static_cast<int>(my_parser.parseNumber());
 				if (vs == 0 && rd != 0) {
 					throw util::file::DataFileException {L"Reload delay must be zero if volley shots is zero."s,
 						my_parser.getLine()};
 				}
-				else if (vs > 0 && rd < 10) {
-					throw util::file::DataFileException {L"Reload delay must be at least 10ms if volley shots is positive."s,
-						my_parser.getLine()};
+				else if (vs > 0) {
+					util::file::DataFileParser::validateNumberMinBound(rd, 10, L"Reload delay (ms)", my_parser.getLine(), true);
 				}
 				my_parser.readKeyValue(L"cost_adjust"s);
-				int cost_adj = static_cast<int>(my_parser.parseNumber());
+				const int cost_adj = static_cast<int>(my_parser.parseNumber());
 				auto my_tower_type = std::make_shared<TowerType>(n, d, c, st, fmethod, tstrategy,
 					std::move(my_tower_shots), fs, fr, vs, rd, cost_adj, max_lv);
+				util::file::DataFileParser::validateNumberMinBound(my_tower_type->getCost(), 0.0, L"Tower Cost", my_parser.getLine(), false);
 				this->tower_types.emplace_back(std::move(my_tower_type));
 			} while (my_parser.getNext());
 		}
