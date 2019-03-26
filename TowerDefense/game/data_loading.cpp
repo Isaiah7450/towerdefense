@@ -1098,7 +1098,12 @@ namespace hoffman::isaiah {
 						std::getline(save_file, buffer);
 						// Leading space is removed...
 						buffer.erase(buffer.begin());
-						this->enemies_seen.at(buffer) = true;
+						try {
+							this->enemies_seen.at(buffer) = true;
+						}
+						catch (const std::out_of_range&) {
+							// Ignore.
+						}
 					}
 				}
 			}
