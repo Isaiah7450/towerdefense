@@ -369,89 +369,89 @@ namespace hoffman::isaiah {
 			if (data_file.bad() || data_file.fail()) {
 				throw util::file::DataFileException {L"Could not open resources/shots.ini for reading."s, 0};
 			}
-			auto my_parser {std::make_unique<util::file::DataFileParser>(data_file)};
+			util::file::DataFileParser my_parser {data_file};
 			// Global section
-			my_parser->expectToken(util::file::TokenTypes::Section, L"global"s);
+			my_parser.expectToken(util::file::TokenTypes::Section, L"global"s);
 #pragma warning(push)
 #pragma warning(disable: 26444) // ES84: Avoid unnamed objects with custom construction/destruction. (No Idea...)
-			my_parser->readKeyValue(L"version");
-			my_parser->expectToken(util::file::TokenTypes::Number, L"1"s);
-			while (my_parser->getNext()) {
+			my_parser.readKeyValue(L"version");
+			my_parser.expectToken(util::file::TokenTypes::Number, L"1"s);
+			while (my_parser.getNext()) {
 				// Shot sections
-				my_parser->expectToken(util::file::TokenTypes::Section, L"shot"s);
-				my_parser->readKeyValue(L"name"s);
-				std::wstring n = my_parser->parseString();
-				my_parser->readKeyValue(L"desc"s);
-				std::wstring d = my_parser->parseString();
-				graphics::Color c = my_parser->readColor();
-				graphics::shapes::ShapeTypes st = my_parser->readShape();
-				my_parser->readKeyValue(L"damage"s);
-				double dmg = my_parser->parseNumber();
+				my_parser.expectToken(util::file::TokenTypes::Section, L"shot"s);
+				my_parser.readKeyValue(L"name"s);
+				std::wstring n = my_parser.parseString();
+				my_parser.readKeyValue(L"desc"s);
+				std::wstring d = my_parser.parseString();
+				graphics::Color c = my_parser.readColor();
+				graphics::shapes::ShapeTypes st = my_parser.readShape();
+				my_parser.readKeyValue(L"damage"s);
+				double dmg = my_parser.parseNumber();
 				if (dmg < 0.0) {
-					throw util::file::DataFileException {L"Damage must be non-negative."s, my_parser->getLine()};
+					throw util::file::DataFileException {L"Damage must be non-negative."s, my_parser.getLine()};
 				}
-				my_parser->readKeyValue(L"piercing"s);
-				double wap = my_parser->parseNumber();
+				my_parser.readKeyValue(L"piercing"s);
+				double wap = my_parser.parseNumber();
 				if (wap < 0.0 || wap > 1.0) {
 					throw util::file::DataFileException {L"Piercing must be between 0 and 1 inclusive."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				}
-				my_parser->readKeyValue(L"move_speed"s);
-				double ms = my_parser->parseNumber();
+				my_parser.readKeyValue(L"move_speed"s);
+				double ms = my_parser.parseNumber();
 				if (ms < 10.00 || ms > 60.00) {
 					throw util::file::DataFileException {L"Movement speed must between 10 and 60 inclusive."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				}
-				my_parser->readKeyValue(L"impact_radius"s);
-				double ir = my_parser->parseNumber();
+				my_parser.readKeyValue(L"impact_radius"s);
+				double ir = my_parser.parseNumber();
 				if (ir < 0.0) {
 					throw util::file::DataFileException {L"Impact radius must be non-negative."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				}
-				my_parser->readKeyValue(L"splash_damage"s);
-				double sdmg = my_parser->parseNumber();
+				my_parser.readKeyValue(L"splash_damage"s);
+				double sdmg = my_parser.parseNumber();
 				if (sdmg < 0.0) {
 					throw util::file::DataFileException {L"Splash damage must be non-negative."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				}
 				else if (sdmg > 0.0 && ir <= 0.0) {
 					throw util::file::DataFileException {L"Splash damage should be zero if impact"s
-						L" radius is zero."s, my_parser->getLine()};
+						L" radius is zero."s, my_parser.getLine()};
 				}
-				my_parser->readKeyValue(L"ground_multiplier"s);
-				double gm = my_parser->parseNumber();
+				my_parser.readKeyValue(L"ground_multiplier"s);
+				double gm = my_parser.parseNumber();
 				if (gm < 0.0) {
 					throw util::file::DataFileException {L"Ground mulitplier must be non-negative."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				}
-				my_parser->readKeyValue(L"air_multiplier"s);
-				double am = my_parser->parseNumber();
+				my_parser.readKeyValue(L"air_multiplier"s);
+				double am = my_parser.parseNumber();
 				if (am < 0.0) {
 					throw util::file::DataFileException {L"Air multiplier must be non-negative."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				}
 				if (am <= 0.0 && gm <= 0.0 && (dmg > 0.0 || sdmg > 0.0)) {
 					throw util::file::DataFileException {L"Either the ground multiplier or the air multiplier"s
-						L" must be positive."s, my_parser->getLine()};
+						L" must be positive."s, my_parser.getLine()};
 				}
-				auto my_type_str = my_parser->readKeyValue(L"type"s).second;
+				auto my_type_str = my_parser.readKeyValue(L"type"s).second;
 				ShotTypes my_type = my_type_str == L"Standard"s ? ShotTypes::Standard :
 					my_type_str == L"Damage_Over_Time"s ? ShotTypes::DoT :
 					my_type_str == L"Slow"s ? ShotTypes::Slow :
 					my_type_str == L"Stun"s ? ShotTypes::Stun :
-					throw util::file::DataFileException {L"Invalid type specified."s, my_parser->getLine()};
+					throw util::file::DataFileException {L"Invalid type specified."s, my_parser.getLine()};
 				if (my_type == ShotTypes::Standard && dmg <= 0.0 && sdmg <= 0.0) {
 					throw util::file::DataFileException {L"The shot should deal some kind of damage or"s
-						L" have some kind of special effect."s, my_parser->getLine()};
+						L" have some kind of special effect."s, my_parser.getLine()};
 				}
 				[[maybe_unused]] bool affect_splash {false};
 				if (my_type != ShotTypes::Standard) {
-					my_parser->readKeyValue(L"apply_effect_on_splash"s);
-					affect_splash = my_parser->parseBoolean();
+					my_parser.readKeyValue(L"apply_effect_on_splash"s);
+					affect_splash = my_parser.parseBoolean();
 					if (!affect_splash && ir > 0.0 && sdmg <= 0.0) {
 						throw util::file::DataFileException {L"It is pointless to set impact radius to a"s
 							L" value greater than zero if splash damage is zero, and there is no special effect"s
-							L" applied on splash."s, my_parser->getLine()};
+							L" applied on splash."s, my_parser.getLine()};
 					}
 				}
 #pragma warning(pop)
@@ -466,29 +466,29 @@ namespace hoffman::isaiah {
 				}
 				case ShotTypes::DoT:
 				{
-					auto dot_type_str = my_parser->readKeyValue(L"dot_damage_type"s).second;
+					auto dot_type_str = my_parser.readKeyValue(L"dot_damage_type"s).second;
 					DoTDamageTypes dot_type = dot_type_str == L"Poison"s ? DoTDamageTypes::Poison :
 						dot_type_str == L"Fire"s ? DoTDamageTypes::Fire :
 						dot_type_str == L"Heal"s ? DoTDamageTypes::Heal :
 						throw util::file::DataFileException {L"Invalid DoT damage type specified."s,
-							my_parser->getLine()};
-					my_parser->readKeyValue(L"dot_damage_per_tick"s);
-					double dot_tick_dmg = my_parser->parseNumber();
+							my_parser.getLine()};
+					my_parser.readKeyValue(L"dot_damage_per_tick"s);
+					double dot_tick_dmg = my_parser.parseNumber();
 					if (dot_tick_dmg <= 0.0) {
 						throw util::file::DataFileException {L"DoT damage per tick must be positive."s,
-							my_parser->getLine()};
+							my_parser.getLine()};
 					}
-					my_parser->readKeyValue(L"dot_time_between_ticks"s);
-					int dot_tick_time = static_cast<int>(my_parser->parseNumber());
+					my_parser.readKeyValue(L"dot_time_between_ticks"s);
+					int dot_tick_time = static_cast<int>(my_parser.parseNumber());
 					if (dot_tick_time <= 10) {
 						throw util::file::DataFileException {L"Time between DoT ticks must be >= 10 ms."s,
-							my_parser->getLine()};
+							my_parser.getLine()};
 					}
-					my_parser->readKeyValue(L"dot_total_ticks"s);
-					int dot_total_ticks = static_cast<int>(my_parser->parseNumber());
+					my_parser.readKeyValue(L"dot_total_ticks"s);
+					int dot_total_ticks = static_cast<int>(my_parser.parseNumber());
 					if (dot_total_ticks < 1) {
 						throw util::file::DataFileException {L"Total number of DoT ticks must be positive."s,
-							my_parser->getLine()};
+							my_parser.getLine()};
 					}
 					auto my_shot = std::make_shared<DoTShotType>(n, d, c, st, dmg, wap, ms, ir, sdmg, gm, am,
 						affect_splash, dot_type, dot_tick_dmg, dot_tick_time, dot_total_ticks);
@@ -498,23 +498,23 @@ namespace hoffman::isaiah {
 				}
 				case ShotTypes::Slow:
 				{
-					my_parser->readKeyValue(L"slow_factor"s);
-					double slow_factor = my_parser->parseNumber();
+					my_parser.readKeyValue(L"slow_factor"s);
+					double slow_factor = my_parser.parseNumber();
 					if (slow_factor <= 0.0 || slow_factor >= 1.0) {
 						throw util::file::DataFileException {L"Slow factor must be between 0 and 1 exclusive."s,
-							my_parser->getLine()};
+							my_parser.getLine()};
 					}
-					my_parser->readKeyValue(L"slow_duration"s);
-					int slow_duration = static_cast<int>(my_parser->parseNumber());
+					my_parser.readKeyValue(L"slow_duration"s);
+					int slow_duration = static_cast<int>(my_parser.parseNumber());
 					if (slow_duration < 10) {
 						throw util::file::DataFileException {L"Slow duration must be >= 10ms."s,
-							my_parser->getLine()};
+							my_parser.getLine()};
 					}
-					my_parser->readKeyValue(L"slow_multi_chance"s);
-					double slow_mchance = my_parser->parseNumber();
+					my_parser.readKeyValue(L"slow_multi_chance"s);
+					double slow_mchance = my_parser.parseNumber();
 					if (slow_mchance < 0.0 || slow_mchance > 1.0) {
 						throw util::file::DataFileException {L"Slow multi-chance must be between 0 and 1 inclusive."s,
-							my_parser->getLine()};
+							my_parser.getLine()};
 					}
 					auto my_shot = std::make_shared<SlowShotType>(n, d, c, st, dmg, wap, ms, ir, sdmg, gm, am,
 						affect_splash, slow_factor, slow_duration, slow_mchance);
@@ -524,27 +524,27 @@ namespace hoffman::isaiah {
 				}
 				case ShotTypes::Stun:
 				{
-					my_parser->readKeyValue(L"stun_chance"s);
-					double stun_chance = my_parser->parseNumber();
+					my_parser.readKeyValue(L"stun_chance"s);
+					double stun_chance = my_parser.parseNumber();
 					if (stun_chance <= 0.0 || stun_chance > 1.0) {
 						throw util::file::DataFileException {L"Stun chance should be positive and less than 1.0."s,
-							my_parser->getLine()};
+							my_parser.getLine()};
 					}
-					my_parser->readKeyValue(L"stun_duration"s);
-					int stun_duration = static_cast<int>(my_parser->parseNumber());
+					my_parser.readKeyValue(L"stun_duration"s);
+					int stun_duration = static_cast<int>(my_parser.parseNumber());
 					if (stun_duration < 10) {
 						throw util::file::DataFileException {L"Stun duration must be >= 10ms."s,
-							my_parser->getLine()};
+							my_parser.getLine()};
 					}
-					my_parser->readKeyValue(L"stun_multi_chance"s);
-					double stun_mchance = my_parser->parseNumber();
+					my_parser.readKeyValue(L"stun_multi_chance"s);
+					double stun_mchance = my_parser.parseNumber();
 					if (stun_mchance < 0.0) {
 						throw util::file::DataFileException {L"Stun multi-chance must be non-negative."s,
-							my_parser->getLine()};
+							my_parser.getLine()};
 					}
 					else if (stun_mchance > stun_chance) {
 						throw util::file::DataFileException {L"Stun multi-chance must not exceed stun chance."s,
-							my_parser->getLine()};
+							my_parser.getLine()};
 					}
 					auto my_shot = std::make_shared<StunShotType>(n, d, c, st, dmg, wap, ms, ir, sdmg, gm, am,
 						affect_splash, stun_chance, stun_duration, stun_mchance);
@@ -554,7 +554,7 @@ namespace hoffman::isaiah {
 				}
 				} // End Switch
 				if (!insert_succeeded) {
-					throw util::file::DataFileException {L"Duplicate shot name found: "s + n + L"."s, my_parser->getLine()};
+					throw util::file::DataFileException {L"Duplicate shot name found: "s + n + L"."s, my_parser.getLine()};
 				}
 			}
 		}
@@ -564,30 +564,30 @@ namespace hoffman::isaiah {
 			if (data_file.bad() || data_file.fail()) {
 				throw util::file::DataFileException {L"Could not open resources/towers.ini for reading."s, 0};
 			}
-			auto my_parser {std::make_unique<util::file::DataFileParser>(data_file)};
+			util::file::DataFileParser my_parser {data_file};
 			// Global section
-			my_parser->expectToken(util::file::TokenTypes::Section, L"global"s);
-			my_parser->readKeyValue(L"version"s);
-			my_parser->expectToken(util::file::TokenTypes::Number, L"1"s);
+			my_parser.expectToken(util::file::TokenTypes::Section, L"global"s);
+			my_parser.readKeyValue(L"version"s);
+			my_parser.expectToken(util::file::TokenTypes::Number, L"1"s);
 			// Firing section
-			my_parser->getNext();
-			my_parser->expectToken(util::file::TokenTypes::Section, L"firing"s);
-			my_parser->readKeyValue(L"firing_methods"s);
-			my_parser->expectToken(util::file::TokenTypes::Object, L"{"s);
+			my_parser.getNext();
+			my_parser.expectToken(util::file::TokenTypes::Section, L"firing"s);
+			my_parser.readKeyValue(L"firing_methods"s);
+			my_parser.expectToken(util::file::TokenTypes::Object, L"{"s);
 			std::map<std::wstring, std::shared_ptr<FiringMethod>> my_firing_methods {};
-			my_parser->getNext();
-			while (my_parser->matchToken(util::file::TokenTypes::Object, L"{"s)) {
-				my_parser->readKeyValue(L"name"s);
-				std::wstring fm_name = my_parser->parseString();
-				my_parser->readKeyValue(L"method"s);
-				if (my_parser->getToken() == L"Default"s) {
+			my_parser.getNext();
+			while (my_parser.matchToken(util::file::TokenTypes::Object, L"{"s)) {
+				my_parser.readKeyValue(L"name"s);
+				std::wstring fm_name = my_parser.parseString();
+				my_parser.readKeyValue(L"method"s);
+				if (my_parser.getToken() == L"Default"s) {
 					auto my_fmethod = std::make_shared<FiringMethod>(fm_name, FiringMethodTypes::Default);
 					my_firing_methods.emplace(fm_name, std::move(my_fmethod));
 				}
 				else {
-					std::wstring fmethod_type_str = my_parser->getToken();
-					my_parser->readKeyValue(L"angles"s);
-					auto fm_angle_strs = my_parser->readList();
+					std::wstring fmethod_type_str = my_parser.getToken();
+					my_parser.readKeyValue(L"angles"s);
+					auto fm_angle_strs = my_parser.readList();
 					std::vector<double> fm_angles {};
 					for (auto& a : fm_angle_strs) {
 						double base_angle_degrees = std::stod(a);
@@ -610,40 +610,40 @@ namespace hoffman::isaiah {
 						my_firing_methods.emplace(fm_name, std::move(my_fmethod));
 					}
 					else {
-						my_parser->readKeyValue(L"duration"s);
-						int fm_duration = static_cast<int>(my_parser->parseNumber());
+						my_parser.readKeyValue(L"duration"s);
+						int fm_duration = static_cast<int>(my_parser.parseNumber());
 						auto my_fmethod = std::make_shared<FiringMethod>(fm_name, FiringMethodTypes::Pulse, fm_angles, fm_duration);
 						my_firing_methods.emplace(fm_name, std::move(my_fmethod));
 					}
 				}
-				my_parser->getNext();
-				my_parser->expectToken(util::file::TokenTypes::Object, L"}"s);
-				my_parser->getNext();
+				my_parser.getNext();
+				my_parser.expectToken(util::file::TokenTypes::Object, L"}"s);
+				my_parser.getNext();
 			}
-			my_parser->expectToken(util::file::TokenTypes::Object, L"}"s);
+			my_parser.expectToken(util::file::TokenTypes::Object, L"}"s);
 			// Targeting section
-			my_parser->getNext();
-			my_parser->expectToken(util::file::TokenTypes::Section, L"targeting"s);
-			my_parser->readKeyValue(L"targeting_methods"s);
-			my_parser->expectToken(util::file::TokenTypes::Object, L"{"s);
+			my_parser.getNext();
+			my_parser.expectToken(util::file::TokenTypes::Section, L"targeting"s);
+			my_parser.readKeyValue(L"targeting_methods"s);
+			my_parser.expectToken(util::file::TokenTypes::Object, L"{"s);
 			std::map<std::wstring, std::shared_ptr<TargetingStrategy>> my_targeting_strategies {};
-			my_parser->getNext();
-			while (my_parser->matchToken(util::file::TokenTypes::Object, L"{"s)) {
-				my_parser->readKeyValue(L"name"s);
-				std::wstring ts_name = my_parser->parseString();
-				my_parser->readKeyValue(L"strategy"s);
-				std::wstring ts_strategy_str = my_parser->getToken();
+			my_parser.getNext();
+			while (my_parser.matchToken(util::file::TokenTypes::Object, L"{"s)) {
+				my_parser.readKeyValue(L"name"s);
+				std::wstring ts_name = my_parser.parseString();
+				my_parser.readKeyValue(L"strategy"s);
+				std::wstring ts_strategy_str = my_parser.getToken();
 				TargetingStrategyTypes ts_strategy = ts_strategy_str == L"Distances"s ? TargetingStrategyTypes::Distances :
 					ts_strategy_str == L"Statistics"s ? TargetingStrategyTypes::Statistics :
 					ts_strategy_str == L"Names"s ? TargetingStrategyTypes::Names :
 					throw util::file::DataFileException {L"Expected a valid targeting strategy: "s
-						L" Distances, Statistics, or Names."s, my_parser->getLine()};
-				my_parser->readKeyValue(L"protocol"s);
-				std::wstring ts_protocol_str = my_parser->getToken();
+						L" Distances, Statistics, or Names."s, my_parser.getLine()};
+				my_parser.readKeyValue(L"protocol"s);
+				std::wstring ts_protocol_str = my_parser.getToken();
 				TargetingStrategyProtocols ts_protocol = ts_protocol_str == L"Lowest"s ? TargetingStrategyProtocols::Lowest :
 					ts_protocol_str == L"Highest"s ? TargetingStrategyProtocols::Highest :
 					throw util::file::DataFileException {L"Expected a valid protocol: Lowest or Highest."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				switch (ts_strategy) {
 				case TargetingStrategyTypes::Distances:
 				{
@@ -653,8 +653,8 @@ namespace hoffman::isaiah {
 				}
 				case TargetingStrategyTypes::Statistics:
 				{
-					my_parser->readKeyValue(L"statistic"s);
-					std::wstring ts_stat_str = my_parser->getToken();
+					my_parser.readKeyValue(L"statistic"s);
+					std::wstring ts_stat_str = my_parser.getToken();
 					TargetingStrategyStatistics ts_stat = ts_stat_str == L"Damage"s ? TargetingStrategyStatistics::Damage :
 						ts_stat_str == L"Health"s ? TargetingStrategyStatistics::Health :
 						ts_stat_str == L"Armor_Health"s ? TargetingStrategyStatistics::Armor_Health :
@@ -662,7 +662,7 @@ namespace hoffman::isaiah {
 						ts_stat_str == L"Speed"s ? TargetingStrategyStatistics::Speed :
 						ts_stat_str == L"Buffs"s ? TargetingStrategyStatistics::Buffs :
 						throw util::file::DataFileException {L"Expected a valid test statistic:"s
-						L" Damage, Health, Armor_Health, Armor_Reduce, Speed, Buffs."s, my_parser->getLine()};
+						L" Damage, Health, Armor_Health, Armor_Reduce, Speed, Buffs."s, my_parser.getLine()};
 					auto my_ts_strategy = std::make_shared<TargetingStrategy>(ts_name, ts_strategy, ts_protocol, ts_stat);
 					my_targeting_strategies.emplace(ts_name, std::move(my_ts_strategy));
 					break;
@@ -670,149 +670,149 @@ namespace hoffman::isaiah {
 				case TargetingStrategyTypes::Names:
 				{
 					// Note: I probably should verify the given names, but I'm not...
-					my_parser->readKeyValue(L"target_names");
-					auto ts_target_names = my_parser->readList();
+					my_parser.readKeyValue(L"target_names");
+					auto ts_target_names = my_parser.readList();
 					auto my_ts_strategy = std::make_shared<TargetingStrategy>(ts_name, ts_strategy, ts_protocol, ts_target_names);
 					my_targeting_strategies.emplace(ts_name, std::move(my_ts_strategy));
 					break;
 				}
 				} // End switch
-				my_parser->getNext();
-				my_parser->expectToken(util::file::TokenTypes::Object, L"}"s);
-				my_parser->getNext();
+				my_parser.getNext();
+				my_parser.expectToken(util::file::TokenTypes::Object, L"}"s);
+				my_parser.getNext();
 			}
-			my_parser->expectToken(util::file::TokenTypes::Object, L"}"s);
+			my_parser.expectToken(util::file::TokenTypes::Object, L"}"s);
 			// Wall section
-			my_parser->getNext();
-			my_parser->expectToken(util::file::TokenTypes::Section, L"wall"s);
-			my_parser->readKeyValue(L"name"s);
-			std::wstring wall_name = my_parser->parseString();
-			my_parser->readKeyValue(L"desc"s);
-			std::wstring wall_desc = my_parser->parseString();
-			graphics::Color wall_color = my_parser->readColor();
-			graphics::shapes::ShapeTypes wall_shape = my_parser->readShape();
-			my_parser->readKeyValue(L"cost"s);
-			int wall_cost = static_cast<int>(my_parser->parseNumber());
+			my_parser.getNext();
+			my_parser.expectToken(util::file::TokenTypes::Section, L"wall"s);
+			my_parser.readKeyValue(L"name"s);
+			std::wstring wall_name = my_parser.parseString();
+			my_parser.readKeyValue(L"desc"s);
+			std::wstring wall_desc = my_parser.parseString();
+			graphics::Color wall_color = my_parser.readColor();
+			graphics::shapes::ShapeTypes wall_shape = my_parser.readShape();
+			my_parser.readKeyValue(L"cost"s);
+			int wall_cost = static_cast<int>(my_parser.parseNumber());
 			if (wall_cost <= 0) {
-				throw util::file::DataFileException {L"The cost to build walls should be positive."s, my_parser->getLine()};
+				throw util::file::DataFileException {L"The cost to build walls should be positive."s, my_parser.getLine()};
 			}
 			auto my_wall = std::make_shared<WallType>(wall_name, wall_desc, wall_color, wall_shape, wall_cost);
 			this->tower_types.emplace_back(std::move(my_wall));
 			// Trap section(s)
-			my_parser->getNext();
-			while (my_parser->matchToken(util::file::TokenTypes::Section, L"trap"s)) {
-				my_parser->getNext();
+			my_parser.getNext();
+			while (my_parser.matchToken(util::file::TokenTypes::Section, L"trap"s)) {
+				my_parser.getNext();
 				// For now, this is ignored...
 				// (This allows me to add new stuff to the game without breaking the
 				// file format.)
-				while (!my_parser->matchTokenType(util::file::TokenTypes::Section)) {
-					my_parser->getNext();
+				while (!my_parser.matchTokenType(util::file::TokenTypes::Section)) {
+					my_parser.getNext();
 				}
 			}
 			do {
 				// Tower section(s)
-				my_parser->expectToken(util::file::TokenTypes::Section, L"tower"s);
-				my_parser->readKeyValue(L"name"s);
-				std::wstring n = my_parser->parseString();
-				my_parser->readKeyValue(L"desc"s);
-				std::wstring d = my_parser->parseString();
-				graphics::Color c = my_parser->readColor();
-				graphics::shapes::ShapeTypes st = my_parser->readShape();
+				my_parser.expectToken(util::file::TokenTypes::Section, L"tower"s);
+				my_parser.readKeyValue(L"name"s);
+				std::wstring n = my_parser.parseString();
+				my_parser.readKeyValue(L"desc"s);
+				std::wstring d = my_parser.parseString();
+				graphics::Color c = my_parser.readColor();
+				graphics::shapes::ShapeTypes st = my_parser.readShape();
 				std::shared_ptr<FiringMethod> fmethod {nullptr};
 				try {
-					my_parser->readKeyValue(L"firing_method"s);
-					fmethod = my_firing_methods.at(my_parser->parseString());
+					my_parser.readKeyValue(L"firing_method"s);
+					fmethod = my_firing_methods.at(my_parser.parseString());
 				}
 				catch (const std::out_of_range&) {
-					throw util::file::DataFileException {L"Unknown firing method name: "s + my_parser->parseString(),
-						my_parser->getLine()};
+					throw util::file::DataFileException {L"Unknown firing method name: "s + my_parser.parseString(),
+						my_parser.getLine()};
 				}
 				std::shared_ptr<TargetingStrategy> tstrategy {nullptr};
 				try {
-					my_parser->readKeyValue(L"targeting_strategy"s);
-					tstrategy = my_targeting_strategies.at(my_parser->parseString());
+					my_parser.readKeyValue(L"targeting_strategy"s);
+					tstrategy = my_targeting_strategies.at(my_parser.parseString());
 				}
 				catch (const std::out_of_range&) {
-					throw util::file::DataFileException {L"Unknown targeting strategy name: "s + my_parser->parseString(),
-						my_parser->getLine()};
+					throw util::file::DataFileException {L"Unknown targeting strategy name: "s + my_parser.parseString(),
+						my_parser.getLine()};
 				}
-				my_parser->readKeyValue(L"shots");
-				my_parser->expectToken(util::file::TokenTypes::Object, L"{"s);
+				my_parser.readKeyValue(L"shots");
+				my_parser.expectToken(util::file::TokenTypes::Object, L"{"s);
 				std::vector<std::pair<std::shared_ptr<ShotBaseType>, double>> my_tower_shots {};
-				my_parser->getNext();
-				my_parser->expectToken(util::file::TokenTypes::Object, L"{"s);
+				my_parser.getNext();
+				my_parser.expectToken(util::file::TokenTypes::Object, L"{"s);
 				double freq_total = 0.0;
 				do {
 					std::shared_ptr<ShotBaseType> my_tower_shot_type {nullptr};
 					try {
-						my_parser->readKeyValue(L"name"s);
-						my_tower_shot_type = this->getShotType(my_parser->parseString());
+						my_parser.readKeyValue(L"name"s);
+						my_tower_shot_type = this->getShotType(my_parser.parseString());
 					}
 					catch (const std::out_of_range&) {
 						throw util::file::DataFileException {L"No projectile exists with the following name: "s
-							+ my_parser->parseString() + L"."s, my_parser->getLine()};
+							+ my_parser.parseString() + L"."s, my_parser.getLine()};
 					}
-					my_parser->readKeyValue(L"frequency"s);
-					double my_tower_shot_freq = my_parser->parseNumber();
+					my_parser.readKeyValue(L"frequency"s);
+					double my_tower_shot_freq = my_parser.parseNumber();
 					freq_total += my_tower_shot_freq;
 					if (my_tower_shot_freq <= 0.0) {
-						throw util::file::DataFileException {L"Shot frequency must be positive."s, my_parser->getLine()};
+						throw util::file::DataFileException {L"Shot frequency must be positive."s, my_parser.getLine()};
 					}
 					else if (freq_total > 1.02) {
 						// (1.02 was chosen due to precision shenanigans)
 						throw util::file::DataFileException {L"The frequencies for all shots must not exceed 1.0."s,
-							my_parser->getLine()};
+							my_parser.getLine()};
 					}
 					my_tower_shots.emplace_back(std::move(my_tower_shot_type), my_tower_shot_freq);
-					my_parser->getNext();
-					my_parser->expectToken(util::file::TokenTypes::Object, L"}"s);
-					my_parser->getNext();
-				} while (my_parser->matchToken(util::file::TokenTypes::Object, L"{"s));
-				my_parser->expectToken(util::file::TokenTypes::Object, L"}"s);
+					my_parser.getNext();
+					my_parser.expectToken(util::file::TokenTypes::Object, L"}"s);
+					my_parser.getNext();
+				} while (my_parser.matchToken(util::file::TokenTypes::Object, L"{"s));
+				my_parser.expectToken(util::file::TokenTypes::Object, L"}"s);
 				if (freq_total < 1.00 || freq_total > 1.02) {
 					throw util::file::DataFileException {L"The frequencies for all shots combined must not exceed 1.0."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				}
-				my_parser->readKeyValue(L"max_level"s);
-				int max_lv = static_cast<int>(my_parser->parseNumber());
+				my_parser.readKeyValue(L"max_level"s);
+				int max_lv = static_cast<int>(my_parser.parseNumber());
 				if (max_lv < 1 || max_lv > 99) {
 					throw util::file::DataFileException {L"Max level must be between 1 and 99 inclusive."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				}
-				my_parser->readKeyValue(L"firing_speed"s);
-				double fs = my_parser->parseNumber();
+				my_parser.readKeyValue(L"firing_speed"s);
+				double fs = my_parser.parseNumber();
 				if (fs < 0.1 || fs > 90.0) {
 					throw util::file::DataFileException {L"Firing speed must be between 0.1 and 90.0 inclusive."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				}
-				my_parser->readKeyValue(L"firing_range"s);
-				double fr = my_parser->parseNumber();
+				my_parser.readKeyValue(L"firing_range"s);
+				double fr = my_parser.parseNumber();
 				if (fr < 0.5) {
 					throw util::file::DataFileException {L"Firing range must be at least 0.5."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				}
-				my_parser->readKeyValue(L"volley_shots"s);
-				int vs = static_cast<int>(my_parser->parseNumber());
+				my_parser.readKeyValue(L"volley_shots"s);
+				int vs = static_cast<int>(my_parser.parseNumber());
 				if (vs < 0) {
 					throw util::file::DataFileException {L"Volley shots must be non-negative."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				}
-				my_parser->readKeyValue(L"reload_delay"s);
-				int rd = static_cast<int>(my_parser->parseNumber());
+				my_parser.readKeyValue(L"reload_delay"s);
+				int rd = static_cast<int>(my_parser.parseNumber());
 				if (vs == 0 && rd != 0) {
 					throw util::file::DataFileException {L"Reload delay must be zero if volley shots is zero."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				}
 				else if (vs > 0 && rd < 10) {
 					throw util::file::DataFileException {L"Reload delay must be at least 10ms if volley shots is positive."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				}
-				my_parser->readKeyValue(L"cost_adjust"s);
-				int cost_adj = static_cast<int>(my_parser->parseNumber());
+				my_parser.readKeyValue(L"cost_adjust"s);
+				int cost_adj = static_cast<int>(my_parser.parseNumber());
 				auto my_tower_type = std::make_shared<TowerType>(n, d, c, st, fmethod, tstrategy,
 					std::move(my_tower_shots), fs, fr, vs, rd, cost_adj, max_lv);
 				this->tower_types.emplace_back(std::move(my_tower_type));
-			} while (my_parser->getNext());
+			} while (my_parser.getNext());
 		}
 
 		void MyGame::load_tower_upgrades_data() {
@@ -928,7 +928,7 @@ namespace hoffman::isaiah {
 			if (data_file.bad() || data_file.fail()) {
 				throw util::file::DataFileException {L"Could not open resources/levels/global.ini for reading."s, 0};
 			}
-			auto my_parser = util::file::DataFileParser {data_file};
+			util::file::DataFileParser my_parser {data_file};
 			my_parser.expectToken(util::file::TokenTypes::Section, L"global"s);
 			my_parser.readKeyValue(L"backup_level_if_load_fails"s);
 			this->my_level_backup_number = static_cast<int>(my_parser.parseNumber());
@@ -946,50 +946,50 @@ namespace hoffman::isaiah {
 						+ std::to_wstring(this->level) + L".ini for reading!"s, 0};
 				}
 			}
-			auto my_parser = std::make_unique<util::file::DataFileParser>(data_file);
+			util::file::DataFileParser my_parser {data_file};
 			// Global section
-			my_parser->expectToken(util::file::TokenTypes::Section, L"global"s);
-			my_parser->readKeyValue(L"version"s);
-			my_parser->expectToken(util::file::TokenTypes::Number, L"1"s);
-			my_parser->readKeyValue(L"wave_spawn_delay"s);
-			int wave_spawn_delay = static_cast<int>(my_parser->parseNumber());
+			my_parser.expectToken(util::file::TokenTypes::Section, L"global"s);
+			my_parser.readKeyValue(L"version"s);
+			my_parser.expectToken(util::file::TokenTypes::Number, L"1"s);
+			my_parser.readKeyValue(L"wave_spawn_delay"s);
+			int wave_spawn_delay = static_cast<int>(my_parser.parseNumber());
 			if (wave_spawn_delay < 200 || wave_spawn_delay > 20000) {
 				throw util::file::DataFileException {L"Wave spawn delay should be between 200ms and 20000ms inclusive."s,
-					my_parser->getLine()};
+					my_parser.getLine()};
 			}
-			my_parser->getNext();
+			my_parser.getNext();
 			std::deque<std::unique_ptr<EnemyWave>> my_level_waves {};
 			do {
 				// [wave] sections
-				my_parser->expectToken(util::file::TokenTypes::Section, L"wave"s);
-				my_parser->readKeyValue(L"group_spawn_delay"s);
-				int group_spawn_delay = static_cast<int>(my_parser->parseNumber());
+				my_parser.expectToken(util::file::TokenTypes::Section, L"wave"s);
+				my_parser.readKeyValue(L"group_spawn_delay"s);
+				int group_spawn_delay = static_cast<int>(my_parser.parseNumber());
 				if (group_spawn_delay < 100 || group_spawn_delay > 7500) {
 					throw util::file::DataFileException {L"Group spawn delay should be between 100ms and 7500ms inclusive."s,
-						my_parser->getLine()};
+						my_parser.getLine()};
 				}
 				std::deque<std::unique_ptr<EnemyGroup>> my_wave_groups {};
-				my_parser->readKeyValue(L"groups"s);
-				my_parser->expectToken(util::file::TokenTypes::Object, L"{"s);
-				my_parser->getNext();
+				my_parser.readKeyValue(L"groups"s);
+				my_parser.expectToken(util::file::TokenTypes::Object, L"{"s);
+				my_parser.getNext();
 				do {
-					my_parser->readKeyValue(L"enemy_name"s);
-					std::wstring enemy_name = my_parser->parseString();
+					my_parser.readKeyValue(L"enemy_name"s);
+					std::wstring enemy_name = my_parser.parseString();
 					if (this->enemy_types.find(enemy_name) == this->enemy_types.end()) {
 						throw util::file::DataFileException {L"Enemy type not found: "s + enemy_name + L"."s,
-							my_parser->getLine()};
+							my_parser.getLine()};
 					}
 					std::shared_ptr<EnemyType> etype = this->getEnemyType(enemy_name);
-					my_parser->readKeyValue(L"extra_count"s);
-					int enemy_count = static_cast<int>(my_parser->parseNumber()) + this->challenge_level + 2;
+					my_parser.readKeyValue(L"extra_count"s);
+					int enemy_count = static_cast<int>(my_parser.parseNumber()) + this->challenge_level + 2;
 					if (enemy_count - this->challenge_level - 2 < 0) {
-						throw util::file::DataFileException {L"Extra count should be non-negative."s, my_parser->getLine()};
+						throw util::file::DataFileException {L"Extra count should be non-negative."s, my_parser.getLine()};
 					}
-					my_parser->readKeyValue(L"enemy_spawn_delay"s);
-					int enemy_spawn_delay = static_cast<int>(my_parser->parseNumber());
+					my_parser.readKeyValue(L"enemy_spawn_delay"s);
+					int enemy_spawn_delay = static_cast<int>(my_parser.parseNumber());
 					if (enemy_spawn_delay < 10 || enemy_spawn_delay > 5000) {
 						throw util::file::DataFileException {L"Enemy spawn delay should be between 10ms and 5000ms inclusive."s,
-							my_parser->getLine()};
+							my_parser.getLine()};
 					}
 					std::queue<std::unique_ptr<Enemy>> my_enemy_spawns {};
 					if (etype->isUnique()) {
@@ -1008,14 +1008,14 @@ namespace hoffman::isaiah {
 					}
 					auto my_group = std::make_unique<EnemyGroup>(std::move(my_enemy_spawns), enemy_spawn_delay);
 					my_wave_groups.emplace_front(std::move(my_group));
-					my_parser->getNext();
-					my_parser->expectToken(util::file::TokenTypes::Object, L"}"s);
-					my_parser->getNext();
-				} while (my_parser->matchToken(util::file::TokenTypes::Object, L"{"s));
-				my_parser->expectToken(util::file::TokenTypes::Object, L"}"s);
+					my_parser.getNext();
+					my_parser.expectToken(util::file::TokenTypes::Object, L"}"s);
+					my_parser.getNext();
+				} while (my_parser.matchToken(util::file::TokenTypes::Object, L"{"s));
+				my_parser.expectToken(util::file::TokenTypes::Object, L"}"s);
 				auto my_wave = std::make_unique<EnemyWave>(std::move(my_wave_groups), group_spawn_delay);
 				my_level_waves.emplace_front(std::move(my_wave));
-			} while (my_parser->getNext());
+			} while (my_parser.getNext());
 			this->my_level = std::make_unique<GameLevel>(this->level, std::move(my_level_waves), wave_spawn_delay);
 			this->my_level_enemy_count = this->my_level->getEnemyCount();
 		}
