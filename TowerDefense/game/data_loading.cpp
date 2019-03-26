@@ -847,25 +847,16 @@ namespace hoffman::isaiah {
 				while (my_parser.matchToken(util::file::TokenTypes::Object, L"{"s)) {
 					my_parser.readKeyValue(L"upgrade_level");
 					const int upgrade_level = static_cast<int>(my_parser.parseNumber());
-					if (upgrade_level < 2) {
-						throw util::file::DataFileException {L"Upgrade level must be greater than or equal to 2.", my_parser.getLine()};
-					}
-					else if (upgrade_level > my_ttype->getMaxLevel()) {
-						throw util::file::DataFileException {L"Upgrade level cannot exceed " + std::to_wstring(my_ttype->getMaxLevel())
-							+ L" for " + tower_name + L".", my_parser.getLine()};
-					}
+					util::file::DataFileParser::validateNumber(upgrade_level, 2, my_ttype->getMaxLevel(),
+						L"Upgrade level for " + tower_name, my_parser.getLine(), true, true);
 					my_parser.readKeyValue(L"upgrade_option");
 					const unsigned int upgrade_option_number = static_cast<unsigned int>(my_parser.parseNumber());
-					if (upgrade_option_number > 1U) {
-						throw util::file::DataFileException {L"Upgrade option should be either 0 or 1.", my_parser.getLine()};
-					}
+					util::file::DataFileParser::validateNumber(upgrade_option_number, 0U, 1U, L"Upgrade option", my_parser.getLine(), true, true);
 					const TowerUpgradeOption upgrade_option = upgrade_option_number == 0
 						? TowerUpgradeOption::One : TowerUpgradeOption::Two;
 					my_parser.readKeyValue(L"upgrade_cost_percent");
 					const double upgrade_cost_percent = my_parser.parseNumber();
-					if (upgrade_cost_percent <= 0) {
-						throw util::file::DataFileException {L"Upgrade cost percent should be positive.", my_parser.getLine()};
-					}
+					util::file::DataFileParser::validateNumberMinBound(upgrade_cost_percent, 0.0, L"Upgrade cost percent", my_parser.getLine(), false);
 					my_parser.readKeyValue(L"special_type");
 					if (!my_parser.matchTokenType(util::file::TokenTypes::Identifier)) {
 						throw util::file::DataFileException {L"Expected an identifier (no quotes).", my_parser.getLine()};
@@ -880,37 +871,25 @@ namespace hoffman::isaiah {
 						my_parser.getLine()};
 					my_parser.readKeyValue(L"special_chance");
 					const double upgrade_special_chance = my_parser.parseNumber();
-					if (upgrade_special_chance < 0) {
-						throw util::file::DataFileException {L"Special chance must be non-negative.", my_parser.getLine()};
-					}
+					util::file::DataFileParser::validateNumberMinBound(upgrade_special_chance, 0.0, L"Special chance", my_parser.getLine(), true);
 					my_parser.readKeyValue(L"special_power");
 					const double upgrade_special_power = my_parser.parseNumber();
 					// I should validate special power but I don't see a real reason to do it right now.
 					my_parser.readKeyValue(L"damage_multi");
 					const double upgrade_damage_multi = my_parser.parseNumber();
-					if (upgrade_damage_multi <= 0) {
-						throw util::file::DataFileException {L"Damage multi must be greater than 0.", my_parser.getLine()};
-					}
+					util::file::DataFileParser::validateNumberMinBound(upgrade_damage_multi, 0.0, L"Damage multi", my_parser.getLine(), false);
 					my_parser.readKeyValue(L"speed_multi");
 					const double upgrade_speed_multi = my_parser.parseNumber();
-					if (upgrade_speed_multi <= -0) {
-						throw util::file::DataFileException {L"Speed multi must be greater than 0.", my_parser.getLine()};
-					}
+					util::file::DataFileParser::validateNumberMinBound(upgrade_speed_multi, 0.0, L"Speed multi", my_parser.getLine(), false);
 					my_parser.readKeyValue(L"range_multi");
 					const double upgrade_range_multi = my_parser.parseNumber();
-					if (upgrade_range_multi <= 0) {
-						throw util::file::DataFileException {L"Range multi must be greater than 0.", my_parser.getLine()};
-					}
+					util::file::DataFileParser::validateNumberMinBound(upgrade_range_multi, 0.0, L"Range multi", my_parser.getLine(), false);
 					my_parser.readKeyValue(L"ammo_multi");
 					const double upgrade_ammo_multi = my_parser.parseNumber();
-					if (upgrade_ammo_multi <= 0) {
-						throw util::file::DataFileException {L"Ammo multi must be greater than 0.", my_parser.getLine()};
-					}
+					util::file::DataFileParser::validateNumberMinBound(upgrade_ammo_multi, 0.0, L"Ammo multi", my_parser.getLine(), false);
 					my_parser.readKeyValue(L"delay_multi");
 					const double upgrade_delay_multi = my_parser.parseNumber();
-					if (upgrade_delay_multi <= 0) {
-						throw util::file::DataFileException {L"Delay multi must be greater than 0.", my_parser.getLine()};
-					}
+					util::file::DataFileParser::validateNumberMinBound(upgrade_delay_multi, 0.0, L"Delay multi", my_parser.getLine(), false);
 					my_ttype->addUpgradeInfo(TowerUpgradeInfo {upgrade_level, upgrade_option, upgrade_cost_percent,
 						upgrade_damage_multi, upgrade_speed_multi, upgrade_range_multi, upgrade_ammo_multi,
 						upgrade_delay_multi, upgrade_special, upgrade_special_chance, upgrade_special_power});
