@@ -121,8 +121,9 @@ namespace hoffman::isaiah {
 			/// <param name="sa">The damage absorption of the shield.</param>
 			void addShield(double shp, double sa) noexcept {
 				this->shield_health += shp;
-				this->shield_max_health += shp;
-				this->shield_absorb = math::get_min(sa, this->getShieldAbsorb());
+				this->shield_max_health = math::get_max(this->shield_health, this->shield_max_health, shp);
+				this->shield_absorb = this->getShieldAbsorb() > 0 ? math::get_avg(sa, this->getShieldAbsorb())
+					: sa;
 			}
 			/// <summary>Deals damage directly to the enemy's shield.</summary>
 			/// <param name="dmg">The amount of damage to inflict.</param>

@@ -293,8 +293,8 @@ namespace hoffman::isaiah {
 				const float shp_bar_start_y = static_cast<float>(this->getScreenY()) - bar_height / 2.f - shp_bar_offset;
 				const float shp_bar_end_y = shp_bar_start_y + bar_height;
 				const D2D1_RECT_F shp_bar_filled_rc {shp_bar_start_x, shp_bar_start_y, shp_bar_end_x, shp_bar_end_y};
-				/*const D2D1_RECT_F shp_bar_outline_rc {shp_bar_start_x, shp_bar_start_y, shp_bar_start_x + bar_max_width,
-					shp_bar_end_y};*/
+				const D2D1_RECT_F shp_bar_outline_rc {shp_bar_start_x, shp_bar_start_y, shp_bar_start_x + bar_max_width,
+					shp_bar_end_y};
 				renderer.setFillColor(shield_fill_color);
 				renderer.fillRectangle(shp_bar_filled_rc);
 			}
@@ -305,12 +305,7 @@ namespace hoffman::isaiah {
 			if (this->getShieldHealth() > 0 && !bypass_armor_completely) {
 				const auto absorbed_dmg = dmg > this->getShieldAbsorb() ? this->getShieldAbsorb() : dmg;
 				dmg -= absorbed_dmg;
-				this->shield_health -= absorbed_dmg;
-				if (this->getShieldHealth() <= 0) {
-					this->shield_health = 0;
-					this->shield_max_health = 0;
-					this->shield_absorb = 0;
-				}
+				this->degradeShield(absorbed_dmg);
 			}
 			if (this->hasArmor()) {
 				// Damage to armor => Base Damage * ((1.0 - Armor Reduce) + Piercing)
