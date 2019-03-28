@@ -67,15 +67,15 @@ InstType /NOCUSTOM
 !insertmacro MUI_LANGUAGE "English"
 ; Version Information
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "Isaiah's Tower defense Game Installer"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "3.2.0.0"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "3.2.1.0"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "Isaiah Hoffman"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© Isaiah Hoffman 2017"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "1.2.0.0"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "1.2.1.0"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "An installer program for Isaiah Hoffman's tower defense game."
 VIAddVersionKey /LANG=${LANG_ENGLISH} "InternalName" "tower_defense_setup.exe"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "OriginalFilename" "tower_defense_setup.exe"
-VIProductVersion 3.1.1.0
-VIFileVersion 1.1.1.0
+VIProductVersion 3.2.1.0
+VIFileVersion 1.2.1.0
 
 ; Installer Sections
 Section "Required Files" SectionRequired

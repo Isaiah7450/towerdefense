@@ -413,3 +413,167 @@ Version 3.2.0: (Released March 20, 2019)
    files; however, subsequent files will have version 2. (This change
    was needed to accomodate tower upgrades.)
  + Destroyer Tower's max level decreased to 4 from 5.
+
+Version 3.2.1: (Released March 28, 2019)
+- Bug Fixes:
+ + Fixed one of the upgrade paths for Rapid-Fire Tower level 3 not having the
+   Multishot ability.
+ + The cost of buying health is now written to the save file and used.
+ + Fixed a crash when loading data files due to ill-formed data.
+ + Fixed a bug where corrupted save data was not correctly overwritten.
+ + Fixed a major bug where opening the app at certain times of day could
+   result in the game not drawing or updating itself.
+ + Fixed negative values being valid for running speed and injured speed for
+   enemies.
+ + Unrecognized enemy names in save files are now ignored rather than
+   causing a save file to be corrupted.
+ + Fixed stun chance not having the proper ranges validated.
+ + Fixed display of shield bars over enemies.
+ + Fixed an error with shield absorb not working properly.
+ + The game now saves if you lose.
+- Balance Changes:
+ + Very slight rebalancing of the money curve. (Added a bonus at level 98 and
+   removed bonuses from level 99+.)
+ + Once again updated some formulas because I can never seem to get them
+   right.
+ + Red Scout: Health decreased from 6 to 5.
+ + Red Foot Soldier: Health increased from 16 to 19.
+ + Red Mounted Soldier: Health increased from 14 to 17.
+ + Red Enforcer: Health increased from 19 to 23.
+ + Red General: Health increased from 55 to 59.
+ + Red General: Armor Health decreased from 25 to 23.
+ + Red Vengeful King: "Red King Group" (Forcefield 1) shield health
+                      decreased from 500 to 200.
+ + Green Scout: Health increased from 29 to 37.
+ + Green Scout: Injured Speed increased from 2.000 tiles per second to
+                2.718 tiles per second.
+ + Green Soldier: Health increased from 55 to 61.
+ + Green Soldier: Armor Health increased from 22 to 23.
+ + Green Berserker: Health increased from 60 to 71.
+ + Green Berserker: Added Purify buff (affects "Green Berserker Group").
+ + Green Guardian: Armor reduction increased from 55% to 57%.
+ + Green Motivator: Injured Speed increased from 1.881 tiles per second to
+                    2.222 tiles per second.
+ + Green General: "Green and Purple Unity Group" (Purify 1) radius increased
+                  from 0.5 tiles to 2.0 tiles.
+ + Green General: "Green and Purple Unity Group" (Purify 1) delay decreased
+                  from 7500ms to 6000ms.
+ + Green Queen: "Green Queen Group" (Forcefield 1) shield health
+                  decreased from 100 to 50.
+ + Green Majestic Queen: Armor Health increased from 240 to 350.
+ + Green Majestic Queen: "Green Queen Group" (Forcefield 1) shield health
+                  decreased from 2500 to 300.
+ + Purple Tactician: "Green and Purple Unity Group" (Forcefield 1) shield
+                  health decreased from 200 to 25.
+ + Purple Queen: "Purple Queen Group" (Forcefield 1) shield health decreased
+                  from 75 to 40.
+ + Purple Vibrant Queen: Armor Health increased from 208 to 257.
+ + Purple Vibrant Queen: "Purple Queen Group" (Forcefield 1) shield health
+                  decreased from 2500 to 300.
+ + Blue Scout: Health increased from 35 to 47.
+ + Blue Scout: Added Forcefield buff (affects "Red and Blue Infantry Group").
+ + Blue Soldier: Health increased from 64 to 79.
+ + Blue Soldier: Added Forcefield buff (affects "Red and Blue Infantry Group").
+ + Blue Supporter: Health increased from 92 to 101.
+ + Blue Supporter: "Red and Blue Defender Group" (Forcefield 1) radius
+                   increased from 0.3 tiles to 0.7 tiles.
+ + Blue Supporter: "Red and Blue Defender Group" (Forcefield 1) delay
+                   increased from 5000ms to 6000ms.
+ + Blue Supporter: "Red and Blue Defender Group" (Forcefield 1) duration
+                   increased from 1500ms to 2750ms.
+ + Blue Supporter: "Red and Blue Defender Group" (Forcefield 1) shield
+                   health decreased from 100 to 60.
+ + Blue Guardian: Health increased from 200 to 269.
+ + Blue Guardian: Injured Speed increased from 1.000 tiles per second
+                  to 1.025 tiles per second.
+ + Blue Guardian: "Blue Guardian Group" (Forcefield 1) shield health
+                   decreased from 200 to 91.
+ + Blue Quartermaster: Health increased from 144 to 157.
+ + Blue Quartermaster: Armor Health increased from 16 to 19.
+ + Blue Quartermaster: Pain Tolerance increeased from 15% to 25%.
+ + Blue Quartermaster: Walking Speed increased from 1.250 tiles per second
+                       to 1.400 tiles per second.
+ + Blue Quartermaster: Running Speed increased from 1.325 tiles per second
+                       to 1.925 tiles per second.
+ + Blue Quartermaster: Injured Speed increased from 0.850 tiles per second
+                       to 1.000 tiles per second.
+ + Blue Quartermaster: "Red and Ble Repair Group" (Repair 1) radius increased
+                       from 1.0 tiles to 1.5 tiles.
+ + Blue Quartermaster: "Red and Blue Repair Group" (Repair 1) repair amount
+                       increased from 0.2 to 0.3.
+ + Blue Quartermaster: "Red and Blue Repair Group" (Repair 2) radius increased
+                       from 0.5 tiles to 1.2 tiles.
+ + Blue General: Health increased from 346 to 383.
+ + Blue General: Armor Health increased from 248 to 251.
+ + Blue General: Armor reduction increased from 70% to 71%.
+ + Blue General: "Red All Group" (Forcefield 1) shield health decreased
+                 from 500 to 200.
+ + Blue General: "Blue Support Group" (Forcefield 1) delay decreased from
+                 15000ms to 12000ms.
+ + Blue General: "Blue Support Group" (Forcefield 1) shield health decreased
+                 from 2000 to 143.
+ + Blue General: Added Forcefield buff (affects "Blue General Group").
+ + Blue King: Health decreased from 999 to 997.
+ + Blue King: Armor Health decreased from 999 to 991.
+ + Blue King: "Blue King Group" (Forcefield 1) shield health decreased
+              from 9999 to 499.
+ + Blue Tyrant King: "Blue King Group" (Forcefield 1) shield health decreased
+              from 9999 to 499.
+ + Destroyer Missile: Damage increased from 10.50 to 12.00.
+ + Air Rocket: Ground Multiplier increased from 60% to 75%.
+ + Air Rocket: Air Multiplier increased from 150% to 225%.
+ + Cheap Tower: Changed Firing Method to "Arc Circle".
+ + Cheap Tower: Firing Speed increased from 6.00 shots per second to 9.00
+                shots per second.
+ + Cheap Tower: Firing Range decreased from 3.50 tiles to 3.00 tiles.
+ + Cheap Tower: Volley Shots increased from 42 to 50.
+ + Rapid-Fire Tower: Frequency of Flak II increased from 15% to 18%.
+ + Rapid-Fire Tower: Frequency of Suppression Flak decreased from 15% to 12%.
+ + Rapid-Fire Tower: Firing Speed decreased from 12.0 shots per second to
+                     11.5 shots per second.
+ + Rapid-Fire Tower: Firing Range decreased from 5.00 tiles to 4.75 tiles.
+ + Rapid-Fire Tower: Volley Shots increased from 200 to 225.
+ + Utility Tower: Frequency of Poison Dart decreased from 30% to 28%.
+ + Utility Tower: Frequency of Big Bang increased from 5% to 7%.
+ + Utility Tower: Firing Range decreased from 5.75 tiles to 5.50 tiles.
+ + Utility Tower: Volley Shots increased from 75 to 125.
+ + Utility Tower: Reload Delay increased from 2000ms to 2400ms.
+ + Changed prices of towers:
+  * Cheap Tower: Cost changed from $29 to $30.
+  * Rapid-Fire Tower: Cost changed from $88 to $86.
+  * Destroyer Tower: Cost changed from $84 to $82.
+  * Splash Tower: Cost changed from $96 to $98.
+  * Spray Tower NE: Cost changed from $94 to $103.
+  * Spray Tower SE: Cost changed from $93 to $102.
+  * Utility Tower: Cost changed from $96 to $98.
+ + Note that stun and slow effects are less effective now. Enemies will build
+   up a temporary resistance to them.
+ + Reworked upgrades to stack multiplicatively instead of additively.
+  * Several (undocumented) changes to tower upgrades occurred as a result
+    of this.
+- New Stuff:
+ + Enemies now build up resistance against status afflictions to prevent
+   being forced into a stun/slow lock situation.
+ + Added Level 51-75.
+- Misc Changes:
+ + (Internal): Increased overall code quality. (Note: It's very possible
+               that the changes caused some kinds of bugs to appear.)
+ + Updated the readme file to include more information.
+ + Towers now show the average shot effect rating on the dialog box, rather
+   the average shot rating.
+ + The save file format has changed. The game will still read version 1 and 2
+   save files; however, subsequent files will have version 3. (This change
+   was to fix a bug as well as add some content.)
+ + When bringing up the info dialog box for placed towers, what was formerly
+   labeled as "Cost" is now labeled as "Value".
+ + Pain tolerance range changed from 0-1 exclusive to 0-1 inclusive.
+ + Decreased maximum allowed value for max_level from 99 to 31 due to the
+   way upgrade data is stored.
+ + Decreased maximum allowed value for firing_speed from 90 to 60 due to
+   certain game constraints.
+ + Adding maximum value of 30.5 for firing_range because most maps aren't
+   going to exceed 60x60.
+ + Slow-multichance range is now inclusive-exclusive.
+ + The save file now keeps track of kill count. This information may be
+   used later.
+
