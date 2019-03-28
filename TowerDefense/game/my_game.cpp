@@ -157,6 +157,16 @@ namespace hoffman::isaiah {
 							if (!this->player.isAlive()) {
 								this->is_paused = true;
 								this->in_level = false;
+								// To prevent players from closing out and thus being able to replay the level.
+								const std::wstring save_name {this->getUserDataPath() + game::default_save_file_name};
+								std::wofstream my_save {save_name};
+								this->saveGame(my_save);
+								my_save.close();
+								std::wofstream my_game_stats {save_name + L".stats"};
+								for (const auto& estats : this->enemy_kill_count) {
+									my_game_stats << estats.first << L": " << estats.second << L"\n";
+								}
+								my_game_stats.close();
 							}
 						}
 						else {
