@@ -13,7 +13,7 @@ Unicode true
 
 ; General Settings
 ; Name and file
-Name "Isaiah's tower defense game"
+Name "A Shaping War: Isaiah's tower defense game"
 OutFile "tower_defense_setup.exe"
 
 function .onInit
@@ -66,7 +66,7 @@ InstType /NOCUSTOM
 ; Languages
 !insertmacro MUI_LANGUAGE "English"
 ; Version Information
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "Isaiah's Tower defense Game Installer"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "A Shaping War: Isaiah's tower defense game installer"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "3.2.1.0"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "Isaiah Hoffman"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© Isaiah Hoffman 2017"

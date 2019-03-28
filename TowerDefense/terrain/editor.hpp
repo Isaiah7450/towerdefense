@@ -85,7 +85,7 @@ namespace hoffman::isaiah {
 			// The window's class
 			static constexpr auto class_name {L"terrain_editor_window"};
 			// The window's name
-			static constexpr auto window_name {L"Isaiah's tower defense - terrain editor"};
+			static constexpr auto window_name {L"A Shaping War: Isaiah's tower defense game (Terrain Editor)"};
 		};
 
 		// Global state is not the best, but it tends to be the most trivial solution.

@@ -8,9 +8,6 @@
 
 namespace hoffman::isaiah {
 	namespace winapi {
-		// Global constants
-		constexpr const auto main_class_name {L"my_game"};
-		constexpr const auto main_window_name {L"Isaiah's tower defense game"};
 		// Interfaces/enums:
 		/// <summary>Interface for dialog boxes.</summary>
 		class IDialog {

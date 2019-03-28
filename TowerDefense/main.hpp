@@ -68,7 +68,7 @@ namespace hoffman::isaiah {
 			int end_gy {-1};
 			// The class name
 			static constexpr const wchar_t* class_name {L"my_game"};
-			static constexpr const wchar_t* window_name {L"Isaiah's tower defense game"};
+			static constexpr const wchar_t* window_name {L"A Shaping War: Isaiah's tower defense game"};
 			/// <summary>Stores the frequency of the high performance counter.</summary>
 			static LARGE_INTEGER qpc_frequency;
 		};
