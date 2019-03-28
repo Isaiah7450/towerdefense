@@ -360,6 +360,7 @@ namespace hoffman::isaiah {
 			// Add listing for "seen before".
 			for (const auto& etype : this->enemy_types) {
 				this->enemies_seen.emplace(etype.first, false);
+				this->enemy_kill_count.emplace(etype.first, 0);
 			}
 #pragma warning(pop)
 		}
@@ -942,7 +943,8 @@ namespace hoffman::isaiah {
 			// Output seen enemies.
 			for (const auto& seen_e : this->enemies_seen) {
 				if (seen_e.second) {
-					save_file << L"E: " << seen_e.first << L"\n";
+					save_file << L"E: " << seen_e.first << L"\n\tK: "
+						<< std::hex << this->enemy_kill_count.at(seen_e.first) << std::dec << L"\n";
 				}
 			}
 		}
@@ -1022,11 +1024,17 @@ namespace hoffman::isaiah {
 					}
 					else if (buffer == L"E:") {
 						// Load seen enemies.
-						std::getline(save_file, buffer);
+						std::wstring enemy_name {};
+						std::getline(save_file, enemy_name);
 						// Leading space is removed...
-						buffer.erase(buffer.begin());
+						enemy_name.erase(enemy_name.begin());
+						long long kill_count {0};
+						if (version >= 3) {
+							save_file >> buffer >> std::hex >> kill_count >> std::dec;
+						}
 						try {
-							this->enemies_seen.at(buffer) = true;
+							this->enemies_seen.at(enemy_name) = true;
+							this->enemy_kill_count.at(enemy_name) = kill_count;
 						}
 						catch (const std::out_of_range&) {
 							// Ignore.

@@ -273,6 +273,8 @@ namespace hoffman::isaiah {
 			std::map<std::wstring, std::shared_ptr<game::EnemyType>> enemy_types;
 			/// <summary>Stores which enemy types have been seen before.</summary>
 			std::map<std::wstring, bool> enemies_seen {};
+			/// <summary>Stores how many times each enemy type has been killed.</summary>
+			std::map<std::wstring, long long> enemy_kill_count {};
 			/// <summary>The list of enemies that are currently alive.</summary>
 			std::vector<std::unique_ptr<game::Enemy>> enemies;
 			/// <summary>The list of shot template types.</summary>

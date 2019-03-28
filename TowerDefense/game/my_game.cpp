@@ -161,6 +161,7 @@ namespace hoffman::isaiah {
 						}
 						else {
 							++this->my_level_enemy_killed;
+							this->enemy_kill_count.at(this->enemies[i]->getBaseType().getName()) += 1;
 							// Alter influence score on Normal challenge level and higher
 							auto& my_node = this->getMap().getInfluenceGraph(
 								this->enemies[i]->getBaseType().isFlying()).getNode(
