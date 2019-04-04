@@ -13,6 +13,7 @@
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 #include "./../main.hpp"
+#include "./../graphics/file_dialogs.hpp"
 #include "./../graphics/graphics_DX.hpp"
 #include "./../graphics/graphics.hpp"
 #include "./../pathfinding/grid.hpp"
@@ -169,20 +170,36 @@ namespace hoffman::isaiah {
 						case ID_TE_FILE_OPEN_MAP:
 						{
 							/*
+							// Much of this adapted from the common item dialogs sample code.
 							// CoCreate (whatever that is) the File Open Dialog object
-							IFileDialog* open_dialog = nullptr;
+							IFileOpenDialog* open_dialog = nullptr;
 							HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER,
 								IID_PPV_ARGS(&open_dialog));
+							if (SUCCEEDED(hr)) {
+								// Create an event handling object and hook it to the dialog
+								IFileDialogEvents* file_dialog_events = nullptr;
+								hr = winapi::TerrainEditorOpenDialog::createInstance(IID_PPV_ARGS(&file_dialog_events));
+								if (SUCCEEDED(hr)) {
+									// Set the options on the dialog.
+									DWORD my_flags;
+									// Make sure not override existing options.
+									hr = open_dialog->GetOptions(&my_flags);
+									if (FAILED(hr)) goto failed;
+									// Get shell items for only file system items.
+									hr = open_dialog->SetOptions(my_flags | FOS_FORCEFILESYSTEM);
+									if (FAILED(hr)) goto failed;
+
+								}
+								need_to_update = true;
+							}
+							// Because I'm not about to nest 10 levels of if SUCCEEDED.
+							failed:
 							if (FAILED(hr)) {
 								MessageBox(this->hwnd, L"TE Thread: Open dialog box creation failed!", TerrainEditor::window_name,
 									MB_OK);
 								break;
 							}
-							// Create an event handling object and hook it to the dialog
-							IFileDialogEvents* file_dialog_events = nullptr;
-							hr = CDialogEventHandler_CreateInstance(IID_PPV_ARGS(&file_dialog_events));
 							*/
-							need_to_update = true;
 							break;
 						}
 						case ID_TE_FILE_SAVE_MAP:
