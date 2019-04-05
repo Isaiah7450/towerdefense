@@ -54,7 +54,9 @@ namespace hoffman::isaiah {
 				/ static_cast<float>(math::convertMillisecondsToFrames(this->getReloadDelay()));
 			const float bar_max_width = 0.7f * graphics::getGameSquareWidth<float>();
 			const float bar_height = 0.15f * graphics::getGameSquareHeight<float>();
-			const float ammo_bar_offset = 8.f * graphics::screen_height / 645.f;
+			const float ammo_bar_offset = 3.6f * bar_height;
+			// Roughly 3.6x the bar's height.
+//			const float ammo_bar_offset = 8.f * graphics::screen_height / 645.f;
 			const float ammo_bar_start_x = static_cast<float>(this->getScreenX()) - bar_max_width / 2.f;
 			const float ammo_bar_start_y = static_cast<float>(this->getScreenY()) - bar_height / 2.f - ammo_bar_offset;
 			const float ammo_bar_end_x = ammo_bar_start_x + bar_max_width * shots_fired_percent;

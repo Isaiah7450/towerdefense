@@ -258,7 +258,9 @@ namespace hoffman::isaiah {
 			const double hp_percent = this->getHealthPercentage();
 			const float bar_max_width = 0.4f * graphics::getGameSquareWidth<float>();
 			const float bar_height = 0.115f * graphics::getGameSquareHeight<float>();
-			const float hp_bar_offset = 5.5f * graphics::screen_height / 645.f;
+			const float hp_bar_offset = 3.23f * bar_height;
+			// Roughtly 3.23 * bar_height
+			// const float hp_bar_offset = 5.5f * graphics::screen_height / 645.f;
 			const float hp_bar_start_x = static_cast<float>(this->getScreenX()) - bar_max_width / 2.f;
 			const float hp_bar_end_x = static_cast<float>(hp_bar_start_x + hp_percent * bar_max_width);
 			const float hp_bar_start_y = static_cast<float>(this->getScreenY()) - bar_height / 2.f - hp_bar_offset;
@@ -272,7 +274,9 @@ namespace hoffman::isaiah {
 			renderer.fillRectangle(hp_bar_filled_rc);
 			if (this->hasArmor()) {
 				const double ahp_percent = this->getArmorPercentage();
-				const float ahp_bar_offset = hp_bar_offset + bar_height + 0.85f * graphics::screen_height / 645.f;
+				const float ahp_bar_offset = hp_bar_offset + bar_height + 0.5f * bar_height;
+				// Roughly hp_bar_offset + 0.5 * bar_height + bar_height
+				// const float ahp_bar_offset = hp_bar_offset + bar_height + 0.85f * graphics::screen_height / 645.f;
 				const float ahp_bar_start_x = hp_bar_start_x;
 				const float ahp_bar_end_x = static_cast<float>(ahp_bar_start_x + ahp_percent * bar_max_width);
 				const float ahp_bar_start_y = static_cast<float>(this->getScreenY()) - bar_height / 2.f - ahp_bar_offset;
@@ -287,7 +291,8 @@ namespace hoffman::isaiah {
 			}
 			if (this->getShieldHealth() > 0) {
 				const double shp_percent = this->getShieldHealth() / this->getMaxShieldHealth();
-				const float shp_bar_offset = hp_bar_offset + bar_height + 0.85f * graphics::screen_height / 645.f;
+				// const float shp_bar_offset = hp_bar_offset + bar_height + 0.85f * graphics::screen_height / 645.f;
+				const float shp_bar_offset = hp_bar_offset + bar_height + 0.5f * bar_height;
 				const float shp_bar_start_x = hp_bar_start_x;
 				const float shp_bar_end_x = static_cast<float>(shp_bar_start_x + shp_percent * bar_max_width);
 				const float shp_bar_start_y = static_cast<float>(this->getScreenY()) - bar_height / 2.f - shp_bar_offset;

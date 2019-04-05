@@ -166,6 +166,8 @@ namespace hoffman::isaiah {
 								this->getMap().getTerrainGraph(false).setGoalNode(0, 0);
 								this->getMap().getTerrainGraph(true).setGoalNode(0, 0);
 								this->getMap().resetOtherGraphs();
+								graphics::grid_height = this->getMap().getHeight();
+								graphics::grid_width = this->getMap().getWidth();
 								// Disable revert to save --> No save exists!
 								constexpr MENUITEMINFO m_item {
 									sizeof(MENUITEMINFO), MIIM_STATE, 0, MFS_DISABLED,

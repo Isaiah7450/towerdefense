@@ -221,6 +221,12 @@ namespace hoffman::isaiah {
 			int getColumns() const noexcept {
 				return this->getTerrainGraph(false).getColumns();
 			}
+			int getHeight() const noexcept {
+				return this->getRows();
+			}
+			int getWidth() const noexcept {
+				return this->getColumns();
+			}
 			/// <param name="get_air_graph">Set this true to return the air graph; otherwise,
 			/// the ground graph is returned.</param>
 			/// <returns>A constant reference to the requested terrain graph.</returns>
