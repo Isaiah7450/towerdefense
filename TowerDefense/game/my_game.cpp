@@ -124,6 +124,10 @@ namespace hoffman::isaiah {
 			std::wifstream air_terrain_file {MyGame::air_terrain_filename};
 			if (ground_terrain_file.good() && air_terrain_file.good()) {
 				this->map = std::make_shared<GameMap>(ground_terrain_file, air_terrain_file);
+				this->ground_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), false,
+					false, pathfinding::HeuristicStrategies::Manhattan);
+				this->air_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), true,
+					false, pathfinding::HeuristicStrategies::Manhattan);
 			}
 			this->my_level_enemy_count = 0;
 			this->did_lose_life = false;
