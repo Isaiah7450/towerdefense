@@ -172,12 +172,14 @@ namespace hoffman::isaiah {
 						else {
 							++this->my_level_enemy_killed;
 							this->enemy_kill_count.at(this->enemies[i]->getBaseType().getName()) += 1;
-							// Alter influence score on Normal challenge level and higher
-							auto& my_node = this->getMap().getInfluenceGraph(
-								this->enemies[i]->getBaseType().isFlying()).getNode(
-									static_cast<int>(std::floor(this->enemies[i]->getGameX())),
-									static_cast<int>(std::floor(this->enemies[i]->getGameY())));
-							my_node.setWeight(my_node.getWeight() + 1);
+							// Alter influence score on Experienced challenge level and higher
+							if (this->getChallengeLevel() >= ID_CHALLENGE_LEVEL_HARD - ID_CHALLENGE_LEVEL_EASY) {
+								auto& my_node = this->getMap().getInfluenceGraph(
+									this->enemies[i]->getBaseType().isFlying()).getNode(
+										static_cast<int>(std::floor(this->enemies[i]->getGameX())),
+										static_cast<int>(std::floor(this->enemies[i]->getGameY())));
+								my_node.setWeight(my_node.getWeight() + 1);
+							}
 						}
 						enemies_to_remove.emplace_back(i);
 					}
