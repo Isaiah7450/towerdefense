@@ -183,10 +183,14 @@ namespace hoffman::isaiah {
 			GameMap(std::wistream& ground_terrain_file, std::wistream& air_terrain_file) :
 				ground_terrain_graph {std::make_unique<pathfinding::Grid>(ground_terrain_file)},
 				air_terrain_graph {std::make_unique<pathfinding::Grid>(air_terrain_file)},
-				ground_filter_graph {std::make_unique<pathfinding::Grid>()},
-				air_filter_graph {std::make_unique<pathfinding::Grid>()},
-				ground_influence_graph {std::make_unique<pathfinding::Grid>()},
-				air_influence_graph {std::make_unique<pathfinding::Grid>()} {
+				ground_filter_graph {nullptr},
+				air_filter_graph {nullptr},
+				ground_influence_graph {nullptr},
+				air_influence_graph {nullptr} {
+				this->ground_filter_graph = std::make_unique<pathfinding::Grid>(this->getRows(), this->getColumns());
+				this->air_filter_graph = std::make_unique<pathfinding::Grid>(this->getRows(), this->getColumns());
+				this->ground_influence_graph = std::make_unique<pathfinding::Grid>(this->getRows(), this->getColumns());
+				this->air_influence_graph = std::make_unique<pathfinding::Grid>(this->getRows(), this->getColumns());
 			}
 			/// <param name="gt_graph">The graph containing the ground terrain information.</param>
 			/// <param name="at_graph">The graph containing the air terrain information.</param>
@@ -211,6 +215,12 @@ namespace hoffman::isaiah {
 			}
 
 			// Getters
+			int getRows() const noexcept {
+				return this->getTerrainGraph(false).getRows();
+			}
+			int getColumns() const noexcept {
+				return this->getTerrainGraph(false).getColumns();
+			}
 			/// <param name="get_air_graph">Set this true to return the air graph; otherwise,
 			/// the ground graph is returned.</param>
 			/// <returns>A constant reference to the requested terrain graph.</returns>
@@ -254,6 +264,7 @@ namespace hoffman::isaiah {
 			void setTerrainGraphs(std::unique_ptr<pathfinding::Grid> gt_graph, std::unique_ptr<pathfinding::Grid> at_graph) {
 				this->ground_terrain_graph.swap(gt_graph);
 				this->air_terrain_graph.swap(at_graph);
+				this->resetOtherGraphs();
 			}
 			/// <summary>Resets the non-terrain graphs to their initial state.</summary>
 			void resetOtherGraphs() {
@@ -268,8 +279,8 @@ namespace hoffman::isaiah {
 				this->ground_influence_graph.swap(ptr_gi_graph);
 				this->air_influence_graph.swap(ptr_ai_graph);
 				*/
-				const auto new_rows = this->getTerrainGraph(false).getRows();
-				const auto new_cols = this->getTerrainGraph(false).getColumns();
+				const auto new_rows = this->getRows();
+				const auto new_cols = this->getColumns();
 				this->ground_filter_graph->clearGrid(new_rows, new_cols, 0);
 				this->air_filter_graph->clearGrid(new_rows, new_cols, 0);
 				this->ground_influence_graph->clearGrid(new_rows, new_cols, 0);
