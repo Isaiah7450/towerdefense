@@ -242,14 +242,14 @@ namespace hoffman::isaiah {
 			if (my_game->show_test_paths
 				&& my_game->ground_test_pf->checkPathExists()) {
 				// Paint pathfinder paths.
-				auto ground_path = my_game->ground_test_pf->findPath(1.0);
+				auto ground_path = my_game->ground_test_pf->findPath(0);
 				while (!ground_path.empty()) {
 					auto my_node = ground_path.front();
 					ground_path.pop();
 					this->paintSquare(my_node.getGameX(), my_node.getGameY(), Color {0.f, 1.f, 0.f, 1.f},
 						Color {0.8f, 0.8f, 0.8f, 0.3f});
 				}
-				auto air_path = my_game->air_test_pf->findPath(1.0);
+				auto air_path = my_game->air_test_pf->findPath(0);
 				while (!air_path.empty()) {
 					auto my_node = air_path.front();
 					air_path.pop();

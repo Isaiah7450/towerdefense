@@ -28,10 +28,13 @@ namespace hoffman::isaiah {
 				for (int j = 0; j < graphics::grid_width; ++j) {
 					int w = 0;
 					is >> w;
+					/*
+					 * Pretty sure this is no longer needed.
 					if (w == 0) {
 						// 100 makes manually editting a bit difficult...
 						w = GraphNode::blocked_space_weight;
 					}
+					*/
 					new_row.emplace_back(j, i, w);
 				}
 				graph.nodes.emplace_back(new_row);
