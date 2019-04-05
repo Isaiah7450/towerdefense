@@ -81,7 +81,7 @@ namespace hoffman::isaiah {
 			/// <summary>Stores the ending y-position of the mouse.</summary>
 			int end_gy {-1};
 			/// <summary>Stores the current name used when saving the map.</summary>
-			std::wstring map_name {L"graph.txt"};
+			std::wstring map_name {L"default.txt"};
 			// The window's class
 			static constexpr auto class_name {L"terrain_editor_window"};
 			// The window's name

@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <Windowsx.h>
 #include "./resource.h"
+#include <commctrl.h>
 #include <process.h>
 #include <memory>
 #include <string>
@@ -25,6 +26,9 @@
 #include "./game/tower.hpp"
 #include "./terrain/editor.hpp"
 
+// Common controls
+#pragma comment(lib, "comctl32.lib")
+
 using namespace std::literals::string_literals;
 namespace ih = hoffman::isaiah;
 // WinMain function
@@ -32,6 +36,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR lpCmdLine, _In_ int nCmdShow) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
+	// Initialize window.
 	auto my_window = ih::winapi::MainWindow {hInstance};
 	my_window.run(nCmdShow);
 	return 0;

@@ -16,6 +16,7 @@
 #include "./../graphics/file_dialogs.hpp"
 #include "./../graphics/graphics_DX.hpp"
 #include "./../graphics/graphics.hpp"
+#include "./../graphics/other_dialogs.hpp"
 #include "./../pathfinding/grid.hpp"
 #include "./../pathfinding/pathfinder.hpp"
 #include "./../game/my_game.hpp"
@@ -140,31 +141,38 @@ namespace hoffman::isaiah {
 						case ID_TE_FILE_NEW_MAP:
 						{
 							// Remove .txt.
-							this->map_name.erase(this->map_name.end() - 4, this->map_name.end());
-							const wchar_t last_num = this->map_name.at(this->map_name.size() - 1);
+							std::wstring new_map_name = this->map_name;
+							new_map_name.erase(new_map_name.end() - 4, new_map_name.end());
+							const wchar_t last_num = new_map_name.at(new_map_name.size() - 1);
 							if (last_num >= L'0' && last_num <= L'9') {
-								this->map_name.pop_back();
-								this->map_name.push_back((last_num + 1));
+								new_map_name.pop_back();
+								new_map_name.push_back((last_num + 1));
 							}
 							else {
-								this->map_name.push_back(L'0');
+								new_map_name.push_back(L'0');
 							}
-							this->map_name += L".txt";
-							WaitForSingleObject(sync_mutex, INFINITE);
-							// Reset map to all mountainous terrain
-							this->getMap().getTerrainGraph(false).clearGrid(pathfinding::GraphNode::blocked_space_weight);
-							this->getMap().getTerrainGraph(true).clearGrid(pathfinding::GraphNode::blocked_space_weight);
-							this->getMap().getTerrainGraph(false).setStartNode(0, 0);
-							this->getMap().getTerrainGraph(true).setStartNode(0, 0);
-							this->getMap().getTerrainGraph(false).setGoalNode(0, 0);
-							this->getMap().getTerrainGraph(true).setGoalNode(0, 0);
-							// Disable revert to save --> No save exists!
-							constexpr MENUITEMINFO m_item {
-								sizeof(MENUITEMINFO), MIIM_STATE, 0, MFS_DISABLED,
-								0, nullptr, nullptr, nullptr, 0, nullptr, 0, nullptr
-							};
-							SetMenuItemInfo(GetSubMenu(GetMenu(hwnd), 1), ID_TE_ACTIONS_REVERT_TO_SAVE, false, &m_item);
-							need_to_update = true;
+							new_map_name += L".txt";
+							winapi::TerrainEditorNewMapDialog my_map_dialog {this->getHWND(), GetModuleHandle(nullptr), new_map_name};
+							if (my_map_dialog.isGood()) {
+								WaitForSingleObject(sync_mutex, INFINITE);
+								this->map_name = my_map_dialog.getName();
+								// Reset map to all mountainous terrain
+								this->getMap().getTerrainGraph(false).clearGrid(my_map_dialog.getRows(), my_map_dialog.getColumns(),
+									pathfinding::GraphNode::blocked_space_weight);
+								this->getMap().getTerrainGraph(true).clearGrid(my_map_dialog.getRows(), my_map_dialog.getColumns(),
+									pathfinding::GraphNode::blocked_space_weight);
+								this->getMap().getTerrainGraph(false).setStartNode(0, 0);
+								this->getMap().getTerrainGraph(true).setStartNode(0, 0);
+								this->getMap().getTerrainGraph(false).setGoalNode(0, 0);
+								this->getMap().getTerrainGraph(true).setGoalNode(0, 0);
+								// Disable revert to save --> No save exists!
+								constexpr MENUITEMINFO m_item {
+									sizeof(MENUITEMINFO), MIIM_STATE, 0, MFS_DISABLED,
+									0, nullptr, nullptr, nullptr, 0, nullptr, 0, nullptr
+								};
+								SetMenuItemInfo(GetSubMenu(GetMenu(hwnd), 1), ID_TE_ACTIONS_REVERT_TO_SAVE, false, &m_item);
+								need_to_update = true;
+							}
 							break;
 						}
 						case ID_TE_FILE_OPEN_MAP:
@@ -205,8 +213,8 @@ namespace hoffman::isaiah {
 						case ID_TE_FILE_SAVE_MAP:
 						{
 							// Open save files
-							std::wofstream ground_save_file {L"./resources/graphs/ground_"s + this->map_name};
-							std::wofstream air_save_file {L"./resources/graphs/air_"s + this->map_name};
+							std::wofstream ground_save_file {L"./resources/graphs/ground_graph_"s + this->map_name};
+							std::wofstream air_save_file {L"./resources/graphs/air_graph_"s + this->map_name};
 							if (!ground_save_file.good() || !air_save_file.good()) {
 								MessageBox(this->hwnd, L"TE Thread: Could not save map!", this->window_name, MB_OK);
 								break;
@@ -230,8 +238,8 @@ namespace hoffman::isaiah {
 						case ID_TE_ACTIONS_REVERT_TO_SAVE:
 						{
 							// Open save files
-							std::wifstream ground_save_file {L"./resources/graphs/ground_"s + this->map_name};
-							std::wifstream air_save_file {L"./resources/graphs/air_"s + this->map_name};
+							std::wifstream ground_save_file {L"./resources/graphs/ground_graph_"s + this->map_name};
+							std::wifstream air_save_file {L"./resources/graphs/air_graph_"s + this->map_name};
 							auto ground_grid {std::make_unique<pathfinding::Grid>(ground_save_file)};
 							auto air_grid {std::make_unique<pathfinding::Grid>(air_save_file)};
 							WaitForSingleObject(sync_mutex, INFINITE);
