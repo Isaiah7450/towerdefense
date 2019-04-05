@@ -149,7 +149,7 @@ namespace hoffman::isaiah {
 			status_effects {},
 			buffs {} {
 			// Get path
-			this->my_pathfinder.findPath(challenge_level / 25.0);
+			this->my_pathfinder.findPath(challenge_level / 10.0);
 			this->my_path = this->my_pathfinder.getPath();
 			this->current_node = &this->my_path.front();
 			this->my_path.pop();
@@ -366,7 +366,7 @@ namespace hoffman::isaiah {
 			// Obtain new path
 			this->my_pathfinder.setStrategy(new_strat, diag_move);
 			// How can I optimize this?
-			this->my_pathfinder.findPath(game::g_my_game->getChallengeLevel(),
+			this->my_pathfinder.findPath(game::g_my_game->getChallengeLevel() / 10.0,
 				static_cast<int>(std::floor(this->getGameX())),
 				static_cast<int>(std::floor(this->getGameY())));
 			this->current_node = &this->my_path.front();

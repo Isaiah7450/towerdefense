@@ -895,7 +895,7 @@ namespace hoffman::isaiah {
 					}
 					pathfinding::Pathfinder my_pathfinder {this->getMap(), etype->isFlying(), etype->canMoveDiagonally(),
 						etype->getDefaultStrategy()};
-					my_pathfinder.findPath(this->challenge_level);
+					my_pathfinder.findPath(this->challenge_level / 10.0);
 					for (int i = 0; i < enemy_count; ++i) {
 						auto my_enemy = std::make_unique<Enemy>(this->getDeviceResources(), etype,
 							graphics::Color {0.f, 0.f, 0.f, 1.f}, my_pathfinder,
