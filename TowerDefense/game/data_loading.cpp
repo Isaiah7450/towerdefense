@@ -923,12 +923,14 @@ namespace hoffman::isaiah {
 				// Can't save now...
 				return;
 			}
-			save_file << L"V: " << 3 << L"\n";
+			save_file << L"V: " << 4 << L"\n";
 			save_file << L"C: " << this->challenge_level << L" D: " << this->difficulty
 				<< L" L: " << this->level << L"\n";
 			save_file << L"H: " << this->player.getHealth() << L" K: " << this->hp_buy_cost
 				<< L" M: " << this->player.getMoney() << L"\n";
 			save_file << L"W: " << this->win_streak << L" L: " << this->lose_streak << L"\n";
+			// Output map name (mainly for the terrain editor rather than the game itself.)
+			save_file << L"MN:\n" << this->map_base_name << L"\n";
 			// Output terrain map
 			save_file << this->getMap().getTerrainGraph(false) << L"\n";
 			save_file << this->getMap().getTerrainGraph(true) << L"\n";
@@ -953,7 +955,7 @@ namespace hoffman::isaiah {
 			std::wstring buffer {};
 			int version;
 			save_file >> buffer >> version;
-			if (version >= 1 && version <= 3) {
+			if (version >= 1 && version <= 4) {
 				save_file >> buffer >> this->challenge_level >> buffer >> this->difficulty
 					>> buffer >> this->level;
 				int player_health;
@@ -967,6 +969,30 @@ namespace hoffman::isaiah {
 				}
 				this->player = Player {player_cash, player_health};
 				save_file >> buffer >> this->win_streak >> buffer >> this->lose_streak;
+				// Read or determine map name.
+				if (version >= 4) {
+					save_file >> buffer;
+					std::getline(save_file, this->map_base_name);
+				}
+				else {
+					switch (this->getChallengeLevel()) {
+					case 0:
+						this->map_base_name = L"beginner";
+						break;
+					case 1:
+						this->map_base_name = L"intermediate";
+						break;
+					case 2:
+						this->map_base_name = L"experienced";
+						break;
+					case 3:
+						this->map_base_name = L"expert";
+						break;
+					default:
+						this->map_base_name = L"intermediate";
+						this->challenge_level = 1;
+					}
+				}
 				// Terrain map
 				// (This is tricky --> Due to the way the start and end nodes are loaded,
 				// I need to TRANSFER the ownership of these resources TO this->map.)

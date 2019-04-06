@@ -45,7 +45,7 @@ namespace hoffman::isaiah {
 			auto* my_game = game::g_my_game.get();
 			// Global state stuff...
 			terrain_editor::g_my_editor = std::make_shared<TerrainEditor>(static_cast<HWND>(data),
-				my_game->getMap());
+				my_game->getMapBaseName());
 			auto& my_editor = *terrain_editor::g_my_editor;
 			HINSTANCE my_h_inst = nullptr;
 			if (!GetModuleHandleEx(0, nullptr, &my_h_inst)) {
@@ -59,6 +59,12 @@ namespace hoffman::isaiah {
 				MessageBoxA(my_editor.getHWND(), e.what(), "TE Thread Error", MB_OK);
 			}
 			return 0;
+		}
+
+		TerrainEditor::TerrainEditor(HWND my_parent, std::wstring map_base_name) :
+			parent_hwnd {my_parent},
+			map_name {map_base_name} {
+			this->reloadMap();
 		}
 
 		void TerrainEditor::createWindow(HINSTANCE h_inst) noexcept {
@@ -94,6 +100,19 @@ namespace hoffman::isaiah {
 		void TerrainEditor::updateMenu() noexcept {
 			// TODO
 			DrawMenuBar(this->hwnd);
+		}
+
+		void TerrainEditor::reloadMap() {
+			// Note: Caller is responsible for syncing code.
+			std::wifstream ground_terrain_file {game::g_my_game->getResourcesPath() + L"graphs/ground_graph_"
+				+ this->map_name + L".txt"};
+			std::wifstream air_terrain_file {game::g_my_game->getResourcesPath() + L"graphs/air_graph_"
+				+ this->map_name + L".txt"};
+			if (ground_terrain_file.bad() || ground_terrain_file.fail()
+				|| air_terrain_file.bad() || air_terrain_file.fail()) {
+				throw std::runtime_error {"File not found!"};
+			}
+			this->map = std::make_shared<game::GameMap>(ground_terrain_file, air_terrain_file);
 		}
 
 		void TerrainEditor::run() {
@@ -140,9 +159,7 @@ namespace hoffman::isaiah {
 						switch (msg.wParam) {
 						case ID_TE_FILE_NEW_MAP:
 						{
-							// Remove .txt.
 							std::wstring new_map_name = this->map_name;
-							new_map_name.erase(new_map_name.end() - 4, new_map_name.end());
 							const wchar_t last_num = new_map_name.at(new_map_name.size() - 1);
 							if (last_num >= L'0' && last_num <= L'9') {
 								new_map_name.pop_back();
@@ -154,17 +171,17 @@ namespace hoffman::isaiah {
 							winapi::TerrainEditorNewMapDialog my_map_dialog {this->getHWND(), GetModuleHandle(nullptr), new_map_name};
 							if (my_map_dialog.isGood()) {
 								WaitForSingleObject(sync_mutex, INFINITE);
-								this->map_name = my_map_dialog.getName() + L".txt";
+								this->map_name = my_map_dialog.getName();
 								// Reset map to all mountainous terrain
-								this->getMap().getTerrainGraph(false).clearGrid(my_map_dialog.getRows(), my_map_dialog.getColumns(),
+								this->map->getTerrainGraph(false).clearGrid(my_map_dialog.getRows(), my_map_dialog.getColumns(),
 									pathfinding::GraphNode::blocked_space_weight);
-								this->getMap().getTerrainGraph(true).clearGrid(my_map_dialog.getRows(), my_map_dialog.getColumns(),
+								this->map->getTerrainGraph(true).clearGrid(my_map_dialog.getRows(), my_map_dialog.getColumns(),
 									pathfinding::GraphNode::blocked_space_weight);
-								this->getMap().getTerrainGraph(false).setStartNode(0, 0);
-								this->getMap().getTerrainGraph(true).setStartNode(0, 0);
-								this->getMap().getTerrainGraph(false).setGoalNode(0, 0);
-								this->getMap().getTerrainGraph(true).setGoalNode(0, 0);
-								this->getMap().resetOtherGraphs();
+								this->map->getTerrainGraph(false).setStartNode(0, 0);
+								this->map->getTerrainGraph(true).setStartNode(0, 0);
+								this->map->getTerrainGraph(false).setGoalNode(0, 0);
+								this->map->getTerrainGraph(true).setGoalNode(0, 0);
+								this->map->resetOtherGraphs();
 								graphics::grid_height = this->getMap().getHeight();
 								graphics::grid_width = this->getMap().getWidth();
 								// Disable revert to save --> No save exists!
@@ -179,30 +196,28 @@ namespace hoffman::isaiah {
 						}
 						case ID_TE_FILE_OPEN_MAP:
 						{
-							try {
-								const winapi::TerrainEditorOpenMapDialog my_dialog {this->getHWND(), GetModuleHandle(nullptr)};
-								if (my_dialog.isGood()) {
-									std::wifstream ground_terrain_file {game::g_my_game->getResourcesPath() + L"graphs/ground_graph_"
-										+ my_dialog.getName() + L".txt"};
-									std::wifstream air_terrain_file {game::g_my_game->getResourcesPath() + L"graphs/air_graph_"
-										+ my_dialog.getName() + L".txt"};
-									if (ground_terrain_file.bad() || ground_terrain_file.fail()
-										|| air_terrain_file.bad() || air_terrain_file.fail()) {
-										throw std::runtime_error {"File not found!"};
-									}
-									// game::g_my_game->getMap() = std::make_shared<game::GameMap>(ground_terrain_file, air_terrain_file);
+							const winapi::TerrainEditorOpenMapDialog my_dialog {this->getHWND(), GetModuleHandle(nullptr)};
+							if (my_dialog.isGood()) {
+								const auto old_name = this->map_name;
+								this->map_name = my_dialog.getName();
+								WaitForSingleObject(sync_mutex, INFINITE);
+								try {
+									this->reloadMap();
 								}
-							}
-							catch (...) {
-								MessageBox(hwnd, L"Error: Could not load the requested map.", L"TE: Open Map Failed!", MB_OK | MB_ICONERROR);
+								catch (...) {
+									MessageBox(hwnd, L"Error: Could not load the requested map.", L"TE: Open Map Failed!", MB_OK | MB_ICONERROR);
+									this->map_name = old_name;
+									this->reloadMap();
+								}
+								need_to_update = true;
 							}
 							break;
 						}
 						case ID_TE_FILE_SAVE_MAP:
 						{
 							// Open save files
-							std::wofstream ground_save_file {L"./resources/graphs/ground_graph_"s + this->map_name};
-							std::wofstream air_save_file {L"./resources/graphs/air_graph_"s + this->map_name};
+							std::wofstream ground_save_file {game::g_my_game->getResourcesPath() + L"graphs/ground_graph_"s + this->map_name};
+							std::wofstream air_save_file {game::g_my_game->getResourcesPath() + L"graphs/air_graph_"s + this->map_name};
 							if (!ground_save_file.good() || !air_save_file.good()) {
 								MessageBox(this->hwnd, L"TE Thread: Could not save map!", this->window_name, MB_OK);
 								break;
@@ -225,14 +240,8 @@ namespace hoffman::isaiah {
 							break;
 						case ID_TE_ACTIONS_REVERT_TO_SAVE:
 						{
-							// Open save files
-							std::wifstream ground_save_file {L"./resources/graphs/ground_graph_"s + this->map_name};
-							std::wifstream air_save_file {L"./resources/graphs/air_graph_"s + this->map_name};
-							auto ground_grid {std::make_unique<pathfinding::Grid>(ground_save_file)};
-							auto air_grid {std::make_unique<pathfinding::Grid>(air_save_file)};
 							WaitForSingleObject(sync_mutex, INFINITE);
-							this->getMap().resetOtherGraphs();
-							this->getMap().setTerrainGraphs(std::move(ground_grid), std::move(air_grid));
+							this->reloadMap();
 							need_to_update = true;
 							break;
 						}
@@ -327,8 +336,8 @@ namespace hoffman::isaiah {
 						// Update nodes with new terrain
 						for (int gx = this->start_gx; gx <= this->end_gx; ++gx) {
 							for (int gy = this->start_gy; gy <= this->end_gy; ++gy) {
-								auto& selected_gnode = this->getMap().getTerrainGraph(false).getNode(gx, gy);
-								auto& selected_anode = this->getMap().getTerrainGraph(true).getNode(gx, gy);
+								auto& selected_gnode = this->map->getTerrainGraph(false).getNode(gx, gy);
+								auto& selected_anode = this->map->getTerrainGraph(true).getNode(gx, gy);
 								switch (this->selected_terrain_type) {
 								case ID_TE_TERRAIN_TYPES_GRASS:
 									selected_gnode.setWeight(1);

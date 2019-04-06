@@ -33,21 +33,14 @@ namespace hoffman::isaiah {
 	namespace game {
 		std::shared_ptr<MyGame> g_my_game {nullptr};
 
-		MyGame::MyGame(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, int clevel,
-			std::wistream& ground_terrain_file, std::wistream& air_terrain_file) :
-			device_resources {dev_res},
-			map {std::make_shared<GameMap>(ground_terrain_file, air_terrain_file)},
-			enemy_types {},
-			enemies {},
-			shot_types {},
-			shots {},
-			tower_types {},
-			towers {},
-			challenge_level {clevel} {
+		MyGame::MyGame(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res) :
+			device_resources {dev_res} {
+				/*
 			this->ground_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), false,
 				false, pathfinding::HeuristicStrategies::Manhattan);
 			this->air_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), true,
 				false, pathfinding::HeuristicStrategies::Manhattan);
+				*/
 		}
 
 		MyGame::~MyGame() noexcept = default;
@@ -83,32 +76,11 @@ namespace hoffman::isaiah {
 #endif
 		}
 
-		void MyGame::resetState(int new_challenge) {
+		void MyGame::resetState(int new_clevel, std::wstring map_name) {
 			this->player = Player {};
+			this->challenge_level = new_clevel;
 			this->level = 1;
 			this->difficulty = 1.0;
-			this->challenge_level = new_challenge - ID_CHALLENGE_LEVEL_EASY;
-			const auto air_terrain_filename_base = this->resources_folder_path + L"graphs/air_graph_";
-			const auto ground_terrain_filename_base = this->resources_folder_path + L"graphs/ground_graph_";
-			switch (new_challenge) {
-			case ID_CHALLENGE_LEVEL_EASY:
-				MyGame::air_terrain_filename = air_terrain_filename_base + L"beginner.txt"s;
-				MyGame::ground_terrain_filename = ground_terrain_filename_base + L"beginner.txt"s;
-				break;
-			case ID_CHALLENGE_LEVEL_HARD:
-				MyGame::air_terrain_filename = air_terrain_filename_base + L"experienced.txt"s;
-				MyGame::ground_terrain_filename = ground_terrain_filename_base + L"experienced.txt"s;
-				break;
-			case ID_CHALLENGE_LEVEL_EXPERT:
-				MyGame::air_terrain_filename = air_terrain_filename_base + L"expert.txt"s;
-				MyGame::ground_terrain_filename = ground_terrain_filename_base + L"expert.txt"s;
-				break;
-			case ID_CHALLENGE_LEVEL_NORMAL:
-			default:
-				MyGame::air_terrain_filename = air_terrain_filename_base + L"intermediate.txt"s;
-				MyGame::ground_terrain_filename = ground_terrain_filename_base + L"intermediate.txt"s;
-				break;
-			}
 			this->my_level = nullptr;
 			this->my_level_enemy_count = 0;
 			this->my_level_enemy_killed = 0;
@@ -120,8 +92,10 @@ namespace hoffman::isaiah {
 			}
 			this->is_paused = false;
 			this->in_level = false;
-			std::wifstream ground_terrain_file {MyGame::ground_terrain_filename};
-			std::wifstream air_terrain_file {MyGame::air_terrain_filename};
+			const auto air_terrain_filename_base = this->resources_folder_path + L"graphs/air_graph_";
+			const auto ground_terrain_filename_base = this->resources_folder_path + L"graphs/ground_graph_";
+			std::wifstream ground_terrain_file {ground_terrain_filename_base + map_name + L".txt"};
+			std::wifstream air_terrain_file {air_terrain_filename_base + map_name + L".txt"};
 			if (ground_terrain_file.good() && air_terrain_file.good()) {
 				this->map = std::make_shared<GameMap>(ground_terrain_file, air_terrain_file);
 				this->ground_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), false,
@@ -383,6 +357,21 @@ namespace hoffman::isaiah {
 		void MyGame::toggleAllRadii() noexcept {
 			for (auto& t : this->towers) {
 				t->toggleShowCoverage();
+			}
+		}
+
+
+		std::wstring MyGame::getDefaultMapName(int new_challenge) const {
+			switch (new_challenge) {
+			case ID_CHALLENGE_LEVEL_EASY:
+				return L"beginner";
+			case ID_CHALLENGE_LEVEL_HARD:
+				return L"experienced";
+			case ID_CHALLENGE_LEVEL_EXPERT:
+				return L"expert";
+			case ID_CHALLENGE_LEVEL_NORMAL:
+			default:
+				return L"intermediate";
 			}
 		}
 	}

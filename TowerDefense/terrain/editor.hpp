@@ -14,10 +14,7 @@ namespace hoffman::isaiah {
 
 		class TerrainEditor {
 		public:
-			TerrainEditor(HWND my_parent, game::GameMap& game_map) noexcept :\
-				parent_hwnd {my_parent},
-				map {game_map} {
-			}
+			TerrainEditor(HWND my_parent, std::wstring map_base_name);
 			/// <summary>Creates the window.</summary>
 			void createWindow(HINSTANCE h_inst) noexcept;
 			/// <summary>Runs the terrain editor.</summary>
@@ -29,16 +26,13 @@ namespace hoffman::isaiah {
 				return this->hwnd;
 			}
 			const game::GameMap& getMap() const noexcept {
-				return this->map;
-			}
-			game::GameMap& getMap() noexcept {
-				return this->map;
+				return *this->map;
 			}
 			const pathfinding::Grid& getTerrainGraph(bool return_air_map) const noexcept {
 				return this->getMap().getTerrainGraph(return_air_map);
 			}
 			pathfinding::Grid& getTerrainGraph(bool return_air_map) noexcept {
-				return this->getMap().getTerrainGraph(return_air_map);
+				return this->map->getTerrainGraph(return_air_map);
 			}
 			bool areGroundWeightsActive() const noexcept {
 				return this->show_ground_weights;
@@ -49,6 +43,9 @@ namespace hoffman::isaiah {
 		protected:
 			/// <summary>Updates the menu bar.</summary>
 			void updateMenu() noexcept;
+			// Note: Caller is responsible for syncing this method.
+			/// <summary>Reloads the map based on the stored map name.</summary>
+			void reloadMap();
 		private:
 			/// <summary>Handle to the parent window of the terrain editor.</summary>
 			HWND parent_hwnd;
@@ -58,8 +55,8 @@ namespace hoffman::isaiah {
 			RECT rc {};
 			/// <summary>Handle to the window's menu.</summary>
 			HMENU h_menu {nullptr};
-			/// <summary>Reference to the terrain editor map.</summary>
-			game::GameMap& map;
+			/// <summary>The terrain editor's map which may be different from the map in use by the game.</summary>
+			std::shared_ptr<game::GameMap> map {nullptr};
 			/// <summary>The currently selected terrain type.</summary>
 			int selected_terrain_type {0};
 			/// <summary>The last selected terrain modifier.</summary>

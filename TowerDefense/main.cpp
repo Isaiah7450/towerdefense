@@ -110,7 +110,8 @@ namespace hoffman::isaiah {
 								[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpet_cast.
 								const auto my_clevel_dialog = *reinterpret_cast<const ChallengeLevelDialog*>(msg.lParam);
 								if (my_clevel_dialog.getChallengeLevel() != IDCANCEL) {
-									my_game->resetState(my_clevel_dialog.getChallengeLevel());
+									const auto new_clevel = my_clevel_dialog.getChallengeLevel() - ID_CHALLENGE_LEVEL_EASY;
+									my_game->resetState(new_clevel, my_game->getDefaultMapName(my_clevel_dialog.getChallengeLevel()));
 								}
 								}
 								ReleaseMutex(sync_mutex);
@@ -279,19 +280,11 @@ namespace hoffman::isaiah {
 			}
 			// Create renderer
 			auto my_renderer = std::make_unique<graphics::Renderer2D>(my_resources);
-
-			// Create game state
-			std::wifstream ground_terrain_file {game::MyGame::ground_terrain_filename};
-			std::wifstream air_terrain_file {game::MyGame::air_terrain_filename};
-			if (!ground_terrain_file.good() || !air_terrain_file.good()) {
-				MessageBox(hwnd, L"Could not load terrain graphs.", L"Tower defense startup error", MB_OK);
-				return;
-			}
 			// Store in global variable --> It's the only way!
 			// Actually, it isn't, but it's the most intuitive (and least overhead involved) way to do it.
 			// That said, there are costs (mostly management), so I should be careful with this variable.
 			// (Particularly in terms of multithreading and synchronization issues.)
-			game::g_my_game = std::make_shared<game::MyGame>(my_resources, 1, ground_terrain_file, air_terrain_file);
+			game::g_my_game = std::make_shared<game::MyGame>(my_resources);
 			// Show window
 			ShowWindow(this->hwnd, n_cmd_show);
 			UpdateWindow(this->hwnd);
@@ -339,7 +332,8 @@ namespace hoffman::isaiah {
 					MessageBox(nullptr, L"Error: Corrupted saved file! Reverting to new game.", L"Corrupted Save",
 						MB_OK | MB_ICONERROR);
 					// Reset state and save over the corrupted file...
-					game::g_my_game->resetState(ID_CHALLENGE_LEVEL_NORMAL);
+					const std::wstring map_name = game::g_my_game->getDefaultMapName(ID_CHALLENGE_LEVEL_NORMAL);
+					game::g_my_game->resetState(ID_CHALLENGE_LEVEL_NORMAL - ID_CHALLENGE_LEVEL_EASY, map_name);
 					std::wofstream save_file {game::g_my_game->getUserDataPath() + game::default_save_file_name};
 					if (!save_file.bad() && !save_file.fail()) {
 						game::g_my_game->saveGame(save_file);
@@ -349,8 +343,9 @@ namespace hoffman::isaiah {
 			else {
 				// Do difficulty selection.
 				const auto my_clevel_dialog = winapi::ChallengeLevelDialog {hwnd, this->h_instance};
-				game::g_my_game->resetState(my_clevel_dialog.getChallengeLevel() > IDCANCEL
+				const std::wstring map_name = game::g_my_game->getDefaultMapName(my_clevel_dialog.getChallengeLevel() > IDCANCEL
 					? my_clevel_dialog.getChallengeLevel() : ID_CHALLENGE_LEVEL_NORMAL);
+				game::g_my_game->resetState(my_clevel_dialog.getChallengeLevel() - ID_CHALLENGE_LEVEL_EASY, map_name);
 			}
 			my_renderer->updateHealthOption(hwnd, game::g_my_game->getHealthBuyCost());
 			my_renderer->updateSpeedOption(hwnd, game::g_my_game->getNextUpdateSpeed());

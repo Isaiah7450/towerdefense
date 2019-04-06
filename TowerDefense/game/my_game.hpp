@@ -77,13 +77,7 @@ namespace hoffman::isaiah {
 		class MyGame {
 			friend class graphics::Renderer2D;
 		public:
-			/// <summary>The name of the ground terrain file to load.</summary>
-			static inline std::wstring ground_terrain_filename {L"./resources/graphs/ground_graph_intermediate.txt"};
-			/// <summary>The name of the air terrain file to load.</summary>
-			static inline std::wstring air_terrain_filename {L"./resources/graphs/air_graph_intermediate.txt"};
-
-			MyGame(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, int clevel,
-				std::wistream& ground_terrain_file, std::wistream& air_terrain_file);
+			MyGame(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res);
 			~MyGame() noexcept;
 			// Rule of 5:
 			MyGame(const MyGame&) = delete;
@@ -91,8 +85,9 @@ namespace hoffman::isaiah {
 			MyGame& operator=(const MyGame&) = delete;
 			MyGame& operator=(MyGame&&);
 			/// <summary>Resets the game's state.</summary>
-			/// <param name="new_challenge">The new challenge level to set.</param>
-			void resetState(int new_challenge);
+			/// <param name="new_clevel">The new challenge level to set.</param>
+			/// <param name="map_name">The base name of the new map to use.</param>
+			void resetState(int new_clevel, std::wstring map_name);
 			/// <summary>Updates the state of the game by one tick.</summary>
 			void update();
 			/// <summary>Updates the state of the game in some way for debugging reasons.</summary>
@@ -115,6 +110,7 @@ namespace hoffman::isaiah {
 			void load_global_level_data();
 			/// <summary>Loads the level data for the current level.</summary>
 			void load_level_data();
+			// Other stuff:
 			/// <summary>Saves the game state.</summary>
 			/// <param name="save_file">The file to save the game's state to.</param>
 			void saveGame(std::wostream& save_file) const;
@@ -178,6 +174,13 @@ namespace hoffman::isaiah {
 			const GameMap& getMap() const noexcept {
 				return *this->map;
 			}
+			std::wstring getMapBaseName() const noexcept {
+				return this->map_base_name;
+			}
+			/// <param name="new_challenge">The new challenge level to set (resource identifier).</param>
+			/// <returns>The map base name of the associat
+			std::wstring getDefaultMapName(int new_challenge) const;
+
 			std::shared_ptr<EnemyType> getEnemyType(std::wstring name) {
 				return this->enemy_types.at(name);
 			}
@@ -270,24 +273,26 @@ namespace hoffman::isaiah {
 		private:
 			/// <summary>Shared pointer to the device resources.</summary>
 			std::shared_ptr<graphics::DX::DeviceResources2D> device_resources;
+			/// <summary>The base name of the current map.</summary>
+			std::wstring map_base_name {L"intermediate"};
 			/// <summary>The game map being used by the program.</summary>
 			std::shared_ptr<GameMap> map {nullptr};
 			/// <summary>The list of enemy template types.</summary>
-			std::map<std::wstring, std::shared_ptr<game::EnemyType>> enemy_types;
+			std::map<std::wstring, std::shared_ptr<game::EnemyType>> enemy_types {};
 			/// <summary>Stores which enemy types have been seen before.</summary>
 			std::map<std::wstring, bool> enemies_seen {};
 			/// <summary>Stores how many times each enemy type has been killed.</summary>
 			std::map<std::wstring, long long> enemy_kill_count {};
 			/// <summary>The list of enemies that are currently alive.</summary>
-			std::vector<std::unique_ptr<game::Enemy>> enemies;
+			std::vector<std::unique_ptr<game::Enemy>> enemies {};
 			/// <summary>The list of shot template types.</summary>
-			std::map<std::wstring, std::shared_ptr<game::ShotBaseType>> shot_types;
+			std::map<std::wstring, std::shared_ptr<game::ShotBaseType>> shot_types {};
 			/// <summary>The list of projectiles that are currently active.</summary>
-			std::vector<std::unique_ptr<game::Shot>> shots;
+			std::vector<std::unique_ptr<game::Shot>> shots {};
 			/// <summary>The list of tower template types.</summary>
-			std::vector<std::shared_ptr<game::TowerType>> tower_types;
+			std::vector<std::shared_ptr<game::TowerType>> tower_types {};
 			/// <summary>The list of towers currently in the game.</summary>
-			std::vector<std::unique_ptr<game::Tower>> towers;
+			std::vector<std::unique_ptr<game::Tower>> towers {};
 			/// <summary>The player's health and cash.</summary>
 			Player player {};
 			/// <summary>The current level number the player is on.</summary>
@@ -303,7 +308,7 @@ namespace hoffman::isaiah {
 			/// <summary>The current dynamic difficulty level the player is at.</summary>
 			double difficulty {1.00};
 			/// <summary>The current game difficulty level the player is at.</summary>
-			int challenge_level;
+			int challenge_level {1};
 			/// <summary>The number of levels in a row that a player has lost life.</summary>
 			int lose_streak {0};
 			/// <summary>The number of levels in a row that a player has NOT lost any life.</summary>
