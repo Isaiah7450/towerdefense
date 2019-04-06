@@ -222,6 +222,9 @@ namespace hoffman::isaiah {
 			int getHealthBuyCost() const noexcept {
 				return static_cast<int>(std::ceil(this->hp_buy_cost));
 			}
+			std::wstring getResourcesPath() const noexcept {
+				return this->resources_folder_path;
+			}
 			std::wstring getUserDataPath() const noexcept {
 				return this->userdata_folder_path;
 			}

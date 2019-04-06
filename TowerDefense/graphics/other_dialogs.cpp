@@ -120,4 +120,48 @@ namespace hoffman::isaiah::winapi {
 		SendMessage(this->hwnd_cols_select, UDM_SETRANGE32, min_rows_cols, max_rows_cols);
 		SendMessage(this->hwnd_cols_select, UDM_SETPOS32, 0, 35);
 	}
+
+	TerrainEditorOpenMapDialog::TerrainEditorOpenMapDialog(HWND owner, HINSTANCE h_inst) {
+		this->open_map = IDOK == DialogBoxParam(h_inst, MAKEINTRESOURCE(IDD_TERRAIN_OPEN_MAP), owner,
+			TerrainEditorOpenMapDialog::dialogProc, reinterpret_cast<LPARAM>(this));
+	}
+
+	INT_PTR CALLBACK TerrainEditorOpenMapDialog::dialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+		switch (msg) {
+		case WM_INITDIALOG:
+		{
+			SetWindowLongPtr(hwnd, GWLP_USERDATA, lparam);
+			[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
+			const auto my_dialog_class = reinterpret_cast<TerrainEditorOpenMapDialog*>(lparam);
+			my_dialog_class->initDialog(hwnd);
+			}
+			return TRUE;
+		}
+		case WM_COMMAND:
+			switch (LOWORD(wparam)) {
+			case IDOK:
+			{
+				[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
+				auto& my_dialog_class = *reinterpret_cast<TerrainEditorOpenMapDialog*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				my_dialog_class.map_name.reserve(80);
+				my_dialog_class.map_name.at(0) = 80;
+				SendMessage(GetDlgItem(hwnd, IDC_TERRAIN_OPEN_MAP_NAME), EM_GETLINE, 0, reinterpret_cast<LPARAM>(my_dialog_class.map_name.data()));
+				}
+				EndDialog(hwnd, IDOK);
+				break;
+			}
+			case IDCANCEL:
+				EndDialog(hwnd, IDCANCEL);
+				break;
+			}
+			break;
+		default:
+			return FALSE;
+		}
+		return TRUE;
+	}
+
+	void TerrainEditorOpenMapDialog::initDialog(HWND hwnd) {
+		UNREFERENCED_PARAMETER(hwnd);
+	}
 }

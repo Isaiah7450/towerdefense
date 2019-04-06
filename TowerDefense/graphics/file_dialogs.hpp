@@ -96,25 +96,5 @@ namespace hoffman::isaiah::winapi {
 		/// <summary>The current reference count for the interface.</summary>
 		long cref;
 	};
-
-	class TerrainEditorOpenDialog : public MyFileDialogHandler {
-	public:
-
-		// Mostly copied from online help files, modified as needed.
-		/// <summary>Utility function to create an instance of this event handler.</sumamry>
-		///
-		static HRESULT createInstance(REFIID riid, void **ppv) {
-			*ppv = nullptr;
-			// ComPtr hence the usage of new.
-			auto dialog_event_handler = new TerrainEditorOpenDialog();
-			HRESULT hr = dialog_event_handler ? S_OK : E_OUTOFMEMORY;
-			if (SUCCEEDED(hr)) {
-				hr = dialog_event_handler->QueryInterface(riid, ppv);
-				dialog_event_handler->Release();
-			}
-			return hr;
-		}
-	};
 }
 
-// #pragma comment(lib, "Shobjidl.idl")

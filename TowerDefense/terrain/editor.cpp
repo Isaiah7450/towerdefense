@@ -179,9 +179,22 @@ namespace hoffman::isaiah {
 						}
 						case ID_TE_FILE_OPEN_MAP:
 						{
-							const int confirm_open = MessageBox(hwnd, L"Warning: Any unsaved changes will be lost! Do you still"
-								L" wish to proceed?", L"Confirm Open Map", MB_ICONWARNING | MB_YESNO);
-							if (confirm_open == IDYES) {
+							try {
+								const winapi::TerrainEditorOpenMapDialog my_dialog {this->getHWND(), GetModuleHandle(nullptr)};
+								if (my_dialog.isGood()) {
+									std::wifstream ground_terrain_file {game::g_my_game->getResourcesPath() + L"graphs/ground_graph_"
+										+ my_dialog.getName() + L".txt"};
+									std::wifstream air_terrain_file {game::g_my_game->getResourcesPath() + L"graphs/air_graph_"
+										+ my_dialog.getName() + L".txt"};
+									if (ground_terrain_file.bad() || ground_terrain_file.fail()
+										|| air_terrain_file.bad() || air_terrain_file.fail()) {
+										throw std::runtime_error {"File not found!"};
+									}
+									// game::g_my_game->getMap() = std::make_shared<game::GameMap>(ground_terrain_file, air_terrain_file);
+								}
+							}
+							catch (...) {
+								MessageBox(hwnd, L"Error: Could not load the requested map.", L"TE: Open Map Failed!", MB_OK | MB_ICONERROR);
 							}
 							break;
 						}
