@@ -216,8 +216,10 @@ namespace hoffman::isaiah {
 						case ID_TE_FILE_SAVE_MAP:
 						{
 							// Open save files
-							std::wofstream ground_save_file {game::g_my_game->getResourcesPath() + L"graphs/ground_graph_"s + this->map_name};
-							std::wofstream air_save_file {game::g_my_game->getResourcesPath() + L"graphs/air_graph_"s + this->map_name};
+							std::wofstream ground_save_file {game::g_my_game->getResourcesPath() + L"graphs/ground_graph_"s
+								+ this->map_name + L".txt"};
+							std::wofstream air_save_file {game::g_my_game->getResourcesPath() + L"graphs/air_graph_"s
+								+ this->map_name + L".txt"};
 							if (!ground_save_file.good() || !air_save_file.good()) {
 								MessageBox(this->hwnd, L"TE Thread: Could not save map!", this->window_name, MB_OK);
 								break;
