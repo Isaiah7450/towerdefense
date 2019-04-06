@@ -930,7 +930,7 @@ namespace hoffman::isaiah {
 				<< L" M: " << this->player.getMoney() << L"\n";
 			save_file << L"W: " << this->win_streak << L" L: " << this->lose_streak << L"\n";
 			// Output map name (mainly for the terrain editor rather than the game itself.)
-			save_file << L"MN:\n" << this->map_base_name << L"\n";
+			save_file << L"MN: " << this->map_base_name << L"\n";
 			// Output terrain map
 			save_file << this->getMap().getTerrainGraph(false) << L"\n";
 			save_file << this->getMap().getTerrainGraph(true) << L"\n";
@@ -973,6 +973,8 @@ namespace hoffman::isaiah {
 				if (version >= 4) {
 					save_file >> buffer;
 					std::getline(save_file, this->map_base_name);
+					// Leading space is removed...
+					this->map_base_name.erase(this->map_base_name.begin());
 				}
 				else {
 					switch (this->getChallengeLevel()) {
