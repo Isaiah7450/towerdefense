@@ -18,6 +18,7 @@ namespace hoffman::isaiah {
 		class EnemyType;
 		class TowerType;
 		class ShotBaseType;
+		class GameMap;
 	}
 
 	namespace terrain_editor {
@@ -133,6 +134,14 @@ namespace hoffman::isaiah {
 			/// <param name="in_editor">Are we in the terrain editor?</param>
 			HRESULT render(const std::shared_ptr<game::MyGame> my_game, int mouse_gx, int mouse_gy,
 				int mouse_end_gx, int mouse_end_gy, bool in_editor = false) const;
+			/// <summary>Draws the current scene based on the editor's state.</summary>
+			/// <param name="my_editor">Reference to the editor being drawn.</param>
+			/// <param name="mouse_gx">The starting game x-coordinate of the mouse.</param>
+			/// <param name="mouse_gy">The starting game y-coordinate of the mouse.</param>
+			/// <param name="mouse_end_gx">The ending game x-coordinate of the mouse.</param>
+			/// <param name="mouse_end_gy">The ending game y-coordinate of the mouse.</param>
+			HRESULT render(const terrain_editor::TerrainEditor& my_editor, int mouse_gx, int mouse_gy,
+				int mouse_end_gx, int mouse_end_gy) const;
 			// Setters
 			void setOutlineColor(Color o_color) const noexcept {
 				this->device_resources->getOutlineBrush()->SetColor(o_color);
@@ -175,6 +184,14 @@ namespace hoffman::isaiah {
 			constexpr static D2D1_RECT_F createRectangle(float lx, float ty, float w, float h) noexcept {
 				return D2D1_RECT_F {lx, ty, lx + w, ty + h};
 			}
+		protected:
+			/// <summary>Highlights the currently selected squares.</summary>
+			/// <param name="map">Reference to the game map being painted.</param>
+			/// <param name="mouse_gx">The starting game x-coordinate of the mouse.</param>
+			/// <param name="mouse_gy">The starting game y-coordinate of the mouse.</param>
+			/// <param name="mouse_end_gx">The ending game x-coordinate of the mouse.</param>
+			/// <param name="mouse_end_gy">The ending game y-coordinate of the mouse.</param>
+			void paintMouseSquares(const game::GameMap& map, int mouse_gx, int mouse_gy, int mouse_end_gx, int mouse_end_gy) const noexcept;
 		private:
 			/// <summary>Shared pointer to the resources used by the renderer.</summary>
 			mutable std::shared_ptr<DX::DeviceResources2D> device_resources;

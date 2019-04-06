@@ -421,8 +421,8 @@ namespace hoffman::isaiah {
 						game::g_my_game->debugUpdate(game::DebugUpdateStates::Terrain_Changed);
 						ReleaseMutex(sync_mutex);
 					}
-					const HRESULT hr = my_renderer->render(game::g_my_game, this->start_gx, this->start_gy,
-						this->end_gx, this->end_gy, true);
+					const HRESULT hr = my_renderer->render(*this, this->start_gx, this->start_gy,
+						this->end_gx, this->end_gy);
 					if (hr == D2DERR_RECREATE_TARGET) {
 						my_resources->discardDeviceResources();
 						my_resources->createDeviceResources(this->hwnd);

@@ -156,7 +156,6 @@ namespace hoffman::isaiah {
 
 		HRESULT Renderer2D::render(const std::shared_ptr<game::MyGame> my_game, int mouse_gx, int mouse_gy,
 			int mouse_end_gx, int mouse_end_gy, bool in_editor) const {
-			UNREFERENCED_PARAMETER(my_game);
 			// Check time before rendering
 			static LARGE_INTEGER last_update_time {0};
 			if (last_update_time.QuadPart == 0) {
@@ -258,9 +257,49 @@ namespace hoffman::isaiah {
 				}
 			}
 #endif // DEBUG | _DEBUG -> Path Debugging
+			this->paintMouseSquares(my_game->getMap(), mouse_gx, mouse_gy, mouse_end_gx, mouse_end_gy);
+			// Release lock
+			SetEvent(update_event);
+			CloseHandle(update_event);
+			return render_target->EndDraw();
+		}
+
+		HRESULT Renderer2D::render(const terrain_editor::TerrainEditor& my_editor, int mouse_gx, int mouse_gy,
+			int mouse_end_gx, int mouse_end_gy) const {
+			// Check time before rendering
+			static LARGE_INTEGER last_update_time {0};
+			if (last_update_time.QuadPart == 0) {
+				QueryPerformanceCounter(&last_update_time);
+			}
+			const auto my_times = winapi::MainWindow::getElapsedTime(last_update_time);
+			if (my_times.second.QuadPart < math::getMicrosecondsInSecond() / game::graphics_framerate) {
+				Sleep(1);
+				return S_OK;
+			}
+			last_update_time = my_times.first;
+			// Obtain lock
+			auto update_event = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT("can_update"));
+			if (!update_event) {
+				return S_FALSE;
+			}
+			ResetEvent(update_event);
+			// Do drawing
+			auto render_target = this->device_resources->getRenderTarget();
+			render_target->BeginDraw();
+			render_target->Clear(Color {1.f, 1.f, 1.f, 1.f});
+			// Draw terrain
+			my_editor.getMap().draw(*this, true);
+			this->paintMouseSquares(my_editor.getMap(), mouse_gx, mouse_gy, mouse_end_gx, mouse_end_gy);
+			// Release lock
+			SetEvent(update_event);
+			CloseHandle(update_event);
+			return render_target->EndDraw();
+		}
+
+		void Renderer2D::paintMouseSquares(const game::GameMap& map, int mouse_gx, int mouse_gy, int mouse_end_gx, int mouse_end_gy) const noexcept {
 			// Highlight squares
-			if (my_game->getMap().getTerrainGraph(false).verifyCoordinates(mouse_gx, mouse_gy)
-				&& my_game->getMap().getTerrainGraph(false).verifyCoordinates(mouse_end_gx, mouse_end_gy)) {
+			if (map.getTerrainGraph(false).verifyCoordinates(mouse_gx, mouse_gy)
+				&& map.getTerrainGraph(false).verifyCoordinates(mouse_end_gx, mouse_end_gy)) {
 				const auto min_gx = math::get_min(mouse_gx, mouse_end_gx);
 				const auto min_gy = math::get_min(mouse_gy, mouse_end_gy);
 				const auto max_gx = math::get_max(mouse_gx, mouse_end_gx);
@@ -273,10 +312,6 @@ namespace hoffman::isaiah {
 					}
 				}
 			}
-			// Release lock
-			SetEvent(update_event);
-			CloseHandle(update_event);
-			return render_target->EndDraw();
 		}
 	}
 }
