@@ -78,9 +78,10 @@ namespace hoffman::isaiah::winapi {
 			{
 				[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
 				auto& my_dialog_class = *reinterpret_cast<TerrainEditorNewMapDialog*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-				my_dialog_class.map_name.reserve(80);
-				my_dialog_class.map_name.at(0) = 80;
-				SendMessage(GetDlgItem(hwnd, IDC_TERRAIN_NEW_MAP_NAME), EM_GETLINE, 0, reinterpret_cast<LPARAM>(my_dialog_class.map_name.data()));
+				auto buffer = std::make_unique<wchar_t[]>(81);
+				buffer[0] = 80;
+				SendMessage(GetDlgItem(hwnd, IDC_TERRAIN_NEW_MAP_NAME), EM_GETLINE, 0, reinterpret_cast<LPARAM>(buffer.get()));
+				my_dialog_class.map_name = buffer.get();
 				my_dialog_class.num_rows = static_cast<int>(GetDlgItemInt(hwnd, IDC_TERRAIN_NEW_MAP_ROWS, nullptr, FALSE));
 				my_dialog_class.num_cols = static_cast<int>(GetDlgItemInt(hwnd, IDC_TERRAIN_NEW_MAP_COLS, nullptr, FALSE));
 				}
@@ -143,9 +144,10 @@ namespace hoffman::isaiah::winapi {
 			{
 				[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
 				auto& my_dialog_class = *reinterpret_cast<TerrainEditorOpenMapDialog*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-				my_dialog_class.map_name.reserve(82);
-				my_dialog_class.map_name.at(0) = 80;
-				SendMessage(GetDlgItem(hwnd, IDC_TERRAIN_OPEN_MAP_NAME), EM_GETLINE, 0, reinterpret_cast<LPARAM>(my_dialog_class.map_name.data()));
+				auto buffer = std::make_unique<wchar_t[]>(81);
+				buffer[0] = 80;
+				SendMessage(GetDlgItem(hwnd, IDC_TERRAIN_OPEN_MAP_NAME), EM_GETLINE, 0, reinterpret_cast<LPARAM>(buffer.get()));
+				my_dialog_class.map_name = buffer.get();
 				}
 				EndDialog(hwnd, IDOK);
 				break;
