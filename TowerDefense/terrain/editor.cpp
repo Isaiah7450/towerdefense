@@ -205,7 +205,9 @@ namespace hoffman::isaiah {
 									this->reloadMap();
 								}
 								catch (...) {
+									ReleaseMutex(sync_mutex);
 									MessageBox(hwnd, L"Error: Could not load the requested map.", L"TE: Open Map Failed!", MB_OK | MB_ICONERROR);
+									WaitForSingleObject(sync_mutex, INFINITE);
 									this->map_name = old_name;
 									this->reloadMap();
 								}
@@ -420,7 +422,7 @@ namespace hoffman::isaiah {
 					if (need_to_update) {
 						// Note that we still have the mutex...
 						// Update first if necessary
-						game::g_my_game->debugUpdate(game::DebugUpdateStates::Terrain_Changed);
+						// game::g_my_game->debugUpdate(game::DebugUpdateStates::Terrain_Changed);
 						ReleaseMutex(sync_mutex);
 					}
 					const HRESULT hr = my_renderer->render(*this, this->start_gx, this->start_gy,
