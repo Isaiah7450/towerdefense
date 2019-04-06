@@ -143,7 +143,7 @@ namespace hoffman::isaiah::winapi {
 			{
 				[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
 				auto& my_dialog_class = *reinterpret_cast<TerrainEditorOpenMapDialog*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-				my_dialog_class.map_name.reserve(80);
+				my_dialog_class.map_name.reserve(82);
 				my_dialog_class.map_name.at(0) = 80;
 				SendMessage(GetDlgItem(hwnd, IDC_TERRAIN_OPEN_MAP_NAME), EM_GETLINE, 0, reinterpret_cast<LPARAM>(my_dialog_class.map_name.data()));
 				}
@@ -162,6 +162,6 @@ namespace hoffman::isaiah::winapi {
 	}
 
 	void TerrainEditorOpenMapDialog::initDialog(HWND hwnd) {
-		UNREFERENCED_PARAMETER(hwnd);
+		SetDlgItemText(hwnd, IDC_TERRAIN_OPEN_MAP_NAME, L"default");
 	}
 }
