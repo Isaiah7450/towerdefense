@@ -151,11 +151,10 @@ namespace hoffman::isaiah {
 							else {
 								new_map_name.push_back(L'0');
 							}
-							new_map_name += L".txt";
 							winapi::TerrainEditorNewMapDialog my_map_dialog {this->getHWND(), GetModuleHandle(nullptr), new_map_name};
 							if (my_map_dialog.isGood()) {
 								WaitForSingleObject(sync_mutex, INFINITE);
-								this->map_name = my_map_dialog.getName();
+								this->map_name = my_map_dialog.getName() + L".txt";
 								// Reset map to all mountainous terrain
 								this->getMap().getTerrainGraph(false).clearGrid(my_map_dialog.getRows(), my_map_dialog.getColumns(),
 									pathfinding::GraphNode::blocked_space_weight);
@@ -180,37 +179,10 @@ namespace hoffman::isaiah {
 						}
 						case ID_TE_FILE_OPEN_MAP:
 						{
-							/*
-							// Much of this adapted from the common item dialogs sample code.
-							// CoCreate (whatever that is) the File Open Dialog object
-							IFileOpenDialog* open_dialog = nullptr;
-							HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER,
-								IID_PPV_ARGS(&open_dialog));
-							if (SUCCEEDED(hr)) {
-								// Create an event handling object and hook it to the dialog
-								IFileDialogEvents* file_dialog_events = nullptr;
-								hr = winapi::TerrainEditorOpenDialog::createInstance(IID_PPV_ARGS(&file_dialog_events));
-								if (SUCCEEDED(hr)) {
-									// Set the options on the dialog.
-									DWORD my_flags;
-									// Make sure not override existing options.
-									hr = open_dialog->GetOptions(&my_flags);
-									if (FAILED(hr)) goto failed;
-									// Get shell items for only file system items.
-									hr = open_dialog->SetOptions(my_flags | FOS_FORCEFILESYSTEM);
-									if (FAILED(hr)) goto failed;
-
-								}
-								need_to_update = true;
+							const int confirm_open = MessageBox(hwnd, L"Warning: Any unsaved changes will be lost! Do you still"
+								L" wish to proceed?", L"Confirm Open Map", MB_ICONWARNING | MB_YESNO);
+							if (confirm_open == IDYES) {
 							}
-							// Because I'm not about to nest 10 levels of if SUCCEEDED.
-							failed:
-							if (FAILED(hr)) {
-								MessageBox(this->hwnd, L"TE Thread: Open dialog box creation failed!", TerrainEditor::window_name,
-									MB_OK);
-								break;
-							}
-							*/
 							break;
 						}
 						case ID_TE_FILE_SAVE_MAP:
