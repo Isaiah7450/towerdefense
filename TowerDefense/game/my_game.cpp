@@ -35,12 +35,6 @@ namespace hoffman::isaiah {
 
 		MyGame::MyGame(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res) :
 			device_resources {dev_res} {
-				/*
-			this->ground_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), false,
-				false, pathfinding::HeuristicStrategies::Manhattan);
-			this->air_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), true,
-				false, pathfinding::HeuristicStrategies::Manhattan);
-				*/
 		}
 
 		MyGame::~MyGame() noexcept = default;
@@ -98,10 +92,7 @@ namespace hoffman::isaiah {
 			std::wifstream air_terrain_file {air_terrain_filename_base + map_name + L".txt"};
 			if (ground_terrain_file.good() && air_terrain_file.good()) {
 				this->map = std::make_shared<GameMap>(ground_terrain_file, air_terrain_file);
-				this->ground_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), false,
-					false, pathfinding::HeuristicStrategies::Manhattan);
-				this->air_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), true,
-					false, pathfinding::HeuristicStrategies::Manhattan);
+				this->debugUpdate(DebugUpdateStates::Terrain_Changed);
 			}
 			this->my_level_enemy_count = 0;
 			this->did_lose_life = false;
@@ -333,6 +324,7 @@ namespace hoffman::isaiah {
 			auto my_tower = std::make_unique<Tower>(this->device_resources, this->getTowerType(this->getSelectedTower()),
 				graphics::Color {0.f, 0.f, 0.f, 1.0f}, gx + 0.5, gy + 0.5);
 			this->addTower(std::move(my_tower));
+			this->debugUpdate(DebugUpdateStates::Terrain_Changed);
 		}
 
 		void MyGame::sellTower(int gx, int gy) {
@@ -349,6 +341,7 @@ namespace hoffman::isaiah {
 					this->getMap().getFiterGraph(false).getNode(gx, gy).setBlockage(false);
 					this->getMap().getFiterGraph(true).getNode(gx, gy).setBlockage(false);
 					this->towers.erase(towers.begin() + i);
+					this->debugUpdate(DebugUpdateStates::Terrain_Changed);
 					break;
 				}
 			}

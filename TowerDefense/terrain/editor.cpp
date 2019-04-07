@@ -172,6 +172,10 @@ namespace hoffman::isaiah {
 							if (my_map_dialog.isGood()) {
 								WaitForSingleObject(sync_mutex, INFINITE);
 								this->map_name = my_map_dialog.getName();
+								// Update the window's title to include the map's name.
+								const std::wstring my_window_name = TerrainEditor::window_name + L" ["s
+									+ this->map_name + L"]";
+								SetWindowText(hwnd, my_window_name.c_str());
 								// Reset map to all mountainous terrain
 								this->map->getTerrainGraph(false).clearGrid(my_map_dialog.getRows(), my_map_dialog.getColumns(),
 									pathfinding::GraphNode::blocked_space_weight);
@@ -203,6 +207,10 @@ namespace hoffman::isaiah {
 								WaitForSingleObject(sync_mutex, INFINITE);
 								try {
 									this->reloadMap();
+									// Update the window's title.
+									const std::wstring my_window_name = TerrainEditor::window_name + L" ["s
+										+ this->map_name + L"]";
+									SetWindowText(hwnd, my_window_name.c_str());
 								}
 								catch (...) {
 									ReleaseMutex(sync_mutex);
