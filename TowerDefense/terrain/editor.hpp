@@ -46,6 +46,8 @@ namespace hoffman::isaiah {
 			// Note: Caller is responsible for syncing this method.
 			/// <summary>Reloads the map based on the stored map name.</summary>
 			void reloadMap();
+			/// <summary>Saves the map based using the stored map name.</summary>
+			void saveMap();
 		private:
 			/// <summary>Handle to the parent window of the terrain editor.</summary>
 			HWND parent_hwnd;

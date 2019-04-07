@@ -166,4 +166,53 @@ namespace hoffman::isaiah::winapi {
 	void TerrainEditorOpenMapDialog::initDialog(HWND hwnd) {
 		SetDlgItemText(hwnd, IDC_TERRAIN_MAP_NAME, L"default");
 	}
+
+	TerrainEditorSaveMapAsDialog::TerrainEditorSaveMapAsDialog(HWND owner, HINSTANCE h_inst, std::wstring default_name) :
+		map_name {default_name} {
+		this->save_map = IDOK == static_cast<int>(DialogBoxParam(h_inst, MAKEINTRESOURCE(IDD_TERRAIN_SAVE_MAP_AS), owner,
+			TerrainEditorSaveMapAsDialog::dialogProc, reinterpret_cast<LPARAM>(this)));
+	}
+
+	INT_PTR CALLBACK TerrainEditorSaveMapAsDialog::dialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+		switch (msg) {
+		case WM_INITDIALOG:
+		{
+			SetWindowLongPtr(hwnd, GWLP_USERDATA, lparam);
+			[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
+			const auto my_dialog_class = reinterpret_cast<TerrainEditorSaveMapAsDialog*>(lparam);
+			my_dialog_class->initDialog(hwnd);
+			}
+			return TRUE;
+		}
+		case WM_COMMAND:
+			switch (LOWORD(wparam)) {
+			case IDOK:
+			{
+				[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
+				auto& my_dialog_class = *reinterpret_cast<TerrainEditorSaveMapAsDialog*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				auto buffer = std::make_unique<wchar_t[]>(81);
+				buffer[0] = 80;
+				SendMessage(GetDlgItem(hwnd, IDC_TERRAIN_MAP_NAME), EM_GETLINE, 0, reinterpret_cast<LPARAM>(buffer.get()));
+				my_dialog_class.map_name = buffer.get();
+				my_dialog_class.show_overwrite_confirm = BST_CHECKED
+					== SendMessage(GetDlgItem(hwnd, IDC_TERRAIN_SAVE_MAP_AS_SHOW_CONFIRM), BM_GETCHECK, 0, 0);
+				}
+				EndDialog(hwnd, IDOK);
+				break;
+			}
+			case IDCANCEL:
+				EndDialog(hwnd, IDCANCEL);
+				break;
+			}
+			break;
+		default:
+			return FALSE;
+		}
+		return TRUE;
+	}
+
+	void TerrainEditorSaveMapAsDialog::initDialog(HWND hwnd) {
+		SetDlgItemText(hwnd, IDC_TERRAIN_MAP_NAME, this->getName().c_str());
+		SendMessage(GetDlgItem(hwnd, IDC_TERRAIN_SAVE_MAP_AS_SHOW_CONFIRM), BM_SETCHECK, BST_CHECKED, 0);
+	}
 }

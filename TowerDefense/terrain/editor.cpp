@@ -9,6 +9,7 @@
 #include <string>
 #include <utility>
 #include <iostream>
+#include <filesystem>
 #include <fstream>
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
@@ -114,6 +115,31 @@ namespace hoffman::isaiah {
 				throw std::runtime_error {"File not found!"};
 			}
 			this->map = std::make_shared<game::GameMap>(ground_terrain_file, air_terrain_file);
+			// Update the window's title.
+			const std::wstring my_window_name = TerrainEditor::window_name + L" ["s
+				+ this->map_name + L"]";
+			SetWindowText(this->getHWND(), my_window_name.c_str());
+		}
+
+		void TerrainEditor::saveMap() {
+			// Open save files
+			std::wofstream ground_save_file {game::g_my_game->getResourcesPath() + L"graphs/ground_graph_"s
+				+ this->map_name + L".txt"};
+			std::wofstream air_save_file {game::g_my_game->getResourcesPath() + L"graphs/air_graph_"s
+				+ this->map_name + L".txt"};
+			if (!ground_save_file.good() || !air_save_file.good()) {
+				MessageBox(this->getHWND(), L"TE Thread: Could not save map!", this->window_name, MB_OK);
+				return;
+			}
+			// Output maps to save files
+			ground_save_file << this->getTerrainGraph(false);
+			air_save_file << this->getTerrainGraph(true);
+			// Reenable revert to save
+			constexpr MENUITEMINFO m_item {
+				sizeof(MENUITEMINFO), MIIM_STATE, 0, MFS_ENABLED,
+				0, nullptr, nullptr, nullptr, 0, nullptr, 0, nullptr
+			};
+			SetMenuItemInfo(GetSubMenu(GetMenu(hwnd), 1), ID_TE_ACTIONS_REVERT_TO_SAVE, false, &m_item);
 		}
 
 		void TerrainEditor::run() {
@@ -208,10 +234,6 @@ namespace hoffman::isaiah {
 								WaitForSingleObject(sync_mutex, INFINITE);
 								try {
 									this->reloadMap();
-									// Update the window's title.
-									const std::wstring my_window_name = TerrainEditor::window_name + L" ["s
-										+ this->map_name + L"]";
-									SetWindowText(hwnd, my_window_name.c_str());
 								}
 								catch (...) {
 									ReleaseMutex(sync_mutex);
@@ -226,28 +248,34 @@ namespace hoffman::isaiah {
 						}
 						case ID_TE_FILE_SAVE_MAP:
 						{
-							// Open save files
-							std::wofstream ground_save_file {game::g_my_game->getResourcesPath() + L"graphs/ground_graph_"s
-								+ this->map_name + L".txt"};
-							std::wofstream air_save_file {game::g_my_game->getResourcesPath() + L"graphs/air_graph_"s
-								+ this->map_name + L".txt"};
-							if (!ground_save_file.good() || !air_save_file.good()) {
-								MessageBox(this->hwnd, L"TE Thread: Could not save map!", this->window_name, MB_OK);
-								break;
-							}
-							// Reenable revert to save
-							constexpr MENUITEMINFO m_item {
-								sizeof(MENUITEMINFO), MIIM_STATE, 0, MFS_ENABLED,
-								0, nullptr, nullptr, nullptr, 0, nullptr, 0, nullptr
-							};
-							SetMenuItemInfo(GetSubMenu(GetMenu(hwnd), 1), ID_TE_ACTIONS_REVERT_TO_SAVE, false, &m_item);
-							// Output maps to save files
-							ground_save_file << this->getTerrainGraph(false);
-							air_save_file << this->getTerrainGraph(true);
+							this->saveMap();
 							break;
 						}
 						case ID_TE_FILE_SAVE_MAP_AS:
+						{
+							const winapi::TerrainEditorSaveMapAsDialog my_dialog {this->getHWND(), GetModuleHandle(nullptr), this->map_name};
+							if (my_dialog.isGood()) {
+								const std::wstring ground_filename = game::g_my_game->getResourcesPath() + L"graphs/ground_graph_"s
+									+ my_dialog.getName() + L".txt";
+								bool go_ahead = true;
+								if (my_dialog.showOvewriteConfirmation() && std::filesystem::exists(ground_filename)) {
+									const int my_result = MessageBox(this->hwnd, (ground_filename + L" already exists. Overwrite anyway?").c_str(),
+										L"TE: Save As - Confirm Overwrite", MB_YESNO | MB_ICONWARNING);
+									if (my_result == IDNO) {
+										go_ahead = false;
+									}
+								}
+								if (go_ahead) {
+									this->map_name = my_dialog.getName();
+									this->saveMap();
+									// Update the window's title.
+									const std::wstring my_window_name = TerrainEditor::window_name + L" ["s
+										+ this->map_name + L"]";
+									SetWindowText(hwnd, my_window_name.c_str());
+								}
+							}
 							break;
+						}
 						case ID_TE_FILE_QUIT:
 							PostQuitMessage(0);
 							break;

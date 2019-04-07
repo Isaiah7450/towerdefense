@@ -94,4 +94,35 @@ namespace hoffman::isaiah::winapi {
 		/// <summary>The name of the map to load.</summary>
 		std::wstring map_name {L"default"};
 	};
+
+	/// <summary>Represents a dialog used to save the current map under a different name in the terrain editor.</summary>
+	class TerrainEditorSaveMapAsDialog : public IDialog {
+	public:
+		/// <param name="owner">Handle to the window that owns this dialog box.</param>
+		/// <param name="h_inst">The hInstance parameter given by the WinMain function.</param>
+		/// <param name="default_name">The default save name.</param>
+		TerrainEditorSaveMapAsDialog(HWND owner, HINSTANCE h_inst, std::wstring default_name);
+		// Dialog box procedure.
+		static INT_PTR CALLBACK dialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+		// Getters
+		bool isGood() const noexcept {
+			return this->save_map;
+		}
+		bool showOvewriteConfirmation() const noexcept {
+			return this->show_overwrite_confirm;
+		}
+		std::wstring getName() const noexcept {
+			return this->map_name;
+		}
+	protected:
+		// Implements IDialog::initDialog(HWND)
+		void initDialog(HWND hwnd) override;
+	private:
+		/// <summary>Proceed with saving?</summary>
+		bool save_map {false};
+		/// <summary>Show overwrite confirmation?</summary>
+		bool show_overwrite_confirm {true};
+		/// <summary>The new save name.</summary>
+		std::wstring map_name;
+	};
 }
