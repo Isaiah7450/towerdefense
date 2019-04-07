@@ -88,8 +88,9 @@ namespace hoffman::isaiah {
 			constexpr const auto dwStyles = WS_OVERLAPPEDWINDOW & (0xFFFFFFFFL ^ WS_MAXIMIZEBOX ^ WS_SIZEBOX);
 			constexpr const auto dwExStyles = 0;
 			AdjustWindowRectEx(&this->rc, dwStyles, (this->h_menu ? true : false), dwExStyles);
+			const std::wstring my_window_name = TerrainEditor::window_name + L" ["s + this->map_name + L"]";
 			// Create window
-			this->hwnd = CreateWindowEx(dwExStyles, TerrainEditor::class_name, TerrainEditor::window_name,
+			this->hwnd = CreateWindowEx(dwExStyles, TerrainEditor::class_name, my_window_name.c_str(),
 				dwStyles, CW_USEDEFAULT, CW_USEDEFAULT, this->rc.right - this->rc.left,
 				this->rc.bottom - this->rc.top, this->parent_hwnd, this->h_menu, h_inst, nullptr);
 			if (!this->hwnd) {
