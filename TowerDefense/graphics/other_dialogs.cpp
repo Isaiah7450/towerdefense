@@ -80,7 +80,7 @@ namespace hoffman::isaiah::winapi {
 				auto& my_dialog_class = *reinterpret_cast<TerrainEditorNewMapDialog*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				auto buffer = std::make_unique<wchar_t[]>(81);
 				buffer[0] = 80;
-				SendMessage(GetDlgItem(hwnd, IDC_TERRAIN_NEW_MAP_NAME), EM_GETLINE, 0, reinterpret_cast<LPARAM>(buffer.get()));
+				SendMessage(GetDlgItem(hwnd, IDC_TERRAIN_MAP_NAME), EM_GETLINE, 0, reinterpret_cast<LPARAM>(buffer.get()));
 				my_dialog_class.map_name = buffer.get();
 				my_dialog_class.num_rows = static_cast<int>(GetDlgItemInt(hwnd, IDC_TERRAIN_NEW_MAP_ROWS, nullptr, FALSE));
 				my_dialog_class.num_cols = static_cast<int>(GetDlgItemInt(hwnd, IDC_TERRAIN_NEW_MAP_COLS, nullptr, FALSE));
@@ -100,7 +100,7 @@ namespace hoffman::isaiah::winapi {
 	}
 
 	void TerrainEditorNewMapDialog::initDialog(HWND hwnd) {
-		SetDlgItemText(hwnd, IDC_TERRAIN_NEW_MAP_NAME, this->map_name.c_str());
+		SetDlgItemText(hwnd, IDC_TERRAIN_MAP_NAME, this->map_name.c_str());
 		constexpr const INT min_rows_cols = 10;
 		constexpr const INT max_rows_cols = 50;
 		INITCOMMONCONTROLSEX icex {};
@@ -146,7 +146,7 @@ namespace hoffman::isaiah::winapi {
 				auto& my_dialog_class = *reinterpret_cast<TerrainEditorOpenMapDialog*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 				auto buffer = std::make_unique<wchar_t[]>(81);
 				buffer[0] = 80;
-				SendMessage(GetDlgItem(hwnd, IDC_TERRAIN_OPEN_MAP_NAME), EM_GETLINE, 0, reinterpret_cast<LPARAM>(buffer.get()));
+				SendMessage(GetDlgItem(hwnd, IDC_TERRAIN_MAP_NAME), EM_GETLINE, 0, reinterpret_cast<LPARAM>(buffer.get()));
 				my_dialog_class.map_name = buffer.get();
 				}
 				EndDialog(hwnd, IDOK);
@@ -164,6 +164,6 @@ namespace hoffman::isaiah::winapi {
 	}
 
 	void TerrainEditorOpenMapDialog::initDialog(HWND hwnd) {
-		SetDlgItemText(hwnd, IDC_TERRAIN_OPEN_MAP_NAME, L"default");
+		SetDlgItemText(hwnd, IDC_TERRAIN_MAP_NAME, L"default");
 	}
 }

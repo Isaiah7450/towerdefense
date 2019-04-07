@@ -103,11 +103,10 @@
 #define ID_CHALLENGE_LEVEL_HARD                 20053
 #define ID_CHALLENGE_LEVEL_EXPERT               20054
 
-#define IDC_TERRAIN_NEW_MAP_ROWS                21001
-#define IDC_TERRAIN_NEW_MAP_COLS                21002
-#define IDC_TERRAIN_NEW_MAP_NAME                21003
-#define IDC_TERRAIN_OPEN_MAP_NAME               22001
-#define IDC_TERRAIN_SAVE_MAP_AS_NAME            23001
+#define IDC_TERRAIN_MAP_NAME                    21001
+#define IDC_TERRAIN_NEW_MAP_ROWS                21101
+#define IDC_TERRAIN_NEW_MAP_COLS                21102
+#define IDC_TERRAIN_SAVE_MAP_AS_SHOW_CONFIRM    21202
 
 #define ID_MM_FILE_NEW_GAME                     40101
 #define ID_MM_FILE_LOAD_GAME                    40102
