@@ -2,6 +2,7 @@
 // Created: March 5, 2019
 #include "./../targetver.hpp"
 #include <Windows.h>
+#include <commctrl.h>
 #include "./../resource.h"
 #include <iomanip>
 #include <sstream>
@@ -120,10 +121,11 @@ namespace hoffman::isaiah::winapi {
 			for (const auto& control_pair : my_dialog_class->getControlColorMap()) {
 				if (GetDlgCtrlID(reinterpret_cast<HWND>(lparam)) == control_pair.first) {
 					SetTextColor(hdc_static, control_pair.second);
-					SetBkMode(hdc_static, TRANSPARENT);
-					return reinterpret_cast<INT_PTR>(background_brush);
+					break;
 				}
 			}
+			SetBkMode(hdc_static, TRANSPARENT);
+			return reinterpret_cast<INT_PTR>(background_brush);
 			break;
 		}
 		default:

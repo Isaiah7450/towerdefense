@@ -36,6 +36,10 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR lpCmdLine, _In_ int nCmdShow) {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
+	INITCOMMONCONTROLSEX icc {};
+	icc.dwSize = sizeof(INITCOMMONCONTROLSEX);
+	icc.dwICC = ICC_STANDARD_CLASSES | ICC_UPDOWN_CLASS;
+	InitCommonControlsEx(&icc);
 	// Initialize window.
 	auto my_window = ih::winapi::MainWindow {hInstance};
 	my_window.run(nCmdShow);
