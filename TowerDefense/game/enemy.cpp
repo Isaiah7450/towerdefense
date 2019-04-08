@@ -127,7 +127,7 @@ namespace hoffman::isaiah {
 		}
 
 		Enemy::Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
-			EnemyType* etype, graphics::Color o_color,
+			const EnemyType* etype, graphics::Color o_color,
 			const GameMap& gmap, int level, double difficulty, int challenge_level) :
 			GameObject {dev_res, etype->getShape(), o_color, etype->getColor(),
 			gmap.getTerrainGraph(etype->isFlying()).getStartNode()->getGameX() + 0.5,
@@ -158,7 +158,7 @@ namespace hoffman::isaiah {
 		}
 
 		Enemy::Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
-			EnemyType* etype, graphics::Color o_color,
+			const EnemyType* etype, graphics::Color o_color,
 			pathfinding::Pathfinder pf, double start_gx, double start_gy,
 			int level, double difficulty, int challenge_level) :
 			GameObject {dev_res, etype->getShape(), o_color, etype->getColor(), start_gx, start_gy, 0.5, 0.5},

@@ -55,10 +55,10 @@ namespace hoffman::isaiah {
 			};
 
 			Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
-				EnemyType* etype, graphics::Color o_color,
+				const EnemyType* etype, graphics::Color o_color,
 				const GameMap& gmap, int level, double difficulty, int challenge_level);
 			Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
-				EnemyType* etype, graphics::Color o_color,
+				const EnemyType* etype, graphics::Color o_color,
 				pathfinding::Pathfinder pf, double start_gx, double start_gy,
 				int level, double difficulty, int challenge_level);
 			/// <summary>Advances the enemy's game state by one frame.</summary>
@@ -333,7 +333,7 @@ namespace hoffman::isaiah {
 			void changeDirection() noexcept;
 		private:
 			/// <summary>The template type used to create the enemy.</summary>
-			EnemyType* base_type;
+			const EnemyType* base_type;
 			// Pathfinding stuff
 			/// <summary>The pathfinder used by the enemy.</summary>
 			pathfinding::Pathfinder my_pathfinder;

@@ -181,9 +181,9 @@ namespace hoffman::isaiah {
 			/// <returns>The map base name of the associat
 			std::wstring getDefaultMapName(int new_challenge) const;
 			/// <param name="name">The name of the enemy type to obtain.</param>
-			EnemyType* getEnemyType(std::wstring name);
+			const EnemyType* getEnemyType(std::wstring name) const;
 			/// <param name="index">The zero-based index of the enemy to retrieve (relative to the beginning of the file).</param>
-			EnemyType* getEnemyType(int index) {
+			const EnemyType* getEnemyType(int index) const {
 				return this->enemy_types.at(index).get();
 			}
 			const std::vector<std::shared_ptr<EnemyType>>& getAllEnemyTypes() const noexcept {

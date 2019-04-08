@@ -884,7 +884,7 @@ namespace hoffman::isaiah {
 				do {
 					my_parser.readKeyValue(L"enemy_name"s);
 					const std::wstring enemy_name = my_parser.parseString();
-					EnemyType* etype = nullptr;
+					const EnemyType* etype = nullptr;
 					// Check the enemy exists.
 					try {
 						etype = this->getEnemyType(enemy_name);

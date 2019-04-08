@@ -368,7 +368,7 @@ namespace hoffman::isaiah {
 			}
 		}
 
-		EnemyType* MyGame::getEnemyType(std::wstring name) {
+		const EnemyType* MyGame::getEnemyType(std::wstring name) const {
 			for (auto& etype : this->enemy_types) {
 				if (etype->getName() == name) return etype.get();
 			}
