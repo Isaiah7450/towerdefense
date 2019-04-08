@@ -845,10 +845,27 @@ namespace hoffman::isaiah {
 			}
 			util::file::DataFileParser my_parser {data_file};
 			my_parser.expectToken(util::file::TokenTypes::Section, L"global"s);
-			my_parser.readKeyValue(L"backup_level_if_load_fails"s);
+			int version = 1;
+			try {
+				my_parser.readKeyValue(L"version");
+				version = static_cast<int>(my_parser.parseNumber());
+				my_parser.readKeyValue(L"backup_level_if_load_fails"s);
+			}
+			catch (const util::file::DataFileException&) {
+				// All this extra code simply because I decided against including a version field to begin with...
+				my_parser.expectToken(util::file::TokenTypes::Identifier, L"backup_level_if_load_fails");
+				my_parser.getNext();
+				my_parser.expectToken(util::file::TokenTypes::Identifier, L"="s);
+				my_parser.getNext();
+			}
 			this->my_level_backup_number = static_cast<int>(my_parser.parseNumber());
 			if (this->my_level_backup_number < 1) {
 				this->my_level_backup_number = 1;
+			}
+			if (version >= 2) {
+				my_parser.getNext();
+				my_parser.expectToken(util::file::TokenTypes::Section, L"level_generation");
+				// TODO: Implement this code.
 			}
 		}
 
