@@ -223,7 +223,7 @@ namespace hoffman::isaiah {
 				if (my_parser.matchToken(util::file::TokenTypes::Object, L"}"s)) {
 					auto my_type = std::make_unique<EnemyType>(n, d, c, st, dmg, hp, ahp, ar, pt,
 						wspd, rspd, ispd, strat, move_diag, fly, unique);
-					const auto ret = this->enemy_types.emplace_back(std::move(my_type));
+					this->enemy_types.emplace_back(std::move(my_type));
 					if (enemy_names.find(n) == enemy_names.end()) {
 						enemy_names.emplace(n);
 						insert_succeeded = true;

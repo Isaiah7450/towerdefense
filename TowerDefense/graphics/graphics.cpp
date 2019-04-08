@@ -98,7 +98,7 @@ namespace hoffman::isaiah {
 		}
 
 		void Renderer2D::createEnemyMenu(HWND hwnd,
-			const std::vector<std::shared_ptr<game::EnemyType>>& enemies,
+			const std::vector<std::unique_ptr<game::EnemyType>>& enemies,
 			std::map<std::wstring, bool> seen_before) const noexcept {
 			auto my_menu = GetSubMenu(GetMenu(hwnd), 4);
 			// Clear the menu.

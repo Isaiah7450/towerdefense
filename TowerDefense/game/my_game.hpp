@@ -186,7 +186,7 @@ namespace hoffman::isaiah {
 			const EnemyType* getEnemyType(int index) const {
 				return this->enemy_types.at(index).get();
 			}
-			const std::vector<std::shared_ptr<EnemyType>>& getAllEnemyTypes() const noexcept {
+			const std::vector<std::unique_ptr<EnemyType>>& getAllEnemyTypes() const noexcept {
 				return this->enemy_types;
 			}
 			std::map<std::wstring, bool> getSeenEnemies() const noexcept {
@@ -280,7 +280,7 @@ namespace hoffman::isaiah {
 			/// <summary>The game map being used by the program.</summary>
 			std::shared_ptr<GameMap> map {nullptr};
 			/// <summary>The list of enemy template types.</summary>
-			std::vector<std::shared_ptr<game::EnemyType>> enemy_types {};
+			std::vector<std::unique_ptr<game::EnemyType>> enemy_types {};
 			/// <summary>Stores which enemy types have been seen before.</summary>
 			std::map<std::wstring, bool> enemies_seen {};
 			/// <summary>Stores how many times each enemy type has been killed.</summary>

@@ -80,7 +80,7 @@ namespace hoffman::isaiah::game {
 			/// <param name="etypes">The mapping of enemy types in the game.</param>
 			/// <returns>The average base rating of the enemies the buff affects.</returns>
 			double getAverageInfluenceRating(std::vector<std::wstring> target_names,
-				const std::vector<std::shared_ptr<EnemyType>>& etypes);
+				const std::vector<std::unique_ptr<EnemyType>>& etypes);
 			/// <param name="br">The radius of the buff.</param>
 			/// <param name="delay_ms">The delay between applications of the buff (in milliseconds).</param>
 			/// <param name="target_names_size">The number of different target names the buff is valid for.</param>
