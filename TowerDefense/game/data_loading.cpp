@@ -449,7 +449,7 @@ namespace hoffman::isaiah {
 				switch (my_type) {
 				case ShotTypes::Standard:
 				{
-					auto my_shot = std::make_shared<NormalShotType>(n, d, c, st, dmg, wap, ms, ir, sdmg, gm, am);
+					auto my_shot = std::make_unique<NormalShotType>(n, d, c, st, dmg, wap, ms, ir, sdmg, gm, am);
 					const auto ret = this->shot_types.emplace(n, std::move(my_shot));
 					insert_succeeded = ret.second;
 					break;
@@ -471,7 +471,7 @@ namespace hoffman::isaiah {
 					my_parser.readKeyValue(L"dot_total_ticks"s);
 					const int dot_total_ticks = static_cast<int>(my_parser.parseNumber());
 					util::file::DataFileParser::validateNumberMinBound(dot_total_ticks, 1, L"DoT Total Ticks", my_parser.getLine(), true);
-					auto my_shot = std::make_shared<DoTShotType>(n, d, c, st, dmg, wap, ms, ir, sdmg, gm, am,
+					auto my_shot = std::make_unique<DoTShotType>(n, d, c, st, dmg, wap, ms, ir, sdmg, gm, am,
 						affect_splash, dot_type, dot_tick_dmg, dot_tick_time, dot_total_ticks);
 					const auto ret = this->shot_types.emplace(n, std::move(my_shot));
 					insert_succeeded = ret.second;
@@ -488,7 +488,7 @@ namespace hoffman::isaiah {
 					my_parser.readKeyValue(L"slow_multi_chance"s);
 					const double slow_mchance = my_parser.parseNumber();
 					util::file::DataFileParser::validateNumber(slow_mchance, 0.0, 1.0, L"Slow multi-chance", my_parser.getLine(), true, false);
-					auto my_shot = std::make_shared<SlowShotType>(n, d, c, st, dmg, wap, ms, ir, sdmg, gm, am,
+					auto my_shot = std::make_unique<SlowShotType>(n, d, c, st, dmg, wap, ms, ir, sdmg, gm, am,
 						affect_splash, slow_factor, slow_duration, slow_mchance);
 					const auto ret = this->shot_types.emplace(n, std::move(my_shot));
 					insert_succeeded = ret.second;
@@ -505,7 +505,7 @@ namespace hoffman::isaiah {
 					my_parser.readKeyValue(L"stun_multi_chance"s);
 					const double stun_mchance = my_parser.parseNumber();
 					util::file::DataFileParser::validateNumber(stun_mchance, 0.0, stun_chance, L"Stun multi-chance", my_parser.getLine(), true, true);
-					auto my_shot = std::make_shared<StunShotType>(n, d, c, st, dmg, wap, ms, ir, sdmg, gm, am,
+					auto my_shot = std::make_unique<StunShotType>(n, d, c, st, dmg, wap, ms, ir, sdmg, gm, am,
 						affect_splash, stun_chance, stun_duration, stun_mchance);
 					const auto ret = this->shot_types.emplace(n, std::move(my_shot));
 					insert_succeeded = ret.second;
@@ -653,7 +653,7 @@ namespace hoffman::isaiah {
 			my_parser.readKeyValue(L"cost"s);
 			const int wall_cost = static_cast<int>(my_parser.parseNumber());
 			util::file::DataFileParser::validateNumberMinBound(wall_cost, 1, L"Cost (Wall)", my_parser.getLine(), true);
-			auto my_wall = std::make_shared<WallType>(wall_name, wall_desc, wall_color, wall_shape, wall_cost);
+			auto my_wall = std::make_unique<WallType>(wall_name, wall_desc, wall_color, wall_shape, wall_cost);
 			this->tower_types.emplace_back(std::move(my_wall));
 			// Trap section(s)
 			my_parser.getNext();
@@ -744,7 +744,7 @@ namespace hoffman::isaiah {
 				}
 				my_parser.readKeyValue(L"cost_adjust"s);
 				const int cost_adj = static_cast<int>(my_parser.parseNumber());
-				auto my_tower_type = std::make_shared<TowerType>(n, d, c, st, fmethod, tstrategy,
+				auto my_tower_type = std::make_unique<TowerType>(n, d, c, st, fmethod, tstrategy,
 					std::move(my_tower_shots), fs, fr, vs, rd, cost_adj, max_lv);
 				util::file::DataFileParser::validateNumberMinBound(my_tower_type->getCost(), 0.0, L"Tower Cost", my_parser.getLine(), false);
 				this->tower_types.emplace_back(std::move(my_tower_type));

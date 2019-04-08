@@ -473,11 +473,11 @@ namespace hoffman::isaiah {
 							if (!pause_state) {
 								game::g_my_game->togglePause();
 							}
-							std::shared_ptr<game::ShotBaseType> my_shot {nullptr};
+							const game::ShotBaseType* my_shot {nullptr};
 							unsigned int i = 0;
 							for (const auto& stype : game::g_my_game->getAllShotTypes()) {
 								if (i == selected_shot) {
-									my_shot = stype.second;
+									my_shot = stype.second.get();
 									break;
 								}
 								++i;

@@ -87,11 +87,11 @@ namespace hoffman::isaiah {
 			/// <summary>Recreates the tower menu with the current list of towers.</summary>
 			/// <param name="hwnd">Handle to the parent window.</param>
 			/// <param name="towers">The list of tower types that the player can choose from.</param>
-			void createTowerMenu(HWND hwnd, const std::vector<std::shared_ptr<game::TowerType>>& towers) const noexcept;
+			void createTowerMenu(HWND hwnd, const std::vector<std::unique_ptr<game::TowerType>>& towers) const noexcept;
 			/// <summary>Recreates the shots menu with the current list of shots.</summary>
 			/// <param name="hwnd">Handle to the parent window.</param>
 			/// <param name="shots">The list of shot types.</param>
-			void createShotMenu(HWND hwnd, const std::map<std::wstring, std::shared_ptr<game::ShotBaseType>>& shots) const noexcept;
+			void createShotMenu(HWND hwnd, const std::map<std::wstring, std::unique_ptr<game::ShotBaseType>>& shots) const noexcept;
 			/// <summary>Recreates the enemies menu with the current list of enemies (that have been seen before).</summary>
 			/// <param name="hwnd">Handle to the parent window.</param>
 			/// <param name="enemies">The list of enemy types.</param>

@@ -67,7 +67,7 @@ namespace hoffman::isaiah {
 		}
 
 		void Renderer2D::createTowerMenu(HWND hwnd,
-			const std::vector<std::shared_ptr<game::TowerType>>& towers) const noexcept {
+			const std::vector<std::unique_ptr<game::TowerType>>& towers) const noexcept {
 			auto my_menu = GetSubMenu(GetMenu(hwnd), 2);
 			// Delete what may have previously been in the menu...
 			while (GetMenuItemCount(my_menu) > 2) {
@@ -83,7 +83,7 @@ namespace hoffman::isaiah {
 		}
 
 		void Renderer2D::createShotMenu(HWND hwnd,
-			const std::map<std::wstring, std::shared_ptr<game::ShotBaseType>>& shots) const noexcept {
+			const std::map<std::wstring, std::unique_ptr<game::ShotBaseType>>& shots) const noexcept {
 			auto my_menu = GetSubMenu(GetMenu(hwnd), 3);
 			// Delete what may have previously been in the menu...
 			while (GetMenuItemCount(my_menu) > 0) {

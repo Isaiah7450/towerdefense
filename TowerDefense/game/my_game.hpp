@@ -195,13 +195,13 @@ namespace hoffman::isaiah {
 			const ShotBaseType* getShotType(std::wstring name) const {
 				return this->shot_types.at(name).get();
 			}
-			const std::map<std::wstring, std::shared_ptr<ShotBaseType>>& getAllShotTypes() const noexcept {
+			const std::map<std::wstring, std::unique_ptr<ShotBaseType>>& getAllShotTypes() const noexcept {
 				return this->shot_types;
 			}
 			const TowerType* getTowerType(int i) const {
 				return this->tower_types.at(i).get();
 			}
-			const std::vector<std::shared_ptr<TowerType>>& getAllTowerTypes() const noexcept {
+			const std::vector<std::unique_ptr<TowerType>>& getAllTowerTypes() const noexcept {
 				return this->tower_types;
 			}
 			std::vector<std::unique_ptr<Enemy>>& getEnemies() noexcept {
@@ -288,11 +288,11 @@ namespace hoffman::isaiah {
 			/// <summary>The list of enemies that are currently alive.</summary>
 			std::vector<std::unique_ptr<game::Enemy>> enemies {};
 			/// <summary>The list of shot template types.</summary>
-			std::map<std::wstring, std::shared_ptr<game::ShotBaseType>> shot_types {};
+			std::map<std::wstring, std::unique_ptr<game::ShotBaseType>> shot_types {};
 			/// <summary>The list of projectiles that are currently active.</summary>
 			std::vector<std::unique_ptr<game::Shot>> shots {};
 			/// <summary>The list of tower template types.</summary>
-			std::vector<std::shared_ptr<game::TowerType>> tower_types {};
+			std::vector<std::unique_ptr<game::TowerType>> tower_types {};
 			/// <summary>The list of towers currently in the game.</summary>
 			std::vector<std::unique_ptr<game::Tower>> towers {};
 			/// <summary>The player's health and cash.</summary>
