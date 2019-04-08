@@ -97,7 +97,7 @@ namespace hoffman::isaiah {
 			/// <param name="enemies">The list of enemy types.</param>
 			/// <param name="seen_before">A list of boolean values that indicate whether a particular enemy
 			/// type has been seen before.</param>
-			void createEnemyMenu(HWND hwnd, const std::map<std::wstring, std::shared_ptr<game::EnemyType>>& enemies,
+			void createEnemyMenu(HWND hwnd, const std::vector<std::shared_ptr<game::EnemyType>>& enemies,
 				std::map<std::wstring, bool> seen_before) const noexcept;
 			/// <summary>Updates the currently selected tower on the tower menu.</summary>
 			/// <param name="hwnd">Handle to the parent window.</param>

@@ -367,5 +367,12 @@ namespace hoffman::isaiah {
 				return L"intermediate";
 			}
 		}
+
+		EnemyType* MyGame::getEnemyType(std::wstring name) {
+			for (auto& etype : this->enemy_types) {
+				if (etype->getName() == name) return etype.get();
+			}
+			throw std::out_of_range {"Enemy does not exist."};
+		}
 	}
 }

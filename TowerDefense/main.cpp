@@ -491,20 +491,12 @@ namespace hoffman::isaiah {
 						else if (msg.wParam >= ID_MM_ENEMIES_PLACEHOLDER
 							&& msg.wParam < ID_MM_ENEMIES_PLACEHOLDER + game::g_my_game->getAllEnemyTypes().size()) {
 							// Show info about a selected enemy.
-							const auto selected_enemy = msg.wParam - ID_MM_ENEMIES_PLACEHOLDER;
+							const int selected_enemy = static_cast<int>(msg.wParam - ID_MM_ENEMIES_PLACEHOLDER);
 							const auto pause_state = game::g_my_game->isPaused();
 							if (!pause_state) {
 								game::g_my_game->togglePause();
 							}
-							std::shared_ptr<game::EnemyType> my_enemy {nullptr};
-							unsigned int i = 0;
-							for (const auto& etype : game::g_my_game->getAllEnemyTypes()) {
-								if (i == selected_enemy) {
-									my_enemy = etype.second;
-									break;
-								}
-								++i;
-							}
+							const game::EnemyType* my_enemy {game::g_my_game->getEnemyType(selected_enemy)};
 							if (game::g_my_game->getSeenEnemies().at(my_enemy->getName())) {
 								const EnemyInfoDialog my_dialog {hwnd, this->h_instance,
 									*my_enemy};

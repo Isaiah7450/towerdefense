@@ -71,10 +71,14 @@ namespace hoffman::isaiah::game {
 	namespace enemy_buffs {
 		namespace buff_base {
 			double getAverageInfluenceRating(std::vector<std::wstring> target_names,
-				const std::map<std::wstring, std::shared_ptr<EnemyType>>& etypes) {
+				const std::vector<std::shared_ptr<EnemyType>>& etypes) {
 				double total_rating = 0.0;
 				for (const auto& ename : target_names) {
-					total_rating += etypes.at(ename)->getBaseRating();
+					for (const auto& my_type : etypes) {
+						if (my_type->getName() == ename) {
+							total_rating += my_type->getBaseRating();
+						}
+					}
 				}
 				return total_rating / static_cast<double>(target_names.size());
 			}

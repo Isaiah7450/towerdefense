@@ -180,11 +180,13 @@ namespace hoffman::isaiah {
 			/// <param name="new_challenge">The new challenge level to set (resource identifier).</param>
 			/// <returns>The map base name of the associat
 			std::wstring getDefaultMapName(int new_challenge) const;
-
-			std::shared_ptr<EnemyType> getEnemyType(std::wstring name) {
-				return this->enemy_types.at(name);
+			/// <param name="name">The name of the enemy type to obtain.</param>
+			EnemyType* getEnemyType(std::wstring name);
+			/// <param name="index">The zero-based index of the enemy to retrieve (relative to the beginning of the file).</param>
+			EnemyType* getEnemyType(int index) {
+				return this->enemy_types.at(index).get();
 			}
-			const std::map<std::wstring, std::shared_ptr<EnemyType>>& getAllEnemyTypes() const noexcept {
+			const std::vector<std::shared_ptr<EnemyType>>& getAllEnemyTypes() const noexcept {
 				return this->enemy_types;
 			}
 			std::map<std::wstring, bool> getSeenEnemies() const noexcept {
@@ -278,7 +280,7 @@ namespace hoffman::isaiah {
 			/// <summary>The game map being used by the program.</summary>
 			std::shared_ptr<GameMap> map {nullptr};
 			/// <summary>The list of enemy template types.</summary>
-			std::map<std::wstring, std::shared_ptr<game::EnemyType>> enemy_types {};
+			std::vector<std::shared_ptr<game::EnemyType>> enemy_types {};
 			/// <summary>Stores which enemy types have been seen before.</summary>
 			std::map<std::wstring, bool> enemies_seen {};
 			/// <summary>Stores how many times each enemy type has been killed.</summary>

@@ -9,6 +9,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <set>
 #include <stdexcept>
 #include <queue>
 #include <deque>
@@ -217,12 +218,16 @@ namespace hoffman::isaiah {
 				}
 				my_parser.getNext();
 				bool insert_succeeded = false;
+				std::set<std::wstring> enemy_names {};
 				// Case when we have {} next to buffs
 				if (my_parser.matchToken(util::file::TokenTypes::Object, L"}"s)) {
 					auto my_type = std::make_unique<EnemyType>(n, d, c, st, dmg, hp, ahp, ar, pt,
 						wspd, rspd, ispd, strat, move_diag, fly, unique);
-					const auto ret = this->enemy_types.emplace(n, std::move(my_type));
-					insert_succeeded = ret.second;
+					const auto ret = this->enemy_types.emplace_back(std::move(my_type));
+					if (enemy_names.find(n) == enemy_names.end()) {
+						enemy_names.emplace(n);
+						insert_succeeded = true;
+					}
 				}
 				std::vector<std::shared_ptr<BuffBase>> my_buffs {};
 				while (!my_parser.matchToken(util::file::TokenTypes::Object, L"}"s)) {
@@ -351,7 +356,10 @@ namespace hoffman::isaiah {
 				if (my_buffs.size() > 0) {
 					auto my_type = std::make_unique<EnemyType>(n, d, c, st, dmg, hp, ahp, ar, pt,
 						wspd, rspd, ispd, strat, move_diag, fly, unique, std::move(my_buffs));
-					insert_succeeded = this->enemy_types.emplace(n, std::move(my_type)).second;
+					if (enemy_names.find(n) == enemy_names.end()) {
+						this->enemy_types.emplace_back(std::move(my_type));
+						insert_succeeded = true;
+					}
 				}
 				if (!insert_succeeded) {
 					throw util::file::DataFileException {L"Duplicate enemy name: "s + n + L"."s, my_parser.getLine()};
@@ -359,8 +367,8 @@ namespace hoffman::isaiah {
 			} while (my_parser.getNext());
 			// Add listing for "seen before".
 			for (const auto& etype : this->enemy_types) {
-				this->enemies_seen.emplace(etype.first, false);
-				this->enemy_kill_count.emplace(etype.first, 0);
+				this->enemies_seen.emplace(etype->getName(), false);
+				this->enemy_kill_count.emplace(etype->getName(), 0);
 			}
 #pragma warning(pop)
 		}
@@ -876,11 +884,15 @@ namespace hoffman::isaiah {
 				do {
 					my_parser.readKeyValue(L"enemy_name"s);
 					const std::wstring enemy_name = my_parser.parseString();
-					if (this->enemy_types.find(enemy_name) == this->enemy_types.end()) {
+					EnemyType* etype = nullptr;
+					// Check the enemy exists.
+					try {
+						etype = this->getEnemyType(enemy_name);
+					}
+					catch (const std::out_of_range&) {
 						throw util::file::DataFileException {L"Enemy type not found: "s + enemy_name + L"."s,
 							my_parser.getLine()};
 					}
-					std::shared_ptr<EnemyType> etype = this->getEnemyType(enemy_name);
 					my_parser.readKeyValue(L"extra_count"s);
 					int enemy_count = static_cast<int>(my_parser.parseNumber()) + this->challenge_level + 2;
 					util::file::DataFileParser::validateNumberMinBound(enemy_count - this->challenge_level - 2, 0,

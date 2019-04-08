@@ -4,14 +4,16 @@
 #include <Windows.h>
 #include <d2d1.h>
 #include <dwrite.h>
-#include <memory>
+#include <algorithm>
 #include <cmath>
-#include <string>
 #include <iostream>
 #include <iomanip>
-#include <sstream>
-#include <vector>
 #include <map>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 #include "./../main.hpp"
@@ -96,7 +98,7 @@ namespace hoffman::isaiah {
 		}
 
 		void Renderer2D::createEnemyMenu(HWND hwnd,
-			const std::map<std::wstring, std::shared_ptr<game::EnemyType>>& enemies,
+			const std::vector<std::shared_ptr<game::EnemyType>>& enemies,
 			std::map<std::wstring, bool> seen_before) const noexcept {
 			auto my_menu = GetSubMenu(GetMenu(hwnd), 4);
 			// Clear the menu.
@@ -106,8 +108,8 @@ namespace hoffman::isaiah {
 			// Add menu items
 			uintptr_t i = 0;
 			for (const auto& etype : enemies) {
-				if (seen_before.at(etype.first)) {
-					AppendMenu(my_menu, MF_STRING, ID_MM_ENEMIES_PLACEHOLDER + i, etype.first.c_str());
+				if (seen_before.at(etype->getName())) {
+					AppendMenu(my_menu, MF_STRING, ID_MM_ENEMIES_PLACEHOLDER + i, etype->getName().c_str());
 				}
 				else {
 					AppendMenu(my_menu, MF_STRING, ID_MM_ENEMIES_PLACEHOLDER + i, L"???");
