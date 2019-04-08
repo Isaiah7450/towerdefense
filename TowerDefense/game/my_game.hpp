@@ -192,14 +192,14 @@ namespace hoffman::isaiah {
 			std::map<std::wstring, bool> getSeenEnemies() const noexcept {
 				return this->enemies_seen;
 			}
-			std::shared_ptr<ShotBaseType> getShotType(std::wstring name) {
-				return this->shot_types.at(name);
+			const ShotBaseType* getShotType(std::wstring name) const {
+				return this->shot_types.at(name).get();
 			}
 			const std::map<std::wstring, std::shared_ptr<ShotBaseType>>& getAllShotTypes() const noexcept {
 				return this->shot_types;
 			}
-			std::shared_ptr<TowerType> getTowerType(int i) {
-				return this->tower_types.at(i);
+			const TowerType* getTowerType(int i) const {
+				return this->tower_types.at(i).get();
 			}
 			const std::vector<std::shared_ptr<TowerType>>& getAllTowerTypes() const noexcept {
 				return this->tower_types;

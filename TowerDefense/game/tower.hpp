@@ -29,7 +29,7 @@ namespace hoffman::isaiah {
 			friend class winapi::TowerUpgradeInfoDialog;
 		public:
 			Tower(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
-				std::shared_ptr<TowerType> ttype, graphics::Color o_color, double build_gx, double build_gy) :
+				const TowerType* ttype, graphics::Color o_color, double build_gx, double build_gy) :
 				GameObject {dev_res, ttype->getShape(), o_color, ttype->getColor(), build_gx, build_gy,
 					0.7f, 0.7f},
 				device_resources {dev_res},
@@ -101,7 +101,7 @@ namespace hoffman::isaiah {
 				}
 			}
 			// Getters
-			const std::shared_ptr<TowerType>& getBaseType() const noexcept {
+			const TowerType* getBaseType() const noexcept {
 				return this->base_type;
 			}
 			// Upgrade getters:
@@ -189,7 +189,7 @@ namespace hoffman::isaiah {
 			/// <summary>Pointer to the game's device resources.</summary>
 			std::shared_ptr<graphics::DX::DeviceResources2D> device_resources;
 			/// <summary>The template type of this projectile.</summary>
-			std::shared_ptr<TowerType> base_type;
+			const TowerType* base_type;
 			/// <summary>The number of shots that have been fired since reloading.</summary>
 			int shots_fired_since_reload {0};
 			/// <summary>The amount of frames remaining before the tower can fire again

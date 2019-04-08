@@ -258,7 +258,7 @@ namespace hoffman::isaiah {
 			// Constructor
 			TowerType(std::wstring n, std::wstring d, graphics::Color c, graphics::shapes::ShapeTypes st,
 				std::shared_ptr<FiringMethod> fmethod, std::shared_ptr<TargetingStrategy> tstrategy,
-				std::vector<std::pair<std::shared_ptr<ShotBaseType>, double>>&& stypes,
+				std::vector<std::pair<const ShotBaseType*, double>>&& stypes,
 				double fs, double fr, int vs, int rd, int cost, int max_lv) :
 				GameObjectType {n, d, c, st},
 				firing_method {fmethod},
@@ -278,7 +278,7 @@ namespace hoffman::isaiah {
 			}
 
 			// Getters and similar
-			std::vector<std::pair<std::shared_ptr<ShotBaseType>, double>> getShotTypes() const noexcept {
+			std::vector<std::pair<const ShotBaseType*, double>> getShotTypes() const noexcept {
 				return this->shot_types;
 			}
 			const FiringMethod& getFiringMethod() const noexcept {
@@ -356,7 +356,7 @@ namespace hoffman::isaiah {
 			std::shared_ptr<TargetingStrategy> targeting_strategy;
 			/// <summary>A list of the shots that can be fired that this tower
 			/// alongside the frequency with which the tower fires each projectile.</summary>
-			std::vector<std::pair<std::shared_ptr<ShotBaseType>, double>> shot_types;
+			std::vector<std::pair<const ShotBaseType*, double>> shot_types;
 			/// <summary>The rate at which the tower creates new projectiles.
 			/// (Given in number of shots per second.)</summary>
 			double firing_speed;

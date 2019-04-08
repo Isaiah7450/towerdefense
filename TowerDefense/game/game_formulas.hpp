@@ -24,13 +24,13 @@ namespace hoffman::isaiah::game {
 		/// <param name="stypes">The shot types and related frequencies that the tower fires.</param>
 		/// <param name="dm">The tower's damage multiplier.</param>
 		/// <returns>The expected amount of damage output by the twoer.</returns>
-		double getAverageDamagePerShot(const std::vector<std::pair<std::shared_ptr<ShotBaseType>, double>>& stypes, double dm) noexcept;
+		double getAverageDamagePerShot(const std::vector<std::pair<const ShotBaseType*, double>>& stypes, double dm) noexcept;
 		/// <param name="stypes">The shot types and related frequencies that the tower fires.</param>
 		/// <returns>The weighted average of the tower's shot types' effect ratings.</returns>
-		double getAverageShotEffectRating(const std::vector<std::pair<std::shared_ptr<ShotBaseType>, double>>& stypes) noexcept;
+		double getAverageShotEffectRating(const std::vector<std::pair<const ShotBaseType*, double>>& stypes) noexcept;
 		/// <param name="stypes">The shot types and related frequencies that the tower fires.</param>
 		/// <returns>The weighted average of the tower's shot types' ratings.</returns>
-		double getAverageShotRating(const std::vector<std::pair<std::shared_ptr<ShotBaseType>, double>>& stypes) noexcept;
+		double getAverageShotRating(const std::vector<std::pair<const ShotBaseType*, double>>& stypes) noexcept;
 		/// <param name="fs">The tower's firing speed in shots / second.</param>
 		/// <param name="vs">The tower's volley shots.</param>
 		/// <param name="rd">The tower's reload delay in milliseconds.</param>

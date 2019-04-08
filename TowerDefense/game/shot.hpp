@@ -20,7 +20,7 @@ namespace hoffman::isaiah {
 		class Shot : public GameObject {
 		public:
 			Shot(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
-				std::shared_ptr<ShotBaseType> stype, graphics::Color o_color, const Tower& ot, double angle);
+				const ShotBaseType* stype, graphics::Color o_color, const Tower& ot, double angle);
 
 			/// <summary>Advances the projectile's state by one logical frame.</summary>
 			/// <param name"enemies">The list of enemies currently present in the game.</param>
@@ -28,7 +28,7 @@ namespace hoffman::isaiah {
 			bool update(const GameMap& gmap, std::vector<std::unique_ptr<Enemy>>& enemies);
 		private:
 			/// <summary>The template type of this projectile.</summary>
-			std::shared_ptr<ShotBaseType> base_type;
+			const ShotBaseType* base_type;
 			/// <summary>The tower that the projectile originated from.</summary>
 			const Tower& origin_tower;
 			/// <summary>The angle (in radians) that the projectile moves in each turn.</summary>

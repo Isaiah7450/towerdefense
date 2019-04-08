@@ -695,12 +695,12 @@ namespace hoffman::isaiah {
 				}
 				my_parser.readKeyValue(L"shots");
 				my_parser.expectToken(util::file::TokenTypes::Object, L"{"s);
-				std::vector<std::pair<std::shared_ptr<ShotBaseType>, double>> my_tower_shots {};
+				std::vector<std::pair<const ShotBaseType*, double>> my_tower_shots {};
 				my_parser.getNext();
 				my_parser.expectToken(util::file::TokenTypes::Object, L"{"s);
 				double freq_total = 0.0;
 				do {
-					std::shared_ptr<ShotBaseType> my_tower_shot_type {nullptr};
+					const ShotBaseType* my_tower_shot_type {nullptr};
 					try {
 						my_parser.readKeyValue(L"name"s);
 						my_tower_shot_type = this->getShotType(my_parser.parseString());
@@ -1037,10 +1037,10 @@ namespace hoffman::isaiah {
 						// Leading space is removed...
 						tower_name.erase(tower_name.begin());
 						save_file >> buffer >> tower_gx >> tower_gy;
-						std::shared_ptr<TowerType> my_type {nullptr};
+						const TowerType* my_type {nullptr};
 						for (const auto& tt : this->getAllTowerTypes()) {
 							if (tt->getName() == tower_name) {
-								my_type = tt;
+								my_type = tt.get();
 								break;
 							}
 						}

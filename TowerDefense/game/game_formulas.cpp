@@ -20,7 +20,7 @@ namespace hoffman::isaiah::game {
 				: fr * fr * (fm.getMaximumAngle() - fm.getMinimumAngle()) / 2.0) : 0;
 		}
 
-		double getAverageDamagePerShot(const std::vector<std::pair<std::shared_ptr<ShotBaseType>, double>>& stypes, double dm) noexcept {
+		double getAverageDamagePerShot(const std::vector<std::pair<const ShotBaseType*, double>>& stypes, double dm) noexcept {
 			double sum = 0.0;
 			for (const auto& st : stypes) {
 				sum += st.first->getBaseRating() * st.second;
@@ -28,7 +28,7 @@ namespace hoffman::isaiah::game {
 			return sum * dm;
 		}
 
-		double getAverageShotEffectRating(const std::vector<std::pair<std::shared_ptr<ShotBaseType>, double>>& stypes) noexcept {
+		double getAverageShotEffectRating(const std::vector<std::pair<const ShotBaseType*, double>>& stypes) noexcept {
 			double sum = 0.0;
 			for (const auto& st : stypes) {
 				sum += st.first->getExtraRating() * st.second;
@@ -36,7 +36,7 @@ namespace hoffman::isaiah::game {
 			return sum;
 		}
 
-		double getAverageShotRating(const std::vector<std::pair<std::shared_ptr<ShotBaseType>, double>>& stypes) noexcept {
+		double getAverageShotRating(const std::vector<std::pair<const ShotBaseType*, double>>& stypes) noexcept {
 			double sum = 0.0;
 			for (const auto& st : stypes) {
 				sum += st.first->getRating() * st.second;

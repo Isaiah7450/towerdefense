@@ -17,7 +17,7 @@
 namespace hoffman::isaiah {
 	namespace game {
 		Shot::Shot(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
-			std::shared_ptr<ShotBaseType> stype, graphics::Color o_color, const Tower& ot, double angle) :
+			const ShotBaseType* stype, graphics::Color o_color, const Tower& ot, double angle) :
 			GameObject {dev_res, stype->getShape(), o_color, stype->getColor(), ot.getGameX(), ot.getGameY(),
 				0.3f, 0.3f},
 			base_type {stype},

@@ -223,7 +223,7 @@ namespace hoffman::isaiah {
 			// Determine which shot to fire...
 			const auto roll = rng::distro_uniform(rng::gen);
 			double running_total = 0.0;
-			std::shared_ptr<ShotBaseType> stype = nullptr;
+			const ShotBaseType* stype = nullptr;
 			for (auto& st_pair : this->getBaseType()->getShotTypes()) {
 				running_total += st_pair.second;
 				if (roll <= running_total) {
