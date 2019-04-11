@@ -195,7 +195,18 @@ namespace hoffman::isaiah {
 						15 : 10)) * (1.00 + this->getChallengeLevel() / 4.0)
 						+ std::sqrt(this->difficulty))
 						+ (this->level < 99
-							? (this->level == 98 ? 200
+							// For the last 10 or so levels, the difficulty of the
+							// game is much higher compared to the rest of the game.
+							// While I think planning ahead is very important for
+							// any tower defense game, I also do not want to lock
+							// the player in with their choices from level 1 to 50
+							// with no real opportunity to make changes.
+							? (this->level == 98 ? 250
+								: this->level == 97 ? 150
+								: this->level == 96 ? 125
+								: this->level == 95 ? 100
+								: this->level == 89 ? 75
+								: this->level >= 90 ? 45
 								: this->level % 25 == 24 ? 60
 								: this->level % 10 == 9 ? 30
 								: this->level % 5 == 4 ? 10 : 0)
