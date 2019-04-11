@@ -555,6 +555,8 @@ Version 3.2.1: (Released March 28, 2019)
  + Enemies now build up resistance against status afflictions to prevent
    being forced into a stun/slow lock situation.
  + Added Level 51-75.
+ + Added a chapter to the playing guide giving challenges, but it is as of
+   right now very incomplete.
 - Misc Changes:
  + (Internal): Increased overall code quality. (Note: It's very possible
                that the changes caused some kinds of bugs to appear.)
@@ -577,3 +579,59 @@ Version 3.2.1: (Released March 28, 2019)
  + The save file now keeps track of kill count. This information may be
    used later.
 
+Version 3.2.2: (Released April 11, 2019)
+- Bug Fixes:
+ + Fixed inconsistent usage of challenge level and the influence map when
+   calculating paths.
+ + Fixed an issue where the influence graph was being incorrectly read from
+   the file.
+ + (Debug): Fixed a crash when trying to use show paths after starting a
+            new game.
+ + Fixed improper scaling of the game on nonstandard map sizes.
+ + Fixed the Terrain Editor not saving maps to the correct location.
+ + Fixed the copyright year on the installer.
+- Balance Changes:
+ + The game now only keeps a heat map on experienced difficulty and higher.
+ + Significantly increased the amount of money one receives from levels
+   90 to 98.
+ + Green Berserker: Injured Speed decreased from 4.500 tiles per second to
+                    4.150 tiles per second.
+ + Purple Guardian: Health decreased from 132 to 129.
+ + Blue Soldier: "Red and Blue Infantry Group" (Forcefield 1) shield absorb
+                 decreased from 1.0 to 0.9.
+ + Blue Supporter: "Red and Blue Defender Group" (Forcefield 1) delay
+                   increased from 6000ms to 6150ms.
+ + Blue Supporter: Added "Red All Group" (Forcefield) buff.
+ + Blue Guardian: Health decreased from 269 to 257.
+ + Blue Guardian: Armor Health increased from 136 to 139.
+ + Blue Quartermaster: Armor Health increased from 19 to 23.
+ + Blue Quartermaster: "Red and Blue Repair Group" (Repair 2) delay decreased
+                       from 15000ms to 12000ms.
+ + Blue Quartermaster: Added "Blue Quartermaster" (Healer) buff.
+ + Blue King: "Blue King Group" (Forcefield 1) delay decreased from 20000ms
+              to 15000ms.
+ + Blue King: "Blue King Group" (Forcefield 1) duration decreased from
+              15000ms to 11000ms.
+ + Changed "Arc Circle" to decrease the number of shots required to complete
+   a full rotation. This should lead to slightly better accuracy for the
+   Cheap Tower.
+- New Stuff:
+ + The "New Map" option for the Terrain Editor has been updated. You can now
+   specify the map's dimensions as well as the map's new name.
+ + The Terrain Editor will now display the name of the map being edited in
+   brackets ([]) at the end.
+ + The "Open Map" option for the Terrain Editor has been implemented.
+ + The "Save Map As" option for the Terrain Editor has been implemented.
+ + Added levels 76-90.
+- Misc Changes:
+ + Title of game changed to "A Shaping War: Isaiah's tower defense game".
+ + Updated the challenges chapter of the playing guide.
+ + Updated the hints and tips chapter of the playing guide.
+ + The save file format has changed once more. As always, the game will
+   continue to read old save file version (1 <= v <= 3) as well as
+   version 4 files. (Added to accomodate changes to the terrain editor.)
+ + The Terrain Editor has been decoupled from the game. (In other words,
+   changing the map in the terrain editor no longer affects the map
+   in the game.)
+ + Made Blue Supporter, Blue Quartermaster, and Blue King/Vengeful King
+   have darker colors to aid differentiation.
