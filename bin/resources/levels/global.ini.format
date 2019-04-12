@@ -1,0 +1,120 @@
+# Sample global level configuration file.
+# Global settings for all levels.
+[global]
+# The file version.
+version = 2
+# If loading fails, load this level. The automatic level generator supercedes
+# this behavior.
+backup_level_if_load_fails = 90
+
+# Settings for automatically generating levels.
+[level_generation]
+# What follows is currently not used; the final format may be vastly
+# different than what lies below.
+# The first level to use the automatic wave generator.
+start_level = 100
+color_data = {
+	{
+		# Name used to refer to the color.
+		name = "Color Red"
+		# The standardized z-score of the color that is used to
+		# estimate the color's difficulty. For a standard distribution
+		# with mean 0 and standard deviation 1, the probability this
+		# wave color will be chosen is equal to the area of the normal
+		# distribution to the left of this z-score minus the area of
+		# the previous color.
+		z_difficulty = -1.2816
+	},
+	{
+		name = "Color Green", z_difficulty = -1.00
+	},
+	{
+		name = "Color Purple", z_difficulty = 1.00
+	},
+	{
+		name = "Color Blue", z_difficulty = 2.50
+	}
+}
+
+# Maps enemies with data to aid wave generation.
+enemy_data = {
+	{
+		# The name of the enemy.
+		name = "Red Scout"
+		# The color (primary grouping) of the enemy. It does not necessarily
+		# have to be related to the color; just make sure to group enemies
+		# with the same goals together. Generally speaking, 
+		color = "Color Red"
+		# The relative difficulty of this enemy among other enemies of
+		# the same color (represented in terms of a standardized z-score
+		# used with the normal distribution).
+		# (A calculator for calculating the area to the left of a z-score
+		# would likely be useful for determining this value.)
+		z_archetype_difficulty = -2.95
+		# The mean extra troops spawned. (Note: Normally distribution)
+		extra_count_mu = 10.00
+		# The average increase per level of extra troops spawned.
+		extra_count_increase = 2.50
+		# The standard deviation in number of extra enemies spawned.
+		extra_count_sigma = 3.00
+		# The standard timing values for guaging the spawn density.
+		# (1st => Dense, 2nd => Normal, 3rd => Sparse); all values in
+		# milliseconds.
+		# Spawn densities per group will be uniformly distributed.
+		spawn_times = <150, 400, 650>
+	},
+	{
+		name = "Red Foot Soldier", color = "Color Red"
+		z_archetype_difficulty = -2.50, extra_count_mu = 10.00
+		extra_count_increase = 0.50, extra_count_sigma = 1.00
+		spawn_times = <250, 500, 750>
+	},
+	{
+		name = "Red Mounted Soldier", color = "Color Red"
+		z_archetype_difficulty = -2.00, extra_count_mu = 10.00
+		extra_count_increase = 0.50, extra_count_sigma = 1.00
+		spawn_times = <200, 450, 700>
+	}
+	# Etc.
+}
+# The waves are randomly generated; results are normally distributed.
+# The mean wave difficulty starting at the start_level.
+wave_difficulty_mu = 0.00
+# The (rightward) shift of the mean wave difficulty for each level above
+# the start level.
+wave_difficulty_increase = 0.05
+# The standard deviation of the wave difficulty distribution. Remember the
+# empirical rule: 68% is within 1 sigma, 95% within 2 sigma, and 99.7% within
+# 3 sigmas.
+wave_difficulty_sigma = 1.00
+
+# Group types within a wave are also normally distributed. The chosen group
+# type is the first one with a z-score greater than the generated one.
+# This indicates the starting center of the distribution.
+group_difficulty_mu = 0.00
+# This indicates how much (rightward) the mean shifts each level.
+group_difficulty_increase = 0.05
+# This indicates the standard deviation in group types. Again, the empirical
+# rule is a good benchmark.
+group_difficulty_sigma = 1.00
+
+# The delay in milliseconds between waves. This value stays constant.
+wave_delay = 5000
+# The delay in milliseconds between groups. This value stays constant.
+group_delay = 2500
+# The starting mean number of waves to generate each level. Again, this is
+# normally distributed.
+num_waves_mu = 5.00
+# The amount the mean of the distribution is shifted each level.
+num_waves_increase = 0.10
+# The standard deviation of the distribution of waves spawned per level.
+num_waves_sigma = 0.50
+# The number of groups per level is also normally distributed. This specifies
+# the center of the distribution (i.e.: the expected number of groups
+# generated on the starting level.)
+# Groups are spread across waves as evenly as possible.
+num_groups_mu = 30.00
+# The amount by which the expected number of groups per level increases.
+num_groups_increase = 0.75
+# The standard deviation in number of groups generated per level.
+num_groups_sigma = 2.50
