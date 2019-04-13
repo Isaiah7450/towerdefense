@@ -122,11 +122,17 @@ namespace hoffman::isaiah {
 			/// <summary>Attempts to parse the current input as a number. (Throws an exception
 			/// if not a number.)</summary>
 			/// <returns>The parsed number.</returns>
-			double parseNumber() const {
+			template <typename T = double>
+			T parseNumber() const {
 				if (!this->matchTokenType(TokenTypes::Number)) {
 					throw DataFileException {L"The current token is not a number.", this->getLine()};
 				}
-				return std::stod(this->getToken());
+				if constexpr(std::is_same_v<T, double>) {
+					return std::stod(this->getToken());
+				}
+				else {
+					return std::stoi(this->getToken());
+				}
 			}
 			/// <summary>Attempts to parse the current input as a boolean constant. (Throws an exception
 			/// if not a boolean constant.)</summary>
