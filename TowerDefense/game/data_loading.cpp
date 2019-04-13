@@ -1004,7 +1004,7 @@ namespace hoffman::isaiah {
 					data_file.open(this->resources_folder_path + L"levels/level"s + std::to_wstring(this->my_level_backup_number) + L".ini"s);
 					if (data_file.bad() || data_file.fail()) {
 						throw util::file::DataFileException {L"Could not open resources/levels/level"s
-							+ std::to_wstring(this->level) + L".ini for reading!"s, 0};
+							+ std::to_wstring(this->level) + L".ini for reading. Automatically generating a level instead..."s, 0};
 					}
 				}
 			}

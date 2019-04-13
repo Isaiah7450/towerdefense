@@ -266,7 +266,8 @@ namespace hoffman::isaiah {
 				}
 				catch ([[maybe_unused]] const util::file::DataFileException& e) {
 					MessageBox(nullptr, e.what(), L"Level Loading Error", MB_OK);
-					std::abort();
+					// Though it is not really meant to be used for levels under the threshold, it should still work despite such.
+					this->my_level = this->my_level_generator->generateLevel(this->getLevelNumber(), *this);
 				}
 			}
 		}
