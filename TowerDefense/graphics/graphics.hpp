@@ -21,6 +21,31 @@ namespace hoffman::isaiah {
 		class GameMap;
 	}
 
+	namespace winapi {
+		/// <summary>Disables a menu item.</summary>
+		/// <param name="hwnd">Handle to the window.</param>
+		/// <param name="menu_offset">The numeric offset of the menu (see order in resource file).</param>
+		/// <param name="menu_identifier">The menu's resource identifier.</param>
+		inline void disableMenuItem(HWND hwnd, int menu_offset, int menu_identifier) {
+			constexpr MENUITEMINFO m_item {
+				sizeof(MENUITEMINFO), MIIM_STATE, 0, MFS_DISABLED,
+				0, nullptr, nullptr, nullptr, 0, nullptr, 0, nullptr
+			};
+			SetMenuItemInfo(GetSubMenu(GetMenu(hwnd), menu_offset), menu_identifier, false, &m_item);
+		}
+		/// <summary>Enables a menu item.</summary>
+		/// <param name="hwnd">Handle to the window.</param>
+		/// <param name="menu_offset">The numeric offset of the menu (see order in resource file).</param>
+		/// <param name="menu_identifier">The menu's resource identifier.</param>
+		inline void enableMenuItem(HWND hwnd, int menu_offset, int menu_identifier) {
+			constexpr MENUITEMINFO m_item {
+				sizeof(MENUITEMINFO), MIIM_STATE, 0, MFS_ENABLED,
+				0, nullptr, nullptr, nullptr, 0, nullptr, 0, nullptr
+			};
+			SetMenuItemInfo(GetSubMenu(GetMenu(hwnd), menu_offset), menu_identifier, false, &m_item);
+		}
+	}
+
 	namespace terrain_editor {
 		// Forward declaration
 		class TerrainEditor;

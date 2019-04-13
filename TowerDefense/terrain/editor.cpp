@@ -135,11 +135,7 @@ namespace hoffman::isaiah {
 			ground_save_file << this->getTerrainGraph(false);
 			air_save_file << this->getTerrainGraph(true);
 			// Reenable revert to save
-			constexpr MENUITEMINFO m_item {
-				sizeof(MENUITEMINFO), MIIM_STATE, 0, MFS_ENABLED,
-				0, nullptr, nullptr, nullptr, 0, nullptr, 0, nullptr
-			};
-			SetMenuItemInfo(GetSubMenu(GetMenu(hwnd), 1), ID_TE_ACTIONS_REVERT_TO_SAVE, false, &m_item);
+			winapi::enableMenuItem(hwnd, 1, ID_TE_ACTIONS_REVERT_TO_SAVE);
 		}
 
 		void TerrainEditor::run() {
@@ -214,11 +210,7 @@ namespace hoffman::isaiah {
 								this->map->getTerrainGraph(true).setGoalNode(0, 0);
 								this->map->resetOtherGraphs();
 								// Disable revert to save --> No save exists!
-								constexpr MENUITEMINFO m_item {
-									sizeof(MENUITEMINFO), MIIM_STATE, 0, MFS_DISABLED,
-									0, nullptr, nullptr, nullptr, 0, nullptr, 0, nullptr
-								};
-								SetMenuItemInfo(GetSubMenu(GetMenu(hwnd), 1), ID_TE_ACTIONS_REVERT_TO_SAVE, false, &m_item);
+								winapi::disableMenuItem(hwnd, 1, ID_TE_ACTIONS_REVERT_TO_SAVE);
 								need_to_update = true;
 							}
 							break;
