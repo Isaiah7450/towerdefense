@@ -1064,7 +1064,7 @@ namespace hoffman::isaiah {
 		}
 
 		void MyGame::saveGame(std::wostream& save_file) const {
-			if (this->isInLevel() || !this->player.isAlive()) {
+			if (this->isInLevel()) {
 				// Can't save now...
 				return;
 			}
