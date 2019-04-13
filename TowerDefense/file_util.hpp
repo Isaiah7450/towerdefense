@@ -3,6 +3,7 @@
 // File Created: May 24, 2018
 #include <string>
 #include <iosfwd>
+#include <type_traits>
 #include <utility>
 #include <vector>
 #include "./graphics/graphics.hpp"
@@ -130,8 +131,17 @@ namespace hoffman::isaiah {
 				if constexpr(std::is_same_v<T, double>) {
 					return std::stod(this->getToken());
 				}
-				else {
+				else if constexpr(std::is_same_v<T, int>) {
 					return std::stoi(this->getToken());
+				}
+				else if constexpr (std::is_same_v<T, float>) {
+					return std::stof(this->getToken());
+				}
+				else if constexpr (std::is_same_v<T, long long>) {
+					return std::stoll(this->getToken());
+				}
+				else {
+					static_assert(false, "An invalid type was specified for parseNumber().");
 				}
 			}
 			/// <summary>Attempts to parse the current input as a boolean constant. (Throws an exception
@@ -149,11 +159,12 @@ namespace hoffman::isaiah {
 			}
 			/// <summary>Attempts to read and parse a list from the input stream.</summary>
 			/// <returns>The items in the list.</returns>
-			std::vector<std::wstring> readList() {
+			template <typename T = std::wstring>
+			std::vector<T> readList() {
 				// Note that this call should have been preceded by this->readKeyValue() or this->getNext()
 				this->expectToken(TokenTypes::List, L"<");
 				const int start_line = this->getLine();
-				std::vector<std::wstring> list_items {};
+				std::vector<T> list_items {};
 				while (true) {
 					if (!this->getNext()) {
 						throw DataFileException {L"Data file stream is in an invalid state."
@@ -162,14 +173,24 @@ namespace hoffman::isaiah {
 					if (this->matchToken(TokenTypes::List, L">")) {
 						return list_items;
 					}
-					else if (this->matchTokenType(TokenTypes::List)) {
-						throw DataFileException {L"You cannot start a list inside a list.", this->getLine()};
+					if constexpr (std::is_same_v<T, std::wstring>) {
+						if (this->matchTokenType(TokenTypes::String)) {
+							list_items.emplace_back(this->parseString());
+						}
+						else if (this->matchTokenType(TokenTypes::Identifier)) {
+							list_items.emplace_back(this->getToken());
+						}
+						else {
+							throw DataFileException {L"Expected a string or an identifier within the list.", this->getLine()};
+						}
 					}
-					else if (this->matchTokenType(TokenTypes::Section) || this->matchTokenType(TokenTypes::Object)) {
-						throw DataFileException {L"Objects and section headers are not allowed in lists.",
-							this->getLine()};
+					else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, double>
+						|| std::is_same_v<T, float> || std::is_same_v<T, long long>) {
+						list_items.emplace_back(this->parseNumber<T>());
 					}
-					list_items.emplace_back(this->getToken());
+					else {
+						static_assert(false, "An invalid type was specified for readList.");
+					}
 				}
 			}
 			/// <summary>Attempts to read and parse a color value from the input, returning
@@ -180,13 +201,12 @@ namespace hoffman::isaiah {
 #pragma warning(disable: 26444) // ES84: Avoid unnamed objects with custom construction/destruction. (No Idea...)
 				this->readKeyValue(L"color");
 #pragma warning(pop)
-				auto my_list = this->readList();
+				auto my_list = this->readList<float>();
 				if (my_list.size() != 4) {
 					throw DataFileException {L"The color property takes a list of four numbers that"
 						L" indicate the levels of Red, Green, Blue, and Alpha respectively.", this->getLine()};
 				}
-				return graphics::Color {std::stof(my_list[0]), std::stof(my_list[1]), std::stof(my_list[2]),
-					std::stof(my_list[3])};
+				return graphics::Color {my_list[0], my_list[1], my_list[2], my_list[3]};
 			}
 			/// <summary>Attempts to read and parse a shape constant from the input, returning
 			/// the shape type on success and throwing an exception on failure.</summary>
