@@ -546,10 +546,10 @@ namespace hoffman::isaiah {
 				else {
 					const std::wstring fmethod_type_str = my_parser.getToken();
 					my_parser.readKeyValue(L"angles"s);
-					auto fm_angle_strs = my_parser.readList();
+					auto fm_angle_strs = my_parser.readList<double>();
 					std::vector<double> fm_angles {};
 					for (auto& a : fm_angle_strs) {
-						double base_angle_degrees = std::stod(a);
+						double base_angle_degrees = a;
 						while (base_angle_degrees < -180.0 || base_angle_degrees > 180.0) {
 							if (base_angle_degrees > 180.0) {
 								base_angle_degrees -= 360.0;
@@ -865,7 +865,131 @@ namespace hoffman::isaiah {
 			if (version >= 2) {
 				my_parser.getNext();
 				my_parser.expectToken(util::file::TokenTypes::Section, L"level_generation");
-				// TODO: Implement this code.
+				my_parser.readKeyValue(L"start_level");
+				const int start_lv = my_parser.parseNumber<int>();
+				util::file::DataFileParser::validateNumberMinBound<int>(start_lv, 1, L"Start level", my_parser.getLine(), true);
+				// Color data
+				my_parser.readKeyValue(L"color_data");
+				my_parser.expectToken(util::file::TokenTypes::Object, L"{");
+				my_parser.getNext();
+				std::vector<GlobalLevelColorData> my_cdata {};
+				while (my_parser.matchToken(util::file::TokenTypes::Object, L"{")) {
+					my_parser.readKeyValue(L"name");
+					const std::wstring cname = my_parser.parseString();
+					my_parser.readKeyValue(L"z_difficulty");
+					const double z_score = my_parser.parseNumber();
+					// Todo: Check for repeat z-scores as that is bound to be a mistake.
+					my_cdata.emplace_back(cname, z_score);
+					my_parser.getNext();
+					my_parser.expectToken(util::file::TokenTypes::Object, L"}");
+					my_parser.getNext();
+				}
+				my_parser.expectToken(util::file::TokenTypes::Object, L"}");
+				// Enemy data
+				my_parser.readKeyValue(L"enemy_data");
+				my_parser.expectToken(util::file::TokenTypes::Object, L"{");
+				my_parser.getNext();
+				std::vector<GlobalLevelEnemyData> my_edata {};
+				while (my_parser.matchToken(util::file::TokenTypes::Object, L"{")) {
+					my_parser.readKeyValue(L"name");
+					const std::wstring ename = my_parser.parseString();
+					try {
+						(void)this->getEnemyType(ename);
+						for (const auto& edata : my_edata) {
+							if (edata.getType()->getName() == ename) {
+								throw util::file::DataFileException {L"Repeat enemy type: `"s + ename + L"`"s, my_parser.getLine()};
+							}
+						}
+					}
+					catch (const std::out_of_range&) {
+						throw util::file::DataFileException {L"Unknown enemy type: `"s + ename + L"`"s, my_parser.getLine()};
+					}
+					my_parser.readKeyValue(L"color");
+					const std::wstring cname = my_parser.parseString();
+					bool did_find = false;
+					for (const auto& cdata : my_cdata) {
+						if (cdata.getName() == cname) {
+							did_find = true;
+							break;
+						}
+					}
+					if (!did_find) {
+						throw util::file::DataFileException {L"No color data associated with `" + cname + L"`", my_parser.getLine()};
+					}
+					my_parser.readKeyValue(L"z_archetype_difficulty");
+					const double z_score = my_parser.parseNumber<double>();
+					// TODO: Check for repeat z-scores.
+					my_parser.readKeyValue(L"extra_count_mu");
+					const double ec_mu = my_parser.parseNumber<double>();
+					my_parser.readKeyValue(L"extra_count_increase");
+					const double ec_increase = my_parser.parseNumber<double>();
+					util::file::DataFileParser::validateNumberMinBound(ec_increase, 0.0, L"Extra count increase", my_parser.getLine(), true);
+					my_parser.readKeyValue(L"extra_count_sigma");
+					const double ec_sigma = my_parser.parseNumber<double>();
+					util::file::DataFileParser::validateNumberMinBound(ec_sigma, 0.0, L"Extra count sigma", my_parser.getLine(), true);
+					const LevelNormalRandomVariable ec_var {NormalRandomVariable {ec_mu, ec_sigma}, ec_increase};
+					my_parser.readKeyValue(L"spawn_times");
+					const auto spawn_times_vec = my_parser.readList<int>();
+					if (spawn_times_vec.size() != 3) {
+						throw util::file::DataFileException {L"Spawn times should consist of three values specifying"
+							L" the spawn delay (in ms) for dense, normal, and sparse values.", my_parser.getLine()};
+					}
+					for (const auto my_time : spawn_times_vec) {
+						util::file::DataFileParser::validateNumber(my_time, 10, 10'000,
+							L"Spawn times (ms)", my_parser.getLine(), true, true);
+					}
+					const std::array<int, 3> spawn_times {
+						spawn_times_vec.at(0), spawn_times_vec.at(1), spawn_times.at(2)
+					};
+					my_parser.getNext();
+					my_parser.expectToken(util::file::TokenTypes::Object, L"}");
+					my_parser.getNext();
+					my_edata.emplace_back(*this, ename, cname, z_score, ec_var, spawn_times);
+				}
+				my_parser.expectToken(util::file::TokenTypes::Object, L"}");
+				// Miscellaneous stuff to load with the level configurer.
+				my_parser.readKeyValue(L"wave_difficulty_mu");
+				const double wd_mu = my_parser.parseNumber<double>();
+				my_parser.readKeyValue(L"wave_difficulty_increase");
+				const double wd_increase = my_parser.parseNumber<double>();
+				util::file::DataFileParser::validateNumberMinBound(wd_increase, 0.0, L"Wave difficulty increase", my_parser.getLine(), true);
+				my_parser.readKeyValue(L"wave_difficulty_sigma");
+				const double wd_sigma = my_parser.parseNumber<double>();
+				util::file::DataFileParser::validateNumberMinBound(wd_sigma, 0.0, L"Wave difficulty sigma", my_parser.getLine(), true);
+				const LevelNormalRandomVariable wd_var {NormalRandomVariable {wd_mu, wd_sigma}, wd_increase};
+				my_parser.readKeyValue(L"group_difficulty_mu");
+				const double gd_mu = my_parser.parseNumber<double>();
+				my_parser.readKeyValue(L"group_difficulty_increase");
+				const double gd_increase = my_parser.parseNumber<double>();
+				util::file::DataFileParser::validateNumberMinBound(gd_increase, 0.0, L"Group difficulty increase", my_parser.getLine(), true);
+				my_parser.readKeyValue(L"group_difficulty_sigma");
+				const double gd_sigma = my_parser.parseNumber<double>();
+				util::file::DataFileParser::validateNumberMinBound(gd_sigma, 0.0, L"Group difficulty sigma", my_parser.getLine(), true);
+				const LevelNormalRandomVariable gd_var {NormalRandomVariable {gd_mu, gd_sigma}, gd_increase};
+				my_parser.readKeyValue(L"wave_delay");
+				const int wd = my_parser.parseNumber<int>();
+				my_parser.readKeyValue(L"group_delay");
+				const int gd = my_parser.parseNumber<int>();
+				my_parser.readKeyValue(L"num_waves_mu");
+				const double nw_mu = my_parser.parseNumber<double>();
+				my_parser.readKeyValue(L"num_waves_increase");
+				const double nw_increase = my_parser.parseNumber<double>();
+				util::file::DataFileParser::validateNumberMinBound(nw_increase, 0.0, L"Number of waves increase", my_parser.getLine(), true);
+				my_parser.readKeyValue(L"num_waves_sigma");
+				const double nw_sigma = my_parser.parseNumber<double>();
+				util::file::DataFileParser::validateNumberMinBound(nw_sigma, 0.0, L"Number of waves sigma", my_parser.getLine(), true);
+				const LevelNormalRandomVariable nw_var {NormalRandomVariable {nw_mu, nw_sigma}, nw_increase};
+				my_parser.readKeyValue(L"num_groups_mu");
+				const double ng_mu = my_parser.parseNumber<double>();
+				my_parser.readKeyValue(L"num_groups_increase");
+				const double ng_increase = my_parser.parseNumber<double>();
+				util::file::DataFileParser::validateNumberMinBound(ng_increase, 0.0, L"Number of groups increase", my_parser.getLine(), true);
+				my_parser.readKeyValue(L"num_groups_sigma");
+				const double ng_sigma = my_parser.parseNumber<double>();
+				util::file::DataFileParser::validateNumberMinBound(ng_sigma, 0.0, L"Number of groups sigma", my_parser.getLine(), true);
+				const LevelNormalRandomVariable ng_var {NormalRandomVariable {ng_mu, ng_sigma}, ng_increase};
+				this->my_level_generator = std::make_unique<LevelGenerator>(start_lv, my_cdata, my_edata,
+					wd_var, gd_var, nw_var, ng_var, wd, gd);
 			}
 		}
 
@@ -911,28 +1035,14 @@ namespace hoffman::isaiah {
 							my_parser.getLine()};
 					}
 					my_parser.readKeyValue(L"extra_count"s);
-					int enemy_count = static_cast<int>(my_parser.parseNumber()) + this->challenge_level + 2;
-					util::file::DataFileParser::validateNumberMinBound(enemy_count - this->challenge_level - 2, 0,
+					const int extra_count = my_parser.parseNumber<int>();
+					util::file::DataFileParser::validateNumberMinBound(extra_count, 0,
 						L"Extra count", my_parser.getLine(), true);
 					my_parser.readKeyValue(L"enemy_spawn_delay"s);
 					const int enemy_spawn_delay = static_cast<int>(my_parser.parseNumber());
 					util::file::DataFileParser::validateNumber(enemy_spawn_delay, 10, 10'000,
 						L"Enemy spawn delay (ms)", my_parser.getLine(), true, true);
-					std::queue<std::unique_ptr<Enemy>> my_enemy_spawns {};
-					if (etype->isUnique()) {
-						enemy_count -= this->getChallengeLevel() + 1;
-					}
-					pathfinding::Pathfinder my_pathfinder {this->getMap(), etype->isFlying(), etype->canMoveDiagonally(),
-						etype->getDefaultStrategy()};
-					my_pathfinder.findPath(this->challenge_level / 10.0);
-					for (int i = 0; i < enemy_count; ++i) {
-						auto my_enemy = std::make_unique<Enemy>(this->getDeviceResources(), etype,
-							graphics::Color {0.f, 0.f, 0.f, 1.f}, my_pathfinder,
-							this->getMap().getTerrainGraph(etype->isFlying()).getStartNode()->getGameX() + 0.5,
-							this->getMap().getTerrainGraph(etype->isFlying()).getStartNode()->getGameY() + 0.5,
-							this->level, this->difficulty, this->challenge_level);
-						my_enemy_spawns.emplace(std::move(my_enemy));
-					}
+					std::queue<std::unique_ptr<Enemy>> my_enemy_spawns {EnemyGroup::createEnemies(etype, extra_count, *this)};
 					auto my_group = std::make_unique<EnemyGroup>(std::move(my_enemy_spawns), enemy_spawn_delay);
 					my_wave_groups.emplace_front(std::move(my_group));
 					my_parser.getNext();
