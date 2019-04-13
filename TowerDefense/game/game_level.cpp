@@ -33,7 +33,7 @@ namespace hoffman::isaiah::game {
 	}
 
 	std::queue<std::unique_ptr<Enemy>> EnemyGroup::createEnemies(const EnemyType* etype, int extra_count, const MyGame& my_game) {
-		const int enemy_count = etype->isUnique() ? my_game.getChallengeLevel() + 1 : my_game.getChallengeLevel() + extra_count + 2;
+		const int enemy_count = etype->isUnique() ? 1 + extra_count : my_game.getChallengeLevel() + extra_count + 2;
 		pathfinding::Pathfinder my_pathfinder {my_game.getMap(), etype->isFlying(), etype->canMoveDiagonally(),
 			etype->getDefaultStrategy()};
 		my_pathfinder.findPath(my_game.getChallengeLevel() / 10.0);
