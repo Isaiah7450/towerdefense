@@ -544,8 +544,8 @@ namespace hoffman::isaiah {
 					{
 						// Display info about placed towers.
 						if (!game::g_my_game->isInLevel()) {
-							const auto gx = static_cast<int>(graphics::convertToGameX(GET_X_LPARAM(msg.lParam)));
-							const auto gy = static_cast<int>(graphics::convertToGameY(GET_Y_LPARAM(msg.lParam)));
+							const auto gx = static_cast<int>(game::g_my_game->getMap().convertToGameX(GET_X_LPARAM(msg.lParam)));
+							const auto gy = static_cast<int>(game::g_my_game->getMap().convertToGameY(GET_Y_LPARAM(msg.lParam)));
 							const bool pause_state = game::g_my_game->isPaused();
 							if (!pause_state) {
 								game::g_my_game->togglePause();
@@ -566,8 +566,8 @@ namespace hoffman::isaiah {
 					case WM_LBUTTONDOWN:
 					{
 						// Obtain start coordinates
-						const auto gx = static_cast<int>(graphics::convertToGameX(GET_X_LPARAM(msg.lParam)));
-						const auto gy = static_cast<int>(graphics::convertToGameY(GET_Y_LPARAM(msg.lParam)));
+						const auto gx = static_cast<int>(game::g_my_game->getMap().convertToGameX(GET_X_LPARAM(msg.lParam)));
+						const auto gy = static_cast<int>(game::g_my_game->getMap().convertToGameY(GET_Y_LPARAM(msg.lParam)));
 						if (game::g_my_game->getMap().getTerrainGraph(false).verifyCoordinates(gx, gy)) {
 							this->start_gx = gx;
 							this->start_gy = gy;
@@ -579,8 +579,8 @@ namespace hoffman::isaiah {
 					{
 						if (msg.wParam == MK_LBUTTON) {
 							// Update end coordinates
-							const auto gx = static_cast<int>(graphics::convertToGameX(GET_X_LPARAM(msg.lParam)));
-							const auto gy = static_cast<int>(graphics::convertToGameY(GET_Y_LPARAM(msg.lParam)));
+							const auto gx = static_cast<int>(game::g_my_game->getMap().convertToGameX(GET_X_LPARAM(msg.lParam)));
+							const auto gy = static_cast<int>(game::g_my_game->getMap().convertToGameY(GET_Y_LPARAM(msg.lParam)));
 							if (game::g_my_game->getMap().getTerrainGraph(false).verifyCoordinates(gx, gy)) {
 								this->end_gx = gx;
 								this->end_gy = gy;
@@ -600,8 +600,8 @@ namespace hoffman::isaiah {
 						// Update end coordinates
 						const auto end_sx = static_cast<float>(GET_X_LPARAM(msg.lParam));
 						const auto end_sy = static_cast<float>(GET_Y_LPARAM(msg.lParam));
-						const auto new_gx = static_cast<int>(graphics::convertToGameX(end_sx));
-						const auto new_gy = static_cast<int>(graphics::convertToGameY(end_sy));
+						const auto new_gx = static_cast<int>(game::g_my_game->getMap().convertToGameX(end_sx));
+						const auto new_gy = static_cast<int>(game::g_my_game->getMap().convertToGameY(end_sy));
 						this->end_gx = math::get_max(new_gx, this->start_gx);
 						this->end_gy = math::get_max(new_gy, this->start_gy);
 						this->start_gx = math::get_min(this->start_gx, new_gx);
@@ -655,8 +655,8 @@ namespace hoffman::isaiah {
 					case WM_RBUTTONUP:
 					{
 						// Get coordinates
-						const auto my_gx = static_cast<int>(graphics::convertToGameX(GET_X_LPARAM(msg.lParam)));
-						const auto my_gy = static_cast<int>(graphics::convertToGameY(GET_Y_LPARAM(msg.lParam)));
+						const auto my_gx = static_cast<int>(game::g_my_game->getMap().convertToGameX(GET_X_LPARAM(msg.lParam)));
+						const auto my_gy = static_cast<int>(game::g_my_game->getMap().convertToGameY(GET_Y_LPARAM(msg.lParam)));
 						const auto my_new_lparam = MAKELPARAM(my_gx, my_gy);
 						PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_TOWERS_SELL_TOWER, my_new_lparam);
 						break;

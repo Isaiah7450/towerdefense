@@ -20,28 +20,21 @@ namespace hoffman::isaiah {
 			graph.start_node = nullptr;
 			graph.goal_node = nullptr;
 			// First, read in the number of rows and columns of the grid
-			// and set the global variables appropriately
-			is >> graphics::grid_height >> graphics::grid_width;
+			int grid_rows = 0, grid_cols = 0;
+			is >> grid_rows >> grid_cols;
 			// Next, read the contents of the grid
-			for (int i = 0; i < graphics::grid_height; ++i) {
+			for (int i = 0; i < grid_rows; ++i) {
 				std::vector<GraphNode> new_row {};
-				for (int j = 0; j < graphics::grid_width; ++j) {
+				for (int j = 0; j < grid_cols; ++j) {
 					int w = 0;
 					is >> w;
-					/*
-					 * Pretty sure this is no longer needed.
-					if (w == 0) {
-						// 100 makes manually editting a bit difficult...
-						w = GraphNode::blocked_space_weight;
-					}
-					*/
 					new_row.emplace_back(j, i, w);
 				}
 				graph.nodes.emplace_back(new_row);
 			}
 			// Check that we read the required number of nodes
-			if (graph.getWidth() != graphics::grid_width ||
-				graph.getHeight() != graphics::grid_height ||
+			if (graph.getRows() != grid_rows ||
+				graph.getColumns() != grid_cols ||
 				is.fail()) {
 				throw std::runtime_error {"Error reading graph: not enough nodes were read "
 					"or input file does not exist."};
@@ -60,11 +53,6 @@ namespace hoffman::isaiah {
 		}
 
 		std::wostream& operator<<(std::wostream& os, const Grid& graph) {
-			/*
-			if (!graph.getStartNode() || !graph.getGoalNode()) {
-				throw std::runtime_error {"Cannot output a graph that lacks a starting and ending location."};
-			}
-			*/
 			// Width and height
 			os << graph.getRows() << L" " << graph.getColumns() << L"\n";
 			// Output grid contents
@@ -139,34 +127,36 @@ namespace hoffman::isaiah {
 			constexpr const graphics::Color air_start_color = graphics::Color {0.40f, 0.40f, 0.40f, 0.65f};
 			constexpr const graphics::Color air_end_color = graphics::Color {0.90f, 0.90f, 0.90f, 0.65f};
 			constexpr const graphics::Color white_color = graphics::Color {1.f, 1.f, 1.f, 0.75f};
-			for (int gx = 0; gx < this->getTerrainGraph(false).getWidth(); ++gx) {
-				for (int gy = 0; gy < this->getTerrainGraph(false).getHeight(); ++gy) {
+			const int grid_width = this->getWidth();
+			const int grid_height = this->getHeight();
+			for (int gx = 0; gx < grid_width; ++gx) {
+				for (int gy = 0; gy < grid_height; ++gy) {
 					const auto& gnode = this->getTerrainGraph(false).getNode(gx, gy);;
 					const auto& anode = this->getTerrainGraph(true).getNode(gx, gy);
 					const auto weight_diff = gnode.getWeight() - anode.getWeight();
 					if (gnode.isBlocked() && anode.isBlocked()) {
 						// Mountains: Blocked to all
-						renderer.paintSquare(gx, gy, outline_color, mountain_color);
+						renderer.paintSquare(*this, gx, gy, outline_color, mountain_color);
 					}
 					else if (gnode.isBlocked()) {
 						// Ocean: Blocked to ground
-						renderer.paintSquare(gx, gy, outline_color, ocean_color);
+						renderer.paintSquare(*this, gx, gy, outline_color, ocean_color);
 					}
 					else if (anode.isBlocked()) {
 						// Cave: Blocked to air
-						renderer.paintSquare(gx, gy, outline_color, cave_color);
+						renderer.paintSquare(*this, gx, gy, outline_color, cave_color);
 					}
 					else if (weight_diff > 0) {
 						// Swamp: More difficult for ground troops
-						renderer.paintSquare(gx, gy, outline_color, swamp_color);
+						renderer.paintSquare(*this, gx, gy, outline_color, swamp_color);
 					}
 					else if (weight_diff < 0) {
 						// Forest: More difficult for air troops
-						renderer.paintSquare(gx, gy, outline_color, forest_color);
+						renderer.paintSquare(*this, gx, gy, outline_color, forest_color);
 					}
 					else {
 						// Grass: Equal weights
-						renderer.paintSquare(gx, gy, outline_color, grass_color);
+						renderer.paintSquare(*this, gx, gy, outline_color, grass_color);
 					}
 				} // End inner for
 			} // End outer for
@@ -175,30 +165,29 @@ namespace hoffman::isaiah {
 			const auto* ground_end_node = this->getTerrainGraph(false).getGoalNode();
 			const auto* air_start_node = this->getTerrainGraph(true).getStartNode();
 			const auto* air_end_node = this->getTerrainGraph(true).getGoalNode();
-			renderer.paintSquare(ground_start_node->getGameX(), ground_start_node->getGameY(),
+			renderer.paintSquare(*this, ground_start_node->getGameX(), ground_start_node->getGameY(),
 				transparent_color, ground_start_color);
-			renderer.paintSquare(ground_end_node->getGameX(), ground_end_node->getGameY(),
+			renderer.paintSquare(*this, ground_end_node->getGameX(), ground_end_node->getGameY(),
 				transparent_color, ground_end_color);
-			renderer.paintSquare(air_start_node->getGameX(), air_start_node->getGameY(),
+			renderer.paintSquare(*this, air_start_node->getGameX(), air_start_node->getGameY(),
 				transparent_color, air_start_color);
-			renderer.paintSquare(air_end_node->getGameX(), air_end_node->getGameY(),
+			renderer.paintSquare(*this, air_end_node->getGameX(), air_end_node->getGameY(),
 				transparent_color, air_end_color);
 			// Make it clearer which points are the start locations.
-			const auto cs_width = graphics::getGameSquareWidth<FLOAT>();
-			const auto cs_height = graphics::getGameSquareHeight<FLOAT>();
-			const auto ground_start_lsx = static_cast<FLOAT>(graphics::convertToScreenX(ground_start_node->getGameX()));
-			const auto ground_start_tsy = static_cast<FLOAT>(graphics::convertToScreenY(ground_start_node->getGameY()));
+			const auto cs_width = this->getGameSquareWidth<FLOAT>();
+			const auto cs_height = this->getGameSquareHeight<FLOAT>();
+			const auto ground_start_lsx = static_cast<FLOAT>(this->convertToScreenX(ground_start_node->getGameX()));
+			const auto ground_start_tsy = static_cast<FLOAT>(this->convertToScreenY(ground_start_node->getGameY()));
 			renderer.drawText(L"GS", white_color, renderer.createRectangle(ground_start_lsx,
 				ground_start_tsy, cs_width, cs_height));
-			const auto air_start_lsx = static_cast<FLOAT>(graphics::convertToScreenX(air_start_node->getGameX()));
-			const auto air_start_tsy = static_cast<FLOAT>(graphics::convertToScreenY(air_start_node->getGameY()));
+			const auto air_start_lsx = static_cast<FLOAT>(this->convertToScreenX(air_start_node->getGameX()));
+			const auto air_start_tsy = static_cast<FLOAT>(this->convertToScreenY(air_start_node->getGameY()));
 			renderer.drawText(L"AS", white_color, renderer.createRectangle(air_start_lsx,
 				air_start_tsy, cs_width, cs_height));
 		}
 
 		void GameMap::draw(const graphics::Renderer2D& renderer, bool in_editor) const noexcept {
 			this->draw(renderer);
-
 			if (in_editor) {
 				constexpr const graphics::Color my_color = graphics::Color {1.f, 1.f, 1.f, 0.75f};
 				const auto ground_active = terrain_editor::g_my_editor->areGroundWeightsActive();
@@ -206,17 +195,17 @@ namespace hoffman::isaiah {
 				if (!ground_active && !air_active) {
 					return;
 				}
-				for (int gx = 0; gx < this->getTerrainGraph(false).getWidth(); ++gx) {
-					for (int gy = 0; gy < this->getTerrainGraph(false).getHeight(); ++gy) {
+				const auto node_width = this->getGameSquareWidth<float>();
+				const auto node_height = this->getGameSquareHeight<float>();
+				for (int gx = 0; gx < this->getWidth(); ++gx) {
+					for (int gy = 0; gy < this->getHeight(); ++gy) {
 						const auto& gnode = this->getTerrainGraph(false).getNode(gx, gy);
 						const auto& anode = this->getTerrainGraph(true).getNode(gx, gy);
 						if (gnode.isBlocked() || anode.isBlocked()) {
 							continue;
 						}
-						const auto node_lsx = static_cast<float>(graphics::convertToScreenX(gnode.getGameX()));
-						const auto node_tsy = static_cast<float>(graphics::convertToScreenY(gnode.getGameY()));
-						const auto node_width = graphics::getGameSquareWidth<float>();
-						const auto node_height = graphics::getGameSquareHeight<float>();
+						const auto node_lsx = static_cast<float>(this->convertToScreenX(gnode.getGameX()));
+						const auto node_tsy = static_cast<float>(this->convertToScreenY(gnode.getGameY()));
 						if (ground_active && air_active) {
 							const auto weight_string = std::to_wstring(gnode.getWeight()) + L"|"
 								+ std::to_wstring(anode.getWeight());

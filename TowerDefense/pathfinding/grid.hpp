@@ -16,16 +16,13 @@ namespace hoffman::isaiah {
 			/// <summary>Creates an empty grid with grid_width columns and grid_height rows.
 			/// (Those numbers are global psuedo-constants.)</summary>
 			Grid() noexcept :
-				Grid(graphics::grid_height, graphics::grid_width) {
+				Grid(40, 35) {
 			}
 			/// <summary>Creates an empty grid with the specified width and height.</summary>
 			/// <param name="rows">The number of rows in the grid.</param>
 			/// <param name="cols">The number of columns in the grid.</param>
 			Grid(int rows, int cols) :
 				nodes {} {
-				// Store values (for drawing purposes)
-				graphics::grid_height = rows;
-				graphics::grid_width = cols;
 				// Reset the grid nodes
 				for (int i = 0; i < rows; ++i) {
 					std::vector<GraphNode> new_row {};
@@ -89,6 +86,44 @@ namespace hoffman::isaiah {
 					}
 					this->nodes.emplace_back(new_row);
 				}
+			}
+
+			// Measurements and coordinate conversions.
+			/// <returns>The width of a single game square based on this grid's width.</returns>
+			template <typename T>
+			T getGameSquareWidth() const noexcept {
+				return static_cast<T>(graphics::screen_width - (graphics::getLeftMarginSize() + graphics::getRightMarginSize()))
+					/ static_cast<T>(this->getWidth());
+			}
+			/// <returns>The height of a single game square based on this grid's height.</returns>
+			template <typename T>
+			T getGameSquareHeight() const noexcept {
+				return static_cast<T>(graphics::screen_height - (graphics::getTopMarginSize() + graphics::getBottomMarginSize()))
+					/ static_cast<T>(this->getHeight());
+			}
+			/// <summary>Converts a screen x-coordinate to a game x-coordinate.</summary>
+			/// <param name="sx">The screen x-coordinate to convert.</param>
+			/// <returns>The equivalent game x-coordinate.</returns>
+			double convertToGameX(double sx) const noexcept {
+				return (sx - graphics::getLeftMarginSize()) / this->getGameSquareWidth<double>();
+			}
+			/// <summary>Converts a game x-coordinate to a screen x-coordinate.</summary>
+			/// <param name="gx">The game x-coordinate to convert.</param>
+			/// <returns>The equivalent screen x-coordinate.</returns>
+			double convertToScreenX(double gx) const noexcept {
+				return (gx * this->getGameSquareWidth<double>()) + graphics::getLeftMarginSize();
+			}
+			/// <summary>Converts a screen y-coordinate to a game y-coordinate.</summary>
+			/// <param name="sy">The screen y-coordinate to convert.</param>
+			/// <returns>The equivalent game y-coordinate.</returns>
+			double convertToGameY(double sy) const noexcept {
+				return (sy - graphics::getTopMarginSize()) / this->getGameSquareHeight<double>();
+			}
+			/// <summary>Converts a game y-coordinate to a screen y-coordinate.</summary>
+			/// <param name="gy">The game y-coordinate to convert.</param>
+			/// <returns>The equivalent screen y-coordinate.</returns>
+			double convertToScreenY(double gy) const noexcept {
+				return (gy * this->getGameSquareHeight<double>()) + graphics::getTopMarginSize();
 			}
 
 			// Getters
@@ -214,7 +249,7 @@ namespace hoffman::isaiah {
 				this->air_influence_graph = std::make_unique<pathfinding::Grid>(air);
 			}
 
-			// Getters
+			// Convenience Getters
 			int getRows() const noexcept {
 				return this->getTerrainGraph(false).getRows();
 			}
@@ -227,6 +262,42 @@ namespace hoffman::isaiah {
 			int getWidth() const noexcept {
 				return this->getColumns();
 			}
+			/// <returns>The size in screen x-coordinates of a single rendered game square.</returns>
+			template <typename T>
+			T getGameSquareWidth() const noexcept {
+				return this->getTerrainGraph(false).getGameSquareWidth<T>();
+			}
+			/// <returns>The size in screen y-coordinates of a single rendered game square.</returns>
+			template <typename T>
+			T getGameSquareHeight() const noexcept {
+				return this->getTerrainGraph(false).getGameSquareHeight<T>();
+			}
+			// Measurement conversions.
+			/// <summary>Converts a screen x-coordinate to a game x-coordinate.</summary>
+			/// <param name="sx">The screen x-coordinate to convert.</param>
+			/// <returns>The equivalent game x-coordinate.</returns>
+			double convertToGameX(double sx) const noexcept {
+				return this->getTerrainGraph(false).convertToGameX(sx);
+			}
+			/// <summary>Converts a game x-coordinate to a screen x-coordinate.</summary>
+			/// <param name="gx">The game x-coordinate to convert.</param>
+			/// <returns>The equivalent screen x-coordinate.</returns>
+			double convertToScreenX(double gx) const noexcept {
+				return this->getTerrainGraph(false).convertToScreenX(gx);
+			}
+			/// <summary>Converts a screen y-coordinate to a game y-coordinate.</summary>
+			/// <param name="sy">The screen y-coordinate to convert.</param>
+			/// <returns>The equivalent game y-coordinate.</returns>
+			double convertToGameY(double sy) const noexcept {
+				return this->getTerrainGraph(false).convertToGameY(sy);
+			}
+			/// <summary>Converts a game y-coordinate to a screen y-coordinate.</summary>
+			/// <param name="gy">The game y-coordinate to convert.</param>
+			/// <returns>The equivalent screen y-coordinate.</returns>
+			double convertToScreenY(double gy) const noexcept {
+				return this->getTerrainGraph(false).convertToScreenY(gy);
+			}
+			// Other getters
 			/// <param name="get_air_graph">Set this true to return the air graph; otherwise,
 			/// the ground graph is returned.</param>
 			/// <returns>A constant reference to the requested terrain graph.</returns>

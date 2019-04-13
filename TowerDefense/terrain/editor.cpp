@@ -213,8 +213,6 @@ namespace hoffman::isaiah {
 								this->map->getTerrainGraph(false).setGoalNode(0, 0);
 								this->map->getTerrainGraph(true).setGoalNode(0, 0);
 								this->map->resetOtherGraphs();
-								graphics::grid_height = this->getMap().getHeight();
-								graphics::grid_width = this->getMap().getWidth();
 								// Disable revert to save --> No save exists!
 								constexpr MENUITEMINFO m_item {
 									sizeof(MENUITEMINFO), MIIM_STATE, 0, MFS_DISABLED,
@@ -328,8 +326,8 @@ namespace hoffman::isaiah {
 					case WM_LBUTTONDOWN:
 					{
 						// Obtain start coordinates
-						const auto gx = static_cast<int>(graphics::convertToGameX(GET_X_LPARAM(msg.lParam)));
-						const auto gy = static_cast<int>(graphics::convertToGameY(GET_Y_LPARAM(msg.lParam)));
+						const auto gx = static_cast<int>(this->getMap().convertToGameX(GET_X_LPARAM(msg.lParam)));
+						const auto gy = static_cast<int>(this->getMap().convertToGameY(GET_Y_LPARAM(msg.lParam)));
 						if (this->getMap().getTerrainGraph(false).verifyCoordinates(gx, gy)) {
 							this->start_gx = gx;
 							this->start_gy = gy;
@@ -341,8 +339,8 @@ namespace hoffman::isaiah {
 					{
 						if (msg.wParam == MK_LBUTTON) {
 							// Update end coordinates
-							const auto gx = static_cast<int>(graphics::convertToGameX(GET_X_LPARAM(msg.lParam)));
-							const auto gy = static_cast<int>(graphics::convertToGameY(GET_Y_LPARAM(msg.lParam)));
+							const auto gx = static_cast<int>(this->getMap().convertToGameX(GET_X_LPARAM(msg.lParam)));
+							const auto gy = static_cast<int>(this->getMap().convertToGameY(GET_Y_LPARAM(msg.lParam)));
 							if (this->getMap().getTerrainGraph(false).verifyCoordinates(gx, gy)) {
 								this->end_gx = gx;
 								this->end_gy = gy;
@@ -360,8 +358,8 @@ namespace hoffman::isaiah {
 					case WM_LBUTTONUP:
 					{
 						// Update end coordinates
-						const auto new_gx = static_cast<int>(graphics::convertToGameX(GET_X_LPARAM(msg.lParam)));
-						const auto new_gy = static_cast<int>(graphics::convertToGameY(GET_Y_LPARAM(msg.lParam)));
+						const auto new_gx = static_cast<int>(this->getMap().convertToGameX(GET_X_LPARAM(msg.lParam)));
+						const auto new_gy = static_cast<int>(this->getMap().convertToGameY(GET_Y_LPARAM(msg.lParam)));
 						this->end_gx = math::get_max(new_gx, this->start_gx);
 						this->end_gy = math::get_max(new_gy, this->start_gy);
 						this->start_gx = math::get_min(this->start_gx, new_gx);

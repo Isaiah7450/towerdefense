@@ -126,12 +126,12 @@ namespace hoffman::isaiah {
 			DrawMenuBar(hwnd);
 		}
 
-		void Renderer2D::paintSquare(double gx, double gy, Color o_color, Color f_color) const noexcept {
+		void Renderer2D::paintSquare(const game::GameMap& my_map, double gx, double gy, Color o_color, Color f_color) const noexcept {
 			this->setBrushColors(o_color, f_color);
-			const float slx = static_cast<float>(graphics::convertToScreenX(gx));
-			const float sty = static_cast<float>(graphics::convertToScreenY(gy));
-			const float sw = graphics::getGameSquareWidth<float>();
-			const float sh = graphics::getGameSquareHeight<float>();
+			const float slx = static_cast<float>(my_map.convertToScreenX(gx));
+			const float sty = static_cast<float>(my_map.convertToScreenY(gy));
+			const float sw = my_map.getGameSquareWidth<float>();
+			const float sh = my_map.getGameSquareHeight<float>();
 			const auto my_rect = this->createRectangle(slx, sty, sw, sh);
 			this->fillRectangle(my_rect);
 			this->outlineRectangle(my_rect);
@@ -247,14 +247,14 @@ namespace hoffman::isaiah {
 				while (!ground_path.empty()) {
 					auto my_node = ground_path.front();
 					ground_path.pop();
-					this->paintSquare(my_node.getGameX(), my_node.getGameY(), Color {0.f, 1.f, 0.f, 1.f},
+					this->paintSquare(my_game->getMap(), my_node.getGameX(), my_node.getGameY(), Color {0.f, 1.f, 0.f, 1.f},
 						Color {0.8f, 0.8f, 0.8f, 0.3f});
 				}
 				auto air_path = my_game->air_test_pf->findPath(0);
 				while (!air_path.empty()) {
 					auto my_node = air_path.front();
 					air_path.pop();
-					this->paintSquare(my_node.getGameX(), my_node.getGameY(), Color {1.f, 0.f, 0.f, 1.f},
+					this->paintSquare(my_game->getMap(), my_node.getGameX(), my_node.getGameY(), Color {1.f, 0.f, 0.f, 1.f},
 						Color {0.8f, 0.8f, 0.8f, 0.3f});
 				}
 			}
@@ -310,7 +310,7 @@ namespace hoffman::isaiah {
 				constexpr const graphics::Color f_color {0.8f, 0.8f, 0.8f, 0.2f};
 				for (int gx = min_gx; gx <= max_gx; ++gx) {
 					for (int gy = min_gy; gy <= max_gy; ++gy) {
-						this->paintSquare(gx, gy, o_color, f_color);
+						this->paintSquare(map, gx, gy, o_color, f_color);
 					}
 				}
 			}

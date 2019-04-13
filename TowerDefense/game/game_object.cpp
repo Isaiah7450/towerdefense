@@ -11,15 +11,16 @@
 
 namespace hoffman::isaiah {
 	namespace game {
-		GameObject::GameObject(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, graphics::shapes::ShapeTypes st,
+		GameObject::GameObject(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, const GameMap& game_map, graphics::shapes::ShapeTypes st,
 			graphics::Color o_color, graphics::Color f_color, double cgx, double cgy, double gw, double gh) :
 			sprite {nullptr},
+			my_map {game_map},
 			gx {cgx},
 			gy {cgy} {
-			const float csx = static_cast<float>(graphics::convertToScreenX(cgx));
-			const float csy = static_cast<float>(graphics::convertToScreenY(cgy));
-			float sw = static_cast<float>(gw) * graphics::getGameSquareWidth<float>();
-			float sh = static_cast<float>(gh) * graphics::getGameSquareHeight<float>();
+			const float csx = static_cast<float>(this->getGameMap().convertToScreenX(cgx));
+			const float csy = static_cast<float>(this->getGameMap().convertToScreenY(cgy));
+			float sw = static_cast<float>(gw) * this->getGameMap().getGameSquareWidth<float>();
+			float sh = static_cast<float>(gh) * this->getGameMap().getGameSquareHeight<float>();
 
 			switch (st) {
 			case graphics::shapes::ShapeTypes::Star:

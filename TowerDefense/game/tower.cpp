@@ -28,16 +28,15 @@ namespace hoffman::isaiah {
 				renderer.setOutlineColor(graphics::Color {0.7f, 0.f, 0.f, 0.8f});
 				renderer.outlineEllipse(renderer.createEllipse(static_cast<float>(this->getScreenX()),
 					static_cast<float>(this->getScreenY()),
-					static_cast<float>(this->getFiringRange() * graphics::getGameSquareWidth()),
-					static_cast<float>(this->getFiringRange() * graphics::getGameSquareHeight())));
+					static_cast<float>(this->getFiringRange() * this->getGameMap().getGameSquareWidth<double>()),
+					static_cast<float>(this->getFiringRange() * this->getGameMap().getGameSquareHeight<double>())));
 				// Also paint upgrade level.
 				constexpr const graphics::Color text_color {1.f, 0.2f, 1.f, 1.f};
 				if (this->getLevel() > 1) {
 					renderer.drawText(std::to_wstring(this->getLevel()), text_color,
-						renderer.createRectangle(static_cast<float>(graphics::convertToScreenX(this->getGameX() - 0.5)),
-							static_cast<float>(graphics::convertToScreenY(this->getGameY() - 0.5)),
-							static_cast<float>(graphics::getGameSquareWidth()),
-							static_cast<float>(graphics::getGameSquareHeight())));
+						renderer.createRectangle(static_cast<float>(this->getGameMap().convertToScreenX(this->getGameX() - 0.5)),
+							static_cast<float>(this->getGameMap().convertToScreenY(this->getGameY() - 0.5)),
+							this->getGameMap().getGameSquareWidth<float>(), this->getGameMap().getGameSquareHeight<float>()));
 				}
 			}
 			if (this->getVolleyShots() == 0) {
@@ -52,8 +51,8 @@ namespace hoffman::isaiah {
 				/ static_cast<float>(this->getVolleyShots());
 			const float reload_time_percent = static_cast<float>(this->frames_to_reload)
 				/ static_cast<float>(math::convertMillisecondsToFrames(this->getReloadDelay()));
-			const float bar_max_width = 0.7f * graphics::getGameSquareWidth<float>();
-			const float bar_height = 0.15f * graphics::getGameSquareHeight<float>();
+			const float bar_max_width = 0.7f * this->getGameMap().getGameSquareWidth<float>();
+			const float bar_height = 0.15f * this->getGameMap().getGameSquareHeight<float>();
 			const float ammo_bar_offset = 3.6f * bar_height;
 			// Roughly 3.6x the bar's height.
 //			const float ammo_bar_offset = 8.f * graphics::screen_height / 645.f;
@@ -252,13 +251,13 @@ namespace hoffman::isaiah {
 				const double gdx = target->getGameX() - this->getGameX();
 				const double gdy = target->getGameY() - this->getGameY();
 				const double theta = std::atan2(gdy, gdx);
-				return std::make_unique<Shot>(this->device_resources, stype, graphics::Color {1.f, 0.f, 1.f, 1.f},
+				return std::make_unique<Shot>(this->device_resources, this->getGameMap(), stype, graphics::Color {1.f, 0.f, 1.f, 1.f},
 					*this, theta);
 			}
 			++this->angle_index;
 			this->angle_index %= this->getBaseType()->getFiringMethod().getAngles().size();
 			// Note that the y-axis is inverted, so we need to correct the angle used here.
-			return std::make_unique<Shot>(this->device_resources, stype, graphics::Color {1.f, 0.f, 1.f, 1.f},
+			return std::make_unique<Shot>(this->device_resources, this->getGameMap(), stype, graphics::Color {1.f, 0.f, 1.f, 1.f},
 				*this, -this->getBaseType()->getFiringMethod().getAngles().at(this->angle_index));
 		}
 	}

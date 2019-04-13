@@ -10,6 +10,7 @@
 #include "./../globals.hpp"
 #include "./../graphics/graphics.hpp"
 #include "./../graphics/graphics_DX.hpp"
+#include "./../pathfinding/grid.hpp"
 #include "./game_object.hpp"
 #include "./tower_types.hpp"
 #include "./game_formulas.hpp"
@@ -28,9 +29,9 @@ namespace hoffman::isaiah {
 		class Tower : public GameObject {
 			friend class winapi::TowerUpgradeInfoDialog;
 		public:
-			Tower(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
+			Tower(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, const GameMap& my_map,
 				const TowerType* ttype, graphics::Color o_color, double build_gx, double build_gy) :
-				GameObject {dev_res, ttype->getShape(), o_color, ttype->getColor(), build_gx, build_gy,
+				GameObject {dev_res, my_map, ttype->getShape(), o_color, ttype->getColor(), build_gx, build_gy,
 					0.7f, 0.7f},
 				device_resources {dev_res},
 				base_type {ttype},

@@ -126,10 +126,10 @@ namespace hoffman::isaiah {
 			}
 		}
 
-		Enemy::Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
+		Enemy::Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, const GameMap& my_map,
 			const EnemyType* etype, graphics::Color o_color,
 			const GameMap& gmap, int level, double difficulty, int challenge_level) :
-			GameObject {dev_res, etype->getShape(), o_color, etype->getColor(),
+			GameObject {dev_res, my_map, etype->getShape(), o_color, etype->getColor(),
 			gmap.getTerrainGraph(etype->isFlying()).getStartNode()->getGameX() + 0.5,
 			gmap.getTerrainGraph(etype->isFlying()).getStartNode()->getGameY() + 0.5, 0.5, 0.5},
 			base_type {etype},
@@ -157,11 +157,11 @@ namespace hoffman::isaiah {
 			this->addEnemyBuffs();
 		}
 
-		Enemy::Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
+		Enemy::Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, const GameMap& my_map,
 			const EnemyType* etype, graphics::Color o_color,
 			pathfinding::Pathfinder pf, double start_gx, double start_gy,
 			int level, double difficulty, int challenge_level) :
-			GameObject {dev_res, etype->getShape(), o_color, etype->getColor(), start_gx, start_gy, 0.5, 0.5},
+			GameObject {dev_res, my_map, etype->getShape(), o_color, etype->getColor(), start_gx, start_gy, 0.5, 0.5},
 			base_type {etype},
 			my_pathfinder {pf},
 			my_path {pf.getPath()},
@@ -256,8 +256,8 @@ namespace hoffman::isaiah {
 			constexpr const graphics::Color armor_fill_color {0.0f, 0.0f, 0.8f, 0.9f};
 			constexpr const graphics::Color shield_fill_color {0.0, 0.8f, 0.8f, 0.9f};
 			const double hp_percent = this->getHealthPercentage();
-			const float bar_max_width = 0.4f * graphics::getGameSquareWidth<float>();
-			const float bar_height = 0.115f * graphics::getGameSquareHeight<float>();
+			const float bar_max_width = 0.4f * this->getGameMap().getGameSquareWidth<float>();
+			const float bar_height = 0.115f * this->getGameMap().getGameSquareHeight<float>();
 			const float hp_bar_offset = 3.23f * bar_height;
 			// Roughtly 3.23 * bar_height
 			// const float hp_bar_offset = 5.5f * graphics::screen_height / 645.f;

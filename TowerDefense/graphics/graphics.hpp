@@ -27,44 +27,6 @@ namespace hoffman::isaiah {
 	}
 
 	namespace graphics {
-		// Get margin sizes
-		constexpr double getLeftMarginSize() noexcept {
-			return graphics::screen_width * graphics::margin_left;
-		}
-		constexpr double getRightMarginSize() noexcept {
-			return graphics::screen_width * graphics::margin_right;
-		}
-		constexpr double getTopMarginSize() noexcept {
-			return graphics::screen_height * graphics::margin_top;
-		}
-		constexpr double getBottomMarginSize() noexcept {
-			return graphics::screen_height * graphics::margin_bottom;
-		}
-		// Measurements
-		template <typename T = double>
-		constexpr T getGameSquareWidth() noexcept {
-			return static_cast<T>(graphics::screen_width - (graphics::getLeftMarginSize() + graphics::getRightMarginSize()))
-				/ static_cast<T>(graphics::grid_width);
-		}
-		template <typename T = double>
-		constexpr T getGameSquareHeight() noexcept {
-			return static_cast<T>(graphics::screen_height - (graphics::getTopMarginSize() + graphics::getBottomMarginSize()))
-				/ static_cast<T>(graphics::grid_height);
-		}
-		// Coordinate conversion
-		constexpr double convertToGameX(double sx) noexcept {
-			return (sx - graphics::getLeftMarginSize()) / graphics::getGameSquareWidth();
-		}
-		constexpr double convertToScreenX(double gx) noexcept {
-			return (gx * graphics::getGameSquareWidth()) + graphics::getLeftMarginSize();
-		}
-		constexpr double convertToGameY(double sy) noexcept {
-			return (sy - graphics::getTopMarginSize()) / graphics::getGameSquareHeight();
-		}
-		constexpr double convertToScreenY(double gy) noexcept {
-			return (gy * graphics::getGameSquareHeight()) + graphics::getTopMarginSize();
-		}
-
 		// The alias isn't really necessary but D3DCOLORVALUE is defined
 		// in <d2d1.h>, so the alieas serves to make it where one is not
 		// using a structure not directly included in a file.
@@ -105,11 +67,12 @@ namespace hoffman::isaiah {
 			void updateSelectedTower(HWND hwnd, int selected_tower) const noexcept;
 
 			/// <summary>Paints a game square a certain color.</summary>
+			/// <param name="my_map">Reference to the game's terrain map.</param>
 			/// <param name="gx">The game x-coordinate of the square.</param>
 			/// <param name="gy">The game y-coordinate of the square.</param>
 			/// <param name="o_color">The color to outline the square with.</param>
 			/// <param name="f_color">The color to fill the square with.</param>
-			void paintSquare(double gx, double gy, Color o_color, Color f_color) const noexcept;
+			void paintSquare(const game::GameMap& my_map, double gx, double gy, Color o_color, Color f_color) const noexcept;
 			/// <summary>Draws the outline of a geometry.</summary>
 			/// <param name="my_geom">The geometry to outline.</param>
 			/// <param name="o_color">The color to outline the geometry with.</param>

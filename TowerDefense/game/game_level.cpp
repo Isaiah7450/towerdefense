@@ -39,7 +39,7 @@ namespace hoffman::isaiah::game {
 		my_pathfinder.findPath(my_game.getChallengeLevel() / 10.0);
 		std::queue<std::unique_ptr<Enemy>> my_enemy_spawns {};
 		for (int i = 0; i < enemy_count; ++i) {
-			auto my_enemy = std::make_unique<Enemy>(my_game.getDeviceResources(), etype,
+			auto my_enemy = std::make_unique<Enemy>(my_game.getDeviceResources(), my_game.getMap(), etype,
 				graphics::Color {0.f, 0.f, 0.f, 1.f}, my_pathfinder,
 				my_game.getMap().getTerrainGraph(etype->isFlying()).getStartNode()->getGameX() + 0.5,
 				my_game.getMap().getTerrainGraph(etype->isFlying()).getStartNode()->getGameY() + 0.5,

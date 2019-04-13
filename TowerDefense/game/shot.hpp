@@ -19,13 +19,13 @@ namespace hoffman::isaiah {
 		/// <summary>Represents a projectile.</summary>
 		class Shot : public GameObject {
 		public:
-			Shot(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
+			Shot(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, const GameMap& my_map,
 				const ShotBaseType* stype, graphics::Color o_color, const Tower& ot, double angle);
 
 			/// <summary>Advances the projectile's state by one logical frame.</summary>
 			/// <param name"enemies">The list of enemies currently present in the game.</param>
 			/// <returns>True if this shot should be deleted; otherwise, false.</returns>
-			bool update(const GameMap& gmap, std::vector<std::unique_ptr<Enemy>>& enemies);
+			bool update(std::vector<std::unique_ptr<Enemy>>& enemies);
 		private:
 			/// <summary>The template type of this projectile.</summary>
 			const ShotBaseType* base_type;

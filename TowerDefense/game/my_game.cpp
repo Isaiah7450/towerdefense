@@ -160,7 +160,7 @@ namespace hoffman::isaiah {
 				// Update shots
 				std::vector<int> shots_to_remove {};
 				for (unsigned int i = 0; i < this->shots.size(); ++i) {
-					if (this->shots[i]->update(*this->map, this->enemies)) {
+					if (this->shots[i]->update(this->enemies)) {
 						shots_to_remove.emplace_back(i);
 					}
 				}
@@ -332,7 +332,7 @@ namespace hoffman::isaiah {
 				return;
 			}
 			this->player.changeMoney(-this->getTowerType(this->getSelectedTower())->getCost());
-			auto my_tower = std::make_unique<Tower>(this->device_resources, this->getTowerType(this->getSelectedTower()),
+			auto my_tower = std::make_unique<Tower>(this->device_resources, this->getMap(), this->getTowerType(this->getSelectedTower()),
 				graphics::Color {0.f, 0.f, 0.f, 1.0f}, gx + 0.5, gy + 0.5);
 			this->addTower(std::move(my_tower));
 			this->debugUpdate(DebugUpdateStates::Terrain_Changed);

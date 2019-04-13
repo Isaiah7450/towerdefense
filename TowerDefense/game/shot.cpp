@@ -16,16 +16,16 @@
 
 namespace hoffman::isaiah {
 	namespace game {
-		Shot::Shot(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res,
+		Shot::Shot(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, const GameMap& my_map,
 			const ShotBaseType* stype, graphics::Color o_color, const Tower& ot, double angle) :
-			GameObject {dev_res, stype->getShape(), o_color, stype->getColor(), ot.getGameX(), ot.getGameY(),
+			GameObject {dev_res, my_map, stype->getShape(), o_color, stype->getColor(), ot.getGameX(), ot.getGameY(),
 				0.3f, 0.3f},
 			base_type {stype},
 			origin_tower {ot},
 			theta {angle} {
 		}
 
-		bool Shot::update(const GameMap& gmap, std::vector<std::unique_ptr<Enemy>>& enemies) {
+		bool Shot::update(std::vector<std::unique_ptr<Enemy>>& enemies) {
 			// Update location
 			const double r = this->base_type->getSpeed() / game::logic_framerate;
 			this->translate(std::cos(this->theta) * r, std::sin(this->theta) * r);
@@ -57,16 +57,16 @@ namespace hoffman::isaiah {
 			const int igx = static_cast<int>(std::floor(this->getGameX()));
 			const int igy = static_cast<int>(std::floor(this->getGameY()));
 			const bool is_on_blocked_space = (igx >= 0 && igy >= 0
-				&& igx < gmap.getTerrainGraph(false).getWidth()
-				&& igy < gmap.getTerrainGraph(false).getHeight())
-				? gmap.getTerrainGraph(true).getNode(igx, igy).isBlocked()
-					&& gmap.getTerrainGraph(false).getNode(igx, igy).isBlocked()
+				&& igx < this->getGameMap().getTerrainGraph(false).getWidth()
+				&& igy < this->getGameMap().getTerrainGraph(false).getHeight())
+				? this->getGameMap().getTerrainGraph(true).getNode(igx, igy).isBlocked()
+					&& this->getGameMap().getTerrainGraph(false).getNode(igx, igy).isBlocked()
 				: true;
 			return i < enemies.size() || is_on_blocked_space
 				|| std::sqrt(tdx * tdx + tdy * tdy) > this->origin_tower.getFiringRange()
 				|| this->getGameX() < 0 || this->getGameY() < 0
-				|| this->getGameX() >= gmap.getTerrainGraph(false).getWidth()
-				|| this->getGameY() >= gmap.getTerrainGraph(false).getHeight();
+				|| this->getGameX() >= this->getGameMap().getTerrainGraph(false).getWidth()
+				|| this->getGameY() >= this->getGameMap().getTerrainGraph(false).getHeight();
 		}
 	}
 }

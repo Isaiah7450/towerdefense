@@ -52,8 +52,8 @@ namespace hoffman::isaiah {
 					return a.getF() > b.getF();
 				}
 			};
-			const auto determine_node_index = [](int x, int y) {
-				return y * graphics::grid_width + x;
+			const auto determine_node_index = [this](int x, int y) {
+				return y * this->terrain_graph.getWidth() + x;
 			};
 			// Get starts and ends of paths
 			auto& start_node = (start_x > -1 && start_y > -1)

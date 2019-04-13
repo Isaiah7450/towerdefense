@@ -40,6 +40,11 @@ namespace hoffman::isaiah {
 		class DeviceResources2D;
 	}
 
+	namespace game {
+		// Forward declarations
+		class GameMap;
+	}
+
 	namespace graphics {
 		// Interfaces
 		/// <summary>Interface for objects that can be drawn.</summary>
@@ -68,10 +73,20 @@ namespace hoffman::isaiah {
 		extern int screen_width;
 		/// <summary>The screen resolution height.</summary>
 		extern int screen_height;
-		/// <summary>The width of the game grid.</summary>
-		extern int grid_width;
-		/// <summary>The height of the game grid.</summary>
-		extern int grid_height;
+
+		// Get margin sizes
+		constexpr double getLeftMarginSize() noexcept {
+			return graphics::screen_width * graphics::margin_left;
+		}
+		constexpr double getRightMarginSize() noexcept {
+			return graphics::screen_width * graphics::margin_right;
+		}
+		constexpr double getTopMarginSize() noexcept {
+			return graphics::screen_height * graphics::margin_top;
+		}
+		constexpr double getBottomMarginSize() noexcept {
+			return graphics::screen_height * graphics::margin_bottom;
+		}
 	}
 
 	namespace pathfinding {
