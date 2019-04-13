@@ -31,6 +31,7 @@ namespace hoffman::isaiah {
 		class TowerType;
 		class Tower;
 		class GameLevel;
+		class LevelGenerator;
 
 		// Debug-related update states
 		enum class DebugUpdateStates {
@@ -77,6 +78,7 @@ namespace hoffman::isaiah {
 		class MyGame {
 			friend class graphics::Renderer2D;
 		public:
+			// Other stuff
 			MyGame(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res);
 			~MyGame() noexcept;
 			// Rule of 5:
@@ -221,6 +223,12 @@ namespace hoffman::isaiah {
 			int getSelectedTower() const noexcept {
 				return this->selected_tower;
 			}
+			int getLevelNumber() const noexcept {
+				return this->level;
+			}
+			double getDifficulty() const noexcept {
+				return this->difficulty;
+			}
 			int getChallengeLevel() const noexcept {
 				return this->challenge_level;
 			}
@@ -335,6 +343,8 @@ namespace hoffman::isaiah {
 			std::wstring resources_folder_path {L"./resources/"};
 			/// <summary>Stores the path to the userdata folder.</summary>
 			std::wstring userdata_folder_path {L"./userdata/"};
+			/// <summary>Stores the automatic level generator.</summary>
+			std::unique_ptr<LevelGenerator> my_level_generator {nullptr};
 			// Testing things
 			std::shared_ptr<pathfinding::Pathfinder> ground_test_pf {nullptr};
 			std::shared_ptr<pathfinding::Pathfinder> air_test_pf {nullptr};

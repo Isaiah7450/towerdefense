@@ -17,5 +17,29 @@ namespace hoffman::isaiah {
 			/// <summary>An integer distribution that gives values from 1 to 100 uniformly.</summary>
 			extern thread_local std::uniform_real_distribution<double> distro_uniform;
 		}
+
+		/// <summary>Represents a normally distributed random variable.</summary>
+		class NormalRandomVariable {
+		public:
+			/// <param name="mu">The mean of the random variable.</param>
+			/// <param name="sigma">The standard deviation of the random variable.</param>
+			NormalRandomVariable(double mu, double sigma) :
+				mean {mu},
+				standard_deviation {sigma},
+				distro_normal {mu, sigma} {
+			}
+
+			/// <returns>A random normally distributed value as specified by this class's data.</returns>
+			double operator()() const noexcept {
+				return this->distro_normal(rng::gen);
+			}
+		private:
+			/// <summary>The mean of the random variable.</summary>
+			double mean;
+			/// <summary>The standard deviation of the random variable.</summary>
+			double standard_deviation;
+			/// <summary>The normal distribution associated with the random variable.</summary>
+			mutable std::normal_distribution<double> distro_normal;
+		};
 	}
 }
