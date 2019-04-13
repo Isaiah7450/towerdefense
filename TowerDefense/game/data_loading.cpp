@@ -1060,7 +1060,6 @@ namespace hoffman::isaiah {
 				my_level_waves.emplace_front(std::move(my_wave));
 			} while (my_parser.getNext());
 			this->my_level = std::make_unique<GameLevel>(this->level, std::move(my_level_waves), wave_spawn_delay);
-			this->my_level_enemy_count = this->my_level->getEnemyCount();
 		}
 
 		void MyGame::saveGame(std::wostream& save_file) const {

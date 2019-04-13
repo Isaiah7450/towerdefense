@@ -269,6 +269,7 @@ namespace hoffman::isaiah {
 					// Though it is not really meant to be used for levels under the threshold, it should still work despite such.
 					this->my_level = this->my_level_generator->generateLevel(this->getLevelNumber(), *this);
 				}
+				this->my_level_enemy_count = this->my_level->getEnemyCount();
 			}
 		}
 
