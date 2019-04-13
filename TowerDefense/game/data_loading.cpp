@@ -939,7 +939,7 @@ namespace hoffman::isaiah {
 							L"Spawn times (ms)", my_parser.getLine(), true, true);
 					}
 					const std::array<int, 3> spawn_times {
-						spawn_times_vec.at(0), spawn_times_vec.at(1), spawn_times.at(2)
+						spawn_times_vec.at(0), spawn_times_vec.at(1), spawn_times_vec.at(2)
 					};
 					my_parser.getNext();
 					my_parser.expectToken(util::file::TokenTypes::Object, L"}");
