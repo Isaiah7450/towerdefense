@@ -226,17 +226,13 @@ namespace hoffman::isaiah {
 				text_rect_top_sy, 100.f, text_rect_height);
 			this->drawText(cash_text.str(), Color {0.f, 0.f, 0.f, 1.f}, cash_rect);
 			if (!my_game->player.isAlive()) {
-				const long long score = static_cast<long long>((my_game->level * 50.0 + my_game->difficulty * 125.0)
-					* (my_game->challenge_level + 1.0)) + static_cast<long long>(my_game->player.getMoney() * 15.0)
-					+ (my_game->level > 99 ? 25000ll
-						: my_game->level > 90 ? 20000ll
-						: my_game->level > 75 ? 15000ll
-						: my_game->level > 50 ? 10000ll
-						: my_game->level > 25 ? 5000ll
-						: my_game->level > 10 ? 2500ll : 0ll);
+				const long long score = my_game->calculateScore();
 				std::wstring score_text = L"Game over! Final Score: "s + std::to_wstring(score);
+				if (my_game->is_hiscore) {
+					score_text += L"\tHiscore!";
+				}
 				const auto score_rect = Renderer2D::createRectangle(margin_left_sx + 340.f + 100.f + 25.f,
-					text_rect_top_sy, 250.f, text_rect_height);
+					text_rect_top_sy - text_rect_height / 4.f, 340.f, text_rect_height * 1.5f);
 				this->drawText(score_text, Color {0.f, 0.f, 0.f, 1.f}, score_rect);
 			}
 #if (defined(DEBUG) || defined(_DEBUG))

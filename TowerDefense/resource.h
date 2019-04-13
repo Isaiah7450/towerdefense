@@ -18,6 +18,7 @@
 #define IDD_TERRAIN_NEW_MAP                     4101
 #define IDD_TERRAIN_OPEN_MAP                    4102
 #define IDD_TERRAIN_SAVE_MAP_AS                 4103
+#define IDD_GAME_LOAD_CUSTOM_MAP                4201
 
 #define IDC_INFO_BASE_NAME                      10001
 #define IDC_INFO_BASE_DESC                      10002
@@ -109,10 +110,11 @@
 #define IDC_TERRAIN_SAVE_MAP_AS_SHOW_CONFIRM    21202
 
 #define ID_MM_FILE_NEW_GAME                     40101
-#define ID_MM_FILE_LOAD_GAME                    40102
-#define ID_MM_FILE_SAVE_GAME                    40103
-#define ID_MM_FILE_SAVE_GAME_AS                 40104
-#define ID_MM_FILE_QUIT                         40105
+#define ID_MM_FILE_START_CUSTOM_GAME            40102
+#define ID_MM_FILE_LOAD_GAME                    40103
+#define ID_MM_FILE_SAVE_GAME                    40104
+#define ID_MM_FILE_SAVE_GAME_AS                 40105
+#define ID_MM_FILE_QUIT                         40106
 #define ID_MM_ACTIONS_TOGGLE_PAUSE              40201
 #define ID_MM_ACTIONS_NEXT_WAVE                 40202
 #define ID_MM_ACTIONS_BUY_HEALTH                40203

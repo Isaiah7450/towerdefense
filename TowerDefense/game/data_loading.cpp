@@ -3,16 +3,17 @@
 #include "./../targetver.hpp"
 #include <shlobj.h>
 #include <algorithm>
-#include <iostream>
+#include <deque>
+#include <filesystem>
 #include <fstream>
-#include <utility>
-#include <string>
+#include <iostream>
 #include <map>
-#include <vector>
+#include <queue>
 #include <set>
 #include <stdexcept>
-#include <queue>
-#include <deque>
+#include <string>
+#include <utility>
+#include <vector>
 #include "./../file_util.hpp"
 #include "./../globals.hpp"
 #include "./../graphics/graphics.hpp"
@@ -1212,6 +1213,47 @@ namespace hoffman::isaiah {
 							// Ignore.
 						}
 					}
+				}
+			}
+			else {
+				throw util::file::DataFileException {L"Unrecognized save file version."s, 1};
+			}
+		}
+
+		void MyGame::saveGlobalData() const {
+			std::wofstream global_data_file {this->getUserDataPath() + game::global_save_file_name};
+			if (global_data_file.bad() || global_data_file.fail()) {
+				throw util::file::DataFileException {L"Could not open global save file for reading.", 0};
+			}
+			global_data_file << L"V: " << 1 << L"\n";
+			global_data_file << L"CG: " << this->start_custom_games << L"\n";
+			global_data_file << L"HS: " << std::oct << this->highest_score << L"\n" << std::dec;
+			for (const auto& high_level_pair : this->highest_levels) {
+				global_data_file << L"H: " << std::hex << high_level_pair.first << L" " << std::hex << high_level_pair.second << L"\n" << std::dec;
+			}
+			global_data_file << L"X: 1233\t85\t518\t112\nE: 421\nZYD: 2909\n";
+		}
+
+		void MyGame::loadGlobalData() {
+			if (!std::filesystem::exists(this->getUserDataPath() + game::global_save_file_name)) {
+				// Fail safely.
+				return;
+			}
+			std::wifstream global_data_file {this->getUserDataPath() + game::global_save_file_name};
+			if (global_data_file.bad() || global_data_file.fail()) {
+				throw util::file::DataFileException {L"Could not open global save file for reading.", 0};
+			}
+			int version {0};
+			std::wstring buffer {};
+			global_data_file >> buffer >> version;
+			if (version >= 1) {
+				global_data_file >> buffer >> this->start_custom_games >> buffer
+					>> std::oct >> this->highest_score >> buffer >> std::dec;
+				while (buffer == L"H:") {
+					int difficulty_number = 0, difficulty_highest = 0;
+					global_data_file >> std::hex >> difficulty_number >> std::hex >> difficulty_highest >> std::dec >> buffer;
+					// Invalid first values are simply handled silently.
+					this->highest_levels[difficulty_number] = difficulty_highest;
 				}
 			}
 			else {

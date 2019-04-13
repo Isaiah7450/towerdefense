@@ -34,7 +34,9 @@ namespace hoffman::isaiah {
 		std::shared_ptr<MyGame> g_my_game {nullptr};
 
 		MyGame::MyGame(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res) :
-			device_resources {dev_res} {
+			device_resources {dev_res},
+			highest_levels {{ID_CHALLENGE_LEVEL_EASY, 0}, {ID_CHALLENGE_LEVEL_NORMAL, 0},
+				{ID_CHALLENGE_LEVEL_HARD, 0}, {ID_CHALLENGE_LEVEL_EXPERT, 0}} {
 		}
 
 		MyGame::~MyGame() noexcept = default;
@@ -98,6 +100,7 @@ namespace hoffman::isaiah {
 			this->did_lose_life = false;
 			this->win_streak = 0;
 			this->lose_streak = 0;
+			this->is_hiscore = false;
 		}
 
 		void MyGame::update() {
@@ -123,6 +126,17 @@ namespace hoffman::isaiah {
 					my_game_stats << estats.first << L": " << estats.second << L"\n";
 				}
 				my_game_stats.close();
+				if (this->getLevelNumber() > this->highest_levels.at(challenge_level + ID_CHALLENGE_LEVEL_EASY)) {
+					this->highest_levels.at(challenge_level + ID_CHALLENGE_LEVEL_EASY) = this->getLevelNumber();
+				}
+				if (this->getLevelNumber() > 99) {
+					this->start_custom_games = true;
+				}
+				if (this->calculateScore() > this->highest_score) {
+					this->highest_score = this->calculateScore();
+					this->is_hiscore = true;
+				}
+				this->saveGlobalData();
 			}
 			// Do processing...
 			for (int k = 0; k < this->update_speed && this->in_level; ++k) {

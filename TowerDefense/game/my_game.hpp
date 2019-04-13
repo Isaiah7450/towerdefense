@@ -119,6 +119,10 @@ namespace hoffman::isaiah {
 			/// <summary>Loads a previously saved game state.</summary>
 			/// <param name="save_file">The file to load the game's state from.</param>
 			void loadGame(std::wistream& save_file);
+			/// <summary>Saves global user data.</summary>
+			void saveGlobalData() const;
+			/// <summary>Loads global user data.</summary>
+			void loadGlobalData();
 			/// <summary>Adds an enemy to the game.</summary>
 			/// <param name="e">The enemy to add.</param>
 			void addEnemy(std::unique_ptr<Enemy>&& e);
@@ -259,6 +263,18 @@ namespace hoffman::isaiah {
 				}
 			}
 		protected:
+			/// <summary>Calculates the player's final score.</summary>
+			/// <returns>The calculated final score.</returns>
+			long long calculateScore() const noexcept {
+				return static_cast<long long>((this->getLevelNumber() * 50.0 + this->getDifficulty() * 125.0)
+					* (this->getChallengeLevel() + 1.0)) + static_cast<long long>(this->player.getMoney() * 15.0)
+					+ (this->getLevelNumber() > 99 ? 25000ll
+						: this->getLevelNumber() > 90 ? 20000ll
+						: this->getLevelNumber() > 75 ? 15000ll
+						: this->getLevelNumber() > 50 ? 10000ll
+						: this->getLevelNumber() > 25 ? 5000ll
+						: this->getLevelNumber() > 10 ? 2500ll : 0ll);
+			}
 			/// <summary>Updates the value of the dynamic difficulty variable.</summary>
 			void updateDifficulty() noexcept {
 				if (!this->did_lose_life) {
@@ -345,6 +361,14 @@ namespace hoffman::isaiah {
 			std::wstring userdata_folder_path {L"./userdata/"};
 			/// <summary>Stores the automatic level generator.</summary>
 			std::unique_ptr<LevelGenerator> my_level_generator {nullptr};
+			/// <summary>Is the player allowed to load and play custom games and maps?</summary>
+			bool start_custom_games {false};
+			/// <summary>Stores the highest score obtained by the player.</summary>
+			long long highest_score {0};
+			/// <summary>Is the current score a high score?</summary>
+			bool is_hiscore {false};
+			/// <summary>Maps the highest levels reached on each difficulty.</summary>
+			std::map<int, int> highest_levels;
 			// Testing things
 			std::shared_ptr<pathfinding::Pathfinder> ground_test_pf {nullptr};
 			std::shared_ptr<pathfinding::Pathfinder> air_test_pf {nullptr};

@@ -292,6 +292,8 @@ namespace hoffman::isaiah {
 			// Show window
 			ShowWindow(this->hwnd, n_cmd_show);
 			UpdateWindow(this->hwnd);
+			// Disable loading custom maps for now.
+			winapi::disableMenuItem(hwnd, 0, ID_MM_FILE_START_CUSTOM_GAME);
 			// Create update thread
 			auto sync_mutex = CreateMutex(nullptr, false, TEXT("can_execute"));
 			if (!sync_mutex) {
@@ -357,6 +359,7 @@ namespace hoffman::isaiah {
 			my_renderer->createShotMenu(hwnd, game::g_my_game->getAllShotTypes());
 			my_renderer->createEnemyMenu(hwnd, game::g_my_game->getAllEnemyTypes(),
 				game::g_my_game->getSeenEnemies());
+			game::g_my_game->loadGlobalData();
 			HANDLE terrain_editor_thread {nullptr};
 			// Message Loop
 #pragma warning(push)
