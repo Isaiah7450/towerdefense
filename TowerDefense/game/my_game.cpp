@@ -264,9 +264,9 @@ namespace hoffman::isaiah {
 				try {
 					this->load_level_data();
 				}
-				catch (const util::file::DataFileException& e) {
+				catch ([[maybe_unused]] const util::file::DataFileException& e) {
 					MessageBox(nullptr, e.what(), L"Level Loading Error", MB_OK);
-					std::exit(1);
+					std::abort();
 				}
 			}
 		}

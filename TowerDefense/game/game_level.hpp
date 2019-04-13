@@ -253,6 +253,10 @@ namespace hoffman::isaiah::game {
 		/// <param name="my_game">Reference to the game state.</param>
 		/// <returns>A pointer to the generated level. The caller is responsible for taking ownership.</returns>
 		std::unique_ptr<GameLevel> generateLevel(int level_number, const MyGame& my_game);
+		// Getters
+		int getStartLevel() const noexcept {
+			return this->start_level;
+		}
 	protected:
 		/// <param name="levels_above_start">The number of levels since the first generated level.</param>
 		/// <returns>The wave difficulty value for this particular call.</returns>
@@ -276,9 +280,6 @@ namespace hoffman::isaiah::game {
 		}
 
 		// Getters
-		int getStartLevel() const noexcept {
-			return this->start_level;
-		}
 		const std::vector<GlobalLevelColorData>& getColorData() const noexcept {
 			return this->color_data;
 		}

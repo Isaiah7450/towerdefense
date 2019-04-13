@@ -996,10 +996,16 @@ namespace hoffman::isaiah {
 		void MyGame::load_level_data() {
 			std::wifstream data_file {this->resources_folder_path + L"levels/level"s + std::to_wstring(this->level) + L".ini"s};
 			if (data_file.bad() || data_file.fail()) {
-				data_file.open(this->resources_folder_path + L"levels/level"s + std::to_wstring(this->my_level_backup_number) + L".ini"s);
-				if (data_file.bad() || data_file.fail()) {
-					throw util::file::DataFileException {L"Could not open resources/levels/level"s
-						+ std::to_wstring(this->level) + L".ini for reading!"s, 0};
+				if (this->getLevelNumber() >= this->my_level_generator->getStartLevel()) {
+					this->my_level = this->my_level_generator->generateLevel(this->getLevelNumber(), *this);
+					return;
+				}
+				else {
+					data_file.open(this->resources_folder_path + L"levels/level"s + std::to_wstring(this->my_level_backup_number) + L".ini"s);
+					if (data_file.bad() || data_file.fail()) {
+						throw util::file::DataFileException {L"Could not open resources/levels/level"s
+							+ std::to_wstring(this->level) + L".ini for reading!"s, 0};
+					}
 				}
 			}
 			util::file::DataFileParser my_parser {data_file};
