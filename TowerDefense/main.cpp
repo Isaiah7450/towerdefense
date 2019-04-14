@@ -404,7 +404,7 @@ namespace hoffman::isaiah {
 							const auto my_dialog = winapi::StartCustomGameDialog {hwnd, this->h_instance};
 							WaitForSingleObject(sync_mutex, INFINITE);
 							if (my_dialog.getChallengeLevel() != IDCANCEL) {
-								game::g_my_game->resetState(my_dialog.getChallengeLevel() - ID_CHALLENGE_LEVEL_EASY, my_dialog.getMapName());
+								game::g_my_game->resetState(my_dialog.getChallengeLevel() - ID_CHALLENGE_LEVEL_EASY, my_dialog.getMapName(), true);
 							}
 							ReleaseMutex(sync_mutex);
 							break;

@@ -91,7 +91,8 @@ namespace hoffman::isaiah {
 			/// <summary>Resets the game's state.</summary>
 			/// <param name="new_clevel">The new challenge level to set.</param>
 			/// <param name="map_name">The base name of the new map to use.</param>
-			void resetState(int new_clevel, std::wstring map_name);
+			/// <param name="is_custom">Is the new game a custom game?</param>
+			void resetState(int new_clevel, std::wstring map_name, bool is_custom = false);
 			/// <summary>Updates the state of the game by one tick.</summary>
 			void update();
 			/// <summary>Updates the state of the game in some way for debugging reasons.</summary>
@@ -171,6 +172,10 @@ namespace hoffman::isaiah {
 			/// <param name="amt">The amount of money to add (or remove) from the player.</param>
 			void changePlayerCash(double amt) noexcept {
 				this->player.changeMoney(amt);
+			}
+			/// <param name="is_custom">Is the current game a custom game?</param>
+			void setGameType(bool is_custom) noexcept {
+				this->in_custom_game = is_custom;
 			}
 			// Getters
 			std::shared_ptr<graphics::DX::DeviceResources2D> getDeviceResources() const noexcept {
@@ -402,6 +407,8 @@ namespace hoffman::isaiah {
 			std::unique_ptr<LevelGenerator> my_level_generator {nullptr};
 			/// <summary>Is the player allowed to load and play custom games and maps?</summary>
 			bool start_custom_games {false};
+			/// <summary>Is the player in a custom game?</summary>
+			bool in_custom_game {false};
 			/// <summary>Stores the highest score obtained by the player.</summary>
 			long long highest_score {0};
 			/// <summary>Is the current score a high score?</summary>

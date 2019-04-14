@@ -72,7 +72,7 @@ namespace hoffman::isaiah {
 #endif
 		}
 
-		void MyGame::resetState(int new_clevel, std::wstring map_name) {
+		void MyGame::resetState(int new_clevel, std::wstring map_name, bool is_custom) {
 			this->player = Player {};
 			this->challenge_level = new_clevel;
 			this->level = 1;
@@ -95,6 +95,7 @@ namespace hoffman::isaiah {
 			if (ground_terrain_file.good() && air_terrain_file.good()) {
 				this->map = std::make_shared<GameMap>(ground_terrain_file, air_terrain_file);
 				this->debugUpdate(DebugUpdateStates::Terrain_Changed);
+				this->setGameType(is_custom);
 			}
 			else {
 				ground_terrain_file.open(ground_terrain_filename_base + MyGame::getDefaultMapName(new_clevel + ID_CHALLENGE_LEVEL_EASY) + L".txt");
@@ -104,6 +105,7 @@ namespace hoffman::isaiah {
 						MB_OK | MB_ICONWARNING);
 					this->map = std::make_shared<GameMap>(ground_terrain_file, air_terrain_file);
 					this->debugUpdate(DebugUpdateStates::Terrain_Changed);
+					this->setGameType(false);
 				}
 				else {
 					MessageBox(nullptr, L"Map loading failed.", L"Map Load Failed", MB_OK | MB_ICONERROR);
@@ -141,15 +143,18 @@ namespace hoffman::isaiah {
 					}
 				}
 				my_game_stats.close();
-				if (this->getLevelNumber() > this->highest_levels.at(challenge_level + ID_CHALLENGE_LEVEL_EASY)) {
-					this->highest_levels.at(challenge_level + ID_CHALLENGE_LEVEL_EASY) = this->getLevelNumber();
-				}
-				if (this->getLevelNumber() > 99) {
-					this->start_custom_games = true;
-				}
-				if (this->calculateScore() > this->highest_score) {
-					this->highest_score = this->calculateScore();
-					this->is_hiscore = true;
+				// For integrity reasons, the stats of custom games are not tracked.
+				if (!this->in_custom_game) {
+					if (this->getLevelNumber() > this->highest_levels.at(challenge_level + ID_CHALLENGE_LEVEL_EASY)) {
+						this->highest_levels.at(challenge_level + ID_CHALLENGE_LEVEL_EASY) = this->getLevelNumber();
+					}
+					if (this->getLevelNumber() > 99) {
+						this->start_custom_games = true;
+					}
+					if (this->calculateScore() > this->highest_score) {
+						this->highest_score = this->calculateScore();
+						this->is_hiscore = true;
+					}
 				}
 				this->saveGlobalData();
 			}
