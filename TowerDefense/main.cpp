@@ -558,6 +558,9 @@ namespace hoffman::isaiah {
 						case 'P':
 							PostMessage(hwnd, WM_COMMAND, ID_MM_ACTIONS_TOGGLE_PAUSE, 0);
 							break;
+						case VK_OEM_PLUS:
+							PostMessage(hwnd, WM_COMMAND, ID_MM_ACTIONS_CHANGE_SPEED, 0);
+							break;
 						}
 						break;
 					}
