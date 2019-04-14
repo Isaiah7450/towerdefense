@@ -15,6 +15,7 @@
 #define IDD_INFO_TOWER_UPGRADE                  3102
 
 #define IDD_CHALLENGE_LEVEL                     4001
+#define IDD_GLOBAL_STATS                        4002
 #define IDD_TERRAIN_NEW_MAP                     4101
 #define IDD_TERRAIN_OPEN_MAP                    4102
 #define IDD_TERRAIN_SAVE_MAP_AS                 4103
@@ -104,10 +105,16 @@
 #define ID_CHALLENGE_LEVEL_HARD                 20053
 #define ID_CHALLENGE_LEVEL_EXPERT               20054
 
-#define IDC_TERRAIN_MAP_NAME                    21001
-#define IDC_TERRAIN_NEW_MAP_ROWS                21101
-#define IDC_TERRAIN_NEW_MAP_COLS                21102
-#define IDC_TERRAIN_SAVE_MAP_AS_SHOW_CONFIRM    21202
+#define IDC_GLOBAL_STATS_HISCORE                21001
+#define IDC_GLOBAL_STATS_EASY                   21051
+#define IDC_GLOBAL_STATS_NORMAL                 21052
+#define IDC_GLOBAL_STATS_HARD                   21053
+#define IDC_GLOBAL_STATS_EXPERT                 21054
+
+#define IDC_TERRAIN_MAP_NAME                    23001
+#define IDC_TERRAIN_NEW_MAP_ROWS                23101
+#define IDC_TERRAIN_NEW_MAP_COLS                23102
+#define IDC_TERRAIN_SAVE_MAP_AS_SHOW_CONFIRM    23202
 
 #define ID_MM_FILE_NEW_GAME                     40101
 #define ID_MM_FILE_START_CUSTOM_GAME            40102
@@ -120,6 +127,7 @@
 #define ID_MM_ACTIONS_BUY_HEALTH                40203
 #define ID_MM_ACTIONS_CHANGE_SPEED              40204
 #define ID_MM_ACTIONS_TOGGLE_ALL_RADII          40205
+#define ID_MM_ACTIONS_VIEW_GLOBAL_STATS         40206
 #define ID_MM_TOWERS_INFO                       40301
 #define ID_MM_TOWERS_NONE                       40302
 #define ID_MM_TOWERS_BUY_TOWER                  40398

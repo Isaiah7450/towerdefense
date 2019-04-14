@@ -15,6 +15,7 @@ namespace hoffman::isaiah {
 	}
 
 	namespace graphics {
+		// Forward declarations
 		class Renderer2D;
 		namespace DX {
 			class DeviceResources2D;
@@ -261,6 +262,12 @@ namespace hoffman::isaiah {
 				default:
 					return 1;
 				}
+			}
+			long long getHiscore() const noexcept {
+				return this->highest_score;
+			}
+			const std::map<int, int>& getHighestLevels() const noexcept {
+				return this->highest_levels;
 			}
 		protected:
 			/// <summary>Calculates the player's final score.</summary>

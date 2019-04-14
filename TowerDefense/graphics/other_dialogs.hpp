@@ -7,6 +7,11 @@
 #include <string>
 #include "./../globals.hpp"
 
+namespace hoffman::isaiah::game {
+	// Forward declarations
+	class MyGame;
+}
+
 namespace hoffman::isaiah::winapi {
 	/// <summary>Represents a dialog used to select the challenge level of the game.</summary>
 	class ChallengeLevelDialog : public IDialog {
@@ -25,7 +30,33 @@ namespace hoffman::isaiah::winapi {
 		// Implements IDialog::initDialog(HWND)
 		void initDialog(HWND hwnd) override;
 	private:
+		/// <summary>The challenge level selected by the user.</summary>
 		int selected_clevel {1};
+	};
+
+	/// <summary>Represents a dialog that shows statistics for the player common across all games.</summary>
+	class GlobalStatsDialog : public IDialog {
+	public:
+		/// <param name="owner">Handle to the window that owns this dialog box.</param>
+		/// <param name="h_inst">The hInstance parameter given by the WinMain function.</param>
+		/// <param name="my_game">Reference to the game state.</param>
+		GlobalStatsDialog(HWND owner, HINSTANCE h_inst, const game::MyGame& my_game);
+		// Dialog box procedure.
+		static INT_PTR CALLBACK dialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+		// Getters
+		long long getHiscore() const noexcept {
+			return this->highest_score;
+		}
+		const std::map<int, int>& getHighestLevels() const noexcept {
+			return this->highest_levels;
+		}
+	protected:
+		void initDialog(HWND hwnd) override;
+	private:
+		/// <summary>The player's highest score ever.</summary>
+		long long highest_score;
+		/// <summary>The highest levels the player has reached on a particular difficulty.</summary>
+		std::map<int, int> highest_levels;
 	};
 
 	/// <summary>Represents a dialog used to make a new map in the terrain editor.</summary>

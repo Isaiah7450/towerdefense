@@ -423,6 +423,11 @@ namespace hoffman::isaiah {
 							PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
 							break;
 						}
+						case ID_MM_ACTIONS_VIEW_GLOBAL_STATS:
+						{
+							const winapi::GlobalStatsDialog my_dialog {this->getHWND(), this->h_instance, *game::g_my_game};
+							break;
+						}
 						case ID_MM_TOWERS_INFO:
 						{
 							// (Yes, walls are explicitly excluded heree.)

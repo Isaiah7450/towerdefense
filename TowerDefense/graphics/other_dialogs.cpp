@@ -3,11 +3,14 @@
 #include "./../targetver.hpp"
 #include <Windows.h>
 #include <commctrl.h>
+#include <map>
 #include <memory>
 #include <string>
+#include <vector>
 #include "./../resource.h"
 #include "./other_dialogs.hpp"
 #include "./../globals.hpp"
+#include "./../game/my_game.hpp"
 namespace hoffman::isaiah::winapi {
 	ChallengeLevelDialog::ChallengeLevelDialog(HWND owner, HINSTANCE h_inst) {
 		this->selected_clevel = static_cast<int>(DialogBoxParam(h_inst, MAKEINTRESOURCE(IDD_CHALLENGE_LEVEL),
@@ -53,6 +56,50 @@ namespace hoffman::isaiah::winapi {
 		SendMessage(dlg_clevel, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Expert"));
 		SendMessage(dlg_clevel, CB_SETCURSEL, 1, 0);
 		}
+	}
+
+	GlobalStatsDialog::GlobalStatsDialog(HWND owner, HINSTANCE h_inst, const game::MyGame& my_game) :
+		highest_score {my_game.getHiscore()},
+		highest_levels {my_game.getHighestLevels()} {
+		DialogBoxParam(h_inst, MAKEINTRESOURCE(IDD_GLOBAL_STATS), owner,
+			GlobalStatsDialog::dialogProc, reinterpret_cast<LPARAM>(this));
+	}
+
+	INT_PTR CALLBACK GlobalStatsDialog::dialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+		switch (msg) {
+		case WM_INITDIALOG:
+		{
+			SetWindowLongPtr(hwnd, GWLP_USERDATA, lparam);
+			[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
+			const auto my_dialog_class = reinterpret_cast<GlobalStatsDialog*>(lparam);
+			my_dialog_class->initDialog(hwnd);
+			}
+			return TRUE;
+		}
+		case WM_COMMAND:
+			switch (LOWORD(wparam)) {
+			case IDOK:
+			{
+				EndDialog(hwnd, IDOK);
+				break;
+			}
+			case IDCANCEL:
+				EndDialog(hwnd, IDCANCEL);
+				break;
+			}
+			break;
+		default:
+			return FALSE;
+		}
+		return TRUE;
+	}
+
+	void GlobalStatsDialog::initDialog(HWND hwnd) {
+		SetDlgItemText(hwnd, IDC_GLOBAL_STATS_HISCORE, std::to_wstring(this->getHiscore()).c_str());
+		SetDlgItemText(hwnd, IDC_GLOBAL_STATS_EASY, std::to_wstring(this->getHighestLevels().at(ID_CHALLENGE_LEVEL_EASY)).c_str());
+		SetDlgItemText(hwnd, IDC_GLOBAL_STATS_NORMAL, std::to_wstring(this->getHighestLevels().at(ID_CHALLENGE_LEVEL_NORMAL)).c_str());
+		SetDlgItemText(hwnd, IDC_GLOBAL_STATS_HARD, std::to_wstring(this->getHighestLevels().at(ID_CHALLENGE_LEVEL_HARD)).c_str());
+		SetDlgItemText(hwnd, IDC_GLOBAL_STATS_EXPERT, std::to_wstring(this->getHighestLevels().at(ID_CHALLENGE_LEVEL_EXPERT)).c_str());
 	}
 
 	TerrainEditorNewMapDialog::TerrainEditorNewMapDialog(HWND owner, HINSTANCE h_inst, std::wstring default_name) :
