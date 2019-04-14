@@ -67,15 +67,15 @@ InstType /NOCUSTOM
 !insertmacro MUI_LANGUAGE "English"
 ; Version Information
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "A Shaping War: Isaiah's tower defense game installer"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "3.2.2.0"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "3.3.0.0"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "Isaiah Hoffman"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© Isaiah Hoffman 2018-2019"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "1.2.2.0"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "1.3.0.0"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "An installer program for Isaiah Hoffman's tower defense game."
 VIAddVersionKey /LANG=${LANG_ENGLISH} "InternalName" "tower_defense_setup.exe"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "OriginalFilename" "tower_defense_setup.exe"
-VIProductVersion 3.2.2.0
-VIFileVersion 1.2.2.0
+VIProductVersion 3.3.0.0
+VIFileVersion 1.3.0.0
 
 ; Installer Sections
 Section "Required Files" SectionRequired
