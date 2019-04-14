@@ -259,6 +259,8 @@ namespace hoffman::isaiah {
 					return 3;
 				case 3:
 					return 5;
+				case 5:
+					return 8;
 				default:
 					return 1;
 				}
