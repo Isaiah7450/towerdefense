@@ -15,11 +15,11 @@
 #define IDD_INFO_TOWER_UPGRADE                  3102
 
 #define IDD_CHALLENGE_LEVEL                     4001
-#define IDD_GLOBAL_STATS                        4002
+#define IDD_START_CUSTOM_GAME                   4002
+#define IDD_GLOBAL_STATS                        4003
 #define IDD_TERRAIN_NEW_MAP                     4101
 #define IDD_TERRAIN_OPEN_MAP                    4102
 #define IDD_TERRAIN_SAVE_MAP_AS                 4103
-#define IDD_GAME_LOAD_CUSTOM_MAP                4201
 
 #define IDC_INFO_BASE_NAME                      10001
 #define IDC_INFO_BASE_DESC                      10002
@@ -105,11 +105,13 @@
 #define ID_CHALLENGE_LEVEL_HARD                 20053
 #define ID_CHALLENGE_LEVEL_EXPERT               20054
 
-#define IDC_GLOBAL_STATS_HISCORE                21001
-#define IDC_GLOBAL_STATS_EASY                   21051
-#define IDC_GLOBAL_STATS_NORMAL                 21052
-#define IDC_GLOBAL_STATS_HARD                   21053
-#define IDC_GLOBAL_STATS_EXPERT                 21054
+#define IDC_CUSTOM_GAME_MAP_NAME                21001
+
+#define IDC_GLOBAL_STATS_HISCORE                22001
+#define IDC_GLOBAL_STATS_EASY                   22051
+#define IDC_GLOBAL_STATS_NORMAL                 22052
+#define IDC_GLOBAL_STATS_HARD                   22053
+#define IDC_GLOBAL_STATS_EXPERT                 22054
 
 #define IDC_TERRAIN_MAP_NAME                    23001
 #define IDC_TERRAIN_NEW_MAP_ROWS                23101

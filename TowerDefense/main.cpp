@@ -399,6 +399,16 @@ namespace hoffman::isaiah {
 							}
 							break;
 						}
+						case ID_MM_FILE_START_CUSTOM_GAME:
+						{
+							const auto my_dialog = winapi::StartCustomGameDialog {hwnd, this->h_instance};
+							WaitForSingleObject(sync_mutex, INFINITE);
+							if (my_dialog.getChallengeLevel() != IDCANCEL) {
+								game::g_my_game->resetState(my_dialog.getChallengeLevel() - ID_CHALLENGE_LEVEL_EASY, my_dialog.getMapName());
+							}
+							ReleaseMutex(sync_mutex);
+							break;
+						}
 						case ID_MM_FILE_SAVE_GAME:
 						{
 							PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);

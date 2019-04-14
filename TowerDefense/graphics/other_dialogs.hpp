@@ -34,6 +34,32 @@ namespace hoffman::isaiah::winapi {
 		int selected_clevel {1};
 	};
 
+	/// <summary>Represents a dialog box that is used to start games on custom maps.</summary>
+	class StartCustomGameDialog : public IDialog {
+	public:
+		/// <param name="owner">Handle to the window that owns this dialog box.</param>
+		/// <param name="h_inst">The hInstance parameter given by the WinMain function.</param>
+		StartCustomGameDialog(HWND owner, HINSTANCE h_inst);
+		// Dialog box procedure.
+		static INT_PTR CALLBACK dialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+
+		// Getters
+		int getChallengeLevel() const noexcept {
+			return this->selected_clevel;
+		}
+		std::wstring getMapName() const noexcept {
+			return this->map_name;
+		}
+	protected:
+		// Implements IDialog::initDialog(HWND)
+		void initDialog(HWND hwnd) override;
+	private:
+		/// <summary>The challenge level selected by the user.</summary>
+		int selected_clevel {1};
+		/// <summary>The name of the map to load.</summary>
+		std::wstring map_name {L"default"};
+	};
+
 	/// <summary>Represents a dialog that shows statistics for the player common across all games.</summary>
 	class GlobalStatsDialog : public IDialog {
 	public:

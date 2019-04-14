@@ -58,6 +58,57 @@ namespace hoffman::isaiah::winapi {
 		}
 	}
 
+	StartCustomGameDialog::StartCustomGameDialog(HWND owner, HINSTANCE h_inst) {
+		this->selected_clevel = DialogBoxParam(h_inst, MAKEINTRESOURCE(IDD_START_CUSTOM_GAME), owner,
+			StartCustomGameDialog::dialogProc, reinterpret_cast<LPARAM>(this));
+	}
+
+	INT_PTR CALLBACK StartCustomGameDialog::dialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+		switch (msg) {
+		case WM_INITDIALOG:
+		{
+			SetWindowLongPtr(hwnd, GWLP_USERDATA, lparam);
+			[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
+			const auto my_dialog_class = reinterpret_cast<StartCustomGameDialog*>(lparam);
+			my_dialog_class->initDialog(hwnd);
+			}
+			return TRUE;
+		}
+		case WM_COMMAND:
+			switch (LOWORD(wparam)) {
+			case IDOK:
+			{
+				auto& my_dialog_class = *reinterpret_cast<StartCustomGameDialog*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				auto buffer = std::make_unique<wchar_t[]>(81);
+				buffer[0] = 80;
+				SendMessage(GetDlgItem(hwnd, IDC_CUSTOM_GAME_MAP_NAME), EM_GETLINE, 0, reinterpret_cast<LPARAM>(buffer.get()));
+				my_dialog_class.map_name = buffer.get();
+				const uintptr_t my_clevel = SendMessage(GetDlgItem(hwnd, IDC_CHALLENGE_LEVEL_SELECTOR), CB_GETCURSEL, 0, 0);
+				EndDialog(hwnd, ID_CHALLENGE_LEVEL_EASY + my_clevel);
+				break;
+			}
+			case IDCANCEL:
+				EndDialog(hwnd, IDCANCEL);
+				break;
+			}
+			break;
+		default:
+			return FALSE;
+		}
+		return TRUE;
+	}
+
+	void StartCustomGameDialog::initDialog(HWND hwnd) {
+		auto dlg_clevel = GetDlgItem(hwnd, IDC_CHALLENGE_LEVEL_SELECTOR);
+		[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
+		SendMessage(dlg_clevel, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Beginner"));
+		SendMessage(dlg_clevel, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Intermediate"));
+		SendMessage(dlg_clevel, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Experienced"));
+		SendMessage(dlg_clevel, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Expert"));
+		SendMessage(dlg_clevel, CB_SETCURSEL, 1, 0);
+		}
+	}
+
 	GlobalStatsDialog::GlobalStatsDialog(HWND owner, HINSTANCE h_inst, const game::MyGame& my_game) :
 		highest_score {my_game.getHiscore()},
 		highest_levels {my_game.getHighestLevels()} {
