@@ -123,7 +123,9 @@ namespace hoffman::isaiah {
 				my_save.close();
 				std::wofstream my_game_stats {save_name + L".stats"};
 				for (const auto& estats : this->enemy_kill_count) {
-					my_game_stats << estats.first << L": " << estats.second << L"\n";
+					if (this->enemies_seen.at(estats.first)) {
+						my_game_stats << estats.first << L": " << estats.second << L"\n";
+					}
 				}
 				my_game_stats.close();
 				if (this->getLevelNumber() > this->highest_levels.at(challenge_level + ID_CHALLENGE_LEVEL_EASY)) {
