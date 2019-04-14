@@ -373,6 +373,9 @@ namespace hoffman::isaiah {
 					// Ignore.
 				}
 			}
+			if (game::g_my_game->canStartCustomGames()) {
+				winapi::enableMenuItem(hwnd, 0, ID_MM_FILE_START_CUSTOM_GAME);
+			}
 			HANDLE terrain_editor_thread {nullptr};
 			// Message Loop
 #pragma warning(push)
@@ -704,6 +707,9 @@ namespace hoffman::isaiah {
 					if (!game::g_my_game->isInLevel()) {
 						my_renderer->createEnemyMenu(hwnd, game::g_my_game->getAllEnemyTypes(),
 							game::g_my_game->getSeenEnemies());
+						if (game::g_my_game->canStartCustomGames()) {
+							winapi::enableMenuItem(hwnd, 0, ID_MM_FILE_START_CUSTOM_GAME);
+						}
 					}
 					if (hr == D2DERR_RECREATE_TARGET) {
 						my_resources->discardDeviceResources();

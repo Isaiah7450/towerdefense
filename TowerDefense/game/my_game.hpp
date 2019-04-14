@@ -263,6 +263,9 @@ namespace hoffman::isaiah {
 					return 1;
 				}
 			}
+			bool canStartCustomGames() const noexcept {
+				return this->start_custom_games;
+			}
 			long long getHiscore() const noexcept {
 				return this->highest_score;
 			}
