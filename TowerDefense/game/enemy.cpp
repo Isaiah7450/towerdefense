@@ -116,12 +116,12 @@ namespace hoffman::isaiah {
 		void Enemy::StatusResistance::increaseResist() {
 			++this->num_times;
 			if (this->isActive()) {
-				this->frames_until_expire *= 2.0;
-				this->status_resist *= 2.0;
+				this->frames_until_expire *= 1.5;
+				this->status_resist *= 1.75;
 				this->status_resist += 0.02 * this->num_times;
 			}
 			else {
-				this->frames_until_expire = math::convertMillisecondsToFrames(1000);
+				this->frames_until_expire = math::convertMillisecondsToFrames(750);
 				this->status_resist = 0.1 + 0.03 * this->num_times;
 			}
 		}
