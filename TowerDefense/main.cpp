@@ -359,7 +359,20 @@ namespace hoffman::isaiah {
 			my_renderer->createShotMenu(hwnd, game::g_my_game->getAllShotTypes());
 			my_renderer->createEnemyMenu(hwnd, game::g_my_game->getAllEnemyTypes(),
 				game::g_my_game->getSeenEnemies());
-			game::g_my_game->loadGlobalData();
+			try {
+				game::g_my_game->loadGlobalData();
+			}
+			catch (const util::file::DataFileException&) {
+				MessageBox(nullptr, L"Error: Corrupted global save file. Overwriting with default values.", L"Corrupted Save",
+					MB_OK | MB_ICONERROR);
+				game::g_my_game->saveGlobalData();
+				try {
+					game::g_my_game->loadGlobalData();
+				}
+				catch (...) {
+					// Ignore.
+				}
+			}
 			HANDLE terrain_editor_thread {nullptr};
 			// Message Loop
 #pragma warning(push)

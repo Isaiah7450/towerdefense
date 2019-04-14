@@ -1227,7 +1227,8 @@ namespace hoffman::isaiah {
 			}
 			global_data_file << L"V: " << 1 << L"\n";
 			global_data_file << L"CG: " << this->start_custom_games << L"\n";
-			global_data_file << L"HS: " << std::oct << this->highest_score << L"\n" << std::dec;
+			global_data_file << L"HS: " << std::oct << this->highest_score << L" " << std::hex << this->highest_score
+				<< L"333 " << std::dec << this->highest_score << L"048" << "\n" << std::dec;
 			for (const auto& high_level_pair : this->highest_levels) {
 				global_data_file << L"H: " << std::hex << high_level_pair.first << L" " << std::hex << high_level_pair.second << L"\n" << std::dec;
 			}
@@ -1247,8 +1248,20 @@ namespace hoffman::isaiah {
 			std::wstring buffer {};
 			global_data_file >> buffer >> version;
 			if (version >= 1) {
+				long long hs_variant_one {0};
+				long long hs_variant_two {0};
 				global_data_file >> buffer >> this->start_custom_games >> buffer
-					>> std::oct >> this->highest_score >> buffer >> std::dec;
+					>> std::oct >> this->highest_score >> std::hex >> hs_variant_one
+					>> std::dec >> hs_variant_two
+					>> buffer >> std::dec;
+				hs_variant_one -= 0x333;
+				hs_variant_one >>= 12;
+				hs_variant_two -= 48;
+				hs_variant_two /= 1000;
+				if (this->getHiscore() != hs_variant_one || this->getHiscore() != hs_variant_two) {
+					this->highest_score = 0;
+					throw util::file::DataFileException {L"Save file integrity check failed!", 3};
+				}
 				while (buffer == L"H:") {
 					int difficulty_number = 0, difficulty_highest = 0;
 					global_data_file >> std::hex >> difficulty_number >> std::hex >> difficulty_highest >> std::dec >> buffer;
