@@ -7,6 +7,7 @@
 #include <vector>
 #include <map>
 #include "./../globals.hpp"
+#include "./../ih_math.hpp"
 
 namespace hoffman::isaiah {
 	namespace pathfinding {
@@ -319,13 +320,17 @@ namespace hoffman::isaiah {
 					++this->lose_streak;
 					this->win_streak = 0;
 				}
+				const double adjusted_challenge_level = this->getChallengeLevel() == 0 ? 0.500
+					: this->getChallengeLevel() == 1 ? 1.000
+					: this->getChallengeLevel() == 2 ? 1.750
+					: this->getChallengeLevel() == 3 ? 2.333 : 2.500;
 				if (this->win_streak > 1) {
 					// Increase the game's difficulty some
-					this->difficulty += 0.005 * this->getChallengeLevel() * (this->win_streak - 1);
+					this->difficulty += 0.005 * adjusted_challenge_level * math::get_min(this->win_streak - 1, 100);
 				}
 				else if (this->lose_streak > 0) {
 					// Decrease the game's difficulty
-					this->difficulty -= 0.015 * this->getChallengeLevel() * this->lose_streak
+					this->difficulty -= 0.015 * adjusted_challenge_level * math::get_min(this->lose_streak, 20)
 						+ this->level * 0.001;
 				}
 				// Else do nothing
