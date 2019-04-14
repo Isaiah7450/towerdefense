@@ -96,10 +96,12 @@ namespace hoffman::isaiah {
 				this->map = std::make_shared<GameMap>(ground_terrain_file, air_terrain_file);
 				this->debugUpdate(DebugUpdateStates::Terrain_Changed);
 				this->setGameType(is_custom);
+				this->map_base_name = map_name;
 			}
 			else {
-				ground_terrain_file.open(ground_terrain_filename_base + MyGame::getDefaultMapName(new_clevel + ID_CHALLENGE_LEVEL_EASY) + L".txt");
-				air_terrain_file.open(air_terrain_filename_base + MyGame::getDefaultMapName(new_clevel + ID_CHALLENGE_LEVEL_EASY) + L".txt");
+				this->map_base_name = MyGame::getDefaultMapName(new_clevel + ID_CHALLENGE_LEVEL_EASY);
+				ground_terrain_file.open(ground_terrain_filename_base + this->getMapBaseName() + L".txt");
+				air_terrain_file.open(air_terrain_filename_base + this->getMapBaseName() + L".txt");
 				if (ground_terrain_file.good() && air_terrain_file.good()) {
 					MessageBox(nullptr, L"Warning: Specified map could not be found. Falling back to a default map.", L"Map Load Failed",
 						MB_OK | MB_ICONWARNING);

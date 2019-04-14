@@ -2,6 +2,7 @@
 // File Created: May 24, 2018
 #include "./../targetver.hpp"
 #include <shlobj.h>
+#include "./../resource.h"
 #include <algorithm>
 #include <deque>
 #include <filesystem>
@@ -1120,6 +1121,9 @@ namespace hoffman::isaiah {
 					std::getline(save_file, this->map_base_name);
 					// Leading space is removed...
 					this->map_base_name.erase(this->map_base_name.begin());
+					if (MyGame::getDefaultMapName(this->getChallengeLevel() + ID_CHALLENGE_LEVEL_EASY) != this->getMapBaseName()) {
+						this->setGameType(true);
+					}
 				}
 				else {
 					switch (this->getChallengeLevel()) {
