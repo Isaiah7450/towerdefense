@@ -276,14 +276,36 @@ namespace hoffman::isaiah {
 			/// <summary>Calculates the player's final score.</summary>
 			/// <returns>The calculated final score.</returns>
 			long long calculateScore() const noexcept {
-				return static_cast<long long>((this->getLevelNumber() * 50.0 + this->getDifficulty() * 125.0)
-					* (this->getChallengeLevel() + 1.0)) + static_cast<long long>(this->player.getMoney() * 15.0)
-					+ (this->getLevelNumber() > 99 ? 25000ll
-						: this->getLevelNumber() > 90 ? 20000ll
-						: this->getLevelNumber() > 75 ? 15000ll
-						: this->getLevelNumber() > 50 ? 10000ll
-						: this->getLevelNumber() > 25 ? 5000ll
-						: this->getLevelNumber() > 10 ? 2500ll : 0ll);
+				const long long clevel_mod_numerator = (this->getChallengeLevel() + 1ll) * 2ll;
+				constexpr const long long clevel_mod_denominator = 3ll;
+				const long long level_score_component = this->getLevelNumber() <= 5
+					? this->getLevelNumber() : this->getLevelNumber() <= 10
+					? this->getLevelNumber() * 2ll : this->getLevelNumber() <= 25
+					? this->getLevelNumber() * 5ll : this->getLevelNumber() <= 50
+					? this->getLevelNumber() * 10ll : this->getLevelNumber() <= 75
+					? this->getLevelNumber() * 15ll : this->getLevelNumber() <= 90
+					? this->getLevelNumber() * 20ll : this->getLevelNumber() <= 95
+					? this->getLevelNumber() * 25ll : this->getLevelNumber() <= 99
+					? this->getLevelNumber() * 33ll : this->getLevelNumber() * 50ll;
+				const long long adjusted_difficulty_numerator = static_cast<long long>(this->getDifficulty() * 1000.0l);
+				constexpr const long long adjusted_difficulty_denominator = 1000ll;
+				const long long difficulty_score_component = (this->getLevelNumber() <= 5
+					? 0ll : this->getLevelNumber() <= 10
+					? adjusted_difficulty_numerator * 13ll: this->getLevelNumber() <= 25
+					? adjusted_difficulty_numerator * 31ll : this->getLevelNumber() <= 50
+					? adjusted_difficulty_numerator * 63ll : this->getLevelNumber() <= 75
+					? adjusted_difficulty_numerator * 94ll : this->getLevelNumber() <= 90
+					? adjusted_difficulty_numerator * 113ll : this->getLevelNumber() <= 95
+					? adjusted_difficulty_numerator * 119ll : this->getLevelNumber() <= 99
+					? adjusted_difficulty_numerator * 124ll : adjusted_difficulty_numerator * 125ll) / adjusted_difficulty_denominator;
+				const long long score_bonus = this->getLevelNumber() > 99 ? 25000ll
+					: this->getLevelNumber() > 95 ? 20000ll
+					: this->getLevelNumber() > 90 ? 15000ll
+					: this->getLevelNumber() > 75 ? 10000ll
+					: this->getLevelNumber() > 50 ? 7500ll
+					: this->getLevelNumber() > 25 ? 5000ll
+					: this->getLevelNumber() > 10 ? 2500ll : 0ll;
+				return score_bonus + clevel_mod_numerator * (level_score_component + difficulty_score_component) / clevel_mod_denominator;
 			}
 			/// <summary>Updates the value of the dynamic difficulty variable.</summary>
 			void updateDifficulty() noexcept {
