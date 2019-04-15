@@ -59,8 +59,8 @@ namespace hoffman::isaiah::winapi {
 	}
 
 	StartCustomGameDialog::StartCustomGameDialog(HWND owner, HINSTANCE h_inst) {
-		this->selected_clevel = DialogBoxParam(h_inst, MAKEINTRESOURCE(IDD_START_CUSTOM_GAME), owner,
-			StartCustomGameDialog::dialogProc, reinterpret_cast<LPARAM>(this));
+		this->selected_clevel = static_cast<int>(DialogBoxParam(h_inst, MAKEINTRESOURCE(IDD_START_CUSTOM_GAME), owner,
+			StartCustomGameDialog::dialogProc, reinterpret_cast<LPARAM>(this)));
 	}
 
 	INT_PTR CALLBACK StartCustomGameDialog::dialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {

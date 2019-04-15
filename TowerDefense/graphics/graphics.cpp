@@ -206,11 +206,19 @@ namespace hoffman::isaiah {
 			const float margin_top_sy = static_cast<float>(graphics::screen_height * graphics::margin_top);
 			const float text_rect_top_sy = margin_top_sy / 4.f;
 			constexpr const float text_rect_height = 15.f;
-			this->setOutlineColor(Color {0.5f, 0.5f, 0.5f, 1.f});
+			constexpr const Color outline_color {0.5f, 0.5f, 0.5f, 1.f};
+			this->setOutlineColor(outline_color);
 			std::wstring level_text = L"Level: "s + std::to_wstring(my_game->level);
 			const auto level_rect = Renderer2D::createRectangle(margin_left_sx,
 				text_rect_top_sy, 70.f, text_rect_height);
-			this->drawText(level_text, Color {0.f, 0.f, 0.f, 1.f}, level_rect);
+			if (my_game->getLevelNumber() < 100) {
+				this->drawText(level_text, Color {0.f, 0.f, 0.f, 1.f}, level_rect);
+			}
+			else {
+				this->setOutlineColor(Color {0.2f, 0.f, 0.f, 1.f});
+				this->drawText(level_text, Color {0.2f, 0.f, 0.f, 1.f}, level_rect);
+				this->setOutlineColor(outline_color);
+			}
 			std::wostringstream difficulty_text {};
 			difficulty_text << L"Difficulty: " << std::setprecision(2) << std::fixed << my_game->difficulty;
 			const auto difficulty_rect = Renderer2D::createRectangle(margin_left_sx + 70.f + 25.f,
