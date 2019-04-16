@@ -549,18 +549,19 @@ namespace hoffman::isaiah {
 						if (GetKeyState(VK_CONTROL) && HIWORD(GetAsyncKeyState(VK_CONTROL))) {
 							switch (msg.wParam) {
 							case 'N':
-								PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_FILE_NEW_GAME, 0);
+								PostMessage(this->hwnd, WM_COMMAND, ID_MM_FILE_NEW_GAME, 0);
 								break;
 							case 'S':
-								PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_FILE_SAVE_GAME, 0);
+								PostMessage(this->hwnd, WM_COMMAND, ID_MM_FILE_SAVE_GAME, 0);
 								break;
 							case 'Q':
 								// Good way to keep mistakes from happening from keypresses
 								// That said, having a confirmation message every time is
 								// flat out annoying.
-								if (MessageBox(hwnd, L"Are you sure you want to quit? (Unsaved data will be lost.)",
+								if (MessageBox(hwnd, L"Are you sure you want to quit?",
 									L"Tower defense - Quit?", MB_YESNO) == IDYES) {
-									PostMessage(hwnd, WM_COMMAND, ID_MM_FILE_QUIT, 0);
+									SendMessage(this->hwnd, WM_COMMAND, ID_MM_FILE_SAVE_GAME, 0);
+									PostMessage(this->hwnd, WM_COMMAND, ID_MM_FILE_QUIT, 0);
 								}
 								break;
 							default:
@@ -569,13 +570,13 @@ namespace hoffman::isaiah {
 						}
 						switch (msg.wParam) {
 						case 'W':
-							PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_ACTIONS_NEXT_WAVE, 0);
+							PostMessage(this->hwnd, WM_COMMAND, ID_MM_ACTIONS_NEXT_WAVE, 0);
 							break;
 						case 'P':
-							PostMessage(hwnd, WM_COMMAND, ID_MM_ACTIONS_TOGGLE_PAUSE, 0);
+							PostMessage(this->hwnd, WM_COMMAND, ID_MM_ACTIONS_TOGGLE_PAUSE, 0);
 							break;
 						case VK_OEM_PLUS:
-							PostMessage(hwnd, WM_COMMAND, ID_MM_ACTIONS_CHANGE_SPEED, 0);
+							PostMessage(this->hwnd, WM_COMMAND, ID_MM_ACTIONS_CHANGE_SPEED, 0);
 							break;
 						}
 						break;
