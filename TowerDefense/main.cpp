@@ -634,22 +634,27 @@ namespace hoffman::isaiah {
 						}
 						break;
 					}
-
+					case WM_RBUTTONDOWN:
+					{
+						// Obtain start coordinates
+						const auto gx = static_cast<int>(game::g_my_game->getMap().convertToGameX(GET_X_LPARAM(msg.lParam)));
+						const auto gy = static_cast<int>(game::g_my_game->getMap().convertToGameY(GET_Y_LPARAM(msg.lParam)));
+						if (game::g_my_game->getMap().getTerrainGraph(false).verifyCoordinates(gx, gy)) {
+							this->start_gx = gx;
+							this->start_gy = gy;
+						}
+						break;
+					}
 					case WM_MOUSEMOVE:
 					{
-						if (msg.wParam == MK_LBUTTON) {
-							// Update end coordinates
-							const auto gx = static_cast<int>(game::g_my_game->getMap().convertToGameX(GET_X_LPARAM(msg.lParam)));
-							const auto gy = static_cast<int>(game::g_my_game->getMap().convertToGameY(GET_Y_LPARAM(msg.lParam)));
-							if (game::g_my_game->getMap().getTerrainGraph(false).verifyCoordinates(gx, gy)) {
-								this->end_gx = gx;
-								this->end_gy = gy;
-							}
+						// Update end coordinates
+						const auto gx = static_cast<int>(game::g_my_game->getMap().convertToGameX(GET_X_LPARAM(msg.lParam)));
+						const auto gy = static_cast<int>(game::g_my_game->getMap().convertToGameY(GET_Y_LPARAM(msg.lParam)));
+						if (game::g_my_game->getMap().getTerrainGraph(false).verifyCoordinates(gx, gy)) {
+							this->end_gx = gx;
+							this->end_gy = gy;
 						}
 						else if (msg.wParam == MK_RBUTTON) {
-							// Cancel action
-							this->start_gx = -1;
-							this->start_gy = -1;
 							this->end_gx = -1;
 							this->end_gy = -1;
 						}
@@ -717,8 +722,15 @@ namespace hoffman::isaiah {
 						// Get coordinates
 						const auto my_gx = static_cast<int>(game::g_my_game->getMap().convertToGameX(GET_X_LPARAM(msg.lParam)));
 						const auto my_gy = static_cast<int>(game::g_my_game->getMap().convertToGameY(GET_Y_LPARAM(msg.lParam)));
-						const auto my_new_lparam = MAKELPARAM(my_gx, my_gy);
-						PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_TOWERS_SELL_TOWER, my_new_lparam);
+						if (my_gx == start_gx && my_gy == start_gy) {
+							const auto my_new_lparam = MAKELPARAM(my_gx, my_gy);
+							PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_TOWERS_SELL_TOWER, my_new_lparam);
+						}
+						// Reset coordinates
+						this->start_gx = -1;
+						this->start_gy = -1;
+						this->end_gx = -1;
+						this->end_gy = -1;
 						break;
 					}
 					default:
