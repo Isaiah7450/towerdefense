@@ -77,6 +77,18 @@ enemy_data = {
 	}
 	# Etc.
 }
+boss_data = {
+	{
+		# Name of the enemy.
+		name = "Red King"
+		# The difficulty z-score for the enemy.
+		z_boss_difficulty = -1.5000
+	},
+	{
+		name = "Red Vengeful King", z_boss_difficulty = -0.5000
+	}
+	# Etc.
+}
 # The waves are randomly generated; results are normally distributed.
 # The mean wave difficulty starting at the start_level.
 wave_difficulty_mu = 0.00
@@ -97,11 +109,21 @@ group_difficulty_increase = 0.05
 # This indicates the standard deviation in group types. Again, the empirical
 # rule is a good benchmark.
 group_difficulty_sigma = 1.00
+# The expected difficulty of spawned bosses on the first boss level.
+boss_difficulty_mu = 0.00
+# The increase in average difficulty of spawned bosses every n levels.
+boss_difficulty_mod_increase = 0.10
+# The standard deviation in the difficulty of bosses.
+boss_difficulty_sigma = 1.00
 
 # The delay in milliseconds between waves. This value stays constant.
 wave_delay = 5000
 # The delay in milliseconds between groups. This value stays constant.
 group_delay = 2500
+# Bosses spawn every n levels where n is the number below.
+# (Precisely, bosses spawn on levels where (current - start) mod n = 0).
+levels_between_bosses = 10
+
 # The starting mean number of waves to generate each level. Again, this is
 # normally distributed.
 num_waves_mu = 5.00
@@ -118,3 +140,9 @@ num_groups_mu = 30.00
 num_groups_increase = 0.75
 # The standard deviation in number of groups generated per level.
 num_groups_sigma = 2.50
+# The expected number of bosses spawned on the first boss level.
+num_bosses_mu = 1.00
+# The expected increase in number of bosses spawned every n levels.
+num_bosses_mod_increase = 0.25
+# The standard deviation in the number of bosses spawned.
+num_bosses_sigma = 0.05

@@ -232,21 +232,48 @@ namespace hoffman::isaiah::game {
 		std::array<int, 3> spawn_times;
 	};
 
+	/// <summary>Stores metadata about boss enemies used by the level generator.</summary>
+	class GlobalLevelBossData {
+	public:
+		/// <param name="my_game">Constant reference to the game state.</param>
+		/// <param name="ename">The name of the enemy.</param>
+		/// <param name="z">The z-score associated with the enemy.</param>
+		GlobalLevelBossData(const MyGame& my_game, std::wstring ename, double z);
+		// Getters
+		const EnemyType* getType() const noexcept {
+			return this->enemy_type;
+		}
+		double getZScore() const noexcept {
+			return this->z_difficulty;
+		}
+	private:
+		/// <summary>The enemy type associated with this data.</summary>
+		const EnemyType* enemy_type;
+		/// <summary>The z-score associated with this enemy which is used to determine
+		/// the frequency this enemy is spawned.</summary>
+		double z_difficulty;
+	};
+
 	/// <summary>Used to generate new levels randomly.</summary>
 	class LevelGenerator {
 	public:
 		/// <param name="start_lv">The number of the first level to automatically generate.</param>
 		/// <param name="cdata">The color metadata for the level generator.</param>
 		/// <param name="edata">The enemy metadata for the level generator.</param>
+		/// <param name="bdata">The boss metadata for the level generator.</param>
 		/// <param name="wd_var">The wave difficulty random variable.</param>
 		/// <param name="gd_var">The group difficulty random variable.</param>
+		/// <param name="bd_var">The boss difficulty random variable.</param>
 		/// <param name="nw_var">The number of waves random variable.</param>
 		/// <param name="ng_var">The number of groups random variable.</param>
+		/// <param name="nb_var">The number of bosses random variable.</param>
 		/// <param name="wd">The wave delay (in milliseconds).</param>
 		/// <param name="gd">The group delay (in milliseconds).</param>
+		/// <param name="bmod">The number of levels between boss levels.</param>
 		LevelGenerator(int start_lv, std::vector<GlobalLevelColorData> cdata, std::vector<GlobalLevelEnemyData> edata,
-			LevelNormalRandomVariable wd_var, LevelNormalRandomVariable gd_var, LevelNormalRandomVariable nw_var,
-			LevelNormalRandomVariable ng_var, int wd, int gd);
+			std::vector<GlobalLevelBossData> bdata, LevelNormalRandomVariable wd_var, LevelNormalRandomVariable gd_var,
+			LevelNormalRandomVariable bd_var, LevelNormalRandomVariable nw_var, LevelNormalRandomVariable ng_var,
+			LevelNormalRandomVariable nb_var, int wd, int gd, int bmod);
 
 		/// <summary>Randomly generates a level.</summary>
 		/// <param name="level_number">The level number of the level to generate.</param>
@@ -269,6 +296,11 @@ namespace hoffman::isaiah::game {
 			return this->group_difficulty_var(levels_above_start);
 		}
 		/// <param name="levels_above_start">The number of levels since the first generated level.</param>
+		/// <returns>The boss difficulty value for this particular call.</returns>
+		double rollBossDifficulty(int levels_above_start) const noexcept {
+			return this->boss_difficulty_var(levels_above_start / this->boss_level_mod);
+		}
+		/// <param name="levels_above_start">The number of levels since the first generated level.</param>
 		/// <returns>The number of waves to generate for this particular call.</returns>
 		int rollNumWaves(int levels_above_start) const noexcept {
 			return math::get_max(static_cast<int>(this->num_waves_var(levels_above_start)), 1);
@@ -278,6 +310,11 @@ namespace hoffman::isaiah::game {
 		int rollNumGroups(int levels_above_start) const noexcept {
 			return math::get_max(static_cast<int>(this->num_groups_var(levels_above_start)), 1);
 		}
+		/// <param name="levels_above_start">The number of levels since the first generated level.</param>
+		/// <returns>The number of bosses to generate for this particular call.</returns>
+		int rollNumBosses(int levels_above_start) const noexcept {
+			return math::get_max(static_cast<int>(this->num_bosses_var(levels_above_start / this->boss_level_mod)), 1);
+		}
 
 		// Getters
 		const std::vector<GlobalLevelColorData>& getColorData() const noexcept {
@@ -285,6 +322,9 @@ namespace hoffman::isaiah::game {
 		}
 		const std::vector<GlobalLevelEnemyData>& getEnemyData() const noexcept {
 			return this->enemy_data;
+		}
+		const std::vector<GlobalLevelBossData>& getBossData() const noexcept {
+			return this->boss_data;
 		}
 		int getWaveDelay() const noexcept {
 			return this->wave_delay;
@@ -299,6 +339,8 @@ namespace hoffman::isaiah::game {
 		std::vector<GlobalLevelColorData> color_data;
 		/// <summary>The global enemy metadata.</summary>
 		std::vector<GlobalLevelEnemyData> enemy_data;
+		/// <summary>The global boss metadata.</summary>
+		std::vector<GlobalLevelBossData> boss_data;
 		/// <summary>The normally distributed random variable associated with
 		/// the difficulty of generated waves each level.</summary>
 		LevelNormalRandomVariable wave_difficulty_var;
@@ -306,14 +348,22 @@ namespace hoffman::isaiah::game {
 		/// the difficulty of generated groups each level.</summary>
 		LevelNormalRandomVariable group_difficulty_var;
 		/// <summary>The normally distributed random variable associated with
+		/// the difficulty of generated bosses every n levels.</summary>
+		LevelNormalRandomVariable boss_difficulty_var;
+		/// <summary>The normally distributed random variable associated with
 		/// the number of waves generated each level.</summary>
 		LevelNormalRandomVariable num_waves_var;
 		/// <summary>The normally distributed random variable associated with
 		/// the number of groups generated each level.</summary>
 		LevelNormalRandomVariable num_groups_var;
+		/// <summary>The normally distributed random variable associated with
+		/// the number of generated bosses every n levels.</summary>
+		LevelNormalRandomVariable num_bosses_var;
 		/// <summary>The standard wave delay (in milliseconds) used by the level generator.</summary>
 		int wave_delay;
 		/// <summary>The standard group delay (in milliseconds) used by the level generator.</summary>
 		int group_delay;
+		/// <summary>Bosses are spawned once every this many levels.</summary>
+		int boss_level_mod;
 	};
 }

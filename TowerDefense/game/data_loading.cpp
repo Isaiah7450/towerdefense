@@ -70,7 +70,7 @@ namespace hoffman::isaiah {
 						const std::wstring my_resources[] = {
 							L"enemies.ini", L"enemies.ini.format", L"shots.ini", L"shots.ini.format", L"towers.ini",
 							L"towers.ini.format", L"tower_upgrades.ini", L"tower_upgrades.ini.format", L"other.ini",
-							L"levels/global.ini", L"levels/level0.ini.format", L"levels/levels.xlsx",
+							L"levels/global.ini", L"levels/global.ini.format", L"levels/level0.ini.format", L"levels/levels.xlsx",
 							L"graphs/air_graph_beginner.txt", L"graphs/air_graph_intermediate.txt",
 							L"graphs/air_graph_experienced.txt", L"graphs/air_graph_expert.txt",
 							L"graphs/ground_graph_beginner.txt", L"graphs/ground_graph_intermediate.txt",
@@ -928,7 +928,7 @@ namespace hoffman::isaiah {
 					util::file::DataFileParser::validateNumberMinBound(ec_increase, 0.0, L"Extra count increase", my_parser.getLine(), true);
 					my_parser.readKeyValue(L"extra_count_sigma");
 					const double ec_sigma = my_parser.parseNumber<double>();
-					util::file::DataFileParser::validateNumberMinBound(ec_sigma, 0.0, L"Extra count sigma", my_parser.getLine(), true);
+					util::file::DataFileParser::validateNumberMinBound(ec_sigma, 0.0, L"Extra count sigma", my_parser.getLine(), false);
 					const LevelNormalRandomVariable ec_var {NormalRandomVariable {ec_mu, ec_sigma}, ec_increase};
 					my_parser.readKeyValue(L"spawn_times");
 					const auto spawn_times_vec = my_parser.readList<int>();
@@ -949,6 +949,38 @@ namespace hoffman::isaiah {
 					my_edata.emplace_back(*this, ename, cname, z_score, ec_var, spawn_times);
 				}
 				my_parser.expectToken(util::file::TokenTypes::Object, L"}");
+				// Boss data
+				my_parser.readKeyValue(L"boss_data");
+				my_parser.expectToken(util::file::TokenTypes::Object, L"{");
+				my_parser.getNext();
+				std::vector<GlobalLevelBossData> my_bdata {};
+				while (my_parser.matchToken(util::file::TokenTypes::Object, L"{")) {
+					my_parser.readKeyValue(L"name");
+					const std::wstring ename = my_parser.parseString();
+					try {
+						(void)this->getEnemyType(ename);
+						for (const auto& edata : my_edata) {
+							if (edata.getType()->getName() == ename) {
+								throw util::file::DataFileException {L"`" + ename + L"` is already defined as a regular enemy.", my_parser.getLine()};
+							}
+						}
+						for (const auto& bdata : my_bdata) {
+							if (bdata.getType()->getName() == ename) {
+								throw util::file::DataFileException {L"Repeat enemy type: `"s + ename + L"`"s, my_parser.getLine()};
+							}
+						}
+					}
+					catch (const std::out_of_range&) {
+						throw util::file::DataFileException {L"Unknown enemy type: `"s + ename + L"`"s, my_parser.getLine()};
+					}
+					my_parser.readKeyValue(L"z_boss_difficulty");
+					const double z_score = my_parser.parseNumber<double>();
+					my_parser.getNext();
+					my_parser.expectToken(util::file::TokenTypes::Object, L"}");
+					my_parser.getNext();
+					my_bdata.emplace_back(*this, ename, z_score);
+				}
+				my_parser.expectToken(util::file::TokenTypes::Object, L"}");
 				// Miscellaneous stuff to load with the level configurer.
 				my_parser.readKeyValue(L"wave_difficulty_mu");
 				const double wd_mu = my_parser.parseNumber<double>();
@@ -957,7 +989,7 @@ namespace hoffman::isaiah {
 				util::file::DataFileParser::validateNumberMinBound(wd_increase, 0.0, L"Wave difficulty increase", my_parser.getLine(), true);
 				my_parser.readKeyValue(L"wave_difficulty_sigma");
 				const double wd_sigma = my_parser.parseNumber<double>();
-				util::file::DataFileParser::validateNumberMinBound(wd_sigma, 0.0, L"Wave difficulty sigma", my_parser.getLine(), true);
+				util::file::DataFileParser::validateNumberMinBound(wd_sigma, 0.0, L"Wave difficulty sigma", my_parser.getLine(), false);
 				const LevelNormalRandomVariable wd_var {NormalRandomVariable {wd_mu, wd_sigma}, wd_increase};
 				my_parser.readKeyValue(L"group_difficulty_mu");
 				const double gd_mu = my_parser.parseNumber<double>();
@@ -966,12 +998,24 @@ namespace hoffman::isaiah {
 				util::file::DataFileParser::validateNumberMinBound(gd_increase, 0.0, L"Group difficulty increase", my_parser.getLine(), true);
 				my_parser.readKeyValue(L"group_difficulty_sigma");
 				const double gd_sigma = my_parser.parseNumber<double>();
-				util::file::DataFileParser::validateNumberMinBound(gd_sigma, 0.0, L"Group difficulty sigma", my_parser.getLine(), true);
+				util::file::DataFileParser::validateNumberMinBound(gd_sigma, 0.0, L"Group difficulty sigma", my_parser.getLine(), false);
 				const LevelNormalRandomVariable gd_var {NormalRandomVariable {gd_mu, gd_sigma}, gd_increase};
+				my_parser.readKeyValue(L"boss_difficulty_mu");
+				const double bd_mu = my_parser.parseNumber<double>();
+				my_parser.readKeyValue(L"boss_difficulty_mod_increase");
+				const double bd_mod_increase = my_parser.parseNumber<double>();
+				util::file::DataFileParser::validateNumberMinBound(bd_mod_increase, 0.0, L"Boss difficulty mod increase", my_parser.getLine(), true);
+				my_parser.readKeyValue(L"boss_difficulty_sigma");
+				const double bd_sigma = my_parser.parseNumber<double>();
+				util::file::DataFileParser::validateNumberMinBound(bd_sigma, 0.0, L"Boss difficulty sigma", my_parser.getLine(), false);
+				const LevelNormalRandomVariable bd_var {NormalRandomVariable {bd_mu, bd_sigma}, bd_mod_increase};
 				my_parser.readKeyValue(L"wave_delay");
 				const int wd = my_parser.parseNumber<int>();
 				my_parser.readKeyValue(L"group_delay");
 				const int gd = my_parser.parseNumber<int>();
+				my_parser.readKeyValue(L"levels_between_bosses");
+				const int bmod = my_parser.parseNumber<int>();
+				util::file::DataFileParser::validateNumberMinBound(bmod, 1, L"Levels between bosses", my_parser.getLine(), true);
 				my_parser.readKeyValue(L"num_waves_mu");
 				const double nw_mu = my_parser.parseNumber<double>();
 				my_parser.readKeyValue(L"num_waves_increase");
@@ -979,7 +1023,7 @@ namespace hoffman::isaiah {
 				util::file::DataFileParser::validateNumberMinBound(nw_increase, 0.0, L"Number of waves increase", my_parser.getLine(), true);
 				my_parser.readKeyValue(L"num_waves_sigma");
 				const double nw_sigma = my_parser.parseNumber<double>();
-				util::file::DataFileParser::validateNumberMinBound(nw_sigma, 0.0, L"Number of waves sigma", my_parser.getLine(), true);
+				util::file::DataFileParser::validateNumberMinBound(nw_sigma, 0.0, L"Number of waves sigma", my_parser.getLine(), false);
 				const LevelNormalRandomVariable nw_var {NormalRandomVariable {nw_mu, nw_sigma}, nw_increase};
 				my_parser.readKeyValue(L"num_groups_mu");
 				const double ng_mu = my_parser.parseNumber<double>();
@@ -988,10 +1032,19 @@ namespace hoffman::isaiah {
 				util::file::DataFileParser::validateNumberMinBound(ng_increase, 0.0, L"Number of groups increase", my_parser.getLine(), true);
 				my_parser.readKeyValue(L"num_groups_sigma");
 				const double ng_sigma = my_parser.parseNumber<double>();
-				util::file::DataFileParser::validateNumberMinBound(ng_sigma, 0.0, L"Number of groups sigma", my_parser.getLine(), true);
+				util::file::DataFileParser::validateNumberMinBound(ng_sigma, 0.0, L"Number of groups sigma", my_parser.getLine(), false);
 				const LevelNormalRandomVariable ng_var {NormalRandomVariable {ng_mu, ng_sigma}, ng_increase};
-				this->my_level_generator = std::make_unique<LevelGenerator>(start_lv, my_cdata, my_edata,
-					wd_var, gd_var, nw_var, ng_var, wd, gd);
+				my_parser.readKeyValue(L"num_bosses_mu");
+				const double nb_mu = my_parser.parseNumber<double>();
+				my_parser.readKeyValue(L"num_bosses_mod_increase");
+				const double nb_mod_increase = my_parser.parseNumber<double>();
+				util::file::DataFileParser::validateNumberMinBound(nb_mod_increase, 0.0, L"Number of bosses mod increase", my_parser.getLine(), true);
+				my_parser.readKeyValue(L"num_bosses_sigma");
+				const double nb_sigma = my_parser.parseNumber<double>();
+				util::file::DataFileParser::validateNumberMinBound(nb_sigma, 0.0, L"Number of bosses sigma", my_parser.getLine(), false);
+				const LevelNormalRandomVariable nb_var {NormalRandomVariable {nb_mu, nb_sigma}, nb_mod_increase};
+				this->my_level_generator = std::make_unique<LevelGenerator>(start_lv, my_cdata, my_edata, my_bdata,
+					wd_var, gd_var, bd_var, nw_var, ng_var, nb_var, wd, gd, bmod);
 			}
 		}
 

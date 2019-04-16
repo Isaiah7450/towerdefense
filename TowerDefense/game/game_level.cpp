@@ -106,23 +106,36 @@ namespace hoffman::isaiah::game {
 		spawn_times {stimes} {
 	}
 
+	GlobalLevelBossData::GlobalLevelBossData(const MyGame& my_game, std::wstring ename, double z) :
+		enemy_type {my_game.getEnemyType(ename)},
+		z_difficulty {z} {
+	}
+
 	LevelGenerator::LevelGenerator(int start_lv, std::vector<GlobalLevelColorData> cdata, std::vector<GlobalLevelEnemyData> edata,
-		LevelNormalRandomVariable wd_var, LevelNormalRandomVariable gd_var, LevelNormalRandomVariable nw_var,
-		LevelNormalRandomVariable ng_var, int wd, int gd) :
+		std::vector<GlobalLevelBossData> bdata,	LevelNormalRandomVariable wd_var, LevelNormalRandomVariable gd_var,
+		LevelNormalRandomVariable bd_var, LevelNormalRandomVariable nw_var, LevelNormalRandomVariable ng_var,
+		LevelNormalRandomVariable nb_var, int wd, int gd, int bmod) :
 		start_level {start_lv},
 		color_data {cdata},
 		enemy_data {edata},
+		boss_data {bdata},
 		wave_difficulty_var {wd_var},
 		group_difficulty_var {gd_var},
+		boss_difficulty_var {bd_var},
 		num_waves_var {nw_var},
 		num_groups_var {ng_var},
+		num_bosses_var {nb_var},
 		wave_delay {wd},
-		group_delay {gd} {
+		group_delay {gd},
+		boss_level_mod {bmod} {
 		std::sort(this->color_data.begin(), this->color_data.end(), [](const auto& a, const auto& b) {
 			return a.getZScore() < b.getZScore();
 		});
 		std::sort(this->enemy_data.begin(), this->enemy_data.end(), [](const auto& a, const auto& b) {
 			return a.getColorName() == b.getColorName() && a.getZScore() < b.getZScore();
+		});
+		std::sort(this->boss_data.begin(), this->boss_data.end(), [](const auto& a, const auto& b) {
+			return a.getZScore() < b.getZScore();
 		});
 	}
 
@@ -134,6 +147,29 @@ namespace hoffman::isaiah::game {
 		const int wave_groups_overflow = num_groups % num_waves;
 		std::deque<std::unique_ptr<EnemyWave>> my_level_waves {};
 		for (int w = 0; w < num_waves; ++w) {
+			if ((level_number - this->getStartLevel()) % this->boss_level_mod == 0 && level_number > start_level
+				&& w == num_waves / 2) {
+				// Boss level; add boss enemies.
+				const int groups_in_this_wave = this->rollNumBosses(levels_above_start);
+				std::deque<std::unique_ptr<EnemyGroup>> my_wave_groups {};
+				for (int g = 0; g < groups_in_this_wave; ++g) {
+					// Determine boss type.
+					const EnemyType* my_etype {nullptr};
+					static constexpr const int extra_count = 0;
+					static constexpr const int enemy_delay = 1500;
+					while (!my_etype) {
+						const double my_boss_difficulty = this->rollBossDifficulty(levels_above_start);
+						for (const auto& bdata : this->getBossData()) {
+							my_etype = bdata.getType();
+						}
+					}
+					std::queue<std::unique_ptr<Enemy>> group_enemies {EnemyGroup::createEnemies(my_etype, extra_count, my_game)};
+					auto my_enemy_group = std::make_unique<EnemyGroup>(std::move(group_enemies), enemy_delay);
+					my_wave_groups.emplace_back(std::move(my_enemy_group));
+				}
+				auto my_enemy_wave = std::make_unique<EnemyWave>(std::move(my_wave_groups), this->getGroupDelay());
+				my_level_waves.emplace_back(std::move(my_enemy_wave));
+			}
 			const int groups_in_this_wave = w - wave_groups_overflow < 0 ? min_wave_groups + 1 : min_wave_groups;
 			// Determine wave color.
 			std::wstring cname = L"";
@@ -170,10 +206,10 @@ namespace hoffman::isaiah::game {
 				auto my_enemy_group = std::make_unique<EnemyGroup>(std::move(group_enemies), enemy_delay);
 				my_wave_groups.emplace_back(std::move(my_enemy_group));
 			}
-			auto my_enemy_wave = std::make_unique<EnemyWave>(std::move(my_wave_groups), group_delay);
+			auto my_enemy_wave = std::make_unique<EnemyWave>(std::move(my_wave_groups), this->getGroupDelay());
 			my_level_waves.emplace_back(std::move(my_enemy_wave));
 		}
-		auto my_level = std::make_unique<GameLevel>(level_number, std::move(my_level_waves), wave_delay);
+		auto my_level = std::make_unique<GameLevel>(level_number, std::move(my_level_waves), this->getWaveDelay());
 		return my_level;
 	}
 }
