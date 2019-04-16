@@ -261,13 +261,13 @@ namespace hoffman::isaiah {
 			}
 			/// <returns>The enemy's starting armor health adjusted for the level, difficulty, and challenge level.</returns>
 			static double getAdjustedArmorHealth(double base_ahp, int level, double difficulty, int challenge_level) noexcept {
-				return base_ahp > 0 ? math::get_min(base_ahp * (challenge_level + 2.0) + level,
-					base_ahp + ((level - 1.0) * 0.05) * ((difficulty + challenge_level) / 12.5 + 0.84)) : 0;
+				return base_ahp > 0 ? math::get_min(base_ahp * (challenge_level + 1.5) + level * (challenge_level + 0.5),
+					base_ahp + ((level - 1.0) * 0.05) * ((difficulty + challenge_level) / 13.0 + 11.0 / 13.0)) : 0;
 			}
 			/// <returns>The enemy's starting speed adjusted for the level, difficulty, and challenge level.</returns>
 			static double getAdjustedSpeed(double base_speed, int level, double difficulty, int challenge_level) noexcept {
-				return base_speed + math::get_min(base_speed / 2.0, static_cast<double>(level - 1) * challenge_level * 0.001)
-					+ math::get_max(0.0, math::get_min(base_speed / 2.0, (difficulty - 1.0) * 0.0025));
+				return base_speed + math::get_min(base_speed * 0.375, static_cast<double>(level - 1) * challenge_level * 0.0007)
+					+ math::get_max(0.0, math::get_min(base_speed * 0.375, (difficulty - 1.0) * 0.0025));
 			}
 			/// <summary>Creates the enemy's actual buffs from the templates stored in its type.</summary>
 			void addEnemyBuffs() noexcept {
