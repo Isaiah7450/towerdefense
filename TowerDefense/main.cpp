@@ -80,10 +80,17 @@ namespace hoffman::isaiah {
 					CloseHandle(update_thread_init_event);
 					throw std::runtime_error {"Can update event does not exist."};
 				}
+				auto save_event = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, true, TEXT("save_finished"));
+				if (!save_event) {
+					CloseHandle(update_thread_init_event);
+					CloseHandle(update_event);
+					throw std::runtime_error {"Save finished event does not exist."};
+				}
 				auto sync_mutex = OpenMutex(SYNCHRONIZE | MUTEX_MODIFY_STATE, false, TEXT("can_execute"));
 				if (!sync_mutex) {
 					CloseHandle(update_thread_init_event);
 					CloseHandle(update_event);
+					CloseHandle(save_event);
 					throw std::runtime_error {"Can execute mutex does not exist."};
 				}
 				// Initialize the game's state
@@ -132,6 +139,7 @@ namespace hoffman::isaiah {
 									my_game->saveGame(save_file);
 									ReleaseMutex(sync_mutex);
 								}
+								SetEvent(save_event);
 								break;
 							}
 							case ID_MM_ACTIONS_NEXT_WAVE:
@@ -200,6 +208,7 @@ namespace hoffman::isaiah {
 				}
 				CloseHandle(update_thread_init_event);
 				CloseHandle(update_event);
+				CloseHandle(save_event);
 				CloseHandle(sync_mutex);
 			}
 			catch (const util::file::DataFileException& e) {
@@ -316,6 +325,13 @@ namespace hoffman::isaiah {
 				CloseHandle(draw_event);
 				winapi::handleWindowsError(L"Update thread ready creation");
 			}
+			auto save_event = CreateEvent(nullptr, false, false, TEXT("save_finished"));
+			if (!save_event) {
+				CloseHandle(update_event);
+				CloseHandle(draw_event);
+				CloseHandle(update_thread_init_event);
+				winapi::handleWindowsError(L"Save finished event creation");
+			}
 #pragma warning(push)
 #pragma warning(disable: 26490) // C26490 => Do not use reinterpret_cast.
 			HANDLE update_thread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, winapi::update_thread_init,
@@ -325,6 +341,7 @@ namespace hoffman::isaiah {
 				CloseHandle(update_event);
 				CloseHandle(draw_event);
 				CloseHandle(update_thread_init_event);
+				CloseHandle(save_event);
 				winapi::handleWindowsError(L"Update thread creation");
 			}
 			WaitForSingleObject(update_thread_init_event, INFINITE);
@@ -416,6 +433,9 @@ namespace hoffman::isaiah {
 						}
 						case ID_MM_FILE_QUIT:
 						{
+							ResetEvent(save_event);
+							PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_FILE_SAVE_GAME, 0);
+							WaitForSingleObject(save_event, INFINITE);
 							PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
 							PostMessage(hwnd, WM_DESTROY, 0, 0);
 							break;
@@ -560,7 +580,6 @@ namespace hoffman::isaiah {
 								// flat out annoying.
 								if (MessageBox(hwnd, L"Are you sure you want to quit?",
 									L"Tower defense - Quit?", MB_YESNO) == IDYES) {
-									SendMessage(this->hwnd, WM_COMMAND, ID_MM_FILE_SAVE_GAME, 0);
 									PostMessage(this->hwnd, WM_COMMAND, ID_MM_FILE_QUIT, 0);
 								}
 								break;
@@ -737,6 +756,7 @@ namespace hoffman::isaiah {
 			CloseHandle(update_thread);
 			CloseHandle(update_event);
 			CloseHandle(draw_event);
+			CloseHandle(save_event);
 			CloseHandle(sync_mutex);
 		}
 	}
