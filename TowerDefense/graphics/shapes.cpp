@@ -22,8 +22,8 @@ namespace hoffman::isaiah {
 			const auto my_translate = D2D1::Matrix3x2F::Translation({this->h_translate, this->v_translate});
 			const auto my_rotate = D2D1::Matrix3x2F::Rotation(math::convert_to_degrees<float>(this->theta),
 				D2D1::Point2F(this->center_sx, this->center_sy));
-			const auto my_scale = D2D1::Matrix3x2F::Scale({this->h_scale, this->v_scale});
-			const auto my_transform = my_rotate * my_translate * my_scale;
+			const auto my_scale = D2D1::Matrix3x2F::Scale({this->h_scale, this->v_scale}, {this->center_sx, this->center_sy});
+			const auto my_transform = my_scale * my_rotate * my_translate;
 			// Release old geometry
 			graphics::SafeRelease(&this->transformed_geometry);
 			// Create new geometry
