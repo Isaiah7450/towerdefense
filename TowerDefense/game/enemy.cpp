@@ -256,7 +256,9 @@ namespace hoffman::isaiah {
 			constexpr const graphics::Color armor_fill_color {0.0f, 0.0f, 0.8f, 0.9f};
 			constexpr const graphics::Color shield_fill_color {0.0, 0.8f, 0.8f, 0.9f};
 			const double hp_percent = this->getHealthPercentage();
-			const float bar_max_width = 0.4f * this->getGameMap().getGameSquareWidth<float>();
+			const float bar_max_width = this->getBaseType().isUnique()
+				? 0.8f * this->getGameMap().getGameSquareWidth<float>()
+				: 0.4f * this->getGameMap().getGameSquareWidth<float>();
 			const float bar_height = 0.115f * this->getGameMap().getGameSquareHeight<float>();
 			const float hp_bar_offset = 3.23f * bar_height;
 			// Roughtly 3.23 * bar_height
