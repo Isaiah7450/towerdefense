@@ -131,7 +131,7 @@ namespace hoffman::isaiah {
 			const GameMap& gmap, int level, double difficulty, int challenge_level) :
 			GameObject {dev_res, my_map, etype->getShape(), o_color, etype->getColor(),
 			gmap.getTerrainGraph(etype->isFlying()).getStartNode()->getGameX() + 0.5,
-			gmap.getTerrainGraph(etype->isFlying()).getStartNode()->getGameY() + 0.5, 0.5, 0.5},
+			gmap.getTerrainGraph(etype->isFlying()).getStartNode()->getGameY() + 0.5, Enemy::gwidth, Enemy::gheight},
 			base_type {etype},
 			my_pathfinder {gmap, etype->isFlying(), etype->canMoveDiagonally(), etype->getDefaultStrategy()},
 			my_path {},
@@ -148,6 +148,9 @@ namespace hoffman::isaiah {
 			move_diagonally {etype->canMoveDiagonally()},
 			status_effects {},
 			buffs {} {
+			if (this->getBaseType().isUnique()) {
+				this->scale(Enemy::unique_enemy_scale);
+			}
 			// Get path
 			this->my_pathfinder.findPath(challenge_level / 10.0);
 			this->my_path = this->my_pathfinder.getPath();
@@ -161,7 +164,7 @@ namespace hoffman::isaiah {
 			const EnemyType* etype, graphics::Color o_color,
 			pathfinding::Pathfinder pf, double start_gx, double start_gy,
 			int level, double difficulty, int challenge_level) :
-			GameObject {dev_res, my_map, etype->getShape(), o_color, etype->getColor(), start_gx, start_gy, 0.5, 0.5},
+			GameObject {dev_res, my_map, etype->getShape(), o_color, etype->getColor(), start_gx, start_gy, Enemy::gwidth, Enemy::gheight},
 			base_type {etype},
 			my_pathfinder {pf},
 			my_path {pf.getPath()},
@@ -178,6 +181,9 @@ namespace hoffman::isaiah {
 			move_diagonally {etype->canMoveDiagonally()},
 			status_effects {},
 			buffs {} {
+			if (this->getBaseType().isUnique()) {
+				this->scale(Enemy::unique_enemy_scale);
+			}
 			this->current_node = &this->my_path.front();
 			this->my_path.pop();
 			this->changeDirection();

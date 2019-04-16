@@ -37,6 +37,9 @@ namespace hoffman::isaiah {
 			void rotate(float new_theta) {
 				this->sprite->change_rotation(new_theta);
 			}
+			void scale(float new_size_percent) {
+				this->sprite->change_scale(new_size_percent, new_size_percent);
+			}
 
 			// Getters
 			/// <returns>Returns the game x-coordinate of the object.</returns>

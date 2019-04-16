@@ -23,6 +23,12 @@ namespace hoffman::isaiah {
 		/// <summary>Class that represents an actual enemy in the game.</summary>
 		class Enemy : public GameObject {
 		public:
+			// The width of normal enemies in game coordinate squares.
+			static constexpr const float gwidth = 0.5f;
+			// The height of normal enemies in game coordinate squares.
+			static constexpr const float gheight = 0.5f;
+			// The scale factor to apply to unique enemies.
+			static constexpr const float unique_enemy_scale = 1.33f;
 			/// <summary>Stores information about a enemy's resistance to a status affliction.</summary>
 			class StatusResistance {
 			public:
