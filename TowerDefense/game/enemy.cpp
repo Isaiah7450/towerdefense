@@ -255,6 +255,10 @@ namespace hoffman::isaiah {
 		void Enemy::draw(const graphics::Renderer2D& renderer) const noexcept {
 			// Call base class member first
 			GameObject::draw(renderer);
+			// Only draw bars if injured.
+			if (this->getHealthPercentage() >= 0.99 && (!this->hasArmor() || this->getArmorPercentage() >= 0.99)) {
+				return;
+			}
 			// Draw health bars
 			constexpr const graphics::Color bar_outline_color {0.2f, 0.2f, 0.2f, 1.0f};
 			constexpr const graphics::Color bar_empty_color {0.7f, 0.7f, 0.7f, 1.0f};
@@ -280,7 +284,7 @@ namespace hoffman::isaiah {
 			renderer.outlineRectangle(hp_bar_outline_rc);
 			renderer.setFillColor(health_fill_color);
 			renderer.fillRectangle(hp_bar_filled_rc);
-			if (this->hasArmor()) {
+			if (this->hasArmor() && this->getArmorPercentage() <= 0.99) {
 				const double ahp_percent = this->getArmorPercentage();
 				const float ahp_bar_offset = hp_bar_offset + bar_height + 0.5f * bar_height;
 				// Roughly hp_bar_offset + 0.5 * bar_height + bar_height
