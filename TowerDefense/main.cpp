@@ -422,6 +422,9 @@ namespace hoffman::isaiah {
 						}
 						case ID_MM_ACTIONS_NEXT_WAVE:
 						{
+							if (game::g_my_game->canStartCustomGames()) {
+								winapi::enableMenuItem(hwnd, 0, ID_MM_FILE_START_CUSTOM_GAME);
+							}
 							PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
 							break;
 						}

@@ -147,9 +147,6 @@ namespace hoffman::isaiah {
 				my_game_stats.close();
 				// For integrity reasons, the stats of custom games are not tracked.
 				if (!this->in_custom_game) {
-					if (this->getLevelNumber() > this->highest_levels.at(challenge_level + ID_CHALLENGE_LEVEL_EASY)) {
-						this->highest_levels.at(challenge_level + ID_CHALLENGE_LEVEL_EASY) = this->getLevelNumber();
-					}
 					if (this->getLevelNumber() > 99) {
 						this->start_custom_games = true;
 					}
@@ -266,6 +263,11 @@ namespace hoffman::isaiah {
 					// Update difficulty
 					this->updateDifficulty();
 					++this->level;
+					// Unlock the ability to start custom games, and make sure the game remembers this fact.
+					if (this->getLevelNumber() > 99) {
+						this->start_custom_games = true;
+						this->saveGlobalData();
+					}
 					this->did_lose_life = false;
 					this->in_level = false;
 				}
@@ -294,6 +296,12 @@ namespace hoffman::isaiah {
 				std::wofstream save_file {this->getUserDataPath() + game::default_save_file_name};
 				if (!save_file.fail() && !save_file.bad()) {
 					this->saveGame(save_file);
+					if (!this->in_custom_game) {
+						if (this->getLevelNumber() > this->highest_levels.at(challenge_level + ID_CHALLENGE_LEVEL_EASY)) {
+							this->highest_levels.at(challenge_level + ID_CHALLENGE_LEVEL_EASY) = this->getLevelNumber();
+						}
+						this->saveGlobalData();
+					}
 				}
 				// Load the level...
 				this->in_level = true;
