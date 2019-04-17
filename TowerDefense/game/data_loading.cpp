@@ -31,9 +31,9 @@ using namespace std::literals::string_literals;
 namespace hoffman::isaiah {
 	namespace game {
 
-		void MyGame::load_config_data() {
-			constexpr const auto config_file_name = L"./config/config.ini";
-			[[maybe_unused]] std::wifstream config_file {config_file_name};
+		void MyGame::load_config_data(bool ran_once) {
+			constexpr const auto config_file_name = L"../config/config.ini";
+			[[maybe_unused]] std::wifstream config_file {this->userdata_folder_path + config_file_name};
 			if (config_file.fail() || config_file.bad()) {
 				// Fail silently.
 				return;
@@ -59,6 +59,12 @@ namespace hoffman::isaiah {
 					CreateDirectory((this->resources_folder_path + L"graphs/").c_str(), nullptr);
 					this->userdata_folder_path = my_path + L"userdata/"s;
 					CreateDirectory(this->userdata_folder_path.c_str(), nullptr);
+					// Reload the correct file.
+					if (!ran_once && std::filesystem::exists(this->userdata_folder_path + config_file_name)) {
+						config_file.close();
+						this->load_config_data(true);
+						return;
+					}
 					my_parser.readKeyValue(L"do_copy");
 					if (my_parser.parseBoolean()) {
 						// Copy needed files.
@@ -79,8 +85,9 @@ namespace hoffman::isaiah {
 						for (const auto res_str : my_resources) {
 							CopyFile((L"./resources/" + res_str).c_str(), (this->resources_folder_path + res_str).c_str(), FALSE);
 						}
+						std::filesystem::create_directory(this->userdata_folder_path + L"../config/");
 						config_file.close();
-						std::wofstream my_config_writer {config_file_name, std::ios_base::out | std::ios_base::trunc};
+						std::wofstream my_config_writer {this->userdata_folder_path + config_file_name, std::ios_base::out | std::ios_base::trunc};
 						if (my_config_writer.fail() || my_config_writer.bad()) {
 							// Fail silently.
 							return;

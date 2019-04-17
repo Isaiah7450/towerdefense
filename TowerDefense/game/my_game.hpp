@@ -100,7 +100,8 @@ namespace hoffman::isaiah {
 			void debugUpdate(DebugUpdateStates cause);
 			// Note: Defined in data_loading.cpp
 			/// <summary>Loads application data.</summary>
-			void load_config_data();
+			/// <param name="ran_once">Has this method been called before?</param>
+			void load_config_data(bool ran_once = false);
 			/// <summary>Initializes the list of enemy types in this game.</summary>
 			void init_enemy_types();
 			/// <summary>Initializes the list of shot types in this game.</summary>
