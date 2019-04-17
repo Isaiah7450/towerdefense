@@ -114,6 +114,7 @@ Section "Game Binary Files" SectionGame
   SetOutPath $R0
   ${If} ${RunningX64}
   File /oname=tower_defense.exe "..\x64_release_towerdefense.exe"
+  File /oname=tower_defense_x86.exe "..\x86_release_towerdefense.exe"
   ${Else}
   File /oname=tower_defense.exe "..\x86_release_towerdefense.exe"
   ${EndIf}
@@ -138,6 +139,7 @@ Section "Resource Files" SectionResources
   File ".\..\resources\levels\level0.ini.format"
   File ".\..\resources\levels\levels.xlsx"
   File ".\..\resources\levels\global.ini"
+  File ".\..\resources\levels\global.ini.format"
   SetOutPath $R0\resources\graphs
   File ".\..\resources\graphs\air_graph_*.txt"
   File ".\..\resources\graphs\ground_graph_*.txt"
