@@ -35,6 +35,20 @@ namespace hoffman::isaiah {
 			if (FAILED(hr)) {
 				winapi::handleWindowsError(L"Vertical centering of text");
 			}
+			hr = this->write_factory->CreateTextFormat(L"Arial", nullptr, DWRITE_FONT_WEIGHT_REGULAR,
+				DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 10.f,
+				L"en-us", &this->small_text_format);
+			if (FAILED(hr)) {
+				winapi::handleWindowsError(L"Creation of small text format");
+			}
+			hr = this->small_text_format->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+			if (FAILED(hr)) {
+				winapi::handleWindowsError(L"Horizontal centering of small text");
+			}
+			hr = this->small_text_format->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+			if (FAILED(hr)) {
+				winapi::handleWindowsError(L"Vertical centering of small text");
+			}
 		}
 
 		HRESULT DeviceResources2D::createDeviceResources(HWND hwnd) {

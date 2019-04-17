@@ -30,6 +30,7 @@ namespace hoffman::isaiah {
 			/// <summary>Releases all COM resources owned by this class.</summary>
 			~DeviceResources2D() noexcept {
 				this->discardDeviceResources();
+				SafeRelease(&this->small_text_format);
 				SafeRelease(&this->text_format);
 				SafeRelease(&this->write_factory);
 				SafeRelease(&this->factory);
@@ -73,6 +74,9 @@ namespace hoffman::isaiah {
 			IDWriteTextFormat* getTextFormat() noexcept {
 				return this->text_format;
 			}
+			IDWriteTextFormat* getSmallTextFormat() noexcept {
+				return this->small_text_format;
+			}
 		protected:
 			IDWriteFactory* getWriteFactory() noexcept {
 				return this->write_factory;
@@ -90,6 +94,8 @@ namespace hoffman::isaiah {
 			IDWriteFactory* write_factory {nullptr};
 			/// <summary>Pointer to the text format (used with DirectWrite).</summary>
 			IDWriteTextFormat* text_format {nullptr};
+			/// <summary>Pointer to the text format used for rendering smaller text.</summary>
+			IDWriteTextFormat* small_text_format {nullptr};
 			/// <summary>Pointer to the Direct2D brush used for text.</summary>
 			ID2D1SolidColorBrush* text_brush {nullptr};
 

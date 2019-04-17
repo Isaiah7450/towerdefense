@@ -33,10 +33,18 @@ namespace hoffman::isaiah {
 				// Also paint upgrade level.
 				constexpr const graphics::Color text_color {1.f, 0.2f, 1.f, 1.f};
 				if (this->getLevel() > 1) {
-					renderer.drawText(std::to_wstring(this->getLevel()), text_color,
-						renderer.createRectangle(static_cast<float>(this->getGameMap().convertToScreenX(this->getGameX() - 0.5)),
-							static_cast<float>(this->getGameMap().convertToScreenY(this->getGameY() - 0.5)),
-							this->getGameMap().getGameSquareWidth<float>(), this->getGameMap().getGameSquareHeight<float>()));
+					if (this->getGameMap().getColumns() <= 40 && this->getGameMap().getRows() <= 40) {
+						renderer.drawText(std::to_wstring(this->getLevel()), text_color,
+							renderer.createRectangle(static_cast<float>(this->getGameMap().convertToScreenX(this->getGameX() - 0.5)),
+								static_cast<float>(this->getGameMap().convertToScreenY(this->getGameY() - 0.5)),
+								this->getGameMap().getGameSquareWidth<float>(), this->getGameMap().getGameSquareHeight<float>()));
+					}
+					else {
+						renderer.drawSmallText(std::to_wstring(this->getLevel()), text_color,
+							renderer.createRectangle(static_cast<float>(this->getGameMap().convertToScreenX(this->getGameX() - 0.5)),
+								static_cast<float>(this->getGameMap().convertToScreenY(this->getGameY() - 0.5)),
+								this->getGameMap().getGameSquareWidth<float>(), this->getGameMap().getGameSquareHeight<float>()));
+					}
 				}
 			}
 			if (this->getVolleyShots() == 0) {

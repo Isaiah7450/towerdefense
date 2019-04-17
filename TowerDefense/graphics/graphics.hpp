@@ -111,7 +111,14 @@ namespace hoffman::isaiah {
 			/// <param name="text">The text to render on the screen.</param>
 			/// <param name="t_color">The color to render the text in.</param>
 			/// <param name="my_rect">The enclosing rectangle of the text.</param>
-			void drawText(std::wstring text, Color t_color, D2D_RECT_F my_rect) const noexcept;
+			/// <param name="draw_rect">Whether or not to draw the enclosing rectangle.</param>
+			void drawText(std::wstring text, Color t_color, D2D_RECT_F my_rect, bool draw_rect = true) const noexcept;
+			/// <summary>Renders some small text on the screen.</summary>
+			/// <param name="text">The text to render on the screen.</param>
+			/// <param name="t_color">The color to render the text in.</param>
+			/// <param name="my_rect">The enclosing rectangle of the text.</param>
+			/// <param name="draw_rect">Whether or not to draw the enclosing rectangle.</param>
+			void drawSmallText(std::wstring text, Color t_color, D2D_RECT_F my_rect, bool draw_rect = true) const noexcept;
 			
 			/// <summary>Draws the current scene based on the game state.</summary>
 			/// <param name="my_game">Shared pointer to object that contains the current game state.</param>

@@ -178,12 +178,20 @@ namespace hoffman::isaiah {
 			const auto cs_height = this->getGameSquareHeight<FLOAT>();
 			const auto ground_start_lsx = static_cast<FLOAT>(this->convertToScreenX(ground_start_node->getGameX()));
 			const auto ground_start_tsy = static_cast<FLOAT>(this->convertToScreenY(ground_start_node->getGameY()));
-			renderer.drawText(L"GS", white_color, renderer.createRectangle(ground_start_lsx,
-				ground_start_tsy, cs_width, cs_height));
 			const auto air_start_lsx = static_cast<FLOAT>(this->convertToScreenX(air_start_node->getGameX()));
 			const auto air_start_tsy = static_cast<FLOAT>(this->convertToScreenY(air_start_node->getGameY()));
-			renderer.drawText(L"AS", white_color, renderer.createRectangle(air_start_lsx,
-				air_start_tsy, cs_width, cs_height));
+			if (this->getColumns() <= 40 && this->getRows() <= 40) {
+				renderer.drawText(L"GS", white_color, renderer.createRectangle(ground_start_lsx,
+					ground_start_tsy, cs_width, cs_height), false);
+				renderer.drawText(L"AS", white_color, renderer.createRectangle(air_start_lsx,
+					air_start_tsy, cs_width, cs_height), false);
+			}
+			else {
+				renderer.drawSmallText(L"GS", white_color, renderer.createRectangle(ground_start_lsx,
+					ground_start_tsy, cs_width, cs_height), false);
+				renderer.drawSmallText(L"AS", white_color, renderer.createRectangle(air_start_lsx,
+					air_start_tsy, cs_width, cs_height), false);
+			}
 		}
 
 		void GameMap::draw(const graphics::Renderer2D& renderer, bool in_editor) const noexcept {

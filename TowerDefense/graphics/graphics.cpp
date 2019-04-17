@@ -147,13 +147,22 @@ namespace hoffman::isaiah {
 			this->device_resources->getRenderTarget()->FillGeometry(my_geom, this->device_resources->getFillBrush());
 		}
 
-		void Renderer2D::drawText(std::wstring text, Color t_color, D2D_RECT_F my_rect) const noexcept {
+		void Renderer2D::drawText(std::wstring text, Color t_color, D2D_RECT_F my_rect, bool draw_rect) const noexcept {
 			this->setTextColor(t_color);
 			this->device_resources->getRenderTarget()->DrawText(text.c_str(), static_cast<UINT32>(text.size()),
 				this->device_resources->getTextFormat(), my_rect, this->device_resources->getTextBrush());
-// #if defined(DEBUG) || defined(_DEBUG)
-			this->outlineRectangle(my_rect);
-// #endif // DEBUG || _DEBUG
+			if (draw_rect) {
+				this->outlineRectangle(my_rect);
+			}
+		}
+
+		void Renderer2D::drawSmallText(std::wstring text, Color t_color, D2D_RECT_F my_rect, bool draw_rect) const noexcept {
+			this->setTextColor(t_color);
+			this->device_resources->getRenderTarget()->DrawText(text.c_str(), static_cast<UINT32>(text.size()),
+				this->device_resources->getSmallTextFormat(), my_rect, this->device_resources->getTextBrush());
+			if (draw_rect) {
+				this->outlineRectangle(my_rect);
+			}
 		}
 
 		HRESULT Renderer2D::render(const std::shared_ptr<game::MyGame> my_game, int mouse_gx, int mouse_gy,
