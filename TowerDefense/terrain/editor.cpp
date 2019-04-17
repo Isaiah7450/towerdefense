@@ -316,6 +316,7 @@ namespace hoffman::isaiah {
 						this->updateMenu();
 					}
 					case WM_LBUTTONDOWN:
+					case WM_RBUTTONDOWN:
 					{
 						// Obtain start coordinates
 						const auto gx = static_cast<int>(this->getMap().convertToGameX(GET_X_LPARAM(msg.lParam)));
@@ -326,28 +327,17 @@ namespace hoffman::isaiah {
 						}
 						break;
 					}
-
 					case WM_MOUSEMOVE:
 					{
-						if (msg.wParam == MK_LBUTTON) {
-							// Update end coordinates
-							const auto gx = static_cast<int>(this->getMap().convertToGameX(GET_X_LPARAM(msg.lParam)));
-							const auto gy = static_cast<int>(this->getMap().convertToGameY(GET_Y_LPARAM(msg.lParam)));
-							if (this->getMap().getTerrainGraph(false).verifyCoordinates(gx, gy)) {
-								this->end_gx = gx;
-								this->end_gy = gy;
-							}
-						}
-						else if (msg.wParam == MK_RBUTTON) {
-							// Cancel action
-							this->start_gx = -1;
-							this->start_gy = -1;
-							this->end_gx = -1;
-							this->end_gy = -1;
-						}
+						// Update end coordinates
+						const auto gx = static_cast<int>(this->getMap().convertToGameX(GET_X_LPARAM(msg.lParam)));
+						const auto gy = static_cast<int>(this->getMap().convertToGameY(GET_Y_LPARAM(msg.lParam)));
+						this->end_gx = gx;
+						this->end_gy = gy;
 						break;
 					}
 					case WM_LBUTTONUP:
+					case WM_RBUTTONUP:
 					{
 						// Update end coordinates
 						const auto new_gx = static_cast<int>(this->getMap().convertToGameX(GET_X_LPARAM(msg.lParam)));
@@ -401,9 +391,14 @@ namespace hoffman::isaiah {
 								// Apply terrain weight adjustment
 								selected_gnode.setWeight(selected_gnode.getWeight() + this->terrain_weights_adjust);
 								selected_anode.setWeight(selected_anode.getWeight() + this->terrain_weights_adjust);
+								// Right-click to paint over with default terrain (grass).
+								if (msg.message == WM_RBUTTONUP) {
+									selected_gnode.setWeight(1);
+									selected_anode.setWeight(1);
+								}
 							}
 						} // End outer for
-						if (this->terrain_modifier_active) {
+						if (this->terrain_modifier_active && msg.message != WM_RBUTTONUP) {
 							// Apply terrain modifier
 							// Use top-left hand corner of rectangle to apply modifier
 							switch (this->selected_terrain_modifier) {
