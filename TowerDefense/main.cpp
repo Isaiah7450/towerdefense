@@ -624,16 +624,6 @@ namespace hoffman::isaiah {
 						break;
 					}
 					case WM_LBUTTONDOWN:
-					{
-						// Obtain start coordinates
-						const auto gx = static_cast<int>(game::g_my_game->getMap().convertToGameX(GET_X_LPARAM(msg.lParam)));
-						const auto gy = static_cast<int>(game::g_my_game->getMap().convertToGameY(GET_Y_LPARAM(msg.lParam)));
-						if (game::g_my_game->getMap().getTerrainGraph(false).verifyCoordinates(gx, gy)) {
-							this->start_gx = gx;
-							this->start_gy = gy;
-						}
-						break;
-					}
 					case WM_RBUTTONDOWN:
 					{
 						// Obtain start coordinates
@@ -673,7 +663,17 @@ namespace hoffman::isaiah {
 						this->start_gy = math::get_min(this->start_gy, new_gy);
 						if (game::g_my_game->getMap().getTerrainGraph(false).verifyCoordinates(this->start_gx, this->start_gy)
 							&& game::g_my_game->getMap().getTerrainGraph(false).verifyCoordinates(this->end_gx, this->end_gy)) {
-							if (game::g_my_game->getSelectedTower() == 0) {
+							if (game::g_my_game->getSelectedTower() == -1) {
+								// Invert coverage showing.
+								for (int gx = this->start_gx; gx <= this->end_gx; ++gx) {
+									for (int gy = this->start_gy; gy <= this->end_gy; ++gy) {
+										const auto my_new_lparam = MAKELPARAM(gx, gy);
+										PostThreadMessage(GetThreadId(update_thread), WM_COMMAND,
+											ID_MM_TOWERS_BUY_TOWER, my_new_lparam);
+									}
+								}
+							}
+							else if (game::g_my_game->getSelectedTower() == 0) {
 								// Wall...
 								WaitForSingleObject(sync_mutex, INFINITE);
 								for (int gx = this->start_gx; gx <= this->end_gx; ++gx) {
