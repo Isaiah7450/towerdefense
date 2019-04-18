@@ -635,3 +635,159 @@ Version 3.2.2: (Released April 11, 2019)
    in the game.)
  + Made Blue Supporter, Blue Quartermaster, and Blue King/Vengeful King
    have darker colors to aid differentiation.
+
+Version 3.3.0: (Released April 17, 2019)
+- Bug Fixes:
+ + Fixed a crash caused by creating a new map with dimensions different from
+   what the currently loaded game possesses.
+ + Fixed the save file being cleared (rather than overwritten with data)
+   when a player dies.
+ + Changed the terrain editor's "Save as" dialog to have "Save as" instead
+   of "Open map" in the title.
+ + Fixed writing the names of enemies the player has not seen before to the
+   stats file on game over.
+ + Fixed the game not correctly setting the map name at all times (and thus
+   saving the wrong map name.)
+ + Fixed excluding "Blue Tyrant King" from "Blue All Group".
+ + Fixed shapes not being scaled properly in the game.
+ + Fixed some broken keybinds.
+ + Fixed a text scaling issue on larger maps. (Note: Terrain weight text
+   has not been scaled.)
+ + Fixed an error where the program copied its resource file on each launch
+   rather than only once.
+- Balance Changes:
+ + Changed the cost multiplier of buying health from 1.05x to 1.15x.
+ + Adjusted enemy status resistance such that it lasts for slightly shorter
+   periods of time. It also builds up slightly slower.
+ + Changed the dynamic difficulty modifier to have a lesser impact at higher
+   difficulties and more impact at lower difficulties.
+  * Also added some constraints so the difficulty does not change by
+    ridiculous amounts at certain points.
+ + Changed the scaling and caps on armor health and speed from the current
+   level and difficulty modifier.
+ + Red Vengeful King: Added "Everyone" (Healer) buff.
+ + Red Vengeful King: Added "Everyone" (Repair) buff.
+ + Green Majestic Queen: Removed "Green All Group" (Speed 1) buff.
+ + Green Majestic Queen: "Purple All Group" (Speed 1) delay decreased from
+                         12500ms to 10000ms.
+ + Green Majestic Queen: "Purple All Group" (Speed 1) duration decreased from
+                         6000ms to 6000ms.
+ + Green Majestic Queen: "Purple All Group" (Speed 1) walking speed boost
+                         decreased from 50% to 45%.
+ + Green Majestic Queen: "Purple All Group" (Speed 1) running speed boost
+                         decreased from 50% to 45%.
+ + Green Majestic Queen: "Purple All Group" (Speed 1) changed to
+                         "Everyone" (Speed).
+ + Green Majestic Queen: "Green Queen Group" (Forcefield 1) shield health
+                         decreased from 300 to 250.
+ + Purple Soldier: Armor Health decreased from 31 to 26.
+ + Purple Medic: Health decreased from 39 to 33.
+ + Purple Medic: Armor Health decreased from 8 to 5.
+ + Purple Medic: "Purple All Group" (Purify 1) delay increased from 5000ms
+                 to 7000ms.
+ + Purple Medic: "Purple Medic Group" (Healer 1) radius decreased from 1.0
+                 tiles to 0.3 tiles.
+ + Purple Medic: "Purple Medic Group" (Healer 1) heal amount decreased from
+                 2.5 to 1.2.
+ + Purple Medic: "Green and Purple Infantry Group" (Healer 2) radius increased
+                 from 0.4 tiles to 0.7 tiles.
+ + Purple Medic: "Green and Purple Infantry Group" (Healer 2) delay increased
+                 from 850ms to 1200ms.
+ + Purple Medic: "Green and Purple Infantry Group" (Healer 2) heal amount
+                 increased from 0.1 to 0.2.
+ + Purple Medic: Removed "Green and Purple Infantry Group" (Healer 1).
+ + Purple General: "Purple All Group" (Purify 1) purify max effects
+                   decreased from 3 to 2.
+ + Purple Queen: "Purple All Group" (Healer 1) radius decreased from 7.5
+                 tiles to 7.0 tiles.
+ + Purple Queen: "Purple All Group" (Healer 1) heal amount decreased from
+                 120.0 to 25.0.
+ + Purple Vibrant Queen: "Green All Group" (Purify 1) purify max effects
+                         decreased from 3 to 2.
+ + Purple Vibrant Queen: "Purple All Group" (Purify 1) delay increased from
+                         2000ms to 2750ms.
+ + Purple Vibrant Queen: "Green All Group" (Intelligence 1) radius increased
+                         from 2.5 tiles to 6 tiles.
+ + Purple Vibrant Queen: "Green All Group" (Intelligence 1) delay decreased
+                         from 30000ms to 10000ms.
+ + Purple Vibrant Queen: "Green All Group" (Intelligence 1) duration decreased
+                         from 25000ms to 9333ms.
+ + Purple Vibrant Queen: "Green All Group" (Intelligence 1) changed to
+                         "Everyone" (Intelligence).
+ + Purple Vibrant Queen: "Green and Purple Heal Group" (Healer 1) radius
+                         decreased from 7.5 tiles to 6.5 tiles.
+ + Purple Vibrant Queen: "Green and Purple Heal Group" (Healer 1) heal amount
+                         decreased from 120.0 to 32.5.
+ + Purple Vibrant Queen: "Purple Queen Group" (Forcefield 1) shield health
+                         decreased from 300 to 250.
+ + Blue Tyrant King: Added "Everyone" (Forcefield 1) buff.
+ + Blue Tyrant King: Added "Blue King Group" (Healer 1) buff.
+ + Blue Tyrant King: Added "Blue King Group" (Repair 1) buff.
+ + BLue Tyrant King: "Blue ALl Group" (Speed 1) duration decreased from 1500ms
+                     to 1000ms.
+ + Flak I: Move Speed increased from 45.00 tiles per second to 60.00 tiles per
+           second.
+ + Flak II: Move Speed increased from 45.00 tiles per second to 60.00 tiles
+            per second.
+ + Anti-Ground Flak: Move Speed increased from 45.00 tiles per second to
+                     60.00 tiles per second.
+ + Anti-Air Flak: Move Speed increased from 45.00 tiles per second to
+                  60.00 tiles per second.
+ + Suppression Flak: Move Speed increased from 45.00 tiles per second to
+                     60.00 tiles per second.
+ + Suppression Flak: Stun Duration increased from 300ms to 333ms.
+ + Destroyer Missile: Move Speed increased from 42.00 tiles per second to
+                      45.00 tiles per second.
+ + Air Rocket: Move Speed increased from 41.00 tiles per second to 47.00
+               tiles per second.
+ + Grenade: Move Speed increased from 27.50 tiles per second to 29.00
+            tiles per second.
+ + Big Bang: Move Speed increased from 34.00 tiles per second to 40.00
+             tiles per second.
+ + Big Bang: Stun Duration increased from 50ms to 125ms.
+ + Charged Blast: Move Speed increased from 32.50 tiles per second to
+                  36.00 tiles per second.
+ + Poison Dart: Move Speed increased from 40.00 tiles per second to 46.00
+                tiles per second.
+ + Mega Missile: Move Speed increased from 40.00 tiles per second to 44.00
+                 tiles per second.
+ + Splash Tower: Cost changed from $98 to $99.
+ + Utility Tower: Cost changed from $98 to $99.
+- New Stuff:
+ + Added an automatic level generator.
+  * After a certain level (100), the generator will randomly generate new
+    levels.
+  * Generated levels have normally distributed characteristics meaning that
+    repeat playthroughs will have a similar level of difficulty.
+  * Load fails that occur before the threshold level still load the backup
+    level rather than generating a new level. (Failure to load the backup
+    will generate a level anyway alongside producing a warning message.)
+  * The game will always attempt to load a regular level file before
+    randomly generating a level.
+ + Added hiscore feature.
+ + Added the ability to view one's stats.
+ + '+' is now keybound to do the same thing as the change speed menu item.
+ + Added ability to start games at an arbitrary difficulty and map.
+ + Added Sky Tower.
+ + The game will now automatically hide the health bars and armor bars of
+   enemies that are at full health or full armor.
+ + Added levels 91-99. This marks the end of the standard levels.
+ + Right-clicking in the Terrain Editor now replaces the terrain with grass.
+- Misc Changes:
+ + Changed scoring function.
+ + Added the ability to speed the game up to 8x.
+ + The health and armor bars for enemies considered "unique" is now twice
+   as large as normal bars.
+ + Certain enemies classified as "unique" are now drawn at a larger size.
+ + The scoring function was altered slightly to account for the difficulty
+   of the later game versus the ease of the early game.
+ + Quitting via CTRL+Q or the file menu will now attempt to save the game.
+   Note that this does not apply if one uses the close button on the window.
+ + Clicking and dragging the right mouse button now displays the same
+   highlighting as clicking and dragging the left mouse button.
+ + You can now "cancel" a right click by moving your cursor off the square
+   before releasing the mouse button.
+ + Updated chapter 2 (controls) of the playing guide.
+ + The showing/hiding of a tower's area coverage now works for selecting an
+   area in addition to working for clicking a single tower.
+ + Changed the experienced and expert difficulty maps.
