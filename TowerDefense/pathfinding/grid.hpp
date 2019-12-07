@@ -232,10 +232,11 @@ namespace hoffman::isaiah {
 			GameMap(std::unique_ptr<pathfinding::Grid>&& gt_graph, std::unique_ptr<pathfinding::Grid>&& at_graph) :
 				ground_terrain_graph {std::move(gt_graph)},
 				air_terrain_graph {std::move(at_graph)},
-				ground_filter_graph {std::make_unique<pathfinding::Grid>()},
-				air_filter_graph {std::make_unique<pathfinding::Grid>()},
-				ground_influence_graph {std::make_unique<pathfinding::Grid>()},
-				air_influence_graph {std::make_unique<pathfinding::Grid>()} {
+				// ORDER DEPENDENCY: The following rely on the above two being set.
+				ground_filter_graph {std::make_unique<pathfinding::Grid>(this->getRows(), this->getColumns())},
+				air_filter_graph {std::make_unique<pathfinding::Grid>(this->getRows(), this->getColumns())},
+				ground_influence_graph {std::make_unique<pathfinding::Grid>(this->getRows(), this->getColumns())},
+				air_influence_graph {std::make_unique<pathfinding::Grid>(this->getRows(), this->getColumns())} {
 			}
 			// Overriding graphics::IDrawable
 			void draw(const graphics::Renderer2D& renderer) const noexcept override;
