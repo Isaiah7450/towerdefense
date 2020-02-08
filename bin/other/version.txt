@@ -52,15 +52,15 @@ same as "is". I make no guarantees that this version works better.)
   * More fine control over who is and who is not affected by an enemy's buff that is not based on color.
  + Prices no longer scale with difficulty. (Rationale: This was silly and just made the game more complicated without adding anything of value.)
  + Enemy speed no longer scales with difficulty. (Rationale: This was also silly and a bit ridiculous.)
- + Enemies possess two new statistics: injured movement speed and pain tolerance. An enemy that has loss a higher percentage of health than its pain tolerance are considered injured and move at the injured movement speed.
+ + Enemies possess two new statistics: injured movement speed and pain tolerance. An enemy that has lost a higher percentage of health than its pain tolerance are considered injured and move at the injured movement speed.
  + The number of enemies spawned in an enemy group is no longer random and is based on the game's challenge level.
- + Initial paths for enemies are found at the beginning of the level, and to improve performance, only one path is found (though the pathfinder is copied, not shared) for each enemy group (which are still of homogenous type).
+ + Initial paths for enemies are found at the beginning of the level, and to improve performance, only one path is found (though the pathfinder is copied, not shared) for each enemy group (which are still of homogeneous type).
  + Path recalculations are still slow, but they should work more reliably now versus how they did in the Java version.
  + It should go without saying that practically everything got rebalanced since I rewrote the game from scratch.
 
 Version 3.0.1:
 - Bug Fixes:
- + Stun not removed from enemy when status effect is purified.
+ + Fixed stun not being removed from an enemy when status effects were purified.
  + Fixed warnings related to 64-bit code.
 - Balance Changes:
  + Adjusted the health and armor of Purple Medic.
@@ -791,3 +791,24 @@ Version 3.3.0: (Released April 17, 2019)
  + The showing/hiding of a tower's area coverage now works for selecting an
    area in addition to working for clicking a single tower.
  + Changed the experienced and expert difficulty maps.
+
+Version 3.3.1: (Released February 8, 2020)
+- Bug Fixes:
+ + Fixed an error causing saves to fail on large maps.
+- Balance Changes:
+- New Stuff:
+ + Added the ability to mark and unmark tiles to help plan ahead. Note that
+   marked tiles are not currently saved to the save file; tiles must be
+   marked again each time the game loads.
+- Misc Changes:
+ + Chapters 98 and 99 (Hints & Achievements respectively) have been renumbered
+   to chapters 97 and 98 respectively.
+ + Added a new chapter 99 to the Playing Guide devoted to acknowledging the
+   people who helped develop this game.
+ + Some typo fixes in this change log.
+ + Updated chapter 1 (terrain map) of the playing guide.
+ + Updated chapter 2 (controls) of the playing guide.
+ + Updated chapter 3 (detailed information) of the playing guide. (This
+   chapter is finally finished.)
+ + Updated readme file.
+
