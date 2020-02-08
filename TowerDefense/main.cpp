@@ -663,7 +663,23 @@ namespace hoffman::isaiah {
 						this->start_gy = math::get_min(this->start_gy, new_gy);
 						if (game::g_my_game->getMap().getTerrainGraph(false).verifyCoordinates(this->start_gx, this->start_gy)
 							&& game::g_my_game->getMap().getTerrainGraph(false).verifyCoordinates(this->end_gx, this->end_gy)) {
-							if (game::g_my_game->getSelectedTower() == -1) {
+							if (game::g_my_game->getSelectedTower() == ID_MM_TOWERS_MARK_TILES - ID_MM_TOWERS_NONE - 1) {
+								// Mark tiles
+								for (int gx = this->start_gx; gx <= this->end_gx; ++gx) {
+									for (int gy = this->start_gy; gy <= this->end_gy; ++gy) {
+										game::g_my_game->getMap().getHighlightGraph().getNode(gx, gy).setBlockage(true);
+									}
+								}
+							}
+							else if (game::g_my_game->getSelectedTower() == ID_MM_TOWERS_UNMARK_TILES - ID_MM_TOWERS_NONE - 1) {
+								// Unmark tiles
+								for (int gx = this->start_gx; gx <= this->end_gx; ++gx) {
+									for (int gy = this->start_gy; gy <= this->end_gy; ++gy) {
+										game::g_my_game->getMap().getHighlightGraph().getNode(gx, gy).setBlockage(false);
+									}
+								}
+							}
+							else if (game::g_my_game->getSelectedTower() == ID_MM_TOWERS_NONE - ID_MM_TOWERS_NONE - 1) {
 								// Invert coverage showing.
 								for (int gx = this->start_gx; gx <= this->end_gx; ++gx) {
 									for (int gy = this->start_gy; gy <= this->end_gy; ++gy) {

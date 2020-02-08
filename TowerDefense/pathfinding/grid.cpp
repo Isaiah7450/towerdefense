@@ -192,6 +192,16 @@ namespace hoffman::isaiah {
 				renderer.drawSmallText(L"AS", white_color, renderer.createRectangle(air_start_lsx,
 					air_start_tsy, cs_width, cs_height), false);
 			}
+			// Paint marked tiles.
+			constexpr const graphics::Color highlight_ocolor {0.f, 0.f, 1.f, 0.9f};
+			constexpr const graphics::Color highlight_fcolor {0.8f, 0.8f, 0.8f, 0.2f};
+			for (int gx = 0; gx < grid_width; ++gx) {
+				for (int gy = 0; gy < grid_height; ++gy) {
+					if (this->getHighlightGraph().getNode(gx, gy).isBlocked()) {
+						renderer.paintSquare(*this, gx, gy, highlight_ocolor, highlight_fcolor);
+					}
+				}
+			}
 		}
 
 		void GameMap::draw(const graphics::Renderer2D& renderer, bool in_editor) const noexcept {
