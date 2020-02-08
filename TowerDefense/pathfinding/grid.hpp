@@ -376,6 +376,16 @@ namespace hoffman::isaiah {
 				this->air_influence_graph->clearGrid(new_rows, new_cols, 0);
 				this->highlight_graph->clearGrid(new_rows, new_cols, 0);
 			}
+		protected:
+			/// <summary>Draws the terrain map.</summary>
+			/// <param name="renderer">A reference to the rendering device.</param>
+			void drawTerrain(const graphics::Renderer2D& renderer) const noexcept;
+			/// <summary>Draws the start and goal tiles.</summary>
+			/// <param name="renderer">A reference to the rendering device.</param>
+			void drawStartGoal(const graphics::Renderer2D& renderer) const noexcept;
+			/// <summary>Draws a highlight over tiles that the user has selected.</summary>
+			/// <param name="renderer">A reference to the rendering device.</param>
+			void drawMarkedTiles(const graphics::Renderer2D& renderer) const noexcept;
 		private:
 			/// <summary>Graph that contains information about the basic terrain weights
 			/// of each grid square for ground units.</summary>

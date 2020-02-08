@@ -114,94 +114,9 @@ namespace hoffman::isaiah {
 
 	namespace game {
 		void GameMap::draw(const graphics::Renderer2D& renderer) const noexcept {
-			constexpr const graphics::Color transparent_color = graphics::Color {0.f, 0.f, 0.f, 0.f};
-			constexpr const graphics::Color outline_color = graphics::Color {0.10f, 0.10f, 0.10f, 1.0f};
-			constexpr const graphics::Color grass_color = graphics::Color {0.f, 0.75f, 0.f, 1.0f};
-			constexpr const graphics::Color forest_color = graphics::Color {0.15f, 0.50f, 0.f, 1.0f};
-			constexpr const graphics::Color ocean_color = graphics::Color {0.f, 0.25f, 0.60f, 1.0f};
-			constexpr const graphics::Color mountain_color = graphics::Color {0.85f, 0.85f, 0.f, 1.0f};
-			constexpr const graphics::Color swamp_color = graphics::Color {0.f, 0.50f, 0.40f, 1.0f};
-			constexpr const graphics::Color cave_color = graphics::Color {0.65f, 0.20f, 0.80f, 1.0f};
-			constexpr const graphics::Color ground_start_color = graphics::Color {0.40f, 0.f, 0.f, 0.65f};
-			constexpr const graphics::Color ground_end_color = graphics::Color {0.95f, 0.f, 0.f, 0.65f};
-			constexpr const graphics::Color air_start_color = graphics::Color {0.40f, 0.40f, 0.40f, 0.65f};
-			constexpr const graphics::Color air_end_color = graphics::Color {0.90f, 0.90f, 0.90f, 0.65f};
-			constexpr const graphics::Color white_color = graphics::Color {1.f, 1.f, 1.f, 0.75f};
-			const int grid_width = this->getWidth();
-			const int grid_height = this->getHeight();
-			for (int gx = 0; gx < grid_width; ++gx) {
-				for (int gy = 0; gy < grid_height; ++gy) {
-					const auto& gnode = this->getTerrainGraph(false).getNode(gx, gy);;
-					const auto& anode = this->getTerrainGraph(true).getNode(gx, gy);
-					const auto weight_diff = gnode.getWeight() - anode.getWeight();
-					if (gnode.isBlocked() && anode.isBlocked()) {
-						// Mountains: Blocked to all
-						renderer.paintSquare(*this, gx, gy, outline_color, mountain_color);
-					}
-					else if (gnode.isBlocked()) {
-						// Ocean: Blocked to ground
-						renderer.paintSquare(*this, gx, gy, outline_color, ocean_color);
-					}
-					else if (anode.isBlocked()) {
-						// Cave: Blocked to air
-						renderer.paintSquare(*this, gx, gy, outline_color, cave_color);
-					}
-					else if (weight_diff > 0) {
-						// Swamp: More difficult for ground troops
-						renderer.paintSquare(*this, gx, gy, outline_color, swamp_color);
-					}
-					else if (weight_diff < 0) {
-						// Forest: More difficult for air troops
-						renderer.paintSquare(*this, gx, gy, outline_color, forest_color);
-					}
-					else {
-						// Grass: Equal weights
-						renderer.paintSquare(*this, gx, gy, outline_color, grass_color);
-					}
-				} // End inner for
-			} // End outer for
-			// Paint start and goal locations
-			const auto* ground_start_node = this->getTerrainGraph(false).getStartNode();
-			const auto* ground_end_node = this->getTerrainGraph(false).getGoalNode();
-			const auto* air_start_node = this->getTerrainGraph(true).getStartNode();
-			const auto* air_end_node = this->getTerrainGraph(true).getGoalNode();
-			renderer.paintSquare(*this, ground_start_node->getGameX(), ground_start_node->getGameY(),
-				transparent_color, ground_start_color);
-			renderer.paintSquare(*this, ground_end_node->getGameX(), ground_end_node->getGameY(),
-				transparent_color, ground_end_color);
-			renderer.paintSquare(*this, air_start_node->getGameX(), air_start_node->getGameY(),
-				transparent_color, air_start_color);
-			renderer.paintSquare(*this, air_end_node->getGameX(), air_end_node->getGameY(),
-				transparent_color, air_end_color);
-			// Make it clearer which points are the start locations.
-			const auto cs_width = this->getGameSquareWidth<FLOAT>();
-			const auto cs_height = this->getGameSquareHeight<FLOAT>();
-			const auto ground_start_lsx = static_cast<FLOAT>(this->convertToScreenX(ground_start_node->getGameX()));
-			const auto ground_start_tsy = static_cast<FLOAT>(this->convertToScreenY(ground_start_node->getGameY()));
-			const auto air_start_lsx = static_cast<FLOAT>(this->convertToScreenX(air_start_node->getGameX()));
-			const auto air_start_tsy = static_cast<FLOAT>(this->convertToScreenY(air_start_node->getGameY()));
-			if (this->getColumns() <= 40 && this->getRows() <= 40) {
-				renderer.drawText(L"GS", white_color, renderer.createRectangle(ground_start_lsx,
-					ground_start_tsy, cs_width, cs_height), false);
-				renderer.drawText(L"AS", white_color, renderer.createRectangle(air_start_lsx,
-					air_start_tsy, cs_width, cs_height), false);
-			}
-			else {
-				renderer.drawSmallText(L"GS", white_color, renderer.createRectangle(ground_start_lsx,
-					ground_start_tsy, cs_width, cs_height), false);
-				renderer.drawSmallText(L"AS", white_color, renderer.createRectangle(air_start_lsx,
-					air_start_tsy, cs_width, cs_height), false);
-			}
-			// Paint marked tiles.
-			constexpr const graphics::Color highlight_ocolor {0.f, 0.f, 1.f, 0.9f};
-			constexpr const graphics::Color highlight_fcolor {0.8f, 0.8f, 0.8f, 0.2f};
-			for (int gx = 0; gx < grid_width; ++gx) {
-				for (int gy = 0; gy < grid_height; ++gy) {
-					if (this->getHighlightGraph().getNode(gx, gy).isBlocked()) {
-						renderer.paintSquare(*this, gx, gy, highlight_ocolor, highlight_fcolor);
-					}
-				}
-			}
+			this->drawTerrain(renderer);
+			this->drawStartGoal(renderer);
+			this->drawMarkedTiles(renderer);
 		}
 
 		void GameMap::draw(const graphics::Renderer2D& renderer, bool in_editor) const noexcept {
@@ -242,6 +157,99 @@ namespace hoffman::isaiah {
 						}
 					} // End inner for.
 				} // End outer for.
+			}
+		}
+
+		void GameMap::drawTerrain(const graphics::Renderer2D& renderer) const noexcept {
+			constexpr const graphics::Color outline_color = graphics::Color {0.10f, 0.10f, 0.10f, 1.0f};
+			constexpr const graphics::Color grass_color = graphics::Color {0.f, 0.75f, 0.f, 1.0f};
+			constexpr const graphics::Color forest_color = graphics::Color {0.15f, 0.50f, 0.f, 1.0f};
+			constexpr const graphics::Color ocean_color = graphics::Color {0.f, 0.25f, 0.60f, 1.0f};
+			constexpr const graphics::Color mountain_color = graphics::Color {0.85f, 0.85f, 0.f, 1.0f};
+			constexpr const graphics::Color swamp_color = graphics::Color {0.f, 0.50f, 0.40f, 1.0f};
+			constexpr const graphics::Color cave_color = graphics::Color {0.65f, 0.20f, 0.80f, 1.0f};
+			for (int gx = 0; gx < this->getWidth(); ++gx) {
+				for (int gy = 0; gy < this->getHeight(); ++gy) {
+					const auto& gnode = this->getTerrainGraph(false).getNode(gx, gy);;
+					const auto& anode = this->getTerrainGraph(true).getNode(gx, gy);
+					const auto weight_diff = gnode.getWeight() - anode.getWeight();
+					if (gnode.isBlocked() && anode.isBlocked()) {
+						// Mountains: Blocked to all
+						renderer.paintSquare(*this, gx, gy, outline_color, mountain_color);
+					}
+					else if (gnode.isBlocked()) {
+						// Ocean: Blocked to ground
+						renderer.paintSquare(*this, gx, gy, outline_color, ocean_color);
+					}
+					else if (anode.isBlocked()) {
+						// Cave: Blocked to air
+						renderer.paintSquare(*this, gx, gy, outline_color, cave_color);
+					}
+					else if (weight_diff > 0) {
+						// Swamp: More difficult for ground troops
+						renderer.paintSquare(*this, gx, gy, outline_color, swamp_color);
+					}
+					else if (weight_diff < 0) {
+						// Forest: More difficult for air troops
+						renderer.paintSquare(*this, gx, gy, outline_color, forest_color);
+					}
+					else {
+						// Grass: Equal weights
+						renderer.paintSquare(*this, gx, gy, outline_color, grass_color);
+					}
+				} // End inner for
+			} // End outer for
+		}
+
+		void GameMap::drawStartGoal(const graphics::Renderer2D& renderer) const noexcept {
+			constexpr const graphics::Color transparent_color = graphics::Color {0.f, 0.f, 0.f, 0.f};
+			constexpr const graphics::Color ground_start_color = graphics::Color {0.40f, 0.f, 0.f, 0.65f};
+			constexpr const graphics::Color ground_end_color = graphics::Color {0.95f, 0.f, 0.f, 0.65f};
+			constexpr const graphics::Color air_start_color = graphics::Color {0.40f, 0.40f, 0.40f, 0.65f};
+			constexpr const graphics::Color air_end_color = graphics::Color {0.90f, 0.90f, 0.90f, 0.65f};
+			constexpr const graphics::Color white_color = graphics::Color {1.f, 1.f, 1.f, 0.75f};
+			const auto* ground_start_node = this->getTerrainGraph(false).getStartNode();
+			const auto* ground_end_node = this->getTerrainGraph(false).getGoalNode();
+			const auto* air_start_node = this->getTerrainGraph(true).getStartNode();
+			const auto* air_end_node = this->getTerrainGraph(true).getGoalNode();
+			renderer.paintSquare(*this, ground_start_node->getGameX(), ground_start_node->getGameY(),
+				transparent_color, ground_start_color);
+			renderer.paintSquare(*this, ground_end_node->getGameX(), ground_end_node->getGameY(),
+				transparent_color, ground_end_color);
+			renderer.paintSquare(*this, air_start_node->getGameX(), air_start_node->getGameY(),
+				transparent_color, air_start_color);
+			renderer.paintSquare(*this, air_end_node->getGameX(), air_end_node->getGameY(),
+				transparent_color, air_end_color);
+			// Make it clearer which points are the start locations.
+			const auto cs_width = this->getGameSquareWidth<FLOAT>();
+			const auto cs_height = this->getGameSquareHeight<FLOAT>();
+			const auto ground_start_lsx = static_cast<FLOAT>(this->convertToScreenX(ground_start_node->getGameX()));
+			const auto ground_start_tsy = static_cast<FLOAT>(this->convertToScreenY(ground_start_node->getGameY()));
+			const auto air_start_lsx = static_cast<FLOAT>(this->convertToScreenX(air_start_node->getGameX()));
+			const auto air_start_tsy = static_cast<FLOAT>(this->convertToScreenY(air_start_node->getGameY()));
+			if (this->getColumns() <= 40 && this->getRows() <= 40) {
+				renderer.drawText(L"GS", white_color, renderer.createRectangle(ground_start_lsx,
+					ground_start_tsy, cs_width, cs_height), false);
+				renderer.drawText(L"AS", white_color, renderer.createRectangle(air_start_lsx,
+					air_start_tsy, cs_width, cs_height), false);
+			}
+			else {
+				renderer.drawSmallText(L"GS", white_color, renderer.createRectangle(ground_start_lsx,
+					ground_start_tsy, cs_width, cs_height), false);
+				renderer.drawSmallText(L"AS", white_color, renderer.createRectangle(air_start_lsx,
+					air_start_tsy, cs_width, cs_height), false);
+			}
+		}
+
+		void GameMap::drawMarkedTiles(const graphics::Renderer2D& renderer) const noexcept {
+			constexpr const graphics::Color o_color {0.f, 0.f, 1.f, 0.9f};
+			constexpr const graphics::Color f_color {0.8f, 0.8f, 0.8f, 0.2f};
+			for (int gx = 0; gx < this->getWidth(); ++gx) {
+				for (int gy = 0; gy < this->getHeight(); ++gy) {
+					if (this->getHighlightGraph().getNode(gx, gy).isBlocked()) {
+						renderer.paintSquare(*this, gx, gy, o_color, f_color);
+					}
+				}
 			}
 		}
 	}
