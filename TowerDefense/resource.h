@@ -131,7 +131,9 @@
 #define ID_MM_ACTIONS_TOGGLE_ALL_RADII          40205
 #define ID_MM_ACTIONS_VIEW_GLOBAL_STATS         40206
 #define ID_MM_TOWERS_INFO                       40301
-#define ID_MM_TOWERS_NONE                       40302
+#define ID_MM_TOWERS_MARK_TILES                 40302
+#define ID_MM_TOWERS_UNMARK_TILES               40303
+#define ID_MM_TOWERS_NONE                       40304
 #define ID_MM_TOWERS_BUY_TOWER                  40398
 #define ID_MM_TOWERS_SELL_TOWER                 40399
 #define ID_MM_SHOTS_PLACEHOLDER                 40401

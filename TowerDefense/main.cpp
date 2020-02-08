@@ -516,7 +516,7 @@ namespace hoffman::isaiah {
 						default:
 							break;
 						}
-						if (msg.wParam >= ID_MM_TOWERS_NONE
+						if (msg.wParam >= ID_MM_TOWERS_MARK_TILES
 							&& msg.wParam <= ID_MM_TOWERS_NONE + game::g_my_game->getAllTowerTypes().size()) {
 							// Check if the tower menu thingy got selected
 							my_renderer->updateSelectedTower(hwnd, static_cast<int>(msg.wParam));

@@ -70,8 +70,8 @@ namespace hoffman::isaiah {
 			const std::vector<std::unique_ptr<game::TowerType>>& towers) const noexcept {
 			auto my_menu = GetSubMenu(GetMenu(hwnd), 2);
 			// Delete what may have previously been in the menu...
-			while (GetMenuItemCount(my_menu) > 2) {
-				DeleteMenu(my_menu, 2, MF_BYPOSITION);
+			while (GetMenuItemCount(my_menu) > 4) {
+				DeleteMenu(my_menu, 4, MF_BYPOSITION);
 			}
 			// Add menu items
 			for (uintptr_t i = 0; i < towers.size(); ++i) {
@@ -121,7 +121,7 @@ namespace hoffman::isaiah {
 		void Renderer2D::updateSelectedTower(HWND hwnd, int selected_tower) const noexcept {
 			auto my_menu = GetSubMenu(GetMenu(hwnd), 2);
 			const auto num_items = GetMenuItemCount(my_menu);
-			CheckMenuRadioItem(my_menu, ID_MM_TOWERS_NONE, ID_MM_TOWERS_NONE + num_items, selected_tower,
+			CheckMenuRadioItem(my_menu, ID_MM_TOWERS_MARK_TILES, ID_MM_TOWERS_MARK_TILES + num_items, selected_tower,
 				MF_BYCOMMAND);
 			DrawMenuBar(hwnd);
 		}
