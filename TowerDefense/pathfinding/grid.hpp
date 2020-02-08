@@ -221,11 +221,13 @@ namespace hoffman::isaiah {
 				ground_filter_graph {nullptr},
 				air_filter_graph {nullptr},
 				ground_influence_graph {nullptr},
-				air_influence_graph {nullptr} {
+				air_influence_graph {nullptr},
+				highlight_graph {nullptr} {
 				this->ground_filter_graph = std::make_unique<pathfinding::Grid>(this->getRows(), this->getColumns());
 				this->air_filter_graph = std::make_unique<pathfinding::Grid>(this->getRows(), this->getColumns());
 				this->ground_influence_graph = std::make_unique<pathfinding::Grid>(this->getRows(), this->getColumns());
 				this->air_influence_graph = std::make_unique<pathfinding::Grid>(this->getRows(), this->getColumns());
+				this->highlight_graph = std::make_unique<pathfinding::Grid>(this->getRows(), this->getColumns());
 			}
 			/// <param name="gt_graph">The graph containing the ground terrain information.</param>
 			/// <param name="at_graph">The graph containing the air terrain information.</param>
@@ -236,7 +238,8 @@ namespace hoffman::isaiah {
 				ground_filter_graph {std::make_unique<pathfinding::Grid>(this->getRows(), this->getColumns())},
 				air_filter_graph {std::make_unique<pathfinding::Grid>(this->getRows(), this->getColumns())},
 				ground_influence_graph {std::make_unique<pathfinding::Grid>(this->getRows(), this->getColumns())},
-				air_influence_graph {std::make_unique<pathfinding::Grid>(this->getRows(), this->getColumns())} {
+				air_influence_graph {std::make_unique<pathfinding::Grid>(this->getRows(), this->getColumns())},
+				highlight_graph {std::make_unique<pathfinding::Grid>(this->getRows(), this->getColumns())} {
 			}
 			// Overriding graphics::IDrawable
 			void draw(const graphics::Renderer2D& renderer) const noexcept override;
@@ -335,6 +338,14 @@ namespace hoffman::isaiah {
 			pathfinding::Grid& getInfluenceGraph(bool get_air_graph) noexcept {
 				return get_air_graph ? *this->air_influence_graph : *this->ground_influence_graph;
 			}
+			/// <returns>A constant reference to the highlight graph.</returns>
+			const pathfinding::Grid& getHighlightGraph() const noexcept {
+				return *this->highlight_graph;
+			}
+			/// <returns>A reference to the highlight graph.</returns>
+			pathfinding::Grid& getHighlightGraph() noexcept {
+				return *this->highlight_graph;
+			}
 			// Setters
 			/// <summary>Sets the given graphs as the current ground and air terrain graphs.</summary>
 			/// <param name="gt_graph">The new graph to store as the ground terrain graph.</param>
@@ -363,6 +374,7 @@ namespace hoffman::isaiah {
 				this->air_filter_graph->clearGrid(new_rows, new_cols, 0);
 				this->ground_influence_graph->clearGrid(new_rows, new_cols, 0);
 				this->air_influence_graph->clearGrid(new_rows, new_cols, 0);
+				this->highlight_graph->clearGrid(new_rows, new_cols, 0);
 			}
 		private:
 			/// <summary>Graph that contains information about the basic terrain weights
@@ -383,6 +395,8 @@ namespace hoffman::isaiah {
 			/// <summary>Graph that contains information about dangerous areas
 			/// for air units.</summary>
 			std::unique_ptr<pathfinding::Grid> air_influence_graph;
+			/// <summary>Graph that contains information about areas the user wants highlighted.</summary>
+			std::unique_ptr<pathfinding::Grid> highlight_graph;
 		};
 	}
 }
