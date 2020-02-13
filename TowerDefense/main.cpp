@@ -302,7 +302,10 @@ namespace hoffman::isaiah {
 			ShowWindow(this->hwnd, n_cmd_show);
 			UpdateWindow(this->hwnd);
 			// Disable loading custom maps for now.
-			winapi::disableMenuItem(hwnd, 0, ID_MM_FILE_START_CUSTOM_GAME);
+			winapi::disableMenuItem(hwnd, id_mm_file_offset, ID_MM_FILE_START_CUSTOM_GAME);
+#if !defined(DEBUG) && !defined(_DEBUG)
+			winapi::disableMenuItem(hwnd, id_mm_develop_offset, ID_MM_DEVELOP_SHOW_TEST_PATHS);
+#endif
 			// Create update thread
 			auto sync_mutex = CreateMutex(nullptr, false, TEXT("can_execute"));
 			if (!sync_mutex) {

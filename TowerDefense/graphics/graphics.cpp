@@ -37,7 +37,7 @@ using namespace std::literals::string_literals;
 namespace hoffman::isaiah {
 	namespace graphics {
 		void Renderer2D::updateHealthOption(HWND hwnd, int new_price) const noexcept {
-			auto my_menu = GetSubMenu(GetMenu(hwnd), 1);
+			auto my_menu = GetSubMenu(GetMenu(hwnd), id_mm_actions_offset);
 			MENUITEMINFO my_info {};
 			my_info.cbSize = sizeof(MENUITEMINFO);
 			my_info.fMask = MIIM_DATA | MIIM_STRING;
@@ -49,7 +49,7 @@ namespace hoffman::isaiah {
 		}
 
 		void Renderer2D::updateSpeedOption(HWND hwnd, int new_update_speed) const noexcept {
-			auto my_menu = GetSubMenu(GetMenu(hwnd), 1);
+			auto my_menu = GetSubMenu(GetMenu(hwnd), id_mm_actions_offset);
 			MENUITEMINFO my_info {};
 			my_info.cbSize = sizeof(MENUITEMINFO);
 			my_info.fMask = MIIM_DATA | MIIM_STRING;
@@ -68,7 +68,7 @@ namespace hoffman::isaiah {
 
 		void Renderer2D::createTowerMenu(HWND hwnd,
 			const std::vector<std::unique_ptr<game::TowerType>>& towers) const noexcept {
-			auto my_menu = GetSubMenu(GetMenu(hwnd), 2);
+			auto my_menu = GetSubMenu(GetMenu(hwnd), id_mm_towers_offset);
 			// Delete what may have previously been in the menu...
 			while (GetMenuItemCount(my_menu) > 4) {
 				DeleteMenu(my_menu, 4, MF_BYPOSITION);
@@ -84,7 +84,7 @@ namespace hoffman::isaiah {
 
 		void Renderer2D::createShotMenu(HWND hwnd,
 			const std::map<std::wstring, std::unique_ptr<game::ShotBaseType>>& shots) const noexcept {
-			auto my_menu = GetSubMenu(GetMenu(hwnd), 3);
+			auto my_menu = GetSubMenu(GetMenu(hwnd), id_mm_shots_offset);
 			// Delete what may have previously been in the menu...
 			while (GetMenuItemCount(my_menu) > 0) {
 				DeleteMenu(my_menu, 0, MF_BYPOSITION);
@@ -100,7 +100,7 @@ namespace hoffman::isaiah {
 		void Renderer2D::createEnemyMenu(HWND hwnd,
 			const std::vector<std::unique_ptr<game::EnemyType>>& enemies,
 			std::map<std::wstring, bool> seen_before) const noexcept {
-			auto my_menu = GetSubMenu(GetMenu(hwnd), 4);
+			auto my_menu = GetSubMenu(GetMenu(hwnd), id_mm_enemies_offset);
 			// Clear the menu.
 			while (GetMenuItemCount(my_menu) > 0) {
 				DeleteMenu(my_menu, 0, MF_BYPOSITION);
@@ -119,7 +119,7 @@ namespace hoffman::isaiah {
 		}
 
 		void Renderer2D::updateSelectedTower(HWND hwnd, int selected_tower) const noexcept {
-			auto my_menu = GetSubMenu(GetMenu(hwnd), 2);
+			auto my_menu = GetSubMenu(GetMenu(hwnd), id_mm_towers_offset);
 			const auto num_items = GetMenuItemCount(my_menu);
 			CheckMenuRadioItem(my_menu, ID_MM_TOWERS_MARK_TILES, ID_MM_TOWERS_MARK_TILES + num_items, selected_tower,
 				MF_BYCOMMAND);

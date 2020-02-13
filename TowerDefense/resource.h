@@ -162,6 +162,13 @@
 #define ID_TE_TERRAIN_TYPES_OCEAN               41306
 #define ID_TE_TERRAIN_TYPES_MOUNTAIN            41307
 
+constexpr const auto id_mm_file_offset = 0;
+constexpr const auto id_mm_actions_offset = 1;
+constexpr const auto id_mm_towers_offset = 2;
+constexpr const auto id_mm_shots_offset = 3;
+constexpr const auto id_mm_enemies_offset = 4;
+constexpr const auto id_mm_develop_offset = 5;
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
