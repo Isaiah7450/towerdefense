@@ -351,42 +351,5 @@ namespace hoffman::isaiah {
 			/// <summary>The current line number the lexer is on.</summary>
 			int line_number {1};
 		};
-
-		// Deprecated code that will eventually be removed.
-		/// <summary>Determines if the provided token matches what is expected.</summary>
-		/// <param name="expected_type">The expected type of token.</param>
-		/// <param name="expected_input">The expected content of the token.</param>
-		/// <param name="actual_token">The actual token obtained from the input stream.</param>
-		/// <returns>True if it matches, otherwise, false.</returns>
-		[[deprecated]] bool matchToken(TokenTypes expected_type, std::wstring expected_input,
-			std::pair<TokenTypes, std::wstring> actual_token) noexcept;
-		/// <summary>Determines if the provided token matches what is expected.</summary>
-		/// <param name="expected_type">The expected type of the token.</param>
-		/// <param name="actual_type">The actual type of the token.</param>
-		/// <returns>True if it matches, otherwise, false.</returns>
-		[[deprecated]] bool matchTokenType(TokenTypes expected_type, TokenTypes actual_type) noexcept;
-		/// <summary>Determines if the provided token matches what is expected.</summary>
-		/// <param name="expected_value">The expected value for the token.</param>
-		/// <param name="actual_value">The actual value associated with the token.</param>
-		/// <returns>True if it matches, otherwise, false.</returns>
-		[[deprecated]] bool matchTokenValue(std::wstring expected_value, std::wstring actual_value) noexcept;
-		/// <summary>Attempts to parse the given token as a string. If this fails, an exception will
-		/// be thrown.</summary>
-		/// <param name="token">The token to parse as a string.</param>
-		/// <param name="line">The current line number.</param>
-		/// <returns>The parsed string.</returns>
-		[[deprecated]] std::wstring parseString(std::pair<TokenTypes, std::wstring> token, int line);
-		/// <summary>Attempts to parse the given token as a number. If this fails, an exception will
-		/// be thrown.</summary>
-		/// <param name="token">The token to parse as a number.</param>
-		/// <param name="line">The current line number.</param>
-		/// <returns>The parsed number.</returns>
-		[[deprecated]] double parseNumber(std::pair<TokenTypes, std::wstring> token, int line);
-		/// <summary>Attempts to parse the given token as a boolean. If this fails, an exception will
-		/// be thrown.</summary>
-		/// <param name="token">The token to parse as a boolean.</param>
-		/// <param name="line">The current line number.</param>
-		/// <returns>The parsed boolean.</returns>
-		[[deprecated]] bool parseBoolean(std::pair<TokenTypes, std::wstring> token, int line);
 	}
 }

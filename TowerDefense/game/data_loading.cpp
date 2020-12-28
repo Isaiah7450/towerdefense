@@ -127,8 +127,6 @@ namespace hoffman::isaiah {
 			util::file::DataFileParser::validateNumberMinBound(this->hp_buy_multiplier, 1., L"Cost multiplier", my_parser.getLine(), true);
 		}
 
-#pragma warning(push)
-#pragma warning(disable: 4996) // I presume this is deprecated warning? Too bad I didn't document this originally.
 		void MyGame::init_enemy_types() {
 			std::wifstream data_file {this->resources_folder_path + L"enemies.ini"s};
 			if (data_file.fail() || data_file.bad()) {
@@ -161,7 +159,7 @@ namespace hoffman::isaiah {
 				// (Yes, this means the quotes are optional in some cases...)
 				const std::wstring group_name = my_parser.readKeyValue(L"group_name"s).second;
 				my_token = my_parser.readKeyValue(L"target_names"s);
-				if (!util::file::matchTokenType(util::file::TokenTypes::List, my_token.first)) {
+				if (!my_parser.matchTokenType(util::file::TokenTypes::List)) {
 					throw util::file::DataFileException {L"Expected a list of names following the equal signs."s
 						L" (Start the list with < and end it with >.)"s, my_parser.getLine()};
 				}
@@ -173,38 +171,40 @@ namespace hoffman::isaiah {
 			do {
 				// Enemy Sections
 				my_parser.expectToken(util::file::TokenTypes::Section, L"enemy"s);
-				my_token = my_parser.readKeyValue(L"name"s);
-				const std::wstring n = util::file::parseString(my_token, my_parser.getLine());
-				my_token = my_parser.readKeyValue(L"desc"s);
-				const std::wstring d = util::file::parseString(my_token, my_parser.getLine());
+				my_parser.readKeyValue(L"name"s);
+				const std::wstring n = my_parser.parseString();
+				my_parser.readKeyValue(L"desc"s);
+				const std::wstring d = my_parser.parseString();
 				const graphics::Color c = my_parser.readColor();
 				const graphics::shapes::ShapeTypes st = my_parser.readShape();
-				my_token = my_parser.readKeyValue(L"damage"s);
-				const int dmg = static_cast<int>(util::file::parseNumber(my_token, my_parser.getLine()));
+
+				my_parser.readKeyValue(L"damage"s);
+				const int dmg = my_parser.parseNumber<int>();
 				util::file::DataFileParser::validateNumberMinBound(dmg, 1, L"Damage", my_parser.getLine(), true);
-				my_token = my_parser.readKeyValue(L"health"s);
-				const double hp = util::file::parseNumber(my_token, my_parser.getLine());
+				my_parser.readKeyValue(L"health"s);
+				const double hp = my_parser.parseNumber();
 				util::file::DataFileParser::validateNumberMinBound(hp, 0.0, L"Health", my_parser.getLine(), false);
-				my_token = my_parser.readKeyValue(L"armor_health"s);
-				const double ahp = util::file::parseNumber(my_token, my_parser.getLine());
+				my_parser.readKeyValue(L"armor_health"s);
+				const double ahp = my_parser.parseNumber();
 				util::file::DataFileParser::validateNumberMinBound(ahp, 0.0, L"Armor health", my_parser.getLine(), true);
-				my_token = my_parser.readKeyValue(L"armor_reduce"s);
+				my_parser.readKeyValue(L"armor_reduce"s);
 				// Allowing ar == 1.0 is not good design.
-				const double ar = util::file::parseNumber(my_token, my_parser.getLine());
+				const double ar = my_parser.parseNumber();
 				util::file::DataFileParser::validateNumber(ar, 0.0, 1.0, L"Armor reduction", my_parser.getLine(), true, false);
-				my_token = my_parser.readKeyValue(L"pain_tolerance"s);
-				const double pt = util::file::parseNumber(my_token, my_parser.getLine());
+
+				my_parser.readKeyValue(L"pain_tolerance"s);
+				const double pt = my_parser.parseNumber();
 				util::file::DataFileParser::validateNumber(pt, 0.0, 1.0, L"Pain tolerance", my_parser.getLine(), true, true);
-				my_token = my_parser.readKeyValue(L"walking_speed"s);
-				const double wspd = util::file::parseNumber(my_token, my_parser.getLine());
+				my_parser.readKeyValue(L"walking_speed"s);
+				const double wspd = my_parser.parseNumber();
 				util::file::DataFileParser::validateNumber(wspd, 0.500, 25.000, L"Walking speed", my_parser.getLine(), true, true);
 				// Not enforcing ispd <= wspd <= rspd because of interesting effects
 				// when that rule is not followed.
-				my_token = my_parser.readKeyValue(L"running_speed"s);
-				const double rspd = util::file::parseNumber(my_token, my_parser.getLine());
+				my_parser.readKeyValue(L"running_speed"s);
+				const double rspd = my_parser.parseNumber();
 				util::file::DataFileParser::validateNumber(rspd, 0.500, 25.000, L"Running speed", my_parser.getLine(), true, true);
-				my_token = my_parser.readKeyValue(L"injured_speed"s);
-				const double ispd = util::file::parseNumber(my_token, my_parser.getLine());
+				my_parser.readKeyValue(L"injured_speed"s);
+				const double ispd = my_parser.parseNumber();
 				util::file::DataFileParser::validateNumber(ispd, 0.500, 25.000, L"Injured speed", my_parser.getLine(), true, true);
 				my_token = my_parser.readKeyValue(L"strategy"s);
 				const pathfinding::HeuristicStrategies strat =
@@ -252,9 +252,8 @@ namespace hoffman::isaiah {
 						: my_token.second == L"Forcefield"s ? BuffTypes::Forcefield
 						: throw util::file::DataFileException {L"Expected the type of the buff."s
 							L" Valid values include: Intelligence, Speed, Healer, Purify, Repair"s, my_parser.getLine()};
-					my_token = my_parser.readKeyValue(L"targets"s);
-					const std::wstring buff_group = util::file::parseString(my_token, my_parser.getLine());
-					my_token = my_parser.readKeyValue(L"radius"s);
+					my_parser.readKeyValue(L"targets"s);
+					const std::wstring buff_group = my_parser.parseString();
 					try {
 						// Gotta find some way to tell the compiler NOT
 						// to optimize away this statement.
@@ -264,17 +263,20 @@ namespace hoffman::isaiah {
 						throw util::file::DataFileException {L"Invalid target group name specified."s,
 							my_parser.getLine()};
 					}
-					const double buff_radius = util::file::parseNumber(my_token, my_parser.getLine());
-					util::file::DataFileParser::validateNumberMinBound(buff_radius, 0.0, L"Buff radius", my_parser.getLine(), false);
-					my_token = my_parser.readKeyValue(L"delay"s);
-					const int buff_delay = static_cast<int>(util::file::parseNumber(my_token, my_parser.getLine()));
-					util::file::DataFileParser::validateNumber(buff_delay, 10, 60'000, L"Buff delay (ms)", my_parser.getLine(), true, true);
+					my_parser.readKeyValue(L"radius"s);
+					const double buff_radius = my_parser.parseNumber();
+					util::file::DataFileParser::validateNumberMinBound(buff_radius, 0.0,
+						L"Buff radius", my_parser.getLine(), false);
+					my_parser.readKeyValue(L"delay"s);
+					const int buff_delay = my_parser.parseNumber<int>();
+					util::file::DataFileParser::validateNumber(buff_delay, 10, 60'000,
+						L"Buff delay (ms)", my_parser.getLine(), true, true);
 					[[maybe_unused]] int buff_duration {};
 					// Duration is common to many buffs, so I don't switch on it.
 					if (buff_type == BuffTypes::Intelligence || buff_type == BuffTypes::Speed
 						|| buff_type == BuffTypes::Forcefield) {
-						my_token = my_parser.readKeyValue(L"duration"s);
-						buff_duration = static_cast<int>(util::file::parseNumber(my_token, my_parser.getLine()));
+						my_parser.readKeyValue(L"duration"s);
+						buff_duration = my_parser.parseNumber<int>();
 						util::file::DataFileParser::validateNumberMinBound(buff_duration, 10, L"Buff duration (ms)", my_parser.getLine(), true);
 					}
 					// Read buff-specific attributes
@@ -288,15 +290,17 @@ namespace hoffman::isaiah {
 					}
 					case BuffTypes::Speed:
 					{
-						my_token = my_parser.readKeyValue(L"walking_speed_boost"s);
-						const double buff_wspd = util::file::parseNumber(my_token, my_parser.getLine());
+						my_parser.readKeyValue(L"walking_speed_boost"s);
+						const double buff_wspd = my_parser.parseNumber();
 						util::file::DataFileParser::validateNumberMinBound(buff_wspd, 0.0, L"Walking speed boost", my_parser.getLine(), true);
-						my_token = my_parser.readKeyValue(L"running_speed_boost"s);
-						const double buff_rspd = util::file::parseNumber(my_token, my_parser.getLine());
-						util::file::DataFileParser::validateNumberMinBound(buff_rspd, 0.0, L"Running speed boost", my_parser.getLine(), true);
-						my_token = my_parser.readKeyValue(L"injured_speed_boost"s);
-						const double buff_ispd = util::file::parseNumber(my_token, my_parser.getLine());
-						util::file::DataFileParser::validateNumberMinBound(buff_ispd, 0.0, L"Injured speed boost", my_parser.getLine(), true);
+						my_parser.readKeyValue(L"running_speed_boost"s);
+						const double buff_rspd = my_parser.parseNumber();
+						util::file::DataFileParser::validateNumberMinBound(buff_rspd,
+							0.0, L"Running speed boost", my_parser.getLine(), true);
+						my_parser.readKeyValue(L"injured_speed_boost"s);
+						const double buff_ispd = my_parser.parseNumber();
+						util::file::DataFileParser::validateNumberMinBound(buff_ispd,
+							0.0, L"Injured speed boost", my_parser.getLine(), true);
 						if (buff_ispd == 0.0 && buff_rspd == 0. && buff_wspd == 0.) {
 							throw util::file::DataFileException {L"You should set at least one of the speed"s
 								L" boosts to a positive value!"s, my_parser.getLine()};
@@ -308,8 +312,8 @@ namespace hoffman::isaiah {
 					}
 					case BuffTypes::Healer:
 					{
-						my_token = my_parser.readKeyValue(L"heal_amount"s);
-						const double buff_heal = util::file::parseNumber(my_token, my_parser.getLine());
+						my_parser.readKeyValue(L"heal_amount"s);
+						const double buff_heal = my_parser.parseNumber();
 						util::file::DataFileParser::validateNumberMinBound(buff_heal, 0.0, L"Heal amount", my_parser.getLine(), false);
 						auto heal_buff = std::make_shared<HealerBuff>(buff_target_groups.at(buff_group),
 							buff_radius, buff_delay, buff_heal);
@@ -318,9 +322,8 @@ namespace hoffman::isaiah {
 					}
 					case BuffTypes::Purify:
 					{
-						my_token = my_parser.readKeyValue(L"purify_max_effects"s);
-						const int buff_cure_max = static_cast<int>(util::file::parseNumber(my_token,
-							my_parser.getLine()));
+						my_parser.readKeyValue(L"purify_max_effects"s);
+						const int buff_cure_max = my_parser.parseNumber<int>();
 						util::file::DataFileParser::validateNumberMinBound(buff_cure_max, 1, L"Purify max effects", my_parser.getLine(), true);
 						auto purify_buff = std::make_shared<PurifyBuff>(buff_target_groups.at(buff_group),
 							buff_radius, buff_delay, buff_cure_max);
@@ -329,8 +332,8 @@ namespace hoffman::isaiah {
 					}
 					case BuffTypes::Repair:
 					{
-						my_token = my_parser.readKeyValue(L"repair_amount"s);
-						const double buff_repair = util::file::parseNumber(my_token, my_parser.getLine());
+						my_parser.readKeyValue(L"repair_amount"s);
+						const double buff_repair = my_parser.parseNumber();
 						util::file::DataFileParser::validateNumberMinBound(buff_repair, 0.0, L"Repair amount", my_parser.getLine(), false);
 						auto repair_buff = std::make_shared<HealerBuff>(buff_target_groups.at(buff_group),
 							buff_radius, buff_delay, buff_repair);
@@ -379,7 +382,6 @@ namespace hoffman::isaiah {
 				this->enemies_seen.emplace(etype->getName(), false);
 				this->enemy_kill_count.emplace(etype->getName(), 0);
 			}
-#pragma warning(pop)
 		}
 
 		void MyGame::init_shot_types() {

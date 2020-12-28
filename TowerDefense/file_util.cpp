@@ -184,46 +184,5 @@ namespace hoffman::isaiah {
 		bool DataFileParser::isValid() const noexcept {
 			return !(this->data_file.bad() || this->data_file.fail());
 		}
-
-		bool matchToken(TokenTypes expected_type, std::wstring expected_input,
-			std::pair<TokenTypes, std::wstring> actual_token) noexcept {
-#pragma warning(disable: 4996)
-			return matchTokenType(expected_type, actual_token.first)
-				&& matchTokenValue(expected_input, actual_token.second);
-#pragma warning(error: 4996)
-		}
-
-		bool matchTokenType(TokenTypes expected_type, TokenTypes actual_type) noexcept {
-			return expected_type == actual_type;
-		}
-
-		bool matchTokenValue(std::wstring expected_value, std::wstring actual_value) noexcept {
-			return expected_value == actual_value;
-		}
-
-		std::wstring parseString(std::pair<TokenTypes, std::wstring> token, int line) {
-#pragma warning(disable: 4996)
-			if (!matchTokenType(TokenTypes::String, token.first)) {
-				throw DataFileException {L"Expected a quoted string."s, line};
-			}
-			return token.second;
-#pragma warning(error: 4996)
-		}
-
-		double parseNumber(std::pair<TokenTypes, std::wstring> token, int line) {
-#pragma warning(disable: 4996)
-			if (!matchTokenType(TokenTypes::Number, token.first)) {
-				throw DataFileException {L"Expected a quoted string."s, line};
-			}
-			return std::stod(token.second);
-#pragma warning(error: 4996)
-		}
-
-		bool parseBoolean(std::pair<TokenTypes, std::wstring> token, int line) {
-			return (token.second == L"True"s || token.second == L"true"s) ? true
-				: (token.second == L"False"s || token.second == L"false"s) ? false
-				: throw DataFileException {L"Invalid boolean constant specified."s
-					L" Expected one of: {True, False}."s, line};
-		}
 	}
 }
