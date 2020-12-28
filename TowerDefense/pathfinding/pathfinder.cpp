@@ -1,11 +1,12 @@
 // File Author: Isaiah Hoffman
 // File Created: March 24, 2018
+#include <algorithm>
+#include <map>
 #include <queue>
 #include <set>
-#include <vector>
-#include <map>
+#include <stdexcept>
 #include <utility>
-#include <algorithm>
+#include <vector>
 #include "./../globals.hpp"
 #include "./graph_node.hpp"
 #include "./grid.hpp"

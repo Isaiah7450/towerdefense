@@ -4,8 +4,9 @@
 #include "./../targetver.hpp"
 #include <Windows.h>
 #include <d2d1.h>
-#include <memory>
 #include <array>
+#include <stdexcept>
+#include <memory>
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 #include "./graphics_DX.hpp"

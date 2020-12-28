@@ -1,9 +1,9 @@
 #include "stdafx.h"
-#include "./globals.hpp"
-#include "./file_util.hpp"
-#include "./pathfinding/graph_node.hpp"
-#include "./pathfinding/grid.hpp"
-#include "./pathfinding/pathfinder.hpp"
+#include "./../TowerDefense/globals.hpp"
+#include "./../TowerDefense/file_util.hpp"
+#include "./../TowerDefense/pathfinding/graph_node.hpp"
+#include "./../TowerDefense/pathfinding/grid.hpp"
+#include "./../TowerDefense/pathfinding/pathfinder.hpp"
 
 namespace ih = hoffman::isaiah;
 using namespace std::literals::string_literals;

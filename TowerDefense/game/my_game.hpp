@@ -1,11 +1,13 @@
 #pragma once
 // File Author: Isaiah Hoffman
 // File Created: March 20, 2018
-#include <string>
-#include <memory>
+#include <cmath>
 #include <iosfwd>
-#include <vector>
 #include <map>
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 
