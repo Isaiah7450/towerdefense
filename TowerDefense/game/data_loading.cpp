@@ -108,7 +108,7 @@ namespace hoffman::isaiah {
 		void MyGame::load_global_misc_data() {
 			std::wifstream data_file {this->resources_folder_path + L"other.ini"s};
 			if (data_file.fail() || data_file.bad()) {
-				throw util::file::DataFileException {L"Could not load the enemy data file (enemies.ini)."s, 0};
+				throw util::file::DataFileException {L"Could not load global data (other.ini)."s, 0};
 			}
 			util::file::DataFileParser my_parser {data_file};
 			// Globals section
