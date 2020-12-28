@@ -62,7 +62,7 @@ namespace hoffman::isaiah {
 		// Obtains the average of a set of values
 		template <typename U, typename... Arguments>
 		constexpr U get_avg(U first, Arguments... rest) noexcept {
-			const U num_args = static_cast<U>(sizeof...(Arguments));
+			constexpr const U num_args = static_cast<U>(sizeof...(Arguments));
 			U my_sum = get_sum<U>(first, rest...);
 			return my_sum / (num_args + U {1});
 		}

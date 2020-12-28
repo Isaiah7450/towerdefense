@@ -74,7 +74,7 @@ namespace hoffman::isaiah {
 						this->volley_shots_multiplier *= upgrade.getAmmoMultiplier();
 						this->reload_delay_multiplier *= upgrade.getDelayMultiplier();
 						// Update the special with the highest values.
-						auto my_iterator = this->upgrade_specials.find(upgrade.getSpecial());
+						const auto my_iterator = this->upgrade_specials.find(upgrade.getSpecial());
 						if (my_iterator == this->upgrade_specials.end()) {
 							this->upgrade_specials.emplace(upgrade.getSpecial(), std::make_pair<double, double>(upgrade.getSpecialChance(),
 								upgrade.getSpecialPower()));

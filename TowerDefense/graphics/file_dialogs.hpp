@@ -32,13 +32,13 @@ namespace hoffman::isaiah::winapi {
 
 		/// <summary>Adds a reference to this interface.</summary>
 		/// <returns>The new reference count.</returns>
-		IFACEMETHODIMP_(ULONG) AddRef() {
+		IFACEMETHODIMP_(ULONG) AddRef() override {
 			return InterlockedIncrement(&this->cref);
 		}
 		/// <summary>Removes a reference to this interface.</summary>
 		/// <returns>The new reference count.</returns>
-		IFACEMETHODIMP_(ULONG) Release() {
-			long my_cref = InterlockedIncrement(&this->cref);
+		IFACEMETHODIMP_(ULONG) Release() override {
+			const long my_cref = InterlockedIncrement(&this->cref);
 			if (!my_cref) {
 				delete this;
 			}
