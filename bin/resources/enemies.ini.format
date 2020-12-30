@@ -1,38 +1,45 @@
 # Format specification for enemies.ini
-# Note that lines beginning with a hash mark like
-# these lines represent comments and will be ignored
-# by the parser.
-# These comments run until the end of the line.
-# These are global settings that apply to the entire
-# file.
+# Note that lines beginning with a hash mark (#) are considered
+# comments and are ignored by the parser. These comments continue
+# until the end of the line.
+
+# The first section to specify is the global section. This provides
+# information relevant to the entire file. Note that the program is
+a bit picky and requires sections to be properly ordered.
 [global]
-# The format version of the file.
-# This number should be 1 for now.
+# The format version of the file. This should be 1 for now.
 version = 1
 
 # This section is used for denoting the names of targets
-# for buffs.
-# And yes, this section must come after [global] but
-# before the definitions of any enemies.
+# for buffs. This section must come after global but before any
+# sections that define enemies.
 [buff_targets]
-# The braces are mandatory; don't forget them!
+# This property employs something called an "object list". The outer braces
+# indicate to the parser that this property is an object list (sometimes
+# referred to as just an object). The inner braces define each object in the
+# list.
+# You are not allowed to combine the two braces in this fashion: {{.
+# Instead, some form of whitespace (such as a newline) is needed.
+# This particular property specifies objects detailing the enemies that a
+# particular buff applies to.
 targets = {
-	# Each individual group of possible targets should
-	# be surrounded by braces (and they must be formatted
-	# similar to how they are here; in particular,
-	# writing targets = {{ would be invalid.)
+	# As noted above, each individual buff group should be surrounded by
+	# braces like it is done here.
 	{
-		# This is the name used to refer to this group of targets when
-		# defining enemies with buffs later on in the file.
+		# This name is used to refer back to this group later in the file.
+		# Be sure to pick something unique. Also, notice the quote marks (").
+		# Those indicate that the item inside the quotes is a string (or
+		# sequence of characters).
 		group_name = "Buff Group A"
+		# Here, the syntax is for something called a list. Unlike object
+		# lists, these lists are much simpler as there is no nesting involved.
+		# The commas used in the list are optional but recommended, and you
+		# may split the list onto multiple lines.
+		# This list specifies which enemies the buff applies to. You will
+		# provide the names of enemies later when you define them. Please
+		# note that case matters: "Enemy" and "enemy" are NOT the same.
 		# This is basically a list of names that buffs that use
 		# this group of targets applies to.
-		# You should use the name of the enemy, and remember
-		# that case matters (i.e.: "Enemy" and "enemy" are NOT the same)
-		# Note that the commas are optional, but recommended, and that you
-		# are allowed to split this onto multiple lines.
-		# Also, generally speaking, you don't write duplicates names; I have
-		# done so only to show you the syntax of the property.
 		target_names = <"My Name", "Another Enemy">
 		# Note that the comma after the end brace is optional
 	},
@@ -43,276 +50,204 @@ targets = {
 	}
 }
 
-# Begin each new enemy with the [enemy] header
+# After specifying the first two sections, all that remains is to define the
+# enemies themselves. To do that, you start each enemy definition with the
+# enemy section header.
 [enemy]
 # Name of the enemy
 name = "My Name"
-# Description of the enemy
+# Description of the enemy.
 desc = "My Desc"
-# Color used to fill the interior of the enemy
-# Specify in the format of <R, G, B, A>
-# G => Green, B => Blue, and A => Alpha
-# Note that these values are percentages
-# out of 100% (1.0); for instance,
-# <1.0, 1.0, 0.0, 1.0> represents
-# fully opaque yellow<
+# This is a list of values specifying the fill color for the enemy. The values
+# are specified in the order Red, Green, Blue, Alpha. Note that the values are
+# percentages specified as decimal numbers. For instance, <1.0, 1.0, 0.0, 1.0>
+# represents fully opaque yellow.
 color = <1.0, 1.0, 0.0, 1.0>
-# The shape of the enemy
-# Valid values (no quotes): Ellipse, Triangle, Rectangle,
-# Diamond, and Star. (Note that case matters!)
+# This specifies the shape used to represent the enemy in-game. Valid values
+# are: Ellipse, Triangle, Rectangle, Diamond, and Star. Note that case matters.
+# Notice that no quotes are used here as this property requires an identifier,
+# not a string.
 shape = Rectangle
-# This number specifies the amount of damage done by
-# the enemy to the player if it reaches the goal.
-# Almost always, you should specify one here. Two
-# and three are occassionally used for rarer
-# enemies, and three, four, or five are typically
-# used for bosses.
-# Values >= 20 are used when it is intended for
-# the player to automatically lose if the enemy
-# reaches the goal.
+# This number specifies how much life the player loses if this enemy reaches
+# the goal. You should almost always specify one here. Two and three are
+# used for rarer enemies. Three, four, and five are typically used for bosses.
+# Remember that since the player starts out with 20 life, values greater than
+# or equal to 20 are intended to cause the player to automatically lose.
 damage = 1
-# This number specifies the base amount of damage
-# that the enemy can withstand before dying.
-# Note that health is also affected by difficulty
-# and level, so this number is typically a minimum
-# value.
+# This number specifies how much damage the enemy can withstand before dying.
+# Note that level, difficulty, and challenge level all play a role as well, so
+# this ends up being a minimum value.
 health = 10
-# This number specifies the base amount of damage
-# that the enemy's armor can withstand before
-# breaking.
+# This number specifies how much damage the enemy's armor can withstand before
+# breaking. Like the previous value, this is a minimum value.
 armor_health = 5
-# This number specifies the percentage of damage
-# that is mitigated while the enemy possesses armor.
-# For instance, if an enemy takes 10 damage from a shot
-# and possesses an armor reduction of 0.10 (i.e.: 10%),
-# then that enemy will receive 10 - (10 * 0.10) or 9
-# damage to their armor.
-# Note that some shots can pierce through armor, so
-# in general, make sure enemies with tough armor
-# have some health as well!
+# This number specifies the percentage of damge that is mitigated while the
+# enemy's armor is still intact. For instance, if an enemy takes 10 damage
+# and possesses an armor reduction of 0.10 (i.e.: 10%), then that enemy will
+# receive 10 - (10 * 0.10) = 9 damage to their armor.
+# Some projectiles can pierce through armor, so it is important that tough
+# enemies have some health as well.
 armor_reduce = 0.10
-# This number specifies the percentage of damage
-# that the enemy can receive before being considered
-# in an "injured" state. You should specify this
-# number as a decimal from 0 to 1.0. Note that
-# this state is based off of the enemy's health,
-# not the amount of hitpoints remaining in the
-# enemy's armor.
-# A value of 0.60 means that the enemy enters
-# the injured state when it has lost 60% of
-# its health.
-# In this case, when the enemy's remaining
-# health reaches 4, the enemy will be considered
-# to be injured.
+# This number specifies the percentage of damage the enemy can withstand
+# before entering the "injured" state. (Note that this threshold only considers
+# the enemy's health, not how much armor the enemy has remaining.)
+# A value of 0.60 means that the enemy enters the injured state when it has
+# lost 60% of its health.
 pain_tolerance = 0.60
-# This is the speed (in game coordinate squares
-# per second) that the enemy moves at if its
-# armor is still active, and it is not considered
-# to be in an injured state.
-# Also, note that an enemy's movement speed is
-# affected by many other factors as well including
-# the terrain.
-# Generally speaking, you don't want to set this
-# value really high.
-# Values between 0.50 and 1.24 tend to be quite
-# slow.
-# Values between 1.25 and 2.24 tend to be moderate.
-# Values between 2.25 and 3.24 tend to be fast.
-# Values greater than or equal to 3.25 tend to be
-# really fast.
-# I wouldn't recommend setting this value any higher
-# than 5.00 as a maximum.
+# The following three properties specify the enemy's speed in game coordinate
+# squares per second. A game coordinate square is one square of the terrain
+# map; they take up most of the game's interface.
+# For all of these speeds, the actual speed is also affected by other factors
+# including the terrain, level, difficulty, and challenge level. Generally,
+# you do not want to set this value too high as it might become very difficult
+# (as in nearly impossible) for the player's towers to actually hit the enemy.
+# Some approximate ranges:
+# Values between 0.50 and 1.24: Slow.
+# Values between 1.25 and 2.24: Moderate.
+# Values between 2.25 and 3.24: Fast.
+# Values between 3.25 and 4.99: Really fast.
+# Values above 4.99: Likely too fast.
+# Enemies have three states: walking, running, and injured. The criteria for
+# the injured state was described above. An enemy is considered "running" if
+# it either possesses no armor or has lost all its armor. An enemy is in the
+# "walking" state otherwise.
+# This value sets the speed in game coordinate squares per second of the
+# enemy when its walking (i.e.: when it has armor).
 walking_speed = 1.250
-# This is the speed (in game coordinate squares
-# per second) that the enemy moves at if it
-# possesses no armor, and it is not considered
-# to be critically injured.
-# This value should typically be greater than
-# the enemy's walking speed.
+# This value sets the speed in game coordinate squares per second of the
+# enemy when its running (i.e.: no armor and not injured).
+# This should typically be higher than the walking speed (but this is not
+# required.)
 running_speed = 1.500
-# This is the speed (in game coordinate squares
-# per second) that the enemy moves at if it
-# is considered to be in the injured state.
-# This value should typically be lower than
-# the enemy's walking speed.
+# This value sets the speed in game coordinate squares per second of the
+# enemy when its injured.
+# This should typically be lower than the walking speed (but this is not
+# required.)
 injured_speed = 1.000
-# This is the pathfinding strategy the enemy
-# uses. Really, you could probably just set
-# this value to whatever as it is simply used
-# as a heuristic for the path; thus, it does
-# not play a significant factor most of the
-# time. Still, as a general rule, enemies
-# that cannot move diagonally should always
-# use Manhattan, and enemies that can
-# move diagonally should generally use
-# Diagonal for best results.
-# Valid values include: Manhattan, Euclidean,
-# Diagonal, and Maximum.
+# This is a very subtle property of the enemy that does not typically have
+# a large impact in-game. Basically, each enemy uses a heuristic that is set
+# by this property to help guide their paths. Heuristics that overestimate
+# the remaining distance to the goal may cause the enemy to take a non-optimal
+# path.
+# In general, if you want enemies to take optimal paths, you should use
+# Manhattan if the enemy cannot move diagonally; else, you should use Diagonal.
+# Valid values are: Manhattan, Euclidean, Diagonal, and Maximum.
 strategy = Manhattan
-# This determines whether the enemy is allowed
-# to move diagonally.
+# This determines whether or not the enemy is allowed to move diagonally.
 # Valid values are true and false.
 can_move_diagonally = false
-# This determines whether the enemy is
-# considered to be a flying enemy or not.
-# Flying enemies start at a different location
-# than regular enemies, and they also tend to
-# have a different goal space as well.
-# Certain towers may also be more or less
-# effective against flying enemies.
-# Generally speaking, flying enemies should
-# not appear early in the game as cash is
-# limited early game, and it will be quite
-# a surprise for enemies to pop out somewhere
-# unexpected.
+# This determines whether or not the enemy is considered to be flying. Flying
+# enemies behave differently from normal enemies, and some projectiles are
+# less effective against flying enemies as compared to normal enemies.
 # Valid values are true and false.
 is_flying = false
 
-# You must include this element, even if it is empty.
+# This specifies the buffs the enemy possesses.
+# Like in the buff targets section, this property uses the object list syntax.
+# Please note that you must include this element even if the enemy has no
+# buffs.
 buffs = {
-	# Each buff must be enclosed by its own set of brackets
-	# Don't forgot that there are two brackets preceding the first
-	# buff!
+	# Like earlier, each buff must be enclosed by its own set of braces.
+	# Don't forgot that there are two braces preceding the first buff.
 	{
-		# This is probably the most important setting for a buff
-		# as it determines which buff is applied!
-		# Valid values are (everything before the initial dash):
-		# Intelligence - Temporarily improves the pathfinding
-		# of affected enemies
-		# Speed - Temporarily increases the speed of affected
-		# enemies.
-		# Healer - Occassionally restores the health of
-		# nearby enemies.
-		# Purify - Occassionally cleanses nearby enemies
-		# of harmful effects.
+		# This value specifies the type of buff that is applied. Valid values
+		# are one of the following identifiers: Intelligence, Speed, Healer,
+		# Purify, Repair, or Forcefield.
+		# Descriptions:
+		# Intelligence - Temporarily improves the pathfinding strategies of
+		#                nearby enemies.
+		# Speed - Temporarily increases the speed of nearby enemies.
+		# Healer - Periodically restores the health of nearby enemies.
+		# Purify - Periodically cleanses nearby enemies of negative
+		#          status afflictions.
+		# Repair - Periodically restores the armor health of nearby enemies.
+		# Forcefield - Periodically generates a shield that absorbs damage
+		#              for nearby enemies. The shield decays with time.
 		type = Intelligence
-		# Remember those group names you defined earlier
-		# in the buff targets section of this file?
-		# This is where you place them; the game will
-		# resolve the group name to the actual list
-		# of enemy names that are affected by this
-		# buff. (Note that the quotes are mandatory.)
+		# This property takes a string value that specifies the types of
+		# enemies the buff applies to. Specifically, you are using one of the
+		# names you specified earlier under the buff targets section.
 		targets = "Buff Group A"
-		# This determines how far another enemy can be
-		# from this enemy in order to receive the
-		# benefits of the buff. This is measured
-		# in game coordinate squares, and keep in
-		# mind that this is a "radius".
+		# This determines how close other enemies must be to this enemy to
+		# benefit from this buff.
 		radius = 3.0
-		# Buffs are not activated every logical frame
-		# of the game as that would be hard to balance
-		# (plus a little inefficient). This value
-		# determines the approximate time (in
-		# milliseconds) between when the buffs
-		# are activated. For instance, if this
-		# value is 250, then the buff will be
-		# activated every 0.25s (or at 250 ms,
-		# 500 ms, and so forth).
-		# Don't this to values lower than 10 ms
-		# as the game is updated in terms of
-		# logical frames, and depending on what
-		# I decide as the best value, the number
-		# of logical frames in a single second
-		# will vary between about 60 fps to
-		# 200 fps.
-		# Also, note that for intelligence buffs,
-		# if the enemy switches strategies often,
-		# the game will slow significantly because
-		# the entire path has to be recalculated
-		# each time.
-		# It is not guaranteed that surrounding enemies
-		# will change strategies immediately. In fact,
-		# I have purposefully added a 0-19 frame delay.
-		# This delay is random for each enemy, but
-		# it is done in attempt to decrease the number
-		# of paths that must be updated in a given frame.
-		# ***FOR THIS REASON, IT IS IMPERATIVE THAT
-		# DELAY >= DURATION + 25.*** Strange things
-		# can happen if one does not follow the previous
-		# guideline, and I do not plan on spending the
-		# time reasoning about this behavior for the
-		# time being.
+		# Buffs are not activated on every logical frame (the discrete units
+		# of time that the game operates in) as this would be both hard to
+		# balance and inefficient. This value specifies the time in
+		# milliseconds between activations of the buff.
+		# For instance, if this value is 250, then surrounding enemies will
+		# receive an intelligence boost every 0.25s. 
+		# You should not set this value lower than 10ms as that is equivalent
+		# to having the buff run every frame. (There are between 60 and 200
+		# logical frames each second; the exact number is not really relevant.)
+		# For the intelligence buff specifically, you should not set this value
+		# too low as it will slow down the game significantly. (The pause you
+		# see at the beginning of each level is the game figuring out the paths
+		# for all the enemies in the level.) Also, as an optimization for this
+		# particular buff, it is not guaranteed that surrounding enemies change
+		# strategies immediately. There is a delay; this is done in an attempt
+		# to decrease the number of paths that must be updated in a single
+		# logical frame. For this reason, you should set the delay to be higher
+		# than the duration. (My notes specify to set delay >= duration + 25,
+		# but I think the actual requirement might be delay >= duration + 200.)
+		# Strange things may happen if you the interval between the two is
+		# smaller for the intelligence buff.
 		delay = 100
-		# This parameter only applies to certain
-		# kinds of buffs like Intelligence and
-		# Speed where the effect goes away after
-		# a while. This is the time in milliseconds
-		# that said effects last for.
-		# ***IT IS IMPERATIVE THAT DURATION + 25
-		# <= DELAY.*** (See above comment.)
+		# This parameter only applies to certain types of buffs. It specifies
+		# how long (in milliseconds) that the buff lasts.
 		duration = 75
 	},
 	# Note that the above comma is optional
 	{
-		# Here, one can define another buff.
-		# The first four options are always the same:
+		# Here, one can define another buff. The first four options are
+		# always the same:
 		# type - the type of the buff
-		# targets - the name of the group of enemies
-		#           affected by the buff
-		# radius - the maximum distance that the buff
-		#          works at.
-		# delay - the amount of time (in ms) between
-		#         activations of the buff.
+		# targets - the name of the group of enemies affected by the buff
+		# radius - the maximum distance that the buff works at.
+		# delay - the amount of time (in ms) between activations of the buff.
 		type = Speed
 		targets = "Buff Group B"
 		radius = 2.5
 		delay = 250
-		# Like Intelligence buffs, Speed buffs also
-		# have a duration in ms that they last for.
+		# Like Intelligence buffs, Speed buffs also require you to specify
+		# a duration in milliseconds.
 		duration = 150
-		# Speed buffs also have a few additional
-		# parameters.
-		# Note that for all of these values,
-		# they are multiplicative rather than
-		# additive. Examples will be noted below.
-		# This value is the percentage increase to
-		# the enemy's walking speed, expressed as
-		# a decimal. For instance, 0.25 represents
-		# a 25% increase in walking speed; in other
-		# words, the enemy will walk at 125% of
-		# their original walking speed.
-		# As mentioned earlier, cumulative speed
-		# boosts are multiplicative, so if an
-		# enemy receives two 25% walking speed boost
-		# buffs, the actual effect will be that the
-		# enemy ends up walking at 156.25% of their
-		# normal walking speed, NOT 150%.
+		# Speed buffs also have a few additional parameters. All speed changes
+		# combine in a multiplicative; this means that if an enemy's speed
+		# is increased by 40% by a buff but is slowed by 20% by an ice
+		# projectile, the net change in speed
+		# is 100% * 140% * (100% - 20%) = 112%. It is not 120% (from adding
+		# 40% and -20% together).
+		# This value is the percentage increase in enemies' walking speeds,
+		# expressed as a decimal. For instance, 0.25 means that enemies
+		# affected by this buff will walk at 125% of their original walking
+		# speed.
 		walking_speed_boost = 0.25
-		# This is just like walking speed boost, except
-		# it boosts the enemy's running speed.
-		# Don't forget to specify this as a decimal;
-		# specificying 50 when you mean to put
-		# 0.50 (for +50%) is NOT going to have the effect
-		# you desired!
+		# This is like the walking speed boost, except it affects the enemy's
+		# running speed. Remember, you are specifying the percentage increase.
 		running_speed_boost = 0.50
-		# Like walking speed boost and running speed
-		# boost, this value boosts the enemy's
-		# speed when in the injured state by the given
-		# percentage.
+		# This value boosts the enemy's speed when injured by the percentage
+		# specified.
 		injured_speed_boost = 0.15
 	}
-	# Notice that I omitted the comma above;
-	# The configuration file should still be able to read without it.
+	# The comma is optional (but recommended); you can omit and the parser
+	# will not complain.
 	{
 		# This time, we are doing a healing buff
 		type = Healer
 		targets = "Buff Group A"
 		radius = 1.25
-		# Note that healing effects can get out of
-		# hand pretty quickly.
-		# I wouldn't recommend setting this value
-		# very low unless you plan to set the heal
-		# amount very low as well.
+		# Healing effects can be really powerful if you are not careful. You
+		# should not set this very low unless you set the heal amount very low
+		# as well.
 		delay = 1500
-		# This value determines how much health is
-		# restored to an enemy every time the healing
-		# buff is activated.
-		# Note that it perfectly legal to specify
-		# a decimal value here. (Perhaps you may do
-		# so to give the illusion of a gradual healing
-		# effect if you also set a low delay value!)
-		# Anything above 10 is probably too high, but
-		# it depends on what you set delay to.
+		# This value determines how much health is restored to enemies each
+		# time the buff activates. Notice that the actual number is a decimal;
+		# the game secretly stores enemies' health as decimal values rather
+		# than integers. You can also use low values to give the illusion of
+		# a gradual healing effect.
+		# Values above 10 are likely too high, but it does depend on what
+		# you set the delay to.
 		heal_amount = 2.50
 	}
 	{
@@ -321,16 +256,11 @@ buffs = {
 		targets = "Buff Group B"
 		radius = 3.50
 		delay = 750
-		# This number determines the maximum number of
-		# hostile effects (which by the way can be
-		# anything ranging from stun effects and speed
-		# debuffs to damage over time effects) that
-		# are removed from EACH enemy whenever the
-		# buff is activated.
-		# It is probably better to keep this value
-		# low unless you plan on making it where
-		# the enemies affected by this buff never
-		# suffer from harmful effects.
+		# This number determines the maximum number of hostile effects that
+		# are removed from each enemy whenever the buff is activated. Hostile
+		# effects include damage over time effects, speed debuffs, stun
+		# effects, and other effects that negatively affect enemies.
+		# It is recommended to keep this value low.
 		purify_max_effects = 2
 	},
 	{
@@ -338,31 +268,40 @@ buffs = {
 		type = Repair
 		targets = "Buff Group A"
 		radius = 1.25
-		# Note that repair effects can get out of
-		# hand pretty quickly.
-		# I wouldn't recommend setting this value
-		# very low unless you plan to set the repair
-		# amount very low as well.
+		# Like healer buffs, repair buffs can get out of hand pretty quickly.
 		delay = 1500
-		# This value determines how much armor health is
-		# restored to an enemy every time the repair
-		# buff is activated.
-		# Note that it perfectly legal to specify
-		# a decimal value here. (Perhaps you may do
-		# so to give the illusion of a gradual repair
-		# effect if you also set a low delay value!)
-		# Anything above 10 is probably too high, but
-		# it depends on what you set delay to.
+		# This value determines how much armor health is restored each time
+		# the buff is activated. Like with enemies' health, armor health is
+		# secretly a decimal number as well, so decimal values are legal here.
+		# Anything above 10 here is likely too high.
 		repair_amount = 2.50
+	},
+	{
+		# This time, we are specifying a forcefield buff.
+		type = Forcefield
+		targets = "Buff Group A"
+		radius = 1.25
+		# Most of the time, you will want to set this value much higher than
+		# the duration.
+		delay = 5000
+		# This value indicates the maximum time in milliseconds that the
+		# shield remains active.
+		duration = 2000
+		# This value is how much damage the shield can sustain before it
+		# deactivates. Note that the shield's health also gradually decays with
+		# time.
+		shield_health = 250
+		# This values indicates how much damage is soaked up by the shield.
+		# The absorbed damage is applied to the shield; the remaining damage
+		# is taken by the enemy like normal. You can set this value pretty
+		# high if you like; it just means the shield is destroyed sooner.
+		shield_absorb = 2.0
 	}
-	# Good indentation helps with these brackets;
-	# Don't forget to include this second closing
-	# bracket when you are finished defining buffs
-	# for the enemies.
+	# Good indentation helps with these brackets. Don't forget the second
+	# brace when you are finished defining the enemy's buffs.
 }
 
-# You can define more enemies by simply adding
-# more [enemy] section headers
+# You can define more enemies by simply adding more enemy section headers
 [enemy]
 name = "Another Enemy"
 desc = "Another example enemy for you!"
@@ -379,12 +318,9 @@ injured_speed = 1.333
 strategy = Euclidean
 can_move_diagonally = true
 is_flying = false
-# As mentioned earlier, you MUST include
-# this element even if the enemy possesses
-# no buffs.
-# In this special case, you MUST place
-# two braces side-by-side on the same
-# line exactly as shown below:
+# As stated earlier, you are required to include this property even if the
+# enemy has no buffs. In this case, you must include the braces as seen below
+# on the same line.
 buffs = {}
 
 # Some other notes:
