@@ -51,7 +51,7 @@ InstType /NOCUSTOM
 
 ; Pages
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE ".\..\other\license.txt"
+!insertmacro MUI_PAGE_LICENSE ".\..\..\license.txt"
 !insertmacro MUI_PAGE_COMPONENTS
 !define MUI_DIRECTORYPAGE_TEXT_TOP "Please select the root folder to install the game to. To choose a different folder, click Browse and select another folder. Note: The actual game is installed in the subfolder $\"tower_defense$\" of this folder. This subfolder is created automatically by the installer; it does not need to already exist."
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE set_install_dir
@@ -88,7 +88,7 @@ Section "Required Files" SectionRequired
   CreateDirectory "$R0"
   WriteUninstaller $R0\uninstall.exe
   SetOutPath $R0
-  File ".\..\other\license.txt"
+  File ".\..\..\license.txt"
   File ".\..\..\readme.txt"
   File ".\..\other\version.txt"
   File ".\..\other\contact.txt"
