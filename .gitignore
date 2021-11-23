@@ -1,6 +1,6 @@
 # Directories
-bin/other/**/
-bin/other/*.*
+bin/other/todo_list.txt
+bin/other/bug_list.txt
 bin/test_resources/*.*
 bin/userdata/*.*
 bin/screenshots/*.*

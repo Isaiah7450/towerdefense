@@ -1,0 +1,19 @@
+/*
+ * Created by: Isaiah Hoffman
+ * Created on: December 31, 2020
+ */
+body {
+	/* font-family: Webdings */
+	font-size: 16pt;
+	color: white;
+	background-color: black;
+}
+
+body section {
+	margin-left: 1%;
+	margin-right: 15%;
+}
+
+dt {
+	font-weight: bold;
+}

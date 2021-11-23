@@ -1,0 +1,13 @@
+System Requirements:
+
+Minimum:
+Operating System: Microsoft Windows 7 or later.
+Screen Resolution: 1024x768 or higher.
+RAM: 32 MB (of free memory)
+
+Recommended:
+Operating System: Microsoft Windows 7 or later.
+Screen Resolution: 1024x768 or higher.
+RAM: 64 MB (of free memory)
+CPU: My computer possesses an Intel(R) Core(TM) i5-6200 CPU @ 2.30 GHz 2.40 GHz; you could probably get by with way lower speeds though.
+

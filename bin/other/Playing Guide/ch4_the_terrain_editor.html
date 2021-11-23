@@ -1,0 +1,56 @@
+<!DOCTYPE html:5>
+<html>
+	<head>
+		<title>Isaiah's tower defense Playing Guide - The Terrain Editor</title>
+		<link rel="stylesheet" type="text/css" href="./screen.css" media="screen" />
+		<link rel="prev" type="text/html" href="./ch3_detailed_information.html" />
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+		<meta name="author" content="Isaiah Hoffman" />
+	</head>
+	<body>
+		<nav>Navigation:
+			<a rel="prev" type="text/html" href="./ch3_detailed_information.html">Prev</a> |
+			Next |
+			<a type="text/html" href="./toc.html">Table of Contents</a>
+		</nav>
+		<h1>Chapter 4: The Terrain Editor</h1>
+		<section>
+			<p>Shipped with all verxions of the game is a terrain editor that allows you to create your own terrain maps. You can access the editor by selecting "Terrain Editor" from the Develop menu. To play a game designed in the terrain editor, you will need to start a custom game and enter the map's name.</p>
+			<p>The editor itself possesses its own window with its own menu bar. The first menu is the File menu that provides options for creating, loading, and saving maps.</p>
+			<dl>
+				<dt>New Map</dt>
+				<dd>This option allows you to create a new map of any size. You will be asked for a default name, the number of rows of the map, and the number of columns of the map. The default name is the default save name for the map. You may save the map under a different name by using the Save Map as command. The valid values for the number of rows and number of columns are any integers between 10 and 50 inclusive. <i>(Note: Do not include a file extension; one will be generated automatically.)</i></dd>
+				<dt>Open Map</dt>
+				<dd>This option allows you to open and make changes to an existing map. When you select this option, you will be asked for the name of the map you would like to change. <i>(Note: Do not include a file extension as one will be inferred automatically.)</i> <strong>As noted in the dialog, <em>all</em> unsaved progress will be lost!</strong></dd>
+				<dt>Save Map</dt>
+				<dd>If you look at the title bar of the window, you will notice a name in square brackets at the very end. This is the default save name of the map. When you select this option, the current map will be saved under this name.</dd>
+				<dt>Save Map as</dt>
+				<dd>This option allows you to save the current map under a differnt name than the default save name. Selecting this option brings up a dialog box requesting the new name of the map. It also includes an option to ask for your confirmation if a map of the given name already exists. Untick the box if you are certain you want to override any map with the given name.</dd>
+				<dt>Quit</dt>
+				<dd>This option closes the terrain editor and returns to the normal game window. Unsaved progress is not guaranteed to be saved when exiting via this option or the X button on the window.</dd>
+			</dl>
+			<p>The next menu, Actions, provides a set of very useful commands to assist in map creation.</p>
+			<dl>
+				<dt>Revert to Last Save</dt>
+				<dd>This option reverts the state of the map when it was last saved. It is useful if you make a huge error or don't like the changes you have made.</dd>
+				<dt>Set Ground Troop Start</dt>
+				<dd>This sets the location that ground enemies spawn from.</dd>
+				<dt>Set Air Troop Start</dt>
+				<dd>This sets the location that air enemeis spawn from.</dd>
+				<dt>Set Ground Troop Goal</dt>
+				<dd>This sets the location that ground enemies are trying to reach.</dd>
+				<dt>Set Air Troop Goal</dt>
+				<dd>This sets the location that air enemies are trying to reach.
+				<dt>Increase Terrain Weights</dt>
+				<dd>This option increases the weight of the terrain by 1. This makes enemies travel slower when going through tiles that you paint after selecting this command. (The exact formula used is `Effective Speed = Normal Speed / Terrain Weight`.)</dd>
+				<dt>Decrease Terrain Weights</dt>
+				<dd>This option decreases the weight of the terrain by 1. Whereas the previous option made enemies travel slower, this option makes them travel faster. Note: The minimum terrain weight is 1 and sometimes 2 and is determined by the defaults for each terrain type.</dd>
+				<dt>Toggle Ground Weights</dt>
+				<dd>This option shows the weight numbers of each tile for enemies that cannot fly.</dd>
+				<dt>Toggle Air Weights</dt>
+				<dd>This option shows the weight numbers of each tile for enemies that can fly.</dd>
+			</dl>
+			<p>The menu labeled Terrain Types has the list of terrains you can place on the map. The characteristics of each terrain were described in chapter 1 of this playing guide. <i>Note: If you change terrain types, the terrain weights are reset to the default values for that terrain.</i> To paint a tile with a certain terrain type, select the type in the Terrain Types menu and then left-click on the location you wish to place it. Right-clicking on a square will revert the tile to grass. (Note: The selected terrain type is not checked in the menu like towers are in the game, but rest assured that the game did respond to your selection.)</p>
+		</section>
+	</body>
+</html>

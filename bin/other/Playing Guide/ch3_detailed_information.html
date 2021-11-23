@@ -1,0 +1,238 @@
+<!DOCTYPE html:5>
+<html>
+	<head>
+		<title>Isaiah's tower defense Playing Guide - More Detailed Information</title>
+		<link rel="stylesheet" type="text/css" href="./screen.css" media="screen" />
+		<link rel="prev" type="text/html" href="./ch2_player_controls.html" /> 
+		<link rel="next" type="text/html" href="./ch4_the_terrain_editor.html" />
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+		<meta name="author" content="Isaiah Hoffman" />
+	</head>
+	<body>
+		<nav>Navigation:
+			<a rel="prev" type="text/html" href="./ch2_player_controls.html">Prev</a> |
+			<a rel="next" type="text/html" href="./ch4_the_terrain_editor.html">Next</a> |
+			<a type="text/html" href="./toc.html">Table of Contents</a>
+		</nav>
+		<h1>Chapter 3: More Detailed Information About Statistics</h1>
+		<section>
+			<p>As mentioned in the previous chapter, you can use the menus and/or click on towers and enemies to bring up detailed information about each one. This chapter explains the meaning of the displayed information so you can make more informed decisions.</p>
+			<section id="enemies_info"><h1>About Enemies:</h1>
+				<p><img src="./images/enemy_info_dialog.png" alt="A dialog box that displays information about an enemy. Information shown includes name, description, health, armor health, pain tolerance, armor reduction, walking speed, running speed, injured speed, flying status, damage, number of buffs, strategy, diagonal movement, buff rating, and rating."/></p>
+				<dl>
+					<dt>Name</dt>
+					<dd>The enemy's name. An enemy's name can help you identify them. The graphic of an enemy is directly related to the enemy's name.</dd>
+					<dt>Description</dt>
+					<dd>The enemy's description that has no purpose in-game except to serve as flavor text. Sometimes, it provides insight into the capabilities of the enemy.</dd>
+					<dt>Health</dt>
+					<dd>An enemy dies if its health reaches zero. In-game, a red health bar above the enemy indicates how much health that enemy has remaining. Note that this is only an enemy's base health; there are other factors that affect an enemy's maximum health like the current level and challenge level, and this information is not reflected in the dialog box.</dd>
+					<dt>Pain Tolerance</dt>
+					<dd>An enemy has three states: walking, running, and injured. This percentage indicates when an enemy enters the injured state. For instance, suppose an enemy starts with 100 health and has a pain tolerance of 70%. That enemy will enter its state when their current health is less than or equal to 30.</dd>
+					<dt>Armor Health</dt>
+					<dd>Some enemies possess armor that keep them alive longer. Armor health indicates the amount of damage an enemy's armor can withstand (after damage reduction) before the armor breaks. In-game, a dark blue bar above the enemy's red health bar indicates the percentage of an enemy's armor that remains. In most cases, an enemy will sustain damage to its armor before losing health. Finally, like with the case of an enemy's health, the provided armor health is only the base value and other things like the level number will influence the actual amount of armor an enemy possesses.</dd>
+					<dt>Shield Health</dt>
+					<dd><i>(Note: This statistic is not shown in-game.)</i> Some enemies provide a shield buff to nearby enemies. When this occurs, a light-blue bar is layered on top of the buffed enemy's armor bar. Unlike regular armor, shields decrease damage taken at a flat rate instead of a percentage. Furthermore, while the shield is active, all damage received is applied towards the shield. Shields decay after a set amount of time or until the shield's health expires. Poison bypasses shields completely.</dd>
+					<dt>Armor Reduction<dt>
+					<dd>While an enemy's armor is still active, damage sustained by the enemy is reduced by this percentage. Damage that bypasses armor is generally not reduced.</dd>
+					<dt>Walking Speed</dt>
+					<dd>The enemy's walking speed in coordinate squares (cs) per second (s). (Note: Each colored square in-game is considered one coordinate square. The standard map for the intermediate challenge level is 35 coordinate squares wide and 40 coordinate squares tall.) An enemy is in the walking state if and only if the enemy's armor is still active and the enemy is not considered injured. Note that like an enemy's armor health and base health, this value is the base walking speed and may be affected by the current level, difficulty, and challenge level.</dd>
+					<dt>Running Speed</dt>
+					<dd>The enemy's running speed. An enemy is in the running state if and only if the enemy does not possess armor, or the enemy's armor is inactive, and the enemy is not considered injured.</dd>
+					<dt>Injured Speed</dt>
+					<dd>The enemy's injured speed. An enemy is in the injured state if and only if the enemy's life bar is at most (100% - {Pain Tolerance%}) filled.</dd>
+					<dt>Can Fly</dt>
+					<dd>Indicates whether an enemy is flying or not. Some projectiles deal more or less damage based on an enemy's flying status. Flying enemies may also follow a different path from other enemies.</dd>
+					<dt>Damage</dt>
+					<dd>If an enemy of this type reaches its goal point, you will lose this much health.</dd>
+					<dt>Number of Buffs</dt>
+					<dd>Some enemies possess passive buffs that help either them or similar enemies around them. This number indicates how many different buffs an enemy possesses.</dd>
+					<dt>Strategy</dt>
+					<dd>
+						<p><i>(Note: The following information is rather advanced and it is highly recommended most people ignore it. This information is not required nor vital to playing the game.)</i></p>
+						<p>This value indicates how an enemy estimates the remaining distance to the goal when determining what path to take. The various values for this field are described below:</p>
+						<ul>
+							<li><b>Euclidean</b>: Refers to the Euclidean distance formula (which gives the shortest distance between any two points in Euclidean space): distance = sqrt((delta x)^2 + (delta y)^2).</li>
+							<li><b>Manhattan</b>: Manhattan distance equals (delta x) + (delta y); it is the distance covered when an entity can only move horizontally or vertically on a grid.</li>
+							<li><b>Diagonal</b>: Diagonal distance equals (delta x) + (delta y) * (sqrt(2) - 2(1)) * min((delta x), (delta y)). Diagonal distance gives the distance between two points when only horizontal, vertical, and diagonal (i.e.: movement NE, N, NW, W, SW, S, SE, and E) are allowed.</li>
+							<li><b>Maximum: (or Max_Dx_Dy)</b>: A variation on diagonal distance; the maximum of (delta x) or (delta y) is returned. Compared to diagonal distance, the maximum distance assigns equivalent costs to moving diagonally and moving horizontally or vertically.</li>
+						</ul>
+					</dd>
+					<dt>Moves Diagonally</dt>
+					<dd>Indicates whether an enemy can move diagonally or not.</dd>
+					<dt>Buff Rating</dt>
+					<dd>This number is an internal estimate of the power of an enemy's passive buffs. While this number may be a good relative measure, it is not recommended to rely solely on this number to make choices; watching the behavior of enemies during the game will serve you the well.</dd>
+					<dt>Full Rating</dt>
+					<dd>This number estimates an enemy's overall effectiveness. Once again, it is highly recommended to only use this number as a relative measure rather than an absolute measure of an enemy's power. If you want a good estimate of an enemy's raw strength, you can subtract their buff rating from this number. The value you obtain is a good approximation of the number of coordinate squares the enemy can cover if it sustains 1 damage per second.</dd>
+				</dl>
+			</section>
+			<section id="shots_info"><h1>About Shots Fired By Towers:</h1>
+				<p><img src="./images/shot_info_dialog.png" alt="A dialog box that displays information about an ammunition type. Information shown includes name, description, base damage, piercing, move speed, splash damage, splash radius, ground multiplier, air multiplier, type, whether special effects apply to indirect targets, expected number of targets, expected damage, effect rating, and full rating."/></p>
+				<dl>
+					<dt>Base Damage</dt>
+					<dd>The base amount of damage sustained by enemies that come in contact with the shot. Damage multipliers use this value as the base of their calculations.</dd>
+					<dt>Piercing</dt>
+					<dd>Indicates how effective the shot is against enemies with armor. Against enemies with no armor, this value has no effect. The exact increase in damage is given below (for enemies that still possess armor) (note that piercing is always considered last when it comes to damage modifiers):
+						<ul>
+							<li><b>Damage to Armor</b> = {Damage} * (100% - {Armor Reduction} + {Piercing})</li>
+							<li><b>Damage to Health</b> = {Damage to Armor} * {Piercing}</li>
+						</ul>
+					</dd>
+					<dt>Move Speed</dt>
+					<dd>The speed at which the shot travels across the screen in coordinate squares per second. In general, higher values will increase the likelihood that the shot hits its intended target.</dd>
+					<dt>Splash Damage</dt>
+					<dd>All enemies within the shot's splash radius (as determined at the time of impact) sustain this amount of damage.</dd>
+					<dt>Splash Radius</dt>
+					<dd>When the shot collides with an enemy, all enemies within this distance of the impact location sustain splash damage.</dd>
+					<dt>Ground Multiplier</dt>
+					<dd>Damage received by non-flying enemies that collide with this shot is multiplied by this percentage.</dd>
+					<dt>Air Multiplier</dt>
+					<dd>Damage received by flying enemies that collide with this shot is multiplied by this percentage.</dd>
+					<dt>Type</dt>
+					<dd>The shot's special effect type. You can use the "View Type Info" button to view more information about the shot's special effect.</dd>
+					<dt>Apply to Splash</dt>
+					<dd>Indicates whether or not the shot's special effect is applied to enemies that receive splash damage.</dd>
+					<dt>Expected Targets</dt>
+					<dd>This number estimates the number of targets that will be hit by the shot.</dd>
+					<dt>Expected Damage</dt>
+					<dd>This number estimates how much damage the shot will do in general.</dd>
+					<dt>Effect Rating</dt>
+					<dd>This number estimates the power of the shot's special effect provided it has one.</dd>
+					<dt>Full Rating</dt>
+					<dd>This number estimates the overall power of the shot and is based on both the shot's expected damage as well as any special effects the shot possesses.</dd>
+				</dl>
+				<section><h1>Shot Special Effects</h1>
+					<section><h1>Slow Effect</h1>
+						<dl>
+							<dt>Speed Decrease</dt>
+							<dd>The percent decrease in an enemy's speed as a result of being slowed. For instance, suppose this number equals 25%. Then enemies affected by the shot's slow effect would move at 75% of their base speed. Note that all slow effects stack multiplicatively, not additively. For instance, suppose an enemy is slowed by 25% then by 10%. The enemy's will travel at (100% - 25%)(100% - 10%) = 67.5% of its base speed, <em>not</em> 100% - 25% - 10% = 65% (of its base speed). An enemy will move no slower than 10% of their base speed at any point in time.</dd>
+							<dt>Slow Duration</dt>
+							<dd>The time in milliseconds that the slow effect lasts for. Note that separate slow effects have separate timers; they are not combined in any way.</dd>
+							<dt>Slow Multi-Chance</dt>
+							<dd>The likelihood that an enemy that is already slowed will be slowed again by this shot. This value is to decrease the likelihood that several slow effects are stacked onto a single enemy causing the enemy to hardly move (because that would be ridiculously strong and unbalanced).</dd>
+						</dl>
+					</section>
+					<section><h1>Stun Effect</h1>
+						<dl>
+							<dt>Stun Chance</dt>
+							<dd>The likelihood that an enemy hit by the shot will be stunned. Stunned enemies are unable to move until the stun expires.</dd>
+							<dt>Stun Duration</dt>
+							<dd>The time in milliseconds that the stun effect lasts for.</dd>
+							<dt>Stun Multi-Chance</dt>
+							<dd>The likelihood that an already stunned enemy will be stunned again by this shot. This is to prevent indefinite stunning of enemies.</dd>
+						</dl>
+					</section>
+					<section><h1>DoT Effect</h1>
+						<p>Note that <i>DoT</i> stands for Damage Over Time.</p>
+						<dl>
+							<dt>Type</dt>
+							<dd>The DoT type. Refer to the effect description for more information about what the type means.</dd>
+							<dt>Effect Description</dt>
+							<dd>Gives more information about how the DoT effect works.</dd>
+							<dt>Tick Damage</dt>
+							<dd>DoT effects deal damage to enemies at regular intervals; these time points are referred to as ticks. This number indicates the amount of damage (before armor reduction) that an enemy sustains each time the DoT effect ticks.</dd>
+							<dt>Tick Time Delay</dt>
+							<dd>The amount of time in milliseconds between ticks of the DoT.</dd>
+							<dt>Total Ticks</dt>
+							<dd>The number of ticks the DoT lasts for. The total (base) damage dealt by the DoT effect equals the {Tick Damage} multiplied by the {Total Ticks}. For instance, a DoT effect that lasts for 5 ticks and deals 3 damage per tick will deal 15 damage to an enemy over the lifetime of the DoT effect.</dd>
+							<dt>Total Duration</dt>
+							<dd>The total time in seconds that the DoT effect lasts for. Please note that DoT effects do <em>not</em> stack; an enemy already affected by a DoT effect will not be affected by another one until the one it is already affected by expires.</dd>
+							<dt>Single-Target DPS</dt>
+							<dd>The approximate damage per second dealt by the DoT effect to a single target.</dd>
+							<dt>Maximum DPS</dt>
+							<dd>The approximate damage per second dealt by the DoT effect after accounting for the average number of targets the shot hits.</dd>
+						</dl>
+					</section>
+				</section> <!-- End effects section -->
+			</section> <!-- End shots section -->
+			<section id="towers_info_part_A"><h1>About Towers (Part A):</h1>
+				<p><img src="./images/tower_info_dialog.png" alt="A dialog box that displays information about an enemy. Information shown includes name, description, firing method, targeting strategy, ammunition types, firing speed, firing range, shots until reload, reload delay, expected shot damage, average shot effect rating, expected fire rate, expected DPS, cost, and full rating."/></p>
+				<dl>
+					<dt>Firing Method</dt>
+					<dd>
+						<p>This describes the general firing pattern of the tower. While learning the specifics requires looking at the game's resource files, an overview is provided below:</p>
+						<ul>
+							<li><b>Default</b>: The tower chooses a target based on its targeting strategy. It then aims its shots at the chosen target.</li>
+							<li><b>Arc Circle</b>: The tower fires in a circle starting on the left side of the tower and continuing around counterclockwise.</li>
+							<li><b>Arc Quadrant I-IV</b>: The tower fires in an arc covering one of the four quadrants with the tower at the origin.</li>
+						</ul>
+					</dd>
+					<dt>Targeting Strategy</dt>
+					<dd>
+						<p>When a tower uses the default firing method, this determines which enemies the target prioritizes. (Note: If there is a tie, the tower defaults to using the default strategy among the tied targets.) Once again, the specifics requires looking at the game's resource files, but an overview is provided below:</p>
+						<ul>
+							<li><b>Default</b>: The tower prioritizes the closest target.</li>
+							<li><b>Farthest</b>: The tower prioritizes the farthest target.</li>
+							<li><b>Highest Health</b>: The tower prioritizes the enemy with the highest health within its firing range.</li>
+							<li><b>Weakest Armor</b>: The tower prioritizes the enemy with the lowest armor reduction percentage.</li>
+							<li><b>Deadliest</b>: The tower prioritizes the enemy that deals the most damage within its firing range.</li>
+							<li><b>Air Infantry</b>: The tower prioritizes the weakest (from an archetype standpoint) air troops.</li>
+						</ul>
+					</dd>
+					<dt>Ammunition Types</dt>
+					<dd>The dropdown box specifies the various ammunition types (i.e.: shots) that the tower uses and the probability that chooses a specific type.</dd>
+					<dt>Firing Speed</dt>
+					<dd>The approximate number of shots the tower shoots during one second while it is not reloading.</dd>
+					<dt>Firing Range</dt>
+					<dd>The maximum distance from the tower that shots can travel to. The tower will not attempt to target any enemies outside its firing range.</dd>
+					<dt>Shots until Reload</dt>
+					<dd>This indicates how many times the tower can shoot until it has to reload. In-game, a purple bar fills up as the tower fires, and once the bar is full, the tower has to reload.</dd>
+					<dt>Reload Delay</dt>
+					<dd>The amount of time in milliseconds the tower spends reloading. The tower will not fire during this time. In-game, a turquoise bar (it's very light) will start filling from the right; when it reaches the left side of the bar, the tower will begin firing again.</dd>
+					<dt>Expected Shot Damage</dt>
+					<dd>The expected damage sustained by enemies per shot fired by the tower.</dd>
+					<dt>Average Shot Effect Rating</dt>
+					<dd>The weighted average of the effect ratings of the shots the tower can fire. It provides a guideline to how much support the tower will provide.</dd>
+					<dt>Expected Fire Rate</dt>
+					<dd>The expected number of shots fired per second. This number takes into account downtime due to the tower having to reload.</dd>
+					<dt>Expected DPS</dt>
+					<dd>The expected amount of damage the tower deals per second.</dd>
+					<dt>Cost</dt>
+					<dd>The cost of the tower to two decimal places. Note that the costs display in the towers menu are rounded off. If you are having trouble purchasing a tower despite having the amount displayed in the menu, it is likely you are missing a few extra cents that are displayed here. All towers are priced according to the following formula: <pre>Cost = {Tower Rating} / 8.2 + 1.0 + {Cost Adjustment}</pre></dd>
+					<dt>Full Rating</dt>
+					<dd>A number that indicates a tower's overall power. Among other factors, it considers the firing area of the tower, the expected DPS of the tower, and the average shot rating of the tower.</dd>
+				</dl>
+				<section id="towers_info_part_B"><h1>About Towers (Part B):</h1>
+					<p><img src="./images/placed_tower_info_dialog.png" alt="A dialog box that displays information about an enemy. Information shown includes name, description, firing method, targeting strategy, ammunition types, firing speed, firing range, shots until reload, reload delay, expected shot damage, average shot effect rating, expected fire rate, expected DPS, value, and full rating."/></p>
+					<dl>
+						<dt>Value</dt>
+						<dd>The net value of the tower that indicates a tower's overall power. Sold towers return half of their value in cash.</dd>
+					</dl>
+				</section>
+				<section id="upgrade_info"><h1>About Tower Upgrades:</h1>
+					<p><img src="./images/upgrade_info_dialog.png" alt="A dialog box that displays information about an upgrade. Information shown includes the upgraded tower, the upgrade special ability, the upgrade level, the upgrade cost, the new speed multiplier, the new range multiplier, the new capacity multiplier, the new delay multiplier, the new damage multiplier, and the new expected DPS."/></p>
+					<dl>
+						<dt>Upgrade For</dt>
+						<dd>The name of the tower that the upgrade is for. Note that towers must be upgraded individually, not all at once.</dd>
+						<dt>Upgrade Special</dt>
+						<dd>
+							<p>Sometimes, a tower upgrade comes with a new special ability for the tower. This ability is described here.</p>
+							<ul>
+								<li><b>None</b>: The tower does not gain a new special ability from this upgrade.</li>
+								<li><b>Extra Cash</b>: At the end of every level, this tower has a chance of generating additional cash.</li>
+								<li><b>Multishot</b>: This tower has a chance to generate multiple shots at once without incurring a reload cost.</li>
+								<li><b>Mega Missile</b>: This tower has a chance to shoot a powerful missile in place of its normal shot.</li>
+								<li><b>Fast Reload</b>: This tower has a chance of reducing its reload time by a certain percentage.</li>
+							</ul>
+						</dd>
+						<dt>Upgrade Level</dt>
+						<dd>This value indicates the level of the tower once the upgrade is performed.</dd>
+						<dt>Upgrade Cost</dt>
+						<dd>Upgrading this tower requires exactly this amount of cash.</dd>
+						<dt>New Speed Multiplier</dt>
+						<dd>The tower's new firing speed is equivalent to its base firing speed (at level 1) times this value. Note: If this number is blue, the upgrade does not change this parameter. If this number is green, the upgrade improves this parameter. If the number is red, the upgrade degrades this parameter.</dd>
+						<dt>New Range Multiplier</dt>
+						<dd>The tower's new firing range is equal to its base firing range times this value.</dd>
+						<dt>New Capacity Multiplier</dt>
+						<dd>The number of shots the tower can shoot before reloading after performing this upgrade is equal to its base value for that stat times this value.</dd>
+						<dt>New Delay Multiplier</dt>
+						<dd>The tower's new reload delay is equal to its base reload delay times this value.</dd>
+						<dt>New Damage Multiplier</dt>
+						<dd>After performing this upgrade, the damage dealt by shots fired from this tower are multiplied by this value.</dd>
+						<dt>New Expected DPS</dt>
+						<dd>This is an estimate of the damage per second that the tower will deal after performing the upgrade.</dd>
+					</dl>
+				</section>
+			</section>
+		</section>
+	</body>
+</html>
