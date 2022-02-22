@@ -15,9 +15,10 @@ namespace hoffman::isaiah {
 		DataFileParser::DataFileParser(std::wistream& is) :
 			data_file {is} {
 			this->lookahead = this->data_file.get();
-			if (!this->isValid() || !this->getNext()) {
+			if (!this->isValid()) {
 				throw DataFileException {L"Could not read data file."s, 0};
 			}
+			this->getNext();
 		}
 
 		bool DataFileParser::getNext() {
