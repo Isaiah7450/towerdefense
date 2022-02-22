@@ -226,24 +226,21 @@ public:
 		public:
 			TEST_METHOD(Datafile_Quoted_String) {
 				try {
-					// TODO: Rewrite
-					/*
 					std::wistringstream my_string {L"\"My Quoted Input\""s};
-					int line_number = 1;
-					auto result = ih::util::file::getNextToken(my_string, line_number).second;
-					Assert::AreEqual(L"My Quoted Input"s, result);
+					ih::util::file::DataFileParser my_parser {my_string};
+					Assert::AreEqual(L"My Quoted Input"s, my_parser.getToken());
 					std::wistringstream my_second_str {L"\"My \\\"Escaped\\\" Quoted Input!\""s};
-					result = ih::util::file::getNextToken(my_second_str, line_number).second;
-					Assert::AreEqual(L"My \"Escaped\" Quoted Input!"s, result);
-					std::wistringstream my_fourth_str {L"\"My hack string cut\"off by a quote.\""s};
-					result = ih::util::file::getNextToken(my_fourth_str, line_number).second;
-					Assert::AreEqual(L"My hack string cut"s, result);
-					std::wistringstream my_fifth_str {L"\"My perfectly normal string with a \\ in it.\""s};
-					result = ih::util::file::getNextToken(my_fifth_str, line_number).second;
-					Assert::AreEqual(L"My perfectly normal string with a \\ in it."s, result);
-					std::wistringstream my_sixth_str {L"\"My \\\"\\\"double quoted\\\"\\\" string\""s};
-					result = ih::util::file::getNextToken(my_sixth_str, line_number).second;
-					*/
+					ih::util::file::DataFileParser my_parser2 {my_second_str};
+					Assert::AreEqual(L"My \"Escaped\" Quoted Input!"s, my_parser2.getToken());
+					std::wistringstream my_third_str {L"\"My hack string cut\"off by a quote.\""s};
+					ih::util::file::DataFileParser my_parser3 {my_third_str};
+					Assert::AreEqual(L"My hack string cut"s, my_parser3.getToken());
+					std::wistringstream my_fourth_str {L"\"My perfectly normal string with a \\ in it.\""s};
+					ih::util::file::DataFileParser my_parser4 {my_fourth_str};
+					Assert::AreEqual(L"My perfectly normal string with a \\ in it."s, my_parser4.getToken());
+					std::wistringstream my_fifth_str {L"\"My \\\"\\\"double quoted\\\"\\\" string\""s};
+					ih::util::file::DataFileParser my_parser5 {my_fifth_str};
+					Assert::AreEqual(L"My \"\"double quoted\"\" string"s, my_parser5.getToken());
 				}
 				catch (const ih::util::file::DataFileException& e) {
 					Assert::Fail(e.what());
