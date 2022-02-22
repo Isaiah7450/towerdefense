@@ -182,8 +182,4 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="graphics\vertex_shader.hlsl" />
-    <FxCompile Include="graphics\pixel_shader.hlsl" />
-  </ItemGroup>
 </Project>
