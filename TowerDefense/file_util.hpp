@@ -37,9 +37,13 @@ namespace hoffman::isaiah {
 		/// <summary>Lexical and syntactical analyzer that reads data files.</summary>
 		class DataFileParser {
 		public:
+			/// <summary>Initializes the parser with the given input stream. Note that
+			/// the parser has already read the first token when this constructor returns.</summary>
+			/// <param name="is">The input stream to read from.</param>
 			DataFileParser(std::wistream& is);
 			/// <summary>Reads the next token and stores the value in the lexer.</summary>
-			/// <returns>False if a stream error occurs; otherwise, true.</returns>
+			/// <returns>False if a stream error occurs; otherwise, true. Note that EOF counts as a stream
+			/// error.</returns>
 			bool getNext();
 
 			// Utility functions

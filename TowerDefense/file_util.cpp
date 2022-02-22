@@ -121,6 +121,7 @@ namespace hoffman::isaiah {
 					return false;
 				}
 				if (this->lookahead != L'_' && !((this->lookahead >= L'a' && this->lookahead <= L'z')
+					|| (this->lookahead >= L'A' && this->lookahead <= L'Z')
 					|| (this->lookahead >= L'0' && this->lookahead <= L'9'))) {
 					throw DataFileException {L"Invalid character encountered: "s + this->lookahead
 						+ L" in section header!"s, this->getLine()};
