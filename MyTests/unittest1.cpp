@@ -223,7 +223,72 @@ public:
 		};
 
 		TEST_CLASS(Datafiles) {
-		public:
+public:
+			TEST_METHOD(Datafile_EOF_Detection) {
+				try {
+					std::wistringstream str_one {L"Hello 123 EOF"};
+					ih::util::file::DataFileParser p1 {str_one};
+					Assert::IsTrue(p1.getNext());
+					Assert::IsFalse(p1.getNext());
+				}
+				catch (const ih::util::file::DataFileException& e) {
+					Assert::Fail(e.what());
+				}
+				catch (...) {
+					Assert::Fail(L"An exception occurred.");
+				}
+			}
+
+			TEST_METHOD(Datafile_Token_Classification) {
+				namespace ih_file = ih::util::file;
+				try {
+					std::wistringstream str_one {L"Hello [Hello] \"Hello\" 1 <abc> <\"a\", \"b\">"};
+					ih_file::DataFileParser parser_one {str_one};
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::Identifier));
+					Assert::IsTrue(parser_one.getNext());
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::Section));
+					Assert::IsTrue(parser_one.getNext());
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::String));
+					Assert::IsTrue(parser_one.getNext());
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::Number));
+					Assert::IsTrue(parser_one.getNext());
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::List));
+					Assert::IsTrue(parser_one.getNext());
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::Identifier));
+					Assert::IsTrue(parser_one.getNext());
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::List));
+					Assert::IsTrue(parser_one.getNext());
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::List));
+					Assert::IsTrue(parser_one.getNext());
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::String));
+					Assert::IsTrue(parser_one.getNext());
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::String));
+					Assert::IsFalse(parser_one.getNext());
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::List));
+					std::wistringstream str_two {L"{xyz = 123} {}"s};
+					ih::util::file::DataFileParser parser_two {str_two};
+					Assert::IsTrue(parser_two.matchTokenType(ih_file::TokenTypes::Object));
+					parser_two.getNext();
+					Assert::IsTrue(parser_two.matchTokenType(ih_file::TokenTypes::Identifier));
+					parser_two.getNext();
+					Assert::IsTrue(parser_two.matchTokenType(ih_file::TokenTypes::Identifier));
+					parser_two.getNext();
+					Assert::IsTrue(parser_two.matchTokenType(ih_file::TokenTypes::Number));
+					parser_two.getNext();
+					Assert::IsTrue(parser_two.matchTokenType(ih_file::TokenTypes::Object));
+					parser_two.getNext();
+					Assert::IsTrue(parser_two.matchTokenType(ih_file::TokenTypes::Object));
+					Assert::IsFalse(parser_two.getNext());
+					Assert::IsTrue(parser_two.matchTokenType(ih_file::TokenTypes::Object));
+				}
+				catch (const ih::util::file::DataFileException& e) {
+					Assert::Fail(e.what());
+				}
+				catch (...) {
+					Assert::Fail(L"An exception occurred.");
+				}
+			}
+
 			TEST_METHOD(Datafile_Quoted_String) {
 				try {
 					std::wistringstream my_string {L"\"My Quoted Input\""s};
@@ -241,6 +306,50 @@ public:
 					std::wistringstream my_fifth_str {L"\"My \\\"\\\"double quoted\\\"\\\" string\""s};
 					ih::util::file::DataFileParser my_parser5 {my_fifth_str};
 					Assert::AreEqual(L"My \"\"double quoted\"\" string"s, my_parser5.getToken());
+				}
+				catch (const ih::util::file::DataFileException& e) {
+					Assert::Fail(e.what());
+				}
+				catch (...) {
+					Assert::Fail(L"An exception occurred.");
+				}
+			}
+
+			TEST_METHOD(Datafile_Reading) {
+				try {
+					namespace ih_file = ih::util::file;
+					std::wistringstream s1 {L"[hello] abc = 123 <3, 17, 12, 6>"};
+					ih_file::DataFileParser p1 {s1};
+					Assert::IsTrue(p1.matchToken(ih_file::TokenTypes::Section, L"hello"));
+					const auto r1 = p1.readKeyValue(L"abc");
+					Assert::IsTrue(r1.first == ih_file::TokenTypes::Number);
+					Assert::IsTrue(r1.second == L"123"s);
+					p1.getNext();
+					const auto r2 = p1.readList<int>();
+					Assert::AreEqual(static_cast<size_t>(4), r2.size());
+					Assert::AreEqual(3, r2[0]);
+					Assert::AreEqual(17, r2[1]);
+					Assert::AreEqual(12, r2[2]);
+					Assert::AreEqual(6, r2[3]);
+				}
+				catch (const ih::util::file::DataFileException& e) {
+					Assert::Fail(e.what());
+				}
+				catch (...) {
+					Assert::Fail(L"An exception occurred.");
+				}
+			}
+
+			TEST_METHOD(Datafile_Comment_Skipping) {
+				try {
+					namespace ih_file = ih::util::file;
+					std::wistringstream s1 {L"# This is a comment.\nHello ; Another comment.\n123\t\t\t\"abc\""};
+					ih_file::DataFileParser p1 {s1};
+					Assert::IsTrue(p1.matchTokenValue(L"Hello"s));
+					Assert::IsTrue(p1.getNext());
+					Assert::IsTrue(p1.matchTokenType(ih_file::TokenTypes::Number));
+					Assert::IsFalse(p1.getNext());
+					Assert::IsTrue(p1.matchToken(ih_file::TokenTypes::String, L"abc"));
 				}
 				catch (const ih::util::file::DataFileException& e) {
 					Assert::Fail(e.what());
