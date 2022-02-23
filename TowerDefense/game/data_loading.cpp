@@ -1128,15 +1128,42 @@ namespace hoffman_isaiah {
 
 		void MyGame::saveGame(std::wostream& save_file) const {
 			if (this->isInLevel()) {
-				// Can't save now...
+				// Cannot save during levels.
+				// Maybe I should add a message of some sort.
 				return;
 			}
-			save_file << L"V: " << 4 << L"\n";
-			save_file << L"C: " << this->challenge_level << L" D: " << this->difficulty
-				<< L" L: " << this->level << L"\n";
-			save_file << L"H: " << this->player.getHealth() << L" K: " << this->hp_buy_cost
-				<< L" M: " << this->player.getMoney() << L"\n";
-			save_file << L"W: " << this->win_streak << L" L: " << this->lose_streak << L"\n";
+			/*
+				Opcode 0x0: No operation
+				Opcode 0x1: Copy integer
+				Opcode 0x2: Copy float
+				Opcode 0x3: Increment integer
+				Opcode 0x4: Decrement integer
+
+				Addresses:
+
+				0x0 : Challenge level
+				0x1 : Level
+				0x2 : Lose Streak
+				0x3 : Win Streak
+				0x4 : Player health
+
+				0x0 : Difficulty
+				0x1 : HP Buy Cost
+				0x2 : Player money
+			 */
+			save_file << L"HEADER\n" << 5 << L"\n";
+			save_file << std::hex << 0x0 << L" " << 0x0 << L" " << 0x1 << L" "
+				<< 0x0 << L" " << this->getChallengeLevel() << L" "
+				<< 0x3 << L" " << 0x1 << L" "
+				<< 0x4 << L" " << 0x1 << L" "
+				<< 0x1 << L" " << 0x1 << L" " << this->level << L" "
+				<< 0x1 << L" " << 0x2 << L" " << this->lose_streak << L" "
+				<< 0x1 << L" " << 0x3 << L" " << this->win_streak << L"\n"
+				<< 0x1 << L" " << 0x4 << L" " << this->player.getHealth() << L" "
+				<< 0x2 << L" " << 0x0 << L" " << this->difficulty << L" "
+				<< 0x2 << L" " << 0x1 << L" " << this->hp_buy_cost << L" "
+				<< 0x2 << L" " << 0x2 << L" " << this->player.getMoney() << L"\n"
+				<< std::dec << L"BODY\n";
 			// Output map name (mainly for the terrain editor rather than the game itself.)
 			save_file << L"MN: " << this->map_base_name << L"\n";
 			// Output terrain map
@@ -1163,126 +1190,157 @@ namespace hoffman_isaiah {
 			std::wstring buffer {};
 			int version;
 			save_file >> buffer >> version;
-			if (version >= 1 && version <= 4) {
-				save_file >> buffer >> this->challenge_level >> buffer >> this->difficulty
-					>> buffer >> this->level;
-				int player_health;
-				double player_cash;
-				if (version <= 2) {
-					save_file >> buffer >> player_health >> buffer >> player_cash;
-				}
-				else {
-					save_file >> buffer >> player_health >> buffer >> this->hp_buy_cost
-						>> buffer >> player_cash;
-				}
-				this->player = Player {player_cash, player_health};
-				save_file >> buffer >> this->win_streak >> buffer >> this->lose_streak;
-				// Read or determine map name.
-				if (version >= 4) {
+			if (version < 5) {
+				throw std::runtime_error {"Old save file detected. The old save is not compatible with "
+					" this version of the game. Starting a new game."};
+			}
+			int integers[16] {};
+			double decimals[16] {};
+			int index {0};
+			save_file >> buffer;
+			while (buffer != L"BODY"s) {
+				switch (std::stoi(buffer, nullptr, 16)) {
+				case 0x0:
+					// No operation
+					break;
+				case 0x1:
+					// Copy integer operation.
 					save_file >> buffer;
-					std::getline(save_file, this->map_base_name);
-					// Leading space is removed...
-					this->map_base_name.erase(this->map_base_name.begin());
-					if (MyGame::getDefaultMapName(this->getChallengeLevel() + ID_CHALLENGE_LEVEL_EASY) != this->getMapBaseName()) {
-						this->setGameType(true);
-					}
+					index = std::clamp(std::stoi(buffer, nullptr, 16), 0, 15);
+					save_file >> buffer;
+					integers[index] = std::stoi(buffer, nullptr, 16);
+					break;
+				case 0x2:
+					// Copy float operation.
+					save_file >> buffer;
+					index = std::clamp(std::stoi(buffer, nullptr, 16), 0, 15);
+					save_file >> buffer;
+					decimals[index] = std::stod(buffer, nullptr);
+					break;
+				case 0x3:
+					// Increment integer operation.
+					save_file >> buffer;
+					index = std::clamp(std::stoi(buffer, nullptr, 16), 0, 15);
+					++integers[index];
+					break;
+				case 0x4:
+					// Decrement integer operation.
+					save_file >> buffer;
+					index = std::clamp(std::stoi(buffer, nullptr, 16), 0, 15);
+					--integers[index];
+					break;
 				}
-				else {
-					switch (this->getChallengeLevel()) {
-					case 0:
-						this->map_base_name = L"beginner";
-						break;
-					case 1:
-						this->map_base_name = L"intermediate";
-						break;
-					case 2:
-						this->map_base_name = L"experienced";
-						break;
-					case 3:
-						this->map_base_name = L"expert";
-						break;
-					default:
-						this->map_base_name = L"intermediate";
-						this->challenge_level = 1;
-					}
-				}
-				// Terrain map
-				// (This is tricky --> Due to the way the start and end nodes are loaded,
-				// I need to TRANSFER the ownership of these resources TO this->map.)
-				auto my_gterrain = std::make_unique<pathfinding::Grid>();
-				auto my_aterrain = std::make_unique<pathfinding::Grid>();
-				save_file >> *my_gterrain >> *my_aterrain;
-				this->map = std::make_shared<game::GameMap>(std::move(my_gterrain), std::move(my_aterrain));
-				// Note that above move invalidates the test paths.
-				this->ground_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), false,
-					false, pathfinding::HeuristicStrategies::Manhattan);
-				this->air_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), true,
-					false, pathfinding::HeuristicStrategies::Manhattan);
-				// Influence map
-				pathfinding::Grid ground_influence_map {};
-				pathfinding::Grid air_influence_map {};
-				save_file >> ground_influence_map >> air_influence_map;
-				this->map->setInfluenceGraphs(ground_influence_map, air_influence_map);
-				while (save_file >> buffer) {
-					if (buffer == L"T:") {
-						// Towers
-#pragma warning(push)
-#pragma warning(disable: 26494) // Code Analysis: type.5 --> Always initialize.
-						std::wstring tower_name;
-						double tower_gx;
-						double tower_gy;
-#pragma warning(pop)
-						std::getline(save_file, tower_name);
-						// Leading space is removed...
-						tower_name.erase(tower_name.begin());
-						save_file >> buffer >> tower_gx >> tower_gy;
-						const TowerType* my_type {nullptr};
-						for (const auto& tt : this->getAllTowerTypes()) {
-							if (tt->getName() == tower_name) {
-								my_type = tt.get();
-								break;
-							}
-						}
-						if (!my_type) {
-							throw std::runtime_error {"Error: Tower does not exist!"};
-						}
-						auto my_tower = std::make_unique<Tower>(this->getDeviceResources(), this->getMap(), my_type,
-							graphics::Color {0.f, 0.f, 0.f, 1.f}, tower_gx, tower_gy);
-						if (version >= 2) {
-							// Special code to handle upgrades (while not breaking old files.)
-							int tower_lv;
-							int tower_path;
-							save_file >> tower_lv >> tower_path;
-							my_tower->setTowerUpgradeStatus(tower_lv, tower_path);
-						}
-						this->addTower(std::move(my_tower));
-						const auto my_floored_gx = static_cast<int>(std::floor(tower_gx));
-						const auto my_floored_gy = static_cast<int>(std::floor(tower_gy));
-						this->getMap().getFiterGraph(false).getNode(my_floored_gx, my_floored_gy).setBlockage(true);
-						this->getMap().getFiterGraph(true).getNode(my_floored_gx, my_floored_gy).setBlockage(true);
-					}
-					else if (buffer == L"E:") {
-						// Load seen enemies.
-						std::wstring enemy_name {};
-						std::getline(save_file, enemy_name);
-						// Leading space is removed...
-						enemy_name.erase(enemy_name.begin());
-						long long kill_count {0};
-						if (version >= 3) {
-							save_file >> buffer >> std::hex >> kill_count >> std::dec;
-						}
-						try {
-							this->enemies_seen.at(enemy_name) = true;
-							this->enemy_kill_count.at(enemy_name) = kill_count;
-						}
-						catch (const std::out_of_range&) {
-							// Ignore.
-						}
-					}
+				save_file >> buffer;
+			}
+			this->challenge_level = integers[0x0];
+			this->level = integers[0x1];
+			this->lose_streak = integers[0x2];
+			this->win_streak = integers[0x3];
+			this->difficulty = decimals[0x0];
+			this->hp_buy_cost = decimals[0x1];
+			this->player = Player {decimals[0x2], integers[0x4]};
+			// Read or determine map name.
+			if (version >= 4) {
+				save_file >> buffer;
+				std::getline(save_file, this->map_base_name);
+				// Leading space is removed...
+				this->map_base_name.erase(this->map_base_name.begin());
+				if (MyGame::getDefaultMapName(this->getChallengeLevel() + ID_CHALLENGE_LEVEL_EASY) != this->getMapBaseName()) {
+					this->setGameType(true);
 				}
 			}
 			else {
-				throw util::file::DataFileException {L"Unrecognized save file version."s, 1};
+				switch (this->getChallengeLevel()) {
+				case 0:
+					this->map_base_name = L"beginner";
+					break;
+				case 1:
+					this->map_base_name = L"intermediate";
+					break;
+				case 2:
+					this->map_base_name = L"experienced";
+					break;
+				case 3:
+					this->map_base_name = L"expert";
+					break;
+				default:
+					this->map_base_name = L"intermediate";
+					this->challenge_level = 1;
+				}
+			}
+			// Terrain map
+			// (This is tricky --> Due to the way the start and end nodes are loaded,
+			// I need to TRANSFER the ownership of these resources TO this->map.)
+			auto my_gterrain = std::make_unique<pathfinding::Grid>();
+			auto my_aterrain = std::make_unique<pathfinding::Grid>();
+			save_file >> *my_gterrain >> *my_aterrain;
+			this->map = std::make_shared<game::GameMap>(std::move(my_gterrain), std::move(my_aterrain));
+			// Note that above move invalidates the test paths.
+			this->ground_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), false,
+				false, pathfinding::HeuristicStrategies::Manhattan);
+			this->air_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), true,
+				false, pathfinding::HeuristicStrategies::Manhattan);
+			// Influence map
+			pathfinding::Grid ground_influence_map {};
+			pathfinding::Grid air_influence_map {};
+			save_file >> ground_influence_map >> air_influence_map;
+			this->map->setInfluenceGraphs(ground_influence_map, air_influence_map);
+			while (save_file >> buffer) {
+				if (buffer == L"T:") {
+					// Towers
+#pragma warning(push)
+#pragma warning(disable: 26494) // Code Analysis: type.5 --> Always initialize.
+					std::wstring tower_name;
+					double tower_gx;
+					double tower_gy;
+#pragma warning(pop)
+					std::getline(save_file, tower_name);
+					// Leading space is removed...
+					tower_name.erase(tower_name.begin());
+					save_file >> buffer >> tower_gx >> tower_gy;
+					const TowerType* my_type {nullptr};
+					for (const auto& tt : this->getAllTowerTypes()) {
+						if (tt->getName() == tower_name) {
+							my_type = tt.get();
+							break;
+						}
+					}
+					if (!my_type) {
+						throw std::runtime_error {"Error: Tower does not exist!"};
+					}
+					auto my_tower = std::make_unique<Tower>(this->getDeviceResources(), this->getMap(), my_type,
+						graphics::Color {0.f, 0.f, 0.f, 1.f}, tower_gx, tower_gy);
+					if (version >= 2) {
+						// Special code to handle upgrades (while not breaking old files.)
+						int tower_lv;
+						int tower_path;
+						save_file >> tower_lv >> tower_path;
+						my_tower->setTowerUpgradeStatus(tower_lv, tower_path);
+					}
+					this->addTower(std::move(my_tower));
+					const auto my_floored_gx = static_cast<int>(std::floor(tower_gx));
+					const auto my_floored_gy = static_cast<int>(std::floor(tower_gy));
+					this->getMap().getFiterGraph(false).getNode(my_floored_gx, my_floored_gy).setBlockage(true);
+					this->getMap().getFiterGraph(true).getNode(my_floored_gx, my_floored_gy).setBlockage(true);
+				}
+				else if (buffer == L"E:") {
+					// Load seen enemies.
+					std::wstring enemy_name {};
+					std::getline(save_file, enemy_name);
+					// Leading space is removed...
+					enemy_name.erase(enemy_name.begin());
+					long long kill_count {0};
+					if (version >= 3) {
+						save_file >> buffer >> std::hex >> kill_count >> std::dec;
+					}
+					try {
+						this->enemies_seen.at(enemy_name) = true;
+						this->enemy_kill_count.at(enemy_name) = kill_count;
+					}
+					catch (const std::out_of_range&) {
+						// Ignore.
+					}
+				}
 			}
 		}
 

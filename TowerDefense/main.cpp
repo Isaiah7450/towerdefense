@@ -355,7 +355,8 @@ namespace hoffman_isaiah {
 					game::g_my_game->loadGame(default_save_file);
 				}
 				catch (...) {
-					MessageBox(nullptr, L"Error: Corrupted saved file! Reverting to new game.", L"Corrupted Save",
+					MessageBox(nullptr, L"Error: Corrupted or old save file detected. Save files made in"
+						L" version 3.3.1 or earlier are no longer supported.", L"Corrupted Save",
 						MB_OK | MB_ICONERROR);
 					// Reset state and save over the corrupted file...
 					const std::wstring map_name = game::g_my_game->getDefaultMapName(ID_CHALLENGE_LEVEL_NORMAL);
@@ -383,8 +384,8 @@ namespace hoffman_isaiah {
 				game::g_my_game->loadGlobalData();
 			}
 			catch (const util::file::DataFileException&) {
-				MessageBox(nullptr, L"Error: Corrupted global save file. Overwriting with default values.", L"Corrupted Save",
-					MB_OK | MB_ICONERROR);
+				MessageBox(nullptr, L"Error: Corrupted global save file. Overwriting with default values.",
+					L"Corrupted Save", MB_OK | MB_ICONERROR);
 				game::g_my_game->saveGlobalData();
 				try {
 					game::g_my_game->loadGlobalData();
