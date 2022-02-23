@@ -14,7 +14,7 @@
 #include "./enemy_type.hpp"
 #include "./game_object.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		// Forward declaration
 		class StatusEffectBase;

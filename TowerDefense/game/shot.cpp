@@ -14,7 +14,7 @@
 #include "./shot_types.hpp"
 #include "./tower.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		Shot::Shot(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, const GameMap& my_map,
 			const ShotBaseType* stype, graphics::Color o_color, const Tower& ot, double angle) :

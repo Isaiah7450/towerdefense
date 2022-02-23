@@ -5,11 +5,11 @@
 #include "./../TowerDefense/pathfinding/grid.hpp"
 #include "./../TowerDefense/pathfinding/pathfinder.hpp"
 
-namespace ih = hoffman::isaiah;
+namespace ih = hoffman_isaiah;
 using namespace std::literals::string_literals;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace tests {
 		TEST_CLASS(Pathfinding) {
 public:

@@ -30,7 +30,7 @@
 #pragma comment(lib, "comctl32.lib")
 
 using namespace std::literals::string_literals;
-namespace ih = hoffman::isaiah;
+namespace ih = hoffman_isaiah;
 // WinMain function
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR lpCmdLine, _In_ int nCmdShow) {
@@ -46,7 +46,7 @@ int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	return 0;
 }
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace graphics {
 		int screen_width {860};
 		int screen_height {645};

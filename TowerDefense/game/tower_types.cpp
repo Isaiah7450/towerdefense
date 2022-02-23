@@ -13,7 +13,7 @@
 #include "./shot_types.hpp"
 #include "./tower_types.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 	}
 }

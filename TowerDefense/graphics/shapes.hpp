@@ -11,7 +11,7 @@
 #include "./../ih_math.hpp"
 #include "./graphics_DX.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace graphics::shapes {
 		enum class ShapeTypes {
 			Ellipse, Triangle, Rectangle, Diamond, Star

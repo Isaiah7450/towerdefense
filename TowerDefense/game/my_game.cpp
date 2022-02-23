@@ -29,7 +29,7 @@
 #include "./tower.hpp"
 using namespace std::literals::string_literals;
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		std::shared_ptr<MyGame> g_my_game {nullptr};
 

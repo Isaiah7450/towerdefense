@@ -7,7 +7,7 @@
 #include "./../graphics/shapes.hpp"
 #include "./../pathfinding/grid.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		/// <summary>Base class for game objects that are drawn on the screen.</summary>
 		class GameObject : public graphics::IDrawable {

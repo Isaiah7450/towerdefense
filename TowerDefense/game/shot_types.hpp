@@ -9,7 +9,7 @@
 #include "./game_object_type.hpp"
 #include "./status_effects.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		// Forward declarations
 		class Enemy;

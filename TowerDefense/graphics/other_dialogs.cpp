@@ -11,7 +11,7 @@
 #include "./other_dialogs.hpp"
 #include "./../globals.hpp"
 #include "./../game/my_game.hpp"
-namespace hoffman::isaiah::winapi {
+namespace hoffman_isaiah::winapi {
 	ChallengeLevelDialog::ChallengeLevelDialog(HWND owner, HINSTANCE h_inst) {
 		this->selected_clevel = static_cast<int>(DialogBoxParam(h_inst, MAKEINTRESOURCE(IDD_CHALLENGE_LEVEL),
 			owner, ChallengeLevelDialog::dialogProc, reinterpret_cast<LPARAM>(this)));

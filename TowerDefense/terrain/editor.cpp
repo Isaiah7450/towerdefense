@@ -25,7 +25,7 @@
 
 using namespace std::literals::string_literals;
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace terrain_editor {
 		std::shared_ptr<TerrainEditor> g_my_editor {nullptr};
 

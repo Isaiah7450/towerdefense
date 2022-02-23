@@ -6,7 +6,7 @@
 #include "./graph_node.hpp"
 #include "./grid.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace pathfinding {
 		/// <summary>Class that represents a pathfinder used to find
 		/// paths for enemies.</summary>

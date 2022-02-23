@@ -9,7 +9,7 @@
 #pragma comment(lib, "d2d1.lib")
 #pragma comment(lib, "dwrite.lib")
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace graphics {
 		// For use with COM pointers
 		template <typename T>

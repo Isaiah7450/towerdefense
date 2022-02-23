@@ -7,12 +7,12 @@
 #include <string>
 #include "./../globals.hpp"
 
-namespace hoffman::isaiah::game {
+namespace hoffman_isaiah::game {
 	// Forward declarations
 	class MyGame;
 }
 
-namespace hoffman::isaiah::winapi {
+namespace hoffman_isaiah::winapi {
 	/// <summary>Represents a dialog used to select the challenge level of the game.</summary>
 	class ChallengeLevelDialog : public IDialog {
 	public:

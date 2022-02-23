@@ -19,7 +19,7 @@
 #include "./tower.hpp"
 #include "./my_game.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		void Tower::draw(const graphics::Renderer2D& renderer) const noexcept {
 			GameObject::draw(renderer);

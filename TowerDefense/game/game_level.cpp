@@ -15,7 +15,7 @@
 #include "./game_util.hpp"
 #include "./my_game.hpp"
 
-namespace hoffman::isaiah::game {
+namespace hoffman_isaiah::game {
 	EnemyGroup::EnemyGroup(std::queue<std::unique_ptr<Enemy>>&& group_enemies, int spawn_ms_delay) :
 		enemies {std::move(group_enemies)},
 		spawn_frame_delay {math::convertMillisecondsToFrames(spawn_ms_delay)},

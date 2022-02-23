@@ -15,7 +15,7 @@
 #include <memory>
 #include "graphics_DX.hpp"
 
-namespace hoffman::isaiah::winapi {
+namespace hoffman_isaiah::winapi {
 	// This is a stupidly high amount of extra code to implement just to be able to
 	// create file dialogs...
 	class MyFileDialogHandler : public IFileDialogEvents, public IFileDialogControlEvents {

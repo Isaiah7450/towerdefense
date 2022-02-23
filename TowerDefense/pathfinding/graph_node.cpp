@@ -4,7 +4,7 @@
 #include "./graph_node.hpp"
 using namespace std::literals::string_literals;
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace pathfinding {
 	}
 }

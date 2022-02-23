@@ -28,7 +28,7 @@
 #include "./tower.hpp"
 using namespace std::literals::string_literals;
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 
 		void MyGame::load_config_data(bool ran_once) {

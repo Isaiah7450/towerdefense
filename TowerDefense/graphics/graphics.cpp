@@ -34,7 +34,7 @@
 #include "./graphics.hpp"
 #include "./shapes.hpp"
 using namespace std::literals::string_literals;
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace graphics {
 		void Renderer2D::updateHealthOption(HWND hwnd, int new_price) const noexcept {
 			auto my_menu = GetSubMenu(GetMenu(hwnd), id_mm_actions_offset);

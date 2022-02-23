@@ -8,7 +8,7 @@
 #include "./../globals.hpp"
 #include "./graph_node.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace pathfinding {
 		/// <summary>Class representing a rectangular graph of nodes.</summary>
 		class Grid {

@@ -10,7 +10,7 @@
 #include "./game_object.hpp"
 #include "./shot_types.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		// Forward declarations
 		class Enemy;

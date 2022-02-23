@@ -15,7 +15,7 @@
 #include "./tower_types.hpp"
 #include "./game_formulas.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace winapi {
 		class TowerUpgradeInfoDialog;
 	}

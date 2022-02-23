@@ -19,7 +19,7 @@
 #include "./my_game.hpp"
 #include "./status_effects.hpp"
 using namespace std::literals::string_literals;
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		// enemy_type.hpp
 		void BuffBase::update(const Enemy& caller, std::vector<std::unique_ptr<Enemy>>& targets) {

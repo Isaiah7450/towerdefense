@@ -12,7 +12,7 @@
 #include "./game_object_type.hpp"
 #include "./game_formulas.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		// Forward declarations:
 		class Enemy;

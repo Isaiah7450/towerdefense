@@ -5,7 +5,7 @@
 #include "./status_effects.hpp"
 #include "./game_util.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 
 		bool DoTEffect::update(Enemy& e) {

@@ -9,7 +9,7 @@
 #include "./graphics/graphics.hpp"
 #include "./graphics/shapes.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace util::file {
 		/// <summary>Exception class for data file parsing errors.</summary>
 		class DataFileException {

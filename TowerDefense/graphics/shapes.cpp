@@ -11,7 +11,7 @@
 #include "./graphics.hpp"
 #include "./shapes.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace graphics::shapes {
 		void Shape2DBase::draw(const Renderer2D& renderer) const noexcept {
 			renderer.drawGeometry(this->transformed_geometry, this->outline_color);

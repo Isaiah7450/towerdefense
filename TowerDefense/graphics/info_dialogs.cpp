@@ -19,7 +19,7 @@
 #include "./../game/tower_types.hpp"
 #include "./../game/tower.hpp"
 using namespace std::literals::string_literals;
-namespace hoffman::isaiah::winapi {
+namespace hoffman_isaiah::winapi {
 	InfoDialogBase::InfoDialogBase(HINSTANCE h_inst, const game::GameObjectType& object_type) :
 		h_instance {h_inst},
 		my_type {object_type} {

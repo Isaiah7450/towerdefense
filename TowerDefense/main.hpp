@@ -6,7 +6,7 @@
 #include <string>
 #include <utility>
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		class MyGame;
 	}

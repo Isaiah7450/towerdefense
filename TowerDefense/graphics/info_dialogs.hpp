@@ -8,7 +8,7 @@
 #include <string>
 #include "./../globals.hpp"
 
-namespace hoffman::isaiah::game {
+namespace hoffman_isaiah::game {
 	// Forward declarations.
 	class EnemyType;
 	class ShotBaseType;
@@ -22,7 +22,7 @@ namespace hoffman::isaiah::game {
 	class TowerUpgradeInfo;
 }
 
-namespace hoffman::isaiah::winapi {
+namespace hoffman_isaiah::winapi {
 
 	/// <summary>The base class for info dialog boxes.</summary>
 	class InfoDialogBase : public IDialog {

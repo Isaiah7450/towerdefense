@@ -6,7 +6,7 @@
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace pathfinding {
 		/// <summary>Class that represents a graph node. (Primarily for grid-based graphs,
 		/// but it may be possible to use it for other types of graphs.)</summary>

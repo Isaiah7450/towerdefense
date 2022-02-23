@@ -6,7 +6,7 @@
 #include <array>
 #include <string>
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace winapi {
 		// Interfaces/enums:
 		/// <summary>Interface for dialog boxes.</summary>

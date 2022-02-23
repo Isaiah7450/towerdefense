@@ -8,7 +8,7 @@
 #include "./../globals.hpp"
 #include "./graphics_DX.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace graphics::DX {
 		void DeviceResources2D::createDeviceIndependentResources() {
 			// Create Direct2D factory

@@ -3,7 +3,7 @@
 // File Created: March 26, 2018
 #include "./globals.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace math {
 		// Constexpr functions
 		// Returns the number of microseconds in a second.

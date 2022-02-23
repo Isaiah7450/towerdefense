@@ -11,7 +11,7 @@
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace pathfinding {
 		// Forward declaration
 		class Pathfinder;

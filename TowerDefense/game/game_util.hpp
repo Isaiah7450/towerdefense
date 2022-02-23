@@ -3,7 +3,7 @@
 // File Created: April 14, 2018
 #include <random>
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		namespace rng {
 			/// <summary>A non-deterministic random number generator used to seed another random number generator.</summary>

@@ -9,7 +9,7 @@
 #include "./../graphics/shapes.hpp"
 #include "./game_object.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		GameObject::GameObject(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, const GameMap& game_map, graphics::shapes::ShapeTypes st,
 			graphics::Color o_color, graphics::Color f_color, double cgx, double cgy, double gw, double gh) :

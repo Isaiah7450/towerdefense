@@ -11,7 +11,7 @@
 #include "./../globals.hpp"
 #include "./graphics_DX.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		// Forward declaration
 		class MyGame;

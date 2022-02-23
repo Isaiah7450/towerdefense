@@ -11,7 +11,7 @@
 #include "./grid.hpp"
 using namespace std::literals::string_literals;
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace pathfinding {
 		std::wistream& operator>>(std::wistream& is, Grid& graph) {
 			// It is important to clear any nodes that may already be

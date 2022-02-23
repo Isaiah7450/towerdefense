@@ -9,7 +9,7 @@
 #include "./enemy.hpp"
 #include "./game_util.hpp"
 
-namespace hoffman::isaiah::game {
+namespace hoffman_isaiah::game {
 	// Forward declarations.
 	class MyGame;
 	class GameMap;

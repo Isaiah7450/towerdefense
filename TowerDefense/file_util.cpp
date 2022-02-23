@@ -10,7 +10,7 @@
 #include "./graphics/shapes.hpp"
 using namespace std::literals::string_literals;
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace util::file {
 		DataFileParser::DataFileParser(std::wistream& is) :
 			data_file {is} {

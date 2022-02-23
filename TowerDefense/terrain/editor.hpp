@@ -8,7 +8,7 @@
 #include "./../pathfinding/grid.hpp"
 #include "./../pathfinding/pathfinder.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace terrain_editor {
 		unsigned __stdcall terrain_editor_thread_init(void* data);
 

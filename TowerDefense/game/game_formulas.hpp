@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 #include "./../ih_math.hpp"
-namespace hoffman::isaiah::game {
+namespace hoffman_isaiah::game {
 	class FiringMethod;
 	class TargetingStrategy;
 	class ShotBaseType;
