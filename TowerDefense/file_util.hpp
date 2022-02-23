@@ -161,21 +161,24 @@ namespace hoffman::isaiah {
 				}
 				return this->getToken() == L"true" || this->getToken() == L"True";
 			}
-			/// <summary>Attempts to read and parse a list from the input stream.</summary>
+			/// <summary>Attempts to read and parse a list from the input stream. Note that getNext()
+			/// or readKeyValuePair() should already have been called; this method expects the current
+			/// token to be &lt;.</summary>
 			/// <returns>The items in the list.</returns>
 			template <typename T = std::wstring>
 			std::vector<T> readList() {
-				// Note that this call should have been preceded by this->readKeyValue() or this->getNext()
 				this->expectToken(TokenTypes::List, L"<");
 				const int start_line = this->getLine();
 				std::vector<T> list_items {};
 				while (true) {
-					if (!this->getNext()) {
-						throw DataFileException {L"Data file stream is in an invalid state."
-							L" Maybe the file ended early?", start_line};
-					}
+					const auto success = this->getNext();
 					if (this->matchToken(TokenTypes::List, L">")) {
 						return list_items;
+					}
+					// (This comes after as it is okay if we hit EOF after reading the closing bracket.)
+					else if (!success) {
+						throw DataFileException {L"Data file stream is in an invalid state."
+							L" Maybe the file ended early?", start_line};
 					}
 					if constexpr (std::is_same_v<T, std::wstring>) {
 						if (this->matchTokenType(TokenTypes::String)) {
@@ -325,9 +328,6 @@ namespace hoffman::isaiah {
 			/// <summary>Skips past leading whitespace and comments in the input stream.</summary>
 			/// <returns>False if a stream error occurs; otherwise, true.</returns>
 			bool skipOptional() noexcept;
-			/// <summary>Skips past comments in the input stream.</summary>
-			/// <returns>False if a stream error occurs; otherwise, true.</returns>
-			bool skipComments() noexcept;
 			/// <summary>Parses a string in the input stream.</summary>
 			/// <returns>False if a stream error occurs; otherwise, true.</returns>
 			bool readString();
