@@ -150,6 +150,9 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalOptions>/constexpr:steps9999999 %(AdditionalOptions)</AdditionalOptions>
       <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <ExternalWarningLevel>Level1</ExternalWarningLevel>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -163,6 +166,11 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalOptions>/constexpr:steps9999999 %(AdditionalOptions)</AdditionalOptions>
       <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <GenerateSourceDependencies />
+      <ExternalWarningLevel>Level1</ExternalWarningLevel>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <GuardEHContMetadata>true</GuardEHContMetadata>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -172,6 +180,9 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalOptions>/constexpr:steps9999999 %(AdditionalOptions)</AdditionalOptions>
       <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <ExternalWarningLevel>Level1</ExternalWarningLevel>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -188,6 +199,9 @@
       <AdditionalOptions>/constexpr:steps9999999 %(AdditionalOptions)</AdditionalOptions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <ExternalWarningLevel>Level1</ExternalWarningLevel>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -204,6 +218,11 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalOptions>/constexpr:steps9999999 %(AdditionalOptions)</AdditionalOptions>
       <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <GenerateSourceDependencies />
+      <ExternalWarningLevel>Level1</ExternalWarningLevel>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <GuardEHContMetadata>true</GuardEHContMetadata>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -220,6 +239,11 @@
       <AdditionalOptions>/constexpr:steps9999999 %(AdditionalOptions)</AdditionalOptions>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <GenerateSourceDependencies />
+      <ExternalWarningLevel>Level1</ExternalWarningLevel>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <GuardEHContMetadata>true</GuardEHContMetadata>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
