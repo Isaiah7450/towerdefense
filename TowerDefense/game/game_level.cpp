@@ -46,7 +46,7 @@ namespace hoffman_isaiah::game {
 				my_game.getLevelNumber(), my_game.getDifficulty(), my_game.getChallengeLevel());
 			my_enemy_spawns.emplace(std::move(my_enemy));
 		}
-		return std::move(my_enemy_spawns);
+		return my_enemy_spawns;
 	}
 
 

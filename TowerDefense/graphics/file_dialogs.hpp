@@ -20,6 +20,7 @@ namespace hoffman_isaiah::winapi {
 	// create file dialogs...
 	class MyFileDialogHandler : public IFileDialogEvents, public IFileDialogControlEvents {
 	public:
+		virtual ~MyFileDialogHandler() noexcept = default;
 		// Most of this code is more or less copied from the github src of the
 		// sample for the common item dialog box.
 		IFACEMETHODIMP QueryInterface(REFIID riid, void** ppv) override {
@@ -91,7 +92,6 @@ namespace hoffman_isaiah::winapi {
 			return S_OK;
 		}
 	protected:
-		virtual ~MyFileDialogHandler() noexcept = default;
 	private:
 		/// <summary>The current reference count for the interface.</summary>
 		long cref;

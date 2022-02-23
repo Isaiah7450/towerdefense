@@ -39,6 +39,8 @@ namespace hoffman_isaiah::winapi {
 			case IDCANCEL:
 				EndDialog(hwnd, IDCANCEL);
 				break;
+			default:
+				break;
 			}
 			break;
 		default:
@@ -90,6 +92,8 @@ namespace hoffman_isaiah::winapi {
 			case IDCANCEL:
 				EndDialog(hwnd, IDCANCEL);
 				break;
+			default:
+				break;
 			}
 			break;
 		default:
@@ -136,6 +140,8 @@ namespace hoffman_isaiah::winapi {
 			}
 			case IDCANCEL:
 				EndDialog(hwnd, IDCANCEL);
+				break;
+			default:
 				break;
 			}
 			break;
@@ -188,6 +194,8 @@ namespace hoffman_isaiah::winapi {
 			}
 			case IDCANCEL:
 				EndDialog(hwnd, IDCANCEL);
+				break;
+			default:
 				break;
 			}
 			break;
@@ -253,6 +261,8 @@ namespace hoffman_isaiah::winapi {
 			case IDCANCEL:
 				EndDialog(hwnd, IDCANCEL);
 				break;
+			default:
+				break;
 			}
 			break;
 		default:
@@ -300,6 +310,8 @@ namespace hoffman_isaiah::winapi {
 			}
 			case IDCANCEL:
 				EndDialog(hwnd, IDCANCEL);
+				break;
+			default:
 				break;
 			}
 			break;

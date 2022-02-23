@@ -43,7 +43,7 @@ namespace hoffman_isaiah {
 		}
 		
 		unsigned __stdcall terrain_editor_thread_init(void* data) {
-			auto* my_game = game::g_my_game.get();
+			const auto* my_game = game::g_my_game.get();
 			// Global state stuff...
 			terrain_editor::g_my_editor = std::make_shared<TerrainEditor>(static_cast<HWND>(data),
 				my_game->getMapBaseName());
@@ -219,7 +219,7 @@ namespace hoffman_isaiah {
 						{
 							const winapi::TerrainEditorOpenMapDialog my_dialog {this->getHWND(), GetModuleHandle(nullptr)};
 							if (my_dialog.isGood()) {
-								const auto old_name = this->map_name;
+								const auto& old_name = this->map_name;
 								this->map_name = my_dialog.getName();
 								WaitForSingleObject(sync_mutex, INFINITE);
 								try {
@@ -314,6 +314,7 @@ namespace hoffman_isaiah {
 							break;
 						}
 						this->updateMenu();
+						break;
 					}
 					case WM_LBUTTONDOWN:
 					case WM_RBUTTONDOWN:

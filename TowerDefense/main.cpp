@@ -32,8 +32,11 @@
 using namespace std::literals::string_literals;
 namespace ih = hoffman_isaiah;
 // WinMain function
+#pragma warning(push)
+#pragma warning(disable: 26461) // C26461 con.3: Parameter can be marked as a pointer to constant.
 int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR lpCmdLine, _In_ int nCmdShow) {
+#pragma warning(pop)
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 	INITCOMMONCONTROLSEX icc {};
@@ -94,7 +97,7 @@ namespace hoffman_isaiah {
 					throw std::runtime_error {"Can execute mutex does not exist."};
 				}
 				// Initialize the game's state
-				auto my_game = game::g_my_game;
+				const std::shared_ptr<game::MyGame> my_game = game::g_my_game;
 				my_game->load_config_data();
 				my_game->init_enemy_types();
 				my_game->init_shot_types();
@@ -119,7 +122,7 @@ namespace hoffman_isaiah {
 							{
 								WaitForSingleObject(sync_mutex, INFINITE);
 								[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpet_cast.
-								const auto my_clevel_dialog = *reinterpret_cast<const ChallengeLevelDialog*>(msg.lParam);
+								const auto& my_clevel_dialog = *reinterpret_cast<const ChallengeLevelDialog*>(msg.lParam);
 								if (my_clevel_dialog.getChallengeLevel() != IDCANCEL) {
 									const auto new_clevel = my_clevel_dialog.getChallengeLevel() - ID_CHALLENGE_LEVEL_EASY;
 									my_game->resetState(new_clevel, my_game->getDefaultMapName(my_clevel_dialog.getChallengeLevel()));
@@ -543,10 +546,12 @@ namespace hoffman_isaiah {
 								}
 								++i;
 							}
-							const ShotBaseInfoDialog my_dialog {hwnd, this->h_instance,
-								*my_shot};
-							if (pause_state != game::g_my_game->isPaused()) {
-								game::g_my_game->togglePause();
+							if (my_shot) {
+								const ShotBaseInfoDialog my_dialog {hwnd, this->h_instance,
+									*my_shot};
+								if (pause_state != game::g_my_game->isPaused()) {
+									game::g_my_game->togglePause();
+								}
 							}
 						}
 						else if (msg.wParam >= ID_MM_ENEMIES_PLACEHOLDER
@@ -600,6 +605,8 @@ namespace hoffman_isaiah {
 							break;
 						case VK_OEM_PLUS:
 							PostMessage(this->hwnd, WM_COMMAND, ID_MM_ACTIONS_CHANGE_SPEED, 0);
+							break;
+						default:
 							break;
 						}
 						break;

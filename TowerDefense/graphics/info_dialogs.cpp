@@ -110,6 +110,8 @@ namespace hoffman_isaiah::winapi {
 				EndDialog(hwnd, IDOK);
 				break;
 			}
+			default:
+				break;
 			}
 			break;
 		case WM_CTLCOLORSTATIC:
@@ -608,9 +610,9 @@ namespace hoffman_isaiah::winapi {
 		my_stream << L"$" << std::setiosflags(std::ios_base::fixed) << std::setprecision(2) << this->upgrade_cost;
 		SetDlgItemText(hwnd, IDC_INFO_TOWER_UPGRADE_COST, my_stream.str().c_str());
 		my_stream.str(L"");
-		static const COLORREF red_color {RGB(128, 0, 0)};
-		static const COLORREF blue_color {RGB(0, 0, 128)};
-		static const COLORREF green_color {RGB(0, 128, 0)};
+		static const constexpr COLORREF red_color {RGB(128, 0, 0)};
+		static const constexpr COLORREF blue_color {RGB(0, 0, 128)};
+		static const constexpr COLORREF green_color {RGB(0, 128, 0)};
 		const auto my_change_field_lambda = [this, &my_stream, &hwnd](int resource_id, double new_value) noexcept {
 			my_stream << std::setiosflags(std::ios_base::fixed) << std::setprecision(1)
 				<< (new_value * 100.0) << L"%";

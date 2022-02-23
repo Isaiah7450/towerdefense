@@ -13,6 +13,7 @@
 #include <set>
 #include <stdexcept>
 #include <string>
+#include <tuple>
 #include <utility>
 #include <vector>
 #include "./../file_util.hpp"
@@ -82,7 +83,7 @@ namespace hoffman_isaiah {
 							L"graphs/ground_graph_beginner.txt", L"graphs/ground_graph_intermediate.txt",
 							L"graphs/ground_graph_experienced.txt", L"graphs/ground_graph_expert.txt"
 						};
-						for (const auto res_str : my_resources) {
+						for (const auto& res_str : my_resources) {
 							CopyFile((L"./resources/" + res_str).c_str(), (this->resources_folder_path + res_str).c_str(), FALSE);
 						}
 						std::filesystem::create_directory(this->userdata_folder_path + L"../config/");
@@ -905,7 +906,7 @@ namespace hoffman_isaiah {
 					my_parser.readKeyValue(L"name");
 					const std::wstring ename = my_parser.parseString();
 					try {
-						(void)this->getEnemyType(ename);
+						std::ignore = this->getEnemyType(ename);
 						for (const auto& edata : my_edata) {
 							if (edata.getType()->getName() == ename) {
 								throw util::file::DataFileException {L"Repeat enemy type: `"s + ename + L"`"s, my_parser.getLine()};
@@ -967,7 +968,7 @@ namespace hoffman_isaiah {
 					my_parser.readKeyValue(L"name");
 					const std::wstring ename = my_parser.parseString();
 					try {
-						(void)this->getEnemyType(ename);
+						std::ignore = this->getEnemyType(ename);
 						for (const auto& edata : my_edata) {
 							if (edata.getType()->getName() == ename) {
 								throw util::file::DataFileException {L"`" + ename + L"` is already defined as a regular enemy.", my_parser.getLine()};
@@ -1228,6 +1229,8 @@ namespace hoffman_isaiah {
 					save_file >> buffer;
 					index = std::clamp(std::stoi(buffer, nullptr, 16), 0, 15);
 					--integers[index];
+					break;
+				default:
 					break;
 				}
 				save_file >> buffer;
