@@ -1,6 +1,14 @@
 #include "stdafx.h"
-#include "./../TowerDefense/globals.hpp"
+#include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
 #include "./../TowerDefense/file_util.hpp"
+#include "./../TowerDefense/globals.hpp"
+#include "./../TowerDefense/resource.h"
+#include "./../TowerDefense/game/my_game.hpp"
 #include "./../TowerDefense/pathfinding/graph_node.hpp"
 #include "./../TowerDefense/pathfinding/grid.hpp"
 #include "./../TowerDefense/pathfinding/pathfinder.hpp"
@@ -357,6 +365,134 @@ public:
 				catch (...) {
 					Assert::Fail(L"An exception occurred.");
 				}
+			}
+		};
+
+		TEST_CLASS(Main_Game) {
+		public:
+			TEST_METHOD(Main_Game_Construction) {
+				try {
+					const ih::game::MyGame my_game {nullptr};
+				}
+				catch (...) {
+					Assert::Fail(L"An exception occurred.");
+				}
+			}
+
+			TEST_METHOD(Main_Game_Initialization) {
+				// Note that it is very possible for this to fail simply because the data files
+				// have some issue. Perhaps not great for a unit test, but it should work.
+				try {
+					ih::game::MyGame my_game {nullptr};
+					initGame(my_game);
+					Assert::IsTrue(my_game.getAllTowerTypes().size() > 0);
+					Assert::IsTrue(my_game.getAllShotTypes().size() > 0);
+					Assert::IsTrue(my_game.getAllEnemyTypes().size() > 0);
+				}
+				catch (const ih::util::file::DataFileException& e) {
+					Assert::Fail(e.what());
+				}
+				catch (...) {
+					Assert::Fail(L"An exception occurred.");
+				}
+			}
+			
+			TEST_METHOD(Main_Game_Save_Load) {
+				try {
+					ih::game::MyGame my_game {nullptr};
+					this->initGame(my_game);
+					this->initGame2(my_game);
+					my_game.buyHealth();
+					const double old_cash = my_game.getPlayerCash();
+					const double old_diffi = my_game.getDifficulty();
+					const int old_health_buy_cost = my_game.getHealthBuyCost();
+					std::wstringstream save_file {};
+					my_game.saveGame(save_file);
+					my_game.changePlayerCash(100);
+					my_game.buyHealth();
+					my_game.loadGame(save_file);
+					Assert::AreEqual(old_cash, my_game.getPlayerCash());
+					Assert::AreEqual(old_diffi, my_game.getDifficulty());
+					Assert::AreEqual(old_health_buy_cost, my_game.getHealthBuyCost());
+					// @TODO: Add second test case. Probably going to be by some kind
+					// of external file (although that's liable to break with a save
+					// format update.)
+				}
+				catch (const ih::util::file::DataFileException& e) {
+					Assert::Fail(e.what());
+				}
+				catch (...) {
+					Assert::Fail(L"An exception occurred.");
+				}
+			}
+
+			TEST_METHOD(Main_Game_Reset_State) {
+				try {
+					constexpr const auto tol = 0.0000005;
+					ih::game::MyGame my_game {nullptr};
+					initGame(my_game);
+					initGame2(my_game);
+					Assert::AreEqual(1, my_game.getChallengeLevel());
+					Assert::AreEqual(1, my_game.getLevelNumber());
+					Assert::IsTrue(std::abs(my_game.getDifficulty() - 1.0) <= tol);
+					Assert::IsTrue(my_game.getEnemies().size() == 0);
+					Assert::IsTrue(my_game.getTowers().size() == 0);
+					const auto is_seen = [](const auto& e) {
+						return e.second;
+					};
+					const auto& seen_enemies = my_game.getSeenEnemies();
+					Assert::IsFalse(std::any_of(seen_enemies.cbegin(), seen_enemies.cend(),
+						is_seen));
+					Assert::IsFalse(my_game.isPaused());
+					Assert::IsFalse(my_game.isInLevel());
+					Assert::AreEqual(L"intermediate"s, my_game.getMapBaseName());
+					my_game.resetState(2, L"expert"s);
+					my_game.setEnemyTypeAsSeen(L"Red Scout");
+					// @TODO: Figure out how to make enemies without needing graphics.
+					// It's probably an easy fix, but I will have to investigate.
+					// my_game.startWave();
+					while (my_game.isInLevel()) {
+						my_game.update();
+					}
+					// my_game.startWave();
+					my_game.update();
+					my_game.update();
+					my_game.togglePause();
+					// One missing piece is adding towers...
+					this->initGame2(my_game);
+					Assert::AreEqual(1, my_game.getChallengeLevel());
+					Assert::AreEqual(1, my_game.getLevelNumber());
+					Assert::IsTrue(std::abs(my_game.getDifficulty() - 1.0) <= tol);
+					Assert::IsTrue(my_game.getEnemies().size() == 0);
+					Assert::IsTrue(my_game.getTowers().size() == 0);
+					Assert::IsFalse(std::any_of(seen_enemies.cbegin(), seen_enemies.cend(),
+						is_seen));
+					Assert::IsFalse(my_game.isPaused());
+					Assert::IsFalse(my_game.isInLevel());
+					Assert::AreEqual(L"intermediate"s, my_game.getMapBaseName());
+				}
+				catch (const ih::util::file::DataFileException& e) {
+					Assert::Fail(e.what());
+				}
+				catch (...) {
+					Assert::Fail(L"An exception occurred.");
+				}
+			}
+		protected:
+		private:
+			void initGame(ih::game::MyGame& my_game) {
+				my_game.load_config_data();
+				my_game.init_enemy_types();
+				my_game.init_shot_types();
+				my_game.init_tower_types();
+				my_game.load_tower_upgrades_data();
+				my_game.load_global_level_data();
+				my_game.load_global_misc_data();
+			}
+
+			void initGame2(ih::game::MyGame& my_game) {
+				const std::wstring map_name = my_game.getDefaultMapName(ID_CHALLENGE_LEVEL_NORMAL);
+				my_game.resetState(ID_CHALLENGE_LEVEL_NORMAL - ID_CHALLENGE_LEVEL_EASY, map_name);
 			}
 		};
 	}
