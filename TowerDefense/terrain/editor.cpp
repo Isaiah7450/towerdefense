@@ -219,7 +219,7 @@ namespace hoffman_isaiah {
 						{
 							const winapi::TerrainEditorOpenMapDialog my_dialog {this->getHWND(), GetModuleHandle(nullptr)};
 							if (my_dialog.isGood()) {
-								const auto& old_name = this->map_name;
+								const std::wstring old_name = this->map_name;
 								this->map_name = my_dialog.getName();
 								WaitForSingleObject(sync_mutex, INFINITE);
 								try {
