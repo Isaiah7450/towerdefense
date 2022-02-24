@@ -34,6 +34,21 @@ namespace hoffman_isaiah {
 			/// <param name="n_cmd_show">Parameter inherited from WinMain that
 			/// determines the initial state of the window.</param>
 			void run(int n_cmd_show);
+
+			/// <summary>Handles WM_COMMAND messages for the main window.
+			/// (A separate method will handle the few other WM_COMMAND messages that used
+			/// to be handled by the update thread.)</summary>
+			/// <param name="my_game">A non-owning pointer to the current game state.</param>
+			/// <param name="my_renderer">A non-owning pointer to the renderer.</param>
+			/// <param name="wparam">The message code to handle.</param>
+			void handle_wm_command(game::MyGame* my_game,
+				graphics::Renderer2D* my_renderer, WPARAM wparam);
+			/// <summary>Handles WM_COMMAND messages that were in the past handled by
+			/// the update thread.</summary>
+			/// <param name="my_game">A non-owning pointer to the current game state.</param>
+			/// <param name="wparam">The message code to handle.</param>
+			void handle_update_wm_command(game::MyGame* my_game, WPARAM wparam);
+
 			/// <param name="start_time">The starting time as determined by QueryPerformanceCounter.</param>
 			/// <returns>The current time as well as the number of microseconds that have passed since
 			/// the last call.</returns>

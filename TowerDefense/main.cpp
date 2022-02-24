@@ -76,13 +76,6 @@ namespace hoffman_isaiah {
 			try {
 				// Initialize the game's state
 				const std::shared_ptr<game::MyGame> my_game = game::g_my_game;
-				my_game->load_config_data();
-				my_game->init_enemy_types();
-				my_game->init_shot_types();
-				my_game->init_tower_types();
-				my_game->load_tower_upgrades_data();
-				my_game->load_global_level_data();
-				my_game->load_global_misc_data();
 				// Force creation of message queue
 				MSG msg;
 				PeekMessage(&msg, nullptr, WM_USER, WM_USER, PM_NOREMOVE);
@@ -154,18 +147,6 @@ namespace hoffman_isaiah {
 						// Error
 						winapi::handleWindowsError(L"Update thread ");
 					}
-					if (keep_running) {
-						// Check time before updating...
-						static LARGE_INTEGER last_update_time = LARGE_INTEGER {0};
-						if (last_update_time.QuadPart == 0) {
-							QueryPerformanceCounter(&last_update_time);
-						}
-						const auto my_times = winapi::MainWindow::getElapsedTime(last_update_time);
-						if (my_times.second.QuadPart >= math::getMicrosecondsInSecond() / game::logic_framerate) {
-							last_update_time = my_times.first;
-							my_game->update();
-						}
-					}
 				}
 			}
 			catch (const util::file::DataFileException& e) {
@@ -215,14 +196,14 @@ namespace hoffman_isaiah {
 			[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
 			WNDCLASSEX wnd_class {
 				sizeof(WNDCLASSEX), CS_DBLCLKS, MainWindow::windowProc, 0, 0, this->h_instance, nullptr,
-				LoadCursor(nullptr, IDC_ARROW), reinterpret_cast<HBRUSH>(COLOR_BACKGROUND+1),
+				LoadCursor(nullptr, IDC_ARROW), reinterpret_cast<HBRUSH>(COLOR_BACKGROUND + 1),
 				nullptr, MainWindow::class_name, nullptr
 			};
 			if (!RegisterClassEx(&wnd_class)) {
 				winapi::handleWindowsError(L"Registration of window class");
 			}
 			}
-			// Keep reference to menu
+				// Keep reference to menu
 			this->h_menu = LoadMenu(this->h_instance, MAKEINTRESOURCE(IDR_MAIN_MENU));
 			// Determine window size and viewport
 			SetRect(&this->rc, 0, 0, graphics::screen_width, graphics::screen_height);
@@ -271,6 +252,16 @@ namespace hoffman_isaiah {
 				nullptr, 0, nullptr));
 #pragma warning(pop)
 			*/
+			// Will need to clean up the code one way or another later,
+			// but this is convenient for now.
+			auto* my_game = game::g_my_game.get();
+			my_game->load_config_data();
+			my_game->init_enemy_types();
+			my_game->init_shot_types();
+			my_game->init_tower_types();
+			my_game->load_tower_upgrades_data();
+			my_game->load_global_level_data();
+			my_game->load_global_misc_data();
 			// Load save data.
 			std::wifstream default_save_file {game::g_my_game->getUserDataPath() + game::default_save_file_name};
 			if (!default_save_file.bad() && !default_save_file.fail()) {
@@ -320,7 +311,6 @@ namespace hoffman_isaiah {
 			if (game::g_my_game->canStartCustomGames()) {
 				winapi::enableMenuItem(hwnd, 0, ID_MM_FILE_START_CUSTOM_GAME);
 			}
-			HANDLE terrain_editor_thread {nullptr};
 			// Message Loop
 #pragma warning(push)
 #pragma warning(disable: 26494) // Code Analysis: type.5 --> Always initialize.
@@ -334,109 +324,8 @@ namespace hoffman_isaiah {
 					switch (msg.message) {
 					case WM_COMMAND:
 					{
-						switch (msg.wParam) {
-						case ID_MM_FILE_NEW_GAME:
-						{
-							const auto my_clevel_dialog = winapi::ChallengeLevelDialog {hwnd, this->h_instance};
-							[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
-							//PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, reinterpret_cast<LPARAM>(&my_clevel_dialog));
-							}
-							break;
-						}
-						case ID_MM_FILE_START_CUSTOM_GAME:
-						{
-							const auto my_dialog = winapi::StartCustomGameDialog {hwnd, this->h_instance};
-							if (my_dialog.getChallengeLevel() != IDCANCEL) {
-								game::g_my_game->resetState(my_dialog.getChallengeLevel() - ID_CHALLENGE_LEVEL_EASY, my_dialog.getMapName(), true);
-							}
-							break;
-						}
-						case ID_MM_FILE_SAVE_GAME:
-						{
-							//PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
-							break;
-						}
-						case ID_MM_FILE_QUIT:
-						{
-							//PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_FILE_SAVE_GAME, 0);
-							//PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
-							PostMessage(hwnd, WM_DESTROY, 0, 0);
-							break;
-						}
-						case ID_MM_ACTIONS_NEXT_WAVE:
-						{
-							if (game::g_my_game->canStartCustomGames()) {
-								winapi::enableMenuItem(hwnd, 0, ID_MM_FILE_START_CUSTOM_GAME);
-							}
-							//PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
-							break;
-						}
-						case ID_MM_ACTIONS_TOGGLE_PAUSE:
-						{
-							game::g_my_game->togglePause();
-							break;
-						}
-						case ID_MM_ACTIONS_BUY_HEALTH:
-						{
-							game::g_my_game->buyHealth();
-							my_renderer->updateHealthOption(hwnd, game::g_my_game->getHealthBuyCost());
-							break;
-						}
-						case ID_MM_ACTIONS_CHANGE_SPEED:
-						{
-							game::g_my_game->changeUpdateSpeed();
-							my_renderer->updateSpeedOption(hwnd, game::g_my_game->getNextUpdateSpeed());
-							break;
-						}
-						case ID_MM_ACTIONS_TOGGLE_ALL_RADII:
-						{
-							//PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
-							break;
-						}
-						case ID_MM_ACTIONS_VIEW_GLOBAL_STATS:
-						{
-							const winapi::GlobalStatsDialog my_dialog {this->getHWND(), this->h_instance, *game::g_my_game};
-							break;
-						}
-						case ID_MM_TOWERS_INFO:
-						{
-							// (Yes, walls are explicitly excluded heree.)
-							if (game::g_my_game->getSelectedTower() >= 1
-								&& static_cast<size_t>(game::g_my_game->getSelectedTower())
-								< game::g_my_game->getAllTowerTypes().size()) {
-								const auto pause_state = game::g_my_game->isPaused();
-								if (!pause_state) {
-									game::g_my_game->togglePause();
-								}
-								const TowerInfoDialog my_dialog {hwnd, this->h_instance,
-									*game::g_my_game->getTowerType(game::g_my_game->getSelectedTower())};
-								if (pause_state != game::g_my_game->isPaused()) {
-									game::g_my_game->togglePause();
-								}
-							}
-							break;
-						}
-						case ID_MM_DEVELOP_TERRAIN_EDITOR:
-						{
-							[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
-							terrain_editor_thread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0,
-								terrain_editor::terrain_editor_thread_init, static_cast<void*>(hwnd), 0, nullptr));
-							// I do not care when the editor thread ends...
-							if (terrain_editor_thread && terrain_editor_thread != INVALID_HANDLE_VALUE) {
-								CloseHandle(terrain_editor_thread);
-							}
-							terrain_editor_thread = nullptr;
-							}
-							break;
-						}
-						case ID_MM_DEVELOP_SHOW_TEST_PATHS:
-						{
-							game::g_my_game->toggleShowPaths();
-							break;
-						}
-						default:
-							break;
-						}
+						handle_wm_command(game::g_my_game.get(), my_renderer.get(),
+							msg.wParam);
 						if (msg.wParam >= ID_MM_TOWERS_MARK_TILES
 							&& msg.wParam <= ID_MM_TOWERS_NONE + game::g_my_game->getAllTowerTypes().size()) {
 							// Check if the tower menu thingy got selected
@@ -693,9 +582,127 @@ namespace hoffman_isaiah {
 						my_resources->discardDeviceResources();
 						my_resources->createDeviceResources(this->hwnd);
 					}
-					// Sleep a little bit
-					Sleep(1);
+					// Update scene.
+					// Check time before updating...
+					static LARGE_INTEGER last_update_time = LARGE_INTEGER {0};
+					if (last_update_time.QuadPart == 0) {
+						QueryPerformanceCounter(&last_update_time);
+					}
+					const auto my_times = winapi::MainWindow::getElapsedTime(last_update_time);
+					if (my_times.second.QuadPart >= math::getMicrosecondsInSecond() / game::logic_framerate) {
+						last_update_time = my_times.first;
+						my_game->update();
+					}
 				}
+			}
+		}
+
+		void MainWindow::handle_wm_command(game::MyGame* my_game,
+			graphics::Renderer2D* my_renderer, WPARAM wparam) {
+			// (For now... I will be updating my code later.)
+			UNREFERENCED_PARAMETER(my_game);
+			switch (wparam) {
+			case ID_MM_FILE_NEW_GAME:
+			{
+				const auto my_clevel_dialog = winapi::ChallengeLevelDialog {hwnd, this->h_instance};
+				[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
+				//PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, reinterpret_cast<LPARAM>(&my_clevel_dialog));
+				}
+				break;
+			}
+			case ID_MM_FILE_START_CUSTOM_GAME:
+			{
+				const auto my_dialog = winapi::StartCustomGameDialog {hwnd, this->h_instance};
+				if (my_dialog.getChallengeLevel() != IDCANCEL) {
+					game::g_my_game->resetState(my_dialog.getChallengeLevel() - ID_CHALLENGE_LEVEL_EASY, my_dialog.getMapName(), true);
+				}
+				break;
+			}
+			case ID_MM_FILE_SAVE_GAME:
+			{
+				//PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
+				break;
+			}
+			case ID_MM_FILE_QUIT:
+			{
+				//PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_FILE_SAVE_GAME, 0);
+				//PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
+				PostMessage(hwnd, WM_DESTROY, 0, 0);
+				break;
+			}
+			case ID_MM_ACTIONS_NEXT_WAVE:
+			{
+				if (game::g_my_game->canStartCustomGames()) {
+					winapi::enableMenuItem(hwnd, 0, ID_MM_FILE_START_CUSTOM_GAME);
+				}
+				//PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
+				break;
+			}
+			case ID_MM_ACTIONS_TOGGLE_PAUSE:
+			{
+				game::g_my_game->togglePause();
+				break;
+			}
+			case ID_MM_ACTIONS_BUY_HEALTH:
+			{
+				game::g_my_game->buyHealth();
+				my_renderer->updateHealthOption(hwnd, game::g_my_game->getHealthBuyCost());
+				break;
+			}
+			case ID_MM_ACTIONS_CHANGE_SPEED:
+			{
+				game::g_my_game->changeUpdateSpeed();
+				my_renderer->updateSpeedOption(hwnd, game::g_my_game->getNextUpdateSpeed());
+				break;
+			}
+			case ID_MM_ACTIONS_TOGGLE_ALL_RADII:
+			{
+				//PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
+				break;
+			}
+			case ID_MM_ACTIONS_VIEW_GLOBAL_STATS:
+			{
+				const winapi::GlobalStatsDialog my_dialog {this->getHWND(), this->h_instance, *game::g_my_game};
+				break;
+			}
+			case ID_MM_TOWERS_INFO:
+			{
+				// (Yes, walls are explicitly excluded heree.)
+				if (game::g_my_game->getSelectedTower() >= 1
+					&& static_cast<size_t>(game::g_my_game->getSelectedTower())
+					< game::g_my_game->getAllTowerTypes().size()) {
+					const auto pause_state = game::g_my_game->isPaused();
+					if (!pause_state) {
+						game::g_my_game->togglePause();
+					}
+					const TowerInfoDialog my_dialog {hwnd, this->h_instance,
+						*game::g_my_game->getTowerType(game::g_my_game->getSelectedTower())};
+					if (pause_state != game::g_my_game->isPaused()) {
+						game::g_my_game->togglePause();
+					}
+				}
+				break;
+			}
+			case ID_MM_DEVELOP_TERRAIN_EDITOR:
+			{
+				[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
+				HANDLE terrain_editor_thread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0,
+					terrain_editor::terrain_editor_thread_init, static_cast<void*>(hwnd), 0, nullptr));
+				// I do not care when the editor thread ends...
+				if (terrain_editor_thread && terrain_editor_thread != INVALID_HANDLE_VALUE) {
+					CloseHandle(terrain_editor_thread);
+				}
+				terrain_editor_thread = nullptr;
+				}
+				break;
+			}
+			case ID_MM_DEVELOP_SHOW_TEST_PATHS:
+			{
+				game::g_my_game->toggleShowPaths();
+				break;
+			}
+			default:
+				break;
 			}
 		}
 	}
