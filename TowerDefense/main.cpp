@@ -74,28 +74,6 @@ namespace hoffman_isaiah {
 		unsigned __stdcall update_thread_init(void* data) {
 			UNREFERENCED_PARAMETER(data);
 			try {
-				auto update_thread_init_event = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT("update_thread_ready"));
-				if (!update_thread_init_event) {
-					throw std::runtime_error {"Update thread ready event does not exist."};
-				}
-				auto update_event = OpenEvent(SYNCHRONIZE, true, TEXT("can_update"));
-				if (!update_event) {
-					CloseHandle(update_thread_init_event);
-					throw std::runtime_error {"Can update event does not exist."};
-				}
-				auto save_event = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, true, TEXT("save_finished"));
-				if (!save_event) {
-					CloseHandle(update_thread_init_event);
-					CloseHandle(update_event);
-					throw std::runtime_error {"Save finished event does not exist."};
-				}
-				auto sync_mutex = OpenMutex(SYNCHRONIZE | MUTEX_MODIFY_STATE, false, TEXT("can_execute"));
-				if (!sync_mutex) {
-					CloseHandle(update_thread_init_event);
-					CloseHandle(update_event);
-					CloseHandle(save_event);
-					throw std::runtime_error {"Can execute mutex does not exist."};
-				}
 				// Initialize the game's state
 				const std::shared_ptr<game::MyGame> my_game = game::g_my_game;
 				my_game->load_config_data();
@@ -108,7 +86,6 @@ namespace hoffman_isaiah {
 				// Force creation of message queue
 				MSG msg;
 				PeekMessage(&msg, nullptr, WM_USER, WM_USER, PM_NOREMOVE);
-				SetEvent(update_thread_init_event);
 				// Message Loop
 				bool keep_running = true;
 				while (keep_running) {
@@ -120,7 +97,6 @@ namespace hoffman_isaiah {
 							switch (msg.wParam) {
 							case ID_MM_FILE_NEW_GAME:
 							{
-								WaitForSingleObject(sync_mutex, INFINITE);
 								[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpet_cast.
 								const auto& my_clevel_dialog = *reinterpret_cast<const ChallengeLevelDialog*>(msg.lParam);
 								if (my_clevel_dialog.getChallengeLevel() != IDCANCEL) {
@@ -128,7 +104,6 @@ namespace hoffman_isaiah {
 									my_game->resetState(new_clevel, my_game->getDefaultMapName(my_clevel_dialog.getChallengeLevel()));
 								}
 								}
-								ReleaseMutex(sync_mutex);
 								break;
 							}
 							case ID_MM_FILE_SAVE_GAME:
@@ -138,39 +113,28 @@ namespace hoffman_isaiah {
 									MessageBox(nullptr, L"Could not save game.", L"Save failed!", MB_ICONEXCLAMATION | MB_OK);
 								}
 								else {
-									WaitForSingleObject(sync_mutex, INFINITE);
 									my_game->saveGame(save_file);
-									ReleaseMutex(sync_mutex);
 								}
-								SetEvent(save_event);
 								break;
 							}
 							case ID_MM_ACTIONS_NEXT_WAVE:
-								WaitForSingleObject(sync_mutex, INFINITE);
 								my_game->startWave();
-								ReleaseMutex(sync_mutex);
 								break;
 							case ID_MM_ACTIONS_TOGGLE_ALL_RADII:
-								WaitForSingleObject(sync_mutex, INFINITE);
 								my_game->toggleAllRadii();
-								ReleaseMutex(sync_mutex);
 								break;
 							case ID_MM_TOWERS_BUY_TOWER:
 							{
 								const auto my_gx = static_cast<int>(GET_X_LPARAM(msg.lParam));
 								const auto my_gy = static_cast<int>(GET_Y_LPARAM(msg.lParam));
-								WaitForSingleObject(sync_mutex, INFINITE);
 								my_game->buyTower(my_gx, my_gy);
-								ReleaseMutex(sync_mutex);
 								break;
 							}
 							case ID_MM_TOWERS_SELL_TOWER:
 							{
 								const auto my_gx = static_cast<int>(GET_X_LPARAM(msg.lParam));
 								const auto my_gy = static_cast<int>(GET_Y_LPARAM(msg.lParam));
-								WaitForSingleObject(sync_mutex, INFINITE);
 								my_game->sellTower(my_gx, my_gy);
-								ReleaseMutex(sync_mutex);
 								break;
 							}
 							default:
@@ -191,11 +155,6 @@ namespace hoffman_isaiah {
 						winapi::handleWindowsError(L"Update thread ");
 					}
 					if (keep_running) {
-						// Update stuff
-						const HANDLE update_handles[] = {
-							update_event, sync_mutex
-						};
-						WaitForMultipleObjects(2, update_handles, true, INFINITE);
 						// Check time before updating...
 						static LARGE_INTEGER last_update_time = LARGE_INTEGER {0};
 						if (last_update_time.QuadPart == 0) {
@@ -206,13 +165,8 @@ namespace hoffman_isaiah {
 							last_update_time = my_times.first;
 							my_game->update();
 						}
-						ReleaseMutex(sync_mutex);
 					}
 				}
-				CloseHandle(update_thread_init_event);
-				CloseHandle(update_event);
-				CloseHandle(save_event);
-				CloseHandle(sync_mutex);
 			}
 			catch (const util::file::DataFileException& e) {
 				MessageBox(nullptr, e.what(), L"Error loading data file", MB_OK | MB_ICONEXCLAMATION);
@@ -309,48 +263,14 @@ namespace hoffman_isaiah {
 #if !defined(DEBUG) && !defined(_DEBUG)
 			winapi::disableMenuItem(hwnd, id_mm_develop_offset, ID_MM_DEVELOP_SHOW_TEST_PATHS);
 #endif
-			// Create update thread
-			auto sync_mutex = CreateMutex(nullptr, false, TEXT("can_execute"));
-			if (!sync_mutex) {
-				winapi::handleWindowsError(L"Can execute mutex creation");
-			}
-			// (Note: update and draw events necessary to ensure that the game can
-			// both update and draw regularly.)
-			auto update_event = CreateEvent(nullptr, true, true, TEXT("can_update"));
-			if (!update_event) {
-				winapi::handleWindowsError(L"Can update event creation");
-			}
-			auto draw_event = CreateEvent(nullptr, true, true, TEXT("can_draw"));
-			if (!draw_event) {
-				CloseHandle(update_event);
-				winapi::handleWindowsError(L"Can draw event creation");
-			}
-			auto update_thread_init_event = CreateEvent(nullptr, false, false, TEXT("update_thread_ready"));
-			if (!update_thread_init_event) {
-				CloseHandle(update_event);
-				CloseHandle(draw_event);
-				winapi::handleWindowsError(L"Update thread ready creation");
-			}
-			auto save_event = CreateEvent(nullptr, false, false, TEXT("save_finished"));
-			if (!save_event) {
-				CloseHandle(update_event);
-				CloseHandle(draw_event);
-				CloseHandle(update_thread_init_event);
-				winapi::handleWindowsError(L"Save finished event creation");
-			}
 #pragma warning(push)
 #pragma warning(disable: 26490) // C26490 => Do not use reinterpret_cast.
+			/*
+			* @TODO: Transport update thread initialization code here.
 			HANDLE update_thread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, winapi::update_thread_init,
 				nullptr, 0, nullptr));
 #pragma warning(pop)
-			if (!update_thread || update_thread == INVALID_HANDLE_VALUE) {
-				CloseHandle(update_event);
-				CloseHandle(draw_event);
-				CloseHandle(update_thread_init_event);
-				CloseHandle(save_event);
-				winapi::handleWindowsError(L"Update thread creation");
-			}
-			WaitForSingleObject(update_thread_init_event, INFINITE);
+			*/
 			// Load save data.
 			std::wifstream default_save_file {game::g_my_game->getUserDataPath() + game::default_save_file_name};
 			if (!default_save_file.bad() && !default_save_file.fail()) {
@@ -419,31 +339,27 @@ namespace hoffman_isaiah {
 						{
 							const auto my_clevel_dialog = winapi::ChallengeLevelDialog {hwnd, this->h_instance};
 							[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
-							PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, reinterpret_cast<LPARAM>(&my_clevel_dialog));
+							//PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, reinterpret_cast<LPARAM>(&my_clevel_dialog));
 							}
 							break;
 						}
 						case ID_MM_FILE_START_CUSTOM_GAME:
 						{
 							const auto my_dialog = winapi::StartCustomGameDialog {hwnd, this->h_instance};
-							WaitForSingleObject(sync_mutex, INFINITE);
 							if (my_dialog.getChallengeLevel() != IDCANCEL) {
 								game::g_my_game->resetState(my_dialog.getChallengeLevel() - ID_CHALLENGE_LEVEL_EASY, my_dialog.getMapName(), true);
 							}
-							ReleaseMutex(sync_mutex);
 							break;
 						}
 						case ID_MM_FILE_SAVE_GAME:
 						{
-							PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
+							//PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
 							break;
 						}
 						case ID_MM_FILE_QUIT:
 						{
-							ResetEvent(save_event);
-							PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_FILE_SAVE_GAME, 0);
-							WaitForSingleObject(save_event, INFINITE);
-							PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
+							//PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_FILE_SAVE_GAME, 0);
+							//PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
 							PostMessage(hwnd, WM_DESTROY, 0, 0);
 							break;
 						}
@@ -452,7 +368,7 @@ namespace hoffman_isaiah {
 							if (game::g_my_game->canStartCustomGames()) {
 								winapi::enableMenuItem(hwnd, 0, ID_MM_FILE_START_CUSTOM_GAME);
 							}
-							PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
+							//PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
 							break;
 						}
 						case ID_MM_ACTIONS_TOGGLE_PAUSE:
@@ -468,15 +384,13 @@ namespace hoffman_isaiah {
 						}
 						case ID_MM_ACTIONS_CHANGE_SPEED:
 						{
-							WaitForSingleObject(sync_mutex, INFINITE);
 							game::g_my_game->changeUpdateSpeed();
 							my_renderer->updateSpeedOption(hwnd, game::g_my_game->getNextUpdateSpeed());
-							ReleaseMutex(sync_mutex);
 							break;
 						}
 						case ID_MM_ACTIONS_TOGGLE_ALL_RADII:
 						{
-							PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
+							//PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
 							break;
 						}
 						case ID_MM_ACTIONS_VIEW_GLOBAL_STATS:
@@ -695,25 +609,23 @@ namespace hoffman_isaiah {
 								for (int gx = this->start_gx; gx <= this->end_gx; ++gx) {
 									for (int gy = this->start_gy; gy <= this->end_gy; ++gy) {
 										const auto my_new_lparam = MAKELPARAM(gx, gy);
-										PostThreadMessage(GetThreadId(update_thread), WM_COMMAND,
-											ID_MM_TOWERS_BUY_TOWER, my_new_lparam);
+										//PostThreadMessage(GetThreadId(update_thread), WM_COMMAND,
+										//	ID_MM_TOWERS_BUY_TOWER, my_new_lparam);
 									}
 								}
 							}
 							else if (game::g_my_game->getSelectedTower() == 0) {
 								// Wall...
-								WaitForSingleObject(sync_mutex, INFINITE);
 								for (int gx = this->start_gx; gx <= this->end_gx; ++gx) {
 									for (int gy = this->start_gy; gy <= this->end_gy; ++gy) {
 										game::g_my_game->buyTower(gx, gy);
 									}
 								}
-								ReleaseMutex(sync_mutex);
 							}
 							else {
 								const auto my_new_lparam = MAKELPARAM(this->end_gx, this->end_gy);
-								PostThreadMessage(GetThreadId(update_thread), WM_COMMAND,
-									ID_MM_TOWERS_BUY_TOWER, my_new_lparam);
+								//PostThreadMessage(GetThreadId(update_thread), WM_COMMAND,
+								//	ID_MM_TOWERS_BUY_TOWER, my_new_lparam);
 							}
 						}
 						if (game::g_my_game->isInLevel()) {
@@ -724,7 +636,6 @@ namespace hoffman_isaiah {
 							// And no wonder this crashed.... We do indeed have a race
 							// condition (but not for long!)
 							// Check if the user clicked on an enemy.
-							WaitForSingleObject(sync_mutex, INFINITE);
 							const auto& enemy_list = game::g_my_game->getEnemies();
 							for (const auto& e : enemy_list) {
 								if (e->checkHit(end_sx, end_sy)) {
@@ -732,7 +643,6 @@ namespace hoffman_isaiah {
 									break;
 								}
 							}
-							ReleaseMutex(sync_mutex);
 							if (pause_state != game::g_my_game->isPaused()) {
 								game::g_my_game->togglePause();
 							}
@@ -751,7 +661,7 @@ namespace hoffman_isaiah {
 						const auto my_gy = static_cast<int>(game::g_my_game->getMap().convertToGameY(GET_Y_LPARAM(msg.lParam)));
 						if (my_gx == start_gx && my_gy == start_gy) {
 							const auto my_new_lparam = MAKELPARAM(my_gx, my_gy);
-							PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_TOWERS_SELL_TOWER, my_new_lparam);
+							//PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_TOWERS_SELL_TOWER, my_new_lparam);
 						}
 						// Reset coordinates
 						this->start_gx = -1;
@@ -764,16 +674,12 @@ namespace hoffman_isaiah {
 						break;
 					}
 					if (msg.message == WM_QUIT) {
-						PostThreadMessage(GetThreadId(update_thread), WM_DESTROY, 0, 0);
+						//PostThreadMessage(GetThreadId(update_thread), WM_DESTROY, 0, 0);
 						keep_looping = false;
 					}
 				}
 				else {
 					// Render scene
-					const HANDLE draw_object_handles[] = {
-						draw_event, sync_mutex
-					};
-					WaitForMultipleObjects(2, draw_object_handles, true, INFINITE);
 					const HRESULT hr = my_renderer->render(game::g_my_game, this->start_gx, this->start_gy,
 						this->end_gx, this->end_gy);
 					if (!game::g_my_game->isInLevel()) {
@@ -787,16 +693,10 @@ namespace hoffman_isaiah {
 						my_resources->discardDeviceResources();
 						my_resources->createDeviceResources(this->hwnd);
 					}
-					ReleaseMutex(sync_mutex);
 					// Sleep a little bit
 					Sleep(1);
 				}
 			}
-			CloseHandle(update_thread);
-			CloseHandle(update_event);
-			CloseHandle(draw_event);
-			CloseHandle(save_event);
-			CloseHandle(sync_mutex);
 		}
 	}
 }

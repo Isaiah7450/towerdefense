@@ -178,12 +178,6 @@ namespace hoffman_isaiah {
 				return S_OK;
 			}
 			last_update_time = my_times.first;
-			// Obtain lock
-			auto update_event = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT("can_update"));
-			if (!update_event) {
-				return S_FALSE;
-			}
-			ResetEvent(update_event);
 			// Do drawing
 			auto render_target = this->device_resources->getRenderTarget();
 			render_target->BeginDraw();
@@ -273,9 +267,6 @@ namespace hoffman_isaiah {
 			}
 #endif // DEBUG | _DEBUG -> Path Debugging
 			this->paintMouseSquares(my_game->getMap(), mouse_gx, mouse_gy, mouse_end_gx, mouse_end_gy);
-			// Release lock
-			SetEvent(update_event);
-			CloseHandle(update_event);
 			return render_target->EndDraw();
 		}
 
