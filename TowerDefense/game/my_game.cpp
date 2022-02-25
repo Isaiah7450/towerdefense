@@ -242,6 +242,7 @@ namespace hoffman_isaiah {
 					this->player.changeMoney(max_reward_money * kill_percent);
 					this->my_level_enemy_count = 0;
 					this->my_level_enemy_killed = 0;
+					this->my_level = nullptr;
 					// Reset game state
 					for (auto& t : this->towers) {
 						// Also take the time to reward extra cash if appropriate.
