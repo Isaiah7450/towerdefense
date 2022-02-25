@@ -2,12 +2,14 @@
 // File Created: March 26, 2018
 #include "./../targetver.hpp"
 #include <Windows.h>
+#include <future>
 #include <memory>
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <vector>
+#include <thread>
 #include <utility>
+#include <vector>
 #include "./../resource.h"
 #include "./../file_util.hpp"
 #include "./../globals.hpp"
@@ -158,9 +160,15 @@ namespace hoffman_isaiah {
 					this->my_level->update();
 				}
 				// Update enemies
+				std::vector<std::future<bool>> ret_values {};
 				std::vector<int> enemies_to_remove {};
 				for (unsigned int i = 0; i < this->enemies.size(); ++i) {
-					if (this->enemies[i]->update()) {
+					// Here, we want a pointer to a member since the function we want to invoke
+					// is a class method.
+					ret_values.push_back(std::async(&Enemy::update, this->enemies[i].get()));
+				}
+				for (unsigned int i = 0; i < this->enemies.size(); ++i) {
+					if (ret_values.at(i).get()) {
 						if (this->enemies[i]->isAlive()) {
 							this->did_lose_life = true;
 							this->player.changeHealth(-this->enemies[i]->getBaseType().getDamage());
