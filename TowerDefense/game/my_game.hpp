@@ -270,6 +270,10 @@ namespace hoffman_isaiah {
 					return 5;
 				case 5:
 					return 8;
+				case 8:
+					return 13;
+				case 13:
+					return 21;
 				default:
 					return 1;
 				}
