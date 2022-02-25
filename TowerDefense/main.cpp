@@ -568,7 +568,7 @@ namespace hoffman_isaiah {
 			{
 				const auto my_dialog = winapi::StartCustomGameDialog {hwnd, this->h_instance};
 				if (my_dialog.getChallengeLevel() != IDCANCEL) {
-					game::g_my_game->resetState(my_dialog.getChallengeLevel() - ID_CHALLENGE_LEVEL_EASY, my_dialog.getMapName(), true);
+					my_game->resetState(my_dialog.getChallengeLevel() - ID_CHALLENGE_LEVEL_EASY, my_dialog.getMapName(), true);
 				}
 				break;
 			}
@@ -586,7 +586,7 @@ namespace hoffman_isaiah {
 			}
 			case ID_MM_ACTIONS_NEXT_WAVE:
 			{
-				if (game::g_my_game->canStartCustomGames()) {
+				if (my_game->canStartCustomGames()) {
 					winapi::enableMenuItem(hwnd, 0, ID_MM_FILE_START_CUSTOM_GAME);
 				}
 				handle_update_wm_command(my_game, wparam, lparam);
@@ -594,19 +594,19 @@ namespace hoffman_isaiah {
 			}
 			case ID_MM_ACTIONS_TOGGLE_PAUSE:
 			{
-				game::g_my_game->togglePause();
+				my_game->togglePause();
 				break;
 			}
 			case ID_MM_ACTIONS_BUY_HEALTH:
 			{
-				game::g_my_game->buyHealth();
-				my_renderer->updateHealthOption(hwnd, game::g_my_game->getHealthBuyCost());
+				my_game->buyHealth();
+				my_renderer->updateHealthOption(hwnd, my_game->getHealthBuyCost());
 				break;
 			}
 			case ID_MM_ACTIONS_CHANGE_SPEED:
 			{
-				game::g_my_game->changeUpdateSpeed();
-				my_renderer->updateSpeedOption(hwnd, game::g_my_game->getNextUpdateSpeed());
+				my_game->changeUpdateSpeed();
+				my_renderer->updateSpeedOption(hwnd, my_game->getNextUpdateSpeed());
 				break;
 			}
 			case ID_MM_ACTIONS_TOGGLE_ALL_RADII:
@@ -616,23 +616,23 @@ namespace hoffman_isaiah {
 			}
 			case ID_MM_ACTIONS_VIEW_GLOBAL_STATS:
 			{
-				const winapi::GlobalStatsDialog my_dialog {this->getHWND(), this->h_instance, *game::g_my_game};
+				const winapi::GlobalStatsDialog my_dialog {this->getHWND(), this->h_instance, *my_game};
 				break;
 			}
 			case ID_MM_TOWERS_INFO:
 			{
 				// (Yes, walls are explicitly excluded heree.)
-				if (game::g_my_game->getSelectedTower() >= 1
-					&& static_cast<size_t>(game::g_my_game->getSelectedTower())
-					< game::g_my_game->getAllTowerTypes().size()) {
-					const auto pause_state = game::g_my_game->isPaused();
+				if (my_game->getSelectedTower() >= 1
+					&& static_cast<size_t>(my_game->getSelectedTower())
+					< my_game->getAllTowerTypes().size()) {
+					const auto pause_state = my_game->isPaused();
 					if (!pause_state) {
-						game::g_my_game->togglePause();
+						my_game->togglePause();
 					}
 					const TowerInfoDialog my_dialog {hwnd, this->h_instance,
-						*game::g_my_game->getTowerType(game::g_my_game->getSelectedTower())};
-					if (pause_state != game::g_my_game->isPaused()) {
-						game::g_my_game->togglePause();
+						*my_game->getTowerType(my_game->getSelectedTower())};
+					if (pause_state != my_game->isPaused()) {
+						my_game->togglePause();
 					}
 				}
 				break;
@@ -652,7 +652,7 @@ namespace hoffman_isaiah {
 			}
 			case ID_MM_DEVELOP_SHOW_TEST_PATHS:
 			{
-				game::g_my_game->toggleShowPaths();
+				my_game->toggleShowPaths();
 				break;
 			}
 			default:
