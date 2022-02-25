@@ -124,12 +124,6 @@ namespace hoffman_isaiah {
 			if (this->is_paused || !this->in_level) {
 				return;
 			}
-			// Set lock
-			auto draw_event = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT("can_draw"));
-			if (!draw_event) {
-				return;
-			}
-			ResetEvent(draw_event);
 			if (!this->player.isAlive()) {
 				this->is_paused = true;
 				this->in_level = false;
@@ -273,9 +267,6 @@ namespace hoffman_isaiah {
 					this->in_level = false;
 				}
 			}
-			// Remove lock
-			SetEvent(draw_event);
-			CloseHandle(draw_event);
 		}
 
 		void MyGame::addEnemy(std::unique_ptr<Enemy>&& e) {

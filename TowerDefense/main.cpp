@@ -87,52 +87,6 @@ namespace hoffman_isaiah {
 						switch (msg.message) {
 						case WM_COMMAND:
 						{
-							switch (msg.wParam) {
-							case ID_MM_FILE_NEW_GAME:
-							{
-								[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpet_cast.
-								const auto& my_clevel_dialog = *reinterpret_cast<const ChallengeLevelDialog*>(msg.lParam);
-								if (my_clevel_dialog.getChallengeLevel() != IDCANCEL) {
-									const auto new_clevel = my_clevel_dialog.getChallengeLevel() - ID_CHALLENGE_LEVEL_EASY;
-									my_game->resetState(new_clevel, my_game->getDefaultMapName(my_clevel_dialog.getChallengeLevel()));
-								}
-								}
-								break;
-							}
-							case ID_MM_FILE_SAVE_GAME:
-							{
-								std::wofstream save_file {game::g_my_game->getUserDataPath() + game::default_save_file_name};
-								if (save_file.fail() || save_file.bad()) {
-									MessageBox(nullptr, L"Could not save game.", L"Save failed!", MB_ICONEXCLAMATION | MB_OK);
-								}
-								else {
-									my_game->saveGame(save_file);
-								}
-								break;
-							}
-							case ID_MM_ACTIONS_NEXT_WAVE:
-								my_game->startWave();
-								break;
-							case ID_MM_ACTIONS_TOGGLE_ALL_RADII:
-								my_game->toggleAllRadii();
-								break;
-							case ID_MM_TOWERS_BUY_TOWER:
-							{
-								const auto my_gx = static_cast<int>(GET_X_LPARAM(msg.lParam));
-								const auto my_gy = static_cast<int>(GET_Y_LPARAM(msg.lParam));
-								my_game->buyTower(my_gx, my_gy);
-								break;
-							}
-							case ID_MM_TOWERS_SELL_TOWER:
-							{
-								const auto my_gx = static_cast<int>(GET_X_LPARAM(msg.lParam));
-								const auto my_gy = static_cast<int>(GET_Y_LPARAM(msg.lParam));
-								my_game->sellTower(my_gx, my_gy);
-								break;
-							}
-							default:
-								break;
-							}
 							break;
 						}
 						case WM_DESTROY:
@@ -325,7 +279,7 @@ namespace hoffman_isaiah {
 					case WM_COMMAND:
 					{
 						handle_wm_command(game::g_my_game.get(), my_renderer.get(),
-							msg.wParam);
+							msg.wParam, msg.lParam);
 						if (msg.wParam >= ID_MM_TOWERS_MARK_TILES
 							&& msg.wParam <= ID_MM_TOWERS_NONE + game::g_my_game->getAllTowerTypes().size()) {
 							// Check if the tower menu thingy got selected
@@ -513,8 +467,7 @@ namespace hoffman_isaiah {
 							}
 							else {
 								const auto my_new_lparam = MAKELPARAM(this->end_gx, this->end_gy);
-								//PostThreadMessage(GetThreadId(update_thread), WM_COMMAND,
-								//	ID_MM_TOWERS_BUY_TOWER, my_new_lparam);
+								handle_update_wm_command(my_game, ID_MM_TOWERS_BUY_TOWER, my_new_lparam);
 							}
 						}
 						if (game::g_my_game->isInLevel()) {
@@ -550,7 +503,7 @@ namespace hoffman_isaiah {
 						const auto my_gy = static_cast<int>(game::g_my_game->getMap().convertToGameY(GET_Y_LPARAM(msg.lParam)));
 						if (my_gx == start_gx && my_gy == start_gy) {
 							const auto my_new_lparam = MAKELPARAM(my_gx, my_gy);
-							//PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_TOWERS_SELL_TOWER, my_new_lparam);
+							handle_update_wm_command(my_game, ID_MM_TOWERS_SELL_TOWER, my_new_lparam);
 						}
 						// Reset coordinates
 						this->start_gx = -1;
@@ -563,7 +516,6 @@ namespace hoffman_isaiah {
 						break;
 					}
 					if (msg.message == WM_QUIT) {
-						//PostThreadMessage(GetThreadId(update_thread), WM_DESTROY, 0, 0);
 						keep_looping = false;
 					}
 				}
@@ -598,15 +550,17 @@ namespace hoffman_isaiah {
 		}
 
 		void MainWindow::handle_wm_command(game::MyGame* my_game,
-			graphics::Renderer2D* my_renderer, WPARAM wparam) {
-			// (For now... I will be updating my code later.)
-			UNREFERENCED_PARAMETER(my_game);
+			graphics::Renderer2D* my_renderer, WPARAM wparam, LPARAM lparam) {
+			UNREFERENCED_PARAMETER(lparam);
 			switch (wparam) {
 			case ID_MM_FILE_NEW_GAME:
 			{
-				const auto my_clevel_dialog = winapi::ChallengeLevelDialog {hwnd, this->h_instance};
-				[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
-				//PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, reinterpret_cast<LPARAM>(&my_clevel_dialog));
+				if (!lparam) {
+					const auto my_clevel_dialog = winapi::ChallengeLevelDialog {hwnd, this->h_instance};
+					[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
+					handle_update_wm_command(my_game, wparam,
+						reinterpret_cast<LPARAM>(&my_clevel_dialog));
+					}
 				}
 				break;
 			}
@@ -620,13 +574,13 @@ namespace hoffman_isaiah {
 			}
 			case ID_MM_FILE_SAVE_GAME:
 			{
-				//PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
+				handle_update_wm_command(my_game, wparam, lparam);
 				break;
 			}
 			case ID_MM_FILE_QUIT:
 			{
-				//PostThreadMessage(GetThreadId(update_thread), WM_COMMAND, ID_MM_FILE_SAVE_GAME, 0);
-				//PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
+				handle_update_wm_command(my_game, ID_MM_FILE_SAVE_GAME, 0);
+				handle_update_wm_command(my_game, wparam, lparam);
 				PostMessage(hwnd, WM_DESTROY, 0, 0);
 				break;
 			}
@@ -635,7 +589,7 @@ namespace hoffman_isaiah {
 				if (game::g_my_game->canStartCustomGames()) {
 					winapi::enableMenuItem(hwnd, 0, ID_MM_FILE_START_CUSTOM_GAME);
 				}
-				//PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
+				handle_update_wm_command(my_game, wparam, lparam);
 				break;
 			}
 			case ID_MM_ACTIONS_TOGGLE_PAUSE:
@@ -657,7 +611,7 @@ namespace hoffman_isaiah {
 			}
 			case ID_MM_ACTIONS_TOGGLE_ALL_RADII:
 			{
-				//PostThreadMessage(GetThreadId(update_thread), msg.message, msg.wParam, msg.lParam);
+				handle_update_wm_command(my_game, wparam, lparam);
 				break;
 			}
 			case ID_MM_ACTIONS_VIEW_GLOBAL_STATS:
@@ -699,6 +653,56 @@ namespace hoffman_isaiah {
 			case ID_MM_DEVELOP_SHOW_TEST_PATHS:
 			{
 				game::g_my_game->toggleShowPaths();
+				break;
+			}
+			default:
+				break;
+			}
+		}
+
+		void MainWindow::handle_update_wm_command(game::MyGame* my_game, WPARAM wparam,
+			LPARAM lparam) {
+			switch (wparam) {
+			case ID_MM_FILE_NEW_GAME:
+			{
+				[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpet_cast.
+				const auto& my_clevel_dialog = *reinterpret_cast<const ChallengeLevelDialog*>(lparam);
+				if (my_clevel_dialog.getChallengeLevel() != IDCANCEL) {
+					const auto new_clevel = my_clevel_dialog.getChallengeLevel() - ID_CHALLENGE_LEVEL_EASY;
+					my_game->resetState(new_clevel, my_game->getDefaultMapName(my_clevel_dialog.getChallengeLevel()));
+				}
+				}
+				break;
+			}
+			case ID_MM_FILE_SAVE_GAME:
+			{
+				std::wofstream save_file {game::g_my_game->getUserDataPath() + game::default_save_file_name};
+				if (save_file.fail() || save_file.bad()) {
+					MessageBox(nullptr, L"Could not save game.", L"Save failed!", MB_ICONEXCLAMATION | MB_OK);
+				}
+				else {
+					my_game->saveGame(save_file);
+				}
+				break;
+			}
+			case ID_MM_ACTIONS_NEXT_WAVE:
+				my_game->startWave();
+				break;
+			case ID_MM_ACTIONS_TOGGLE_ALL_RADII:
+				my_game->toggleAllRadii();
+				break;
+			case ID_MM_TOWERS_BUY_TOWER:
+			{
+				const auto my_gx = static_cast<int>(GET_X_LPARAM(lparam));
+				const auto my_gy = static_cast<int>(GET_Y_LPARAM(lparam));
+				my_game->buyTower(my_gx, my_gy);
+				break;
+			}
+			case ID_MM_TOWERS_SELL_TOWER:
+			{
+				const auto my_gx = static_cast<int>(GET_X_LPARAM(lparam));
+				const auto my_gy = static_cast<int>(GET_Y_LPARAM(lparam));
+				my_game->sellTower(my_gx, my_gy);
 				break;
 			}
 			default:
