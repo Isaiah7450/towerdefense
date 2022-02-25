@@ -452,8 +452,8 @@ namespace hoffman_isaiah {
 								for (int gx = this->start_gx; gx <= this->end_gx; ++gx) {
 									for (int gy = this->start_gy; gy <= this->end_gy; ++gy) {
 										const auto my_new_lparam = MAKELPARAM(gx, gy);
-										//PostThreadMessage(GetThreadId(update_thread), WM_COMMAND,
-										//	ID_MM_TOWERS_BUY_TOWER, my_new_lparam);
+										handle_update_wm_command(my_game,
+											ID_MM_TOWERS_BUY_TOWER, my_new_lparam);
 									}
 								}
 							}
