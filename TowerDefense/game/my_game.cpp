@@ -156,11 +156,11 @@ namespace hoffman_isaiah {
 				for (unsigned int i = 0; i < this->enemies.size(); ++i) {
 					// Here, we want a pointer to a member since the function we want to invoke
 					// is a class method.
-					ret_values.push_back(std::async(&Enemy::update, this->enemies[i].get()));
+					//ret_values.push_back(std::async(&Enemy::update, this->enemies[i].get()));
 				}
 				for (unsigned int i = 0; i < this->enemies.size(); ++i) {
-					//if (this->enemies[i]->update()) {
-					if (ret_values.at(i).get()) {
+					if (this->enemies[i]->update()) {
+					//if (ret_values.at(i).get()) {
 						if (this->enemies[i]->isAlive()) {
 							this->did_lose_life = true;
 							this->player.changeHealth(-this->enemies[i]->getBaseType().getDamage());
