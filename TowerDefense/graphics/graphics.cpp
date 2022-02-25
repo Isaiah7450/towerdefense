@@ -183,7 +183,7 @@ namespace hoffman_isaiah {
 			render_target->BeginDraw();
 			render_target->Clear(Color {1.f, 1.f, 1.f, 1.f});
 			// Draw terrain
-			my_game->getMap().draw(*this, in_editor);
+			my_game->getMap().draw(*this, nullptr);
 			// Draw shots, towers, and enemies.
 			if (!in_editor) {
 				for (const auto& s : my_game->shots) {
@@ -288,7 +288,7 @@ namespace hoffman_isaiah {
 			render_target->BeginDraw();
 			render_target->Clear(Color {1.f, 1.f, 1.f, 1.f});
 			// Draw terrain
-			my_editor.getMap().draw(*this, true);
+			my_editor.getMap().draw(*this, &my_editor);
 			this->paintMouseSquares(my_editor.getMap(), mouse_gx, mouse_gy, mouse_end_gx, mouse_end_gy);
 			return render_target->EndDraw();
 		}

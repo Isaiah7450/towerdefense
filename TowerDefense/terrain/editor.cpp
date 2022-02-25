@@ -6,11 +6,13 @@
 #include <Shobjidl.h>
 #include "./../resource.h"
 #include <process.h>
-#include <string>
-#include <utility>
-#include <iostream>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <utility>
+
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 #include "./../main.hpp"
@@ -27,8 +29,6 @@ using namespace std::literals::string_literals;
 
 namespace hoffman_isaiah {
 	namespace terrain_editor {
-		std::shared_ptr<TerrainEditor> g_my_editor {nullptr};
-
 		LRESULT CALLBACK TerrainEditor::windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			switch (msg) {
 			case WM_DESTROY:
@@ -45,9 +45,9 @@ namespace hoffman_isaiah {
 		unsigned __stdcall terrain_editor_thread_init(void* data) {
 			const auto* my_game = game::g_my_game.get();
 			// Global state stuff...
-			terrain_editor::g_my_editor = std::make_shared<TerrainEditor>(static_cast<HWND>(data),
+			const auto my_editor_ptr = std::make_unique<TerrainEditor>(static_cast<HWND>(data),
 				my_game->getMapBaseName());
-			auto& my_editor = *terrain_editor::g_my_editor;
+			auto& my_editor = *my_editor_ptr;
 			HINSTANCE my_h_inst = nullptr;
 			if (!GetModuleHandleEx(0, nullptr, &my_h_inst)) {
 				winapi::handleWindowsError(L"TE Thread: Terrain editor creation");

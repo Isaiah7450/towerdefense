@@ -119,12 +119,13 @@ namespace hoffman_isaiah {
 			this->drawMarkedTiles(renderer);
 		}
 
-		void GameMap::draw(const graphics::Renderer2D& renderer, bool in_editor) const noexcept {
+		void GameMap::draw(const graphics::Renderer2D& renderer,
+			const terrain_editor::TerrainEditor* my_editor) const noexcept {
 			this->draw(renderer);
-			if (in_editor) {
+			if (my_editor) {
 				constexpr const graphics::Color my_color = graphics::Color {1.f, 1.f, 1.f, 0.75f};
-				const auto ground_active = terrain_editor::g_my_editor->areGroundWeightsActive();
-				const auto air_active = terrain_editor::g_my_editor->areAirWeightsActive();
+				const auto ground_active = my_editor->areGroundWeightsActive();
+				const auto air_active = my_editor->areAirWeightsActive();
 				if (!ground_active && !air_active) {
 					return;
 				}

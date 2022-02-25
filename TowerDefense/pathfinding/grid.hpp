@@ -9,6 +9,10 @@
 #include "./graph_node.hpp"
 
 namespace hoffman_isaiah {
+	namespace terrain_editor {
+		class TerrainEditor;
+	}
+
 	namespace pathfinding {
 		/// <summary>Class representing a rectangular graph of nodes.</summary>
 		class Grid {
@@ -244,7 +248,8 @@ namespace hoffman_isaiah {
 			// Overriding graphics::IDrawable
 			void draw(const graphics::Renderer2D& renderer) const noexcept override;
 			// Slight variation on the above because we need the additional variable.
-			void draw(const graphics::Renderer2D& renderer, bool in_editor) const noexcept;
+			void draw(const graphics::Renderer2D& renderer,
+				const terrain_editor::TerrainEditor* my_editor) const noexcept;
 			/// <summary>Sets the influence graphs stored in the map.</summary>
 			/// <param name="ground">The new ground influence graph.</param>
 			/// <param name="air">The new air influence graph.</param>
