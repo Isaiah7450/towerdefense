@@ -1082,7 +1082,7 @@ namespace hoffman_isaiah {
 			my_parser.expectToken(util::file::TokenTypes::Number, L"1"s);
 			my_parser.readKeyValue(L"wave_spawn_delay"s);
 			const int wave_spawn_delay = static_cast<int>(my_parser.parseNumber());
-			util::file::DataFileParser::validateNumber(wave_spawn_delay, 200, 30'000,
+			util::file::DataFileParser::validateNumber(wave_spawn_delay, 500, 60'000,
 				L"Wave spawn delay (ms)", my_parser.getLine(), true, true);
 			my_parser.getNext();
 			std::deque<std::unique_ptr<EnemyWave>> my_level_waves {};
@@ -1091,7 +1091,8 @@ namespace hoffman_isaiah {
 				my_parser.expectToken(util::file::TokenTypes::Section, L"wave"s);
 				my_parser.readKeyValue(L"group_spawn_delay"s);
 				const int group_spawn_delay = static_cast<int>(my_parser.parseNumber());
-				util::file::DataFileParser::validateNumber(group_spawn_delay, 100, 15'000, L"Group spawn delay (ms)", my_parser.getLine(), true, true);
+				util::file::DataFileParser::validateNumber(group_spawn_delay, 250, 20'000,
+					L"Group spawn delay (ms)", my_parser.getLine(), true, true);
 				std::deque<std::unique_ptr<EnemyGroup>> my_wave_groups {};
 				my_parser.readKeyValue(L"groups"s);
 				my_parser.expectToken(util::file::TokenTypes::Object, L"{"s);
@@ -1114,7 +1115,7 @@ namespace hoffman_isaiah {
 						L"Extra count", my_parser.getLine(), true);
 					my_parser.readKeyValue(L"enemy_spawn_delay"s);
 					const int enemy_spawn_delay = static_cast<int>(my_parser.parseNumber());
-					util::file::DataFileParser::validateNumber(enemy_spawn_delay, 10, 10'000,
+					util::file::DataFileParser::validateNumber(enemy_spawn_delay, 20, 10'000,
 						L"Enemy spawn delay (ms)", my_parser.getLine(), true, true);
 					std::queue<std::unique_ptr<Enemy>> my_enemy_spawns {EnemyGroup::createEnemies(etype, extra_count, *this)};
 					auto my_group = std::make_unique<EnemyGroup>(std::move(my_enemy_spawns), enemy_spawn_delay);
