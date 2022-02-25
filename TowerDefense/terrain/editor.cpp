@@ -151,19 +151,6 @@ namespace hoffman_isaiah {
 			// Show window
 			ShowWindow(this->hwnd, SW_SHOWNORMAL);
 			UpdateWindow(this->hwnd);
-			// Keep track of mutex
-			auto sync_mutex = OpenMutex(SYNCHRONIZE | MUTEX_MODIFY_STATE, false, TEXT("can_execute"));
-			if (!sync_mutex) {
-				winapi::handleWindowsError(L"TE Thread: Can execute mutex creation");
-				return;
-			}
-			// Keep track of draw event
-			auto draw_event = OpenEvent(SYNCHRONIZE, false, TEXT("can_draw"));
-			if (!draw_event) {
-				CloseHandle(sync_mutex);
-				winapi::handleWindowsError(L"TE Thread: Can draw event creation");
-				return;
-			}
 			// Message Loop
 #pragma warning(push)
 #pragma warning(disable: 26494) // Code Analysis: type.5 --> Always initialize.
@@ -193,7 +180,6 @@ namespace hoffman_isaiah {
 							}
 							winapi::TerrainEditorNewMapDialog my_map_dialog {this->getHWND(), GetModuleHandle(nullptr), new_map_name};
 							if (my_map_dialog.isGood()) {
-								WaitForSingleObject(sync_mutex, INFINITE);
 								this->map_name = my_map_dialog.getName();
 								// Update the window's title to include the map's name.
 								const std::wstring my_window_name = TerrainEditor::window_name + L" ["s
@@ -221,14 +207,11 @@ namespace hoffman_isaiah {
 							if (my_dialog.isGood()) {
 								const std::wstring old_name = this->map_name;
 								this->map_name = my_dialog.getName();
-								WaitForSingleObject(sync_mutex, INFINITE);
 								try {
 									this->reloadMap();
 								}
 								catch (...) {
-									ReleaseMutex(sync_mutex);
 									MessageBox(hwnd, L"Error: Could not load the requested map.", L"TE: Open Map Failed!", MB_OK | MB_ICONERROR);
-									WaitForSingleObject(sync_mutex, INFINITE);
 									this->map_name = old_name;
 									this->reloadMap();
 								}
@@ -271,7 +254,6 @@ namespace hoffman_isaiah {
 							break;
 						case ID_TE_ACTIONS_REVERT_TO_SAVE:
 						{
-							WaitForSingleObject(sync_mutex, INFINITE);
 							this->reloadMap();
 							need_to_update = true;
 							break;
@@ -441,12 +423,10 @@ namespace hoffman_isaiah {
 				}
 				else {
 					// Render scene
-					WaitForSingleObject(sync_mutex, INFINITE);
 					if (need_to_update) {
 						// Note that we still have the mutex...
 						// Update first if necessary
 						// game::g_my_game->debugUpdate(game::DebugUpdateStates::Terrain_Changed);
-						ReleaseMutex(sync_mutex);
 					}
 					const HRESULT hr = my_renderer->render(*this, this->start_gx, this->start_gy,
 						this->end_gx, this->end_gy);
@@ -454,11 +434,8 @@ namespace hoffman_isaiah {
 						my_resources->discardDeviceResources();
 						my_resources->createDeviceResources(this->hwnd);
 					}
-					ReleaseMutex(sync_mutex);
 				}
 			}
-			CloseHandle(sync_mutex);
-			CloseHandle(draw_event);
 		}
 	}
 }
