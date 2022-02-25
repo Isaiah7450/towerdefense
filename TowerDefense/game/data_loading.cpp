@@ -1059,7 +1059,8 @@ namespace hoffman_isaiah {
 		}
 
 		void MyGame::load_level_data() {
-			std::wifstream data_file {this->resources_folder_path + L"levels/level"s + std::to_wstring(this->level) + L".ini"s};
+			std::wifstream data_file {this->resources_folder_path + L"levels/level"s
+				+ std::to_wstring(this->level) + L".ini"s};
 			if (data_file.bad() || data_file.fail()) {
 				if (this->getLevelNumber() >= this->my_level_generator->getStartLevel()) {
 					this->my_level = this->my_level_generator->generateLevel(this->getLevelNumber(), *this);
@@ -1069,7 +1070,8 @@ namespace hoffman_isaiah {
 					data_file.open(this->resources_folder_path + L"levels/level"s + std::to_wstring(this->my_level_backup_number) + L".ini"s);
 					if (data_file.bad() || data_file.fail()) {
 						throw util::file::DataFileException {L"Could not open resources/levels/level"s
-							+ std::to_wstring(this->level) + L".ini for reading. Automatically generating a level instead..."s, 0};
+							+ std::to_wstring(this->level)
+							+ L".ini for reading. Automatically generating a level instead..."s, 0};
 					}
 				}
 			}
@@ -1080,7 +1082,8 @@ namespace hoffman_isaiah {
 			my_parser.expectToken(util::file::TokenTypes::Number, L"1"s);
 			my_parser.readKeyValue(L"wave_spawn_delay"s);
 			const int wave_spawn_delay = static_cast<int>(my_parser.parseNumber());
-			util::file::DataFileParser::validateNumber(wave_spawn_delay, 200, 30'000, L"Wave spawn delay (ms)", my_parser.getLine(), true, true);
+			util::file::DataFileParser::validateNumber(wave_spawn_delay, 200, 30'000,
+				L"Wave spawn delay (ms)", my_parser.getLine(), true, true);
 			my_parser.getNext();
 			std::deque<std::unique_ptr<EnemyWave>> my_level_waves {};
 			do {

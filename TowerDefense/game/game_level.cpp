@@ -2,11 +2,13 @@
 // File Created: June 6, 2018
 #include <algorithm>
 #include <deque>
+#include <future>
 #include <memory>
+#include <queue>
 #include <random>
+#include <thread>
 #include <utility>
 #include <vector>
-#include <queue>
 #include "./../ih_math.hpp"
 #include "./../pathfinding/grid.hpp"
 #include "./../pathfinding/pathfinder.hpp"
@@ -32,19 +34,27 @@ namespace hoffman_isaiah::game {
 		this->enemies.pop();
 	}
 
-	std::queue<std::unique_ptr<Enemy>> EnemyGroup::createEnemies(const EnemyType* etype, int extra_count, const MyGame& my_game) {
-		const int enemy_count = etype->isUnique() ? 1 + extra_count : my_game.getChallengeLevel() + extra_count + 2;
+	std::queue<std::unique_ptr<Enemy>> EnemyGroup::createEnemies(const EnemyType* etype,
+		int extra_count, const MyGame& my_game) {
+		const int enemy_count = etype->isUnique()
+			? 1 + extra_count : my_game.getChallengeLevel() + extra_count + 2;
 		pathfinding::Pathfinder my_pathfinder {my_game.getMap(), etype->isFlying(), etype->canMoveDiagonally(),
 			etype->getDefaultStrategy()};
 		my_pathfinder.findPath(my_game.getChallengeLevel() / 10.0);
 		std::queue<std::unique_ptr<Enemy>> my_enemy_spawns {};
+		std::vector<std::future<std::unique_ptr<Enemy>>> enemy_asyncs {};
 		for (int i = 0; i < enemy_count; ++i) {
-			auto my_enemy = std::make_unique<Enemy>(my_game.getDeviceResources(), my_game.getMap(), etype,
-				graphics::Color {0.f, 0.f, 0.f, 1.f}, my_pathfinder,
-				my_game.getMap().getTerrainGraph(etype->isFlying()).getStartNode()->getGameX() + 0.5,
-				my_game.getMap().getTerrainGraph(etype->isFlying()).getStartNode()->getGameY() + 0.5,
-				my_game.getLevelNumber(), my_game.getDifficulty(), my_game.getChallengeLevel());
-			my_enemy_spawns.emplace(std::move(my_enemy));
+			enemy_asyncs.push_back(std::async([&]() {
+				return std::make_unique<Enemy>(
+					my_game.getDeviceResources(), my_game.getMap(), etype,
+					graphics::Color {0.f, 0.f, 0.f, 1.f}, my_pathfinder,
+					my_game.getMap().getTerrainGraph(etype->isFlying()).getStartNode()->getGameX() + 0.5,
+					my_game.getMap().getTerrainGraph(etype->isFlying()).getStartNode()->getGameY() + 0.5,
+					my_game.getLevelNumber(), my_game.getDifficulty(), my_game.getChallengeLevel());
+				}));
+		}
+		for (int i = 0; i < enemy_count; ++i) {
+			my_enemy_spawns.emplace(std::move(enemy_asyncs.at(i).get()));
 		}
 		return my_enemy_spawns;
 	}
@@ -73,7 +83,8 @@ namespace hoffman_isaiah::game {
 		this->groups.pop_back();
 	}
 
-	GameLevel::GameLevel(int level_no, std::deque<std::unique_ptr<EnemyWave>>&& level_waves, int spawn_ms_delay) :
+	GameLevel::GameLevel(int level_no, std::deque<std::unique_ptr<EnemyWave>>&& level_waves,
+		int spawn_ms_delay) :
 		level {level_no},
 		waves {std::move(level_waves)},
 		active_waves {},
@@ -97,8 +108,8 @@ namespace hoffman_isaiah::game {
 		this->waves.pop_back();
 	}
 
-	GlobalLevelEnemyData::GlobalLevelEnemyData(const MyGame& my_game, std::wstring ename, std::wstring cname, double z,
-		LevelNormalRandomVariable ec_var, std::array<int, 3> stimes) :
+	GlobalLevelEnemyData::GlobalLevelEnemyData(const MyGame& my_game, std::wstring ename,
+		std::wstring cname, double z, LevelNormalRandomVariable ec_var, std::array<int, 3> stimes) :
 		enemy_type {my_game.getEnemyType(ename)},
 		color_name {cname},
 		z_difficulty {z},
@@ -111,8 +122,9 @@ namespace hoffman_isaiah::game {
 		z_difficulty {z} {
 	}
 
-	LevelGenerator::LevelGenerator(int start_lv, std::vector<GlobalLevelColorData> cdata, std::vector<GlobalLevelEnemyData> edata,
-		std::vector<GlobalLevelBossData> bdata,	LevelNormalRandomVariable wd_var, LevelNormalRandomVariable gd_var,
+	LevelGenerator::LevelGenerator(int start_lv, std::vector<GlobalLevelColorData> cdata,
+		std::vector<GlobalLevelEnemyData> edata, std::vector<GlobalLevelBossData> bdata,
+		LevelNormalRandomVariable wd_var, LevelNormalRandomVariable gd_var,
 		LevelNormalRandomVariable bd_var, LevelNormalRandomVariable nw_var, LevelNormalRandomVariable ng_var,
 		LevelNormalRandomVariable nb_var, int wd, int gd, int bmod) :
 		start_level {start_lv},
@@ -163,14 +175,17 @@ namespace hoffman_isaiah::game {
 							my_etype = bdata.getType();
 						}
 					}
-					std::queue<std::unique_ptr<Enemy>> group_enemies {EnemyGroup::createEnemies(my_etype, extra_count, my_game)};
+					std::queue<std::unique_ptr<Enemy>> group_enemies {
+						EnemyGroup::createEnemies(my_etype, extra_count, my_game)};
 					auto my_enemy_group = std::make_unique<EnemyGroup>(std::move(group_enemies), enemy_delay);
 					my_wave_groups.emplace_back(std::move(my_enemy_group));
 				}
-				auto my_enemy_wave = std::make_unique<EnemyWave>(std::move(my_wave_groups), this->getGroupDelay());
+				auto my_enemy_wave = std::make_unique<EnemyWave>(std::move(my_wave_groups),
+					this->getGroupDelay());
 				my_level_waves.emplace_back(std::move(my_enemy_wave));
 			}
-			const int groups_in_this_wave = w - wave_groups_overflow < 0 ? min_wave_groups + 1 : min_wave_groups;
+			const int groups_in_this_wave = w - wave_groups_overflow < 0
+				? min_wave_groups + 1 : min_wave_groups;
 			// Determine wave color.
 			std::wstring cname = L"";
 			while (cname == L"") {
@@ -202,14 +217,16 @@ namespace hoffman_isaiah::game {
 						}
 					}
 				}
-				std::queue<std::unique_ptr<Enemy>> group_enemies {EnemyGroup::createEnemies(my_etype, extra_count, my_game)};
+				std::queue<std::unique_ptr<Enemy>> group_enemies {
+					EnemyGroup::createEnemies(my_etype, extra_count, my_game)};
 				auto my_enemy_group = std::make_unique<EnemyGroup>(std::move(group_enemies), enemy_delay);
 				my_wave_groups.emplace_back(std::move(my_enemy_group));
 			}
 			auto my_enemy_wave = std::make_unique<EnemyWave>(std::move(my_wave_groups), this->getGroupDelay());
 			my_level_waves.emplace_back(std::move(my_enemy_wave));
 		}
-		auto my_level = std::make_unique<GameLevel>(level_number, std::move(my_level_waves), this->getWaveDelay());
+		auto my_level = std::make_unique<GameLevel>(level_number,
+			std::move(my_level_waves), this->getWaveDelay());
 		return my_level;
 	}
 }
