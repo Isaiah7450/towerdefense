@@ -47,12 +47,6 @@ namespace hoffman_isaiah {
 
 		void MyGame::debugUpdate(DebugUpdateStates cause) {
 #if defined(DEBUG) || defined(_DEBUG)
-			// Set lock
-			auto draw_event = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT("can_draw"));
-			if (!draw_event) {
-				return;
-			}
-			ResetEvent(draw_event);
 			// Do processing...
 			switch (cause) {
 			case DebugUpdateStates::Terrain_Changed:
@@ -66,9 +60,6 @@ namespace hoffman_isaiah {
 			default:
 				break;
 			}
-			// Remove lock
-			SetEvent(draw_event);
-			CloseHandle(draw_event);
 #else
 			UNREFERENCED_PARAMETER(cause);
 #endif
@@ -168,6 +159,7 @@ namespace hoffman_isaiah {
 					ret_values.push_back(std::async(&Enemy::update, this->enemies[i].get()));
 				}
 				for (unsigned int i = 0; i < this->enemies.size(); ++i) {
+					//if (this->enemies[i]->update()) {
 					if (ret_values.at(i).get()) {
 						if (this->enemies[i]->isAlive()) {
 							this->did_lose_life = true;
