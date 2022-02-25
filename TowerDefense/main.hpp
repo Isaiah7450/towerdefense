@@ -12,8 +12,6 @@ namespace hoffman_isaiah {
 	}
 
 	namespace winapi {
-		unsigned __stdcall update_thread_init(void* data);
-
 		/// <summary>Represents the primary application window.</summary>
 		class MainWindow {
 		public:
@@ -85,7 +83,7 @@ namespace hoffman_isaiah {
 			int end_gy {-1};
 			// The class name
 			static constexpr const wchar_t* class_name {L"my_game"};
-			static constexpr const wchar_t* window_name {L"A Shaping War: Isaiah's tower defense game"};
+			static constexpr const wchar_t* window_name {L"A Shaping War"};
 			/// <summary>Stores the frequency of the high performance counter.</summary>
 			static LARGE_INTEGER qpc_frequency;
 		};

@@ -71,51 +71,6 @@ namespace hoffman_isaiah {
 			return DefWindowProc(hwnd, msg, wParam, lParam);
 		}
 
-		unsigned __stdcall update_thread_init(void* data) {
-			UNREFERENCED_PARAMETER(data);
-			try {
-				// Initialize the game's state
-				const std::shared_ptr<game::MyGame> my_game = game::g_my_game;
-				// Force creation of message queue
-				MSG msg;
-				PeekMessage(&msg, nullptr, WM_USER, WM_USER, PM_NOREMOVE);
-				// Message Loop
-				bool keep_running = true;
-				while (keep_running) {
-					const BOOL ret_value = PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE);
-					if (ret_value > 0) {
-						switch (msg.message) {
-						case WM_COMMAND:
-						{
-							break;
-						}
-						case WM_DESTROY:
-						case WM_QUIT:
-							keep_running = false;
-							break;
-						default:
-							break;
-						}
-					}
-					else if (ret_value == -1) {
-						// Error
-						winapi::handleWindowsError(L"Update thread ");
-					}
-				}
-			}
-			catch (const util::file::DataFileException& e) {
-				MessageBox(nullptr, e.what(), L"Error loading data file", MB_OK | MB_ICONEXCLAMATION);
-				std::exit(1);
-			}
-#if 0
-			catch (const std::exception& e) {
-				UNREFERENCED_PARAMETER(e);
-				std::exit(1);
-			}
-#endif
-			return 0;
-		}
-
 		[[noreturn]] void handleWindowsError(std::wstring lpszFunction) {
 			// (Copied straight from help files... Hopefully it works!)
 			// (I did replace the C-style casts with a C++ version.)
@@ -137,7 +92,8 @@ namespace hoffman_isaiah {
 				ExitProcess(dw);
 			}
 			StringCchPrintf(static_cast<LPTSTR>(lpDisplayBuf), LocalSize(lpDisplayBuf) / sizeof(TCHAR),
-				TEXT("%s failed with error %d: %s"), lpszFunction.c_str(), static_cast<int>(dw), static_cast<LPWSTR>(lpMsgBuf));
+				TEXT("%s failed with error %d: %s"), lpszFunction.c_str(),
+				static_cast<int>(dw), static_cast<LPWSTR>(lpMsgBuf));
 			MessageBox(nullptr, static_cast<LPWSTR>(lpDisplayBuf), TEXT("Error"), MB_OK);
 			LocalFree(lpMsgBuf);
 			LocalFree(lpDisplayBuf);
@@ -198,16 +154,8 @@ namespace hoffman_isaiah {
 #if !defined(DEBUG) && !defined(_DEBUG)
 			winapi::disableMenuItem(hwnd, id_mm_develop_offset, ID_MM_DEVELOP_SHOW_TEST_PATHS);
 #endif
-#pragma warning(push)
-#pragma warning(disable: 26490) // C26490 => Do not use reinterpret_cast.
-			/*
-			* @TODO: Transport update thread initialization code here.
-			HANDLE update_thread = reinterpret_cast<HANDLE>(_beginthreadex(nullptr, 0, winapi::update_thread_init,
-				nullptr, 0, nullptr));
-#pragma warning(pop)
-			*/
-			// Will need to clean up the code one way or another later,
-			// but this is convenient for now.
+			// Note: Try to refer to this variable within the method.
+			// It's shorter and also doesn't directly refer to global data.
 			auto* my_game = game::g_my_game.get();
 			my_game->load_config_data();
 			my_game->init_enemy_types();
@@ -217,52 +165,53 @@ namespace hoffman_isaiah {
 			my_game->load_global_level_data();
 			my_game->load_global_misc_data();
 			// Load save data.
-			std::wifstream default_save_file {game::g_my_game->getUserDataPath() + game::default_save_file_name};
+			std::wifstream default_save_file {my_game->getUserDataPath() + game::default_save_file_name};
 			if (!default_save_file.bad() && !default_save_file.fail()) {
 				try {
-					game::g_my_game->loadGame(default_save_file);
+					my_game->loadGame(default_save_file);
 				}
 				catch (...) {
 					MessageBox(nullptr, L"Error: Corrupted or old save file detected. Save files made in"
 						L" version 3.3.1 or earlier are no longer supported.", L"Corrupted Save",
 						MB_OK | MB_ICONERROR);
 					// Reset state and save over the corrupted file...
-					const std::wstring map_name = game::g_my_game->getDefaultMapName(ID_CHALLENGE_LEVEL_NORMAL);
-					game::g_my_game->resetState(ID_CHALLENGE_LEVEL_NORMAL - ID_CHALLENGE_LEVEL_EASY, map_name);
-					std::wofstream save_file {game::g_my_game->getUserDataPath() + game::default_save_file_name};
+					const std::wstring map_name = my_game->getDefaultMapName(ID_CHALLENGE_LEVEL_NORMAL);
+					my_game->resetState(ID_CHALLENGE_LEVEL_NORMAL - ID_CHALLENGE_LEVEL_EASY, map_name);
+					std::wofstream save_file {my_game->getUserDataPath() + game::default_save_file_name};
 					if (!save_file.bad() && !save_file.fail()) {
-						game::g_my_game->saveGame(save_file);
+						my_game->saveGame(save_file);
 					}
 				}
 			}
 			else {
 				// Do difficulty selection.
 				const auto my_clevel_dialog = winapi::ChallengeLevelDialog {hwnd, this->h_instance};
-				const std::wstring map_name = game::g_my_game->getDefaultMapName(my_clevel_dialog.getChallengeLevel() > IDCANCEL
+				const std::wstring map_name
+					= my_game->getDefaultMapName(my_clevel_dialog.getChallengeLevel() > IDCANCEL
 					? my_clevel_dialog.getChallengeLevel() : ID_CHALLENGE_LEVEL_NORMAL);
-				game::g_my_game->resetState(my_clevel_dialog.getChallengeLevel() - ID_CHALLENGE_LEVEL_EASY, map_name);
+				my_game->resetState(my_clevel_dialog.getChallengeLevel() - ID_CHALLENGE_LEVEL_EASY, map_name);
 			}
-			my_renderer->updateHealthOption(hwnd, game::g_my_game->getHealthBuyCost());
-			my_renderer->updateSpeedOption(hwnd, game::g_my_game->getNextUpdateSpeed());
-			my_renderer->createTowerMenu(hwnd, game::g_my_game->getAllTowerTypes());
-			my_renderer->createShotMenu(hwnd, game::g_my_game->getAllShotTypes());
-			my_renderer->createEnemyMenu(hwnd, game::g_my_game->getAllEnemyTypes(),
-				game::g_my_game->getSeenEnemies());
+			my_renderer->updateHealthOption(hwnd, my_game->getHealthBuyCost());
+			my_renderer->updateSpeedOption(hwnd, my_game->getNextUpdateSpeed());
+			my_renderer->createTowerMenu(hwnd, my_game->getAllTowerTypes());
+			my_renderer->createShotMenu(hwnd, my_game->getAllShotTypes());
+			my_renderer->createEnemyMenu(hwnd, my_game->getAllEnemyTypes(),
+				my_game->getSeenEnemies());
 			try {
-				game::g_my_game->loadGlobalData();
+				my_game->loadGlobalData();
 			}
 			catch (const util::file::DataFileException&) {
 				MessageBox(nullptr, L"Error: Corrupted global save file. Overwriting with default values.",
 					L"Corrupted Save", MB_OK | MB_ICONERROR);
-				game::g_my_game->saveGlobalData();
+				my_game->saveGlobalData();
 				try {
-					game::g_my_game->loadGlobalData();
+					my_game->loadGlobalData();
 				}
 				catch (...) {
 					// Ignore.
 				}
 			}
-			if (game::g_my_game->canStartCustomGames()) {
+			if (my_game->canStartCustomGames()) {
 				winapi::enableMenuItem(hwnd, 0, ID_MM_FILE_START_CUSTOM_GAME);
 			}
 			// Message Loop
@@ -278,25 +227,25 @@ namespace hoffman_isaiah {
 					switch (msg.message) {
 					case WM_COMMAND:
 					{
-						handle_wm_command(game::g_my_game.get(), my_renderer.get(),
+						handle_wm_command(my_game, my_renderer.get(),
 							msg.wParam, msg.lParam);
 						if (msg.wParam >= ID_MM_TOWERS_MARK_TILES
-							&& msg.wParam <= ID_MM_TOWERS_NONE + game::g_my_game->getAllTowerTypes().size()) {
+							&& msg.wParam <= ID_MM_TOWERS_NONE + my_game->getAllTowerTypes().size()) {
 							// Check if the tower menu thingy got selected
 							my_renderer->updateSelectedTower(hwnd, static_cast<int>(msg.wParam));
-							game::g_my_game->selectTower(static_cast<int>(msg.wParam) - ID_MM_TOWERS_NONE - 1);
+							my_game->selectTower(static_cast<int>(msg.wParam) - ID_MM_TOWERS_NONE - 1);
 						}
 						else if (msg.wParam >= ID_MM_SHOTS_PLACEHOLDER
-							&& msg.wParam < ID_MM_SHOTS_PLACEHOLDER + game::g_my_game->getAllShotTypes().size()) {
+							&& msg.wParam < ID_MM_SHOTS_PLACEHOLDER + my_game->getAllShotTypes().size()) {
 							// Show info about a selected shot.
 							const auto selected_shot = msg.wParam - ID_MM_SHOTS_PLACEHOLDER;
-							const auto pause_state = game::g_my_game->isPaused();
+							const auto pause_state = my_game->isPaused();
 							if (!pause_state) {
-								game::g_my_game->togglePause();
+								my_game->togglePause();
 							}
 							const game::ShotBaseType* my_shot {nullptr};
 							unsigned int i = 0;
-							for (const auto& stype : game::g_my_game->getAllShotTypes()) {
+							for (const auto& stype : my_game->getAllShotTypes()) {
 								if (i == selected_shot) {
 									my_shot = stype.second.get();
 									break;
@@ -306,26 +255,26 @@ namespace hoffman_isaiah {
 							if (my_shot) {
 								const ShotBaseInfoDialog my_dialog {hwnd, this->h_instance,
 									*my_shot};
-								if (pause_state != game::g_my_game->isPaused()) {
-									game::g_my_game->togglePause();
+								if (pause_state != my_game->isPaused()) {
+									my_game->togglePause();
 								}
 							}
 						}
 						else if (msg.wParam >= ID_MM_ENEMIES_PLACEHOLDER
-							&& msg.wParam < ID_MM_ENEMIES_PLACEHOLDER + game::g_my_game->getAllEnemyTypes().size()) {
+							&& msg.wParam < ID_MM_ENEMIES_PLACEHOLDER + my_game->getAllEnemyTypes().size()) {
 							// Show info about a selected enemy.
 							const int selected_enemy = static_cast<int>(msg.wParam - ID_MM_ENEMIES_PLACEHOLDER);
-							const auto pause_state = game::g_my_game->isPaused();
+							const auto pause_state = my_game->isPaused();
 							if (!pause_state) {
-								game::g_my_game->togglePause();
+								my_game->togglePause();
 							}
-							const game::EnemyType* my_enemy {game::g_my_game->getEnemyType(selected_enemy)};
-							if (game::g_my_game->getSeenEnemies().at(my_enemy->getName())) {
+							const game::EnemyType* my_enemy {my_game->getEnemyType(selected_enemy)};
+							if (my_game->getSeenEnemies().at(my_enemy->getName())) {
 								const EnemyInfoDialog my_dialog {hwnd, this->h_instance,
 									*my_enemy};
 							}
-							if (pause_state != game::g_my_game->isPaused()) {
-								game::g_my_game->togglePause();
+							if (pause_state != my_game->isPaused()) {
+								my_game->togglePause();
 							}
 						}
 						break;
@@ -371,22 +320,24 @@ namespace hoffman_isaiah {
 					case WM_LBUTTONDBLCLK:
 					{
 						// Display info about placed towers.
-						if (!game::g_my_game->isInLevel()) {
-							const auto gx = static_cast<int>(game::g_my_game->getMap().convertToGameX(GET_X_LPARAM(msg.lParam)));
-							const auto gy = static_cast<int>(game::g_my_game->getMap().convertToGameY(GET_Y_LPARAM(msg.lParam)));
-							const bool pause_state = game::g_my_game->isPaused();
+						if (!my_game->isInLevel()) {
+							const auto gx = static_cast<int>(my_game->getMap()
+								.convertToGameX(GET_X_LPARAM(msg.lParam)));
+							const auto gy = static_cast<int>(my_game->getMap()
+								.convertToGameY(GET_Y_LPARAM(msg.lParam)));
+							const bool pause_state = my_game->isPaused();
 							if (!pause_state) {
-								game::g_my_game->togglePause();
+								my_game->togglePause();
 							}
-							for (auto& t : game::g_my_game->getTowers()) {
+							for (auto& t : my_game->getTowers()) {
 								if (static_cast<int>(t->getGameX()) == gx
 									&& static_cast<int>(t->getGameY()) == gy) {
 									const TowerPlacedInfoDialog my_dialog {hwnd, this->h_instance, *t};
 									break;
 								}
 							}
-							if (pause_state != game::g_my_game->isPaused()) {
-								game::g_my_game->togglePause();
+							if (pause_state != my_game->isPaused()) {
+								my_game->togglePause();
 							}
 						}
 						break;
@@ -395,9 +346,11 @@ namespace hoffman_isaiah {
 					case WM_RBUTTONDOWN:
 					{
 						// Obtain start coordinates
-						const auto gx = static_cast<int>(game::g_my_game->getMap().convertToGameX(GET_X_LPARAM(msg.lParam)));
-						const auto gy = static_cast<int>(game::g_my_game->getMap().convertToGameY(GET_Y_LPARAM(msg.lParam)));
-						if (game::g_my_game->getMap().getTerrainGraph(false).verifyCoordinates(gx, gy)) {
+						const auto gx = static_cast<int>(my_game->getMap()
+							.convertToGameX(GET_X_LPARAM(msg.lParam)));
+						const auto gy = static_cast<int>(my_game->getMap()
+							.convertToGameY(GET_Y_LPARAM(msg.lParam)));
+						if (my_game->getMap().getTerrainGraph(false).verifyCoordinates(gx, gy)) {
 							this->start_gx = gx;
 							this->start_gy = gy;
 						}
@@ -406,9 +359,11 @@ namespace hoffman_isaiah {
 					case WM_MOUSEMOVE:
 					{
 						// Update end coordinates
-						const auto gx = static_cast<int>(game::g_my_game->getMap().convertToGameX(GET_X_LPARAM(msg.lParam)));
-						const auto gy = static_cast<int>(game::g_my_game->getMap().convertToGameY(GET_Y_LPARAM(msg.lParam)));
-						if (game::g_my_game->getMap().getTerrainGraph(false).verifyCoordinates(gx, gy)) {
+						const auto gx = static_cast<int>(my_game->getMap()
+							.convertToGameX(GET_X_LPARAM(msg.lParam)));
+						const auto gy = static_cast<int>(my_game->getMap()
+							.convertToGameY(GET_Y_LPARAM(msg.lParam)));
+						if (my_game->getMap().getTerrainGraph(false).verifyCoordinates(gx, gy)) {
 							this->end_gx = gx;
 							this->end_gy = gy;
 						}
@@ -423,31 +378,38 @@ namespace hoffman_isaiah {
 						// Update end coordinates
 						const auto end_sx = static_cast<float>(GET_X_LPARAM(msg.lParam));
 						const auto end_sy = static_cast<float>(GET_Y_LPARAM(msg.lParam));
-						const auto new_gx = static_cast<int>(game::g_my_game->getMap().convertToGameX(end_sx));
-						const auto new_gy = static_cast<int>(game::g_my_game->getMap().convertToGameY(end_sy));
+						const auto new_gx = static_cast<int>(my_game->getMap().convertToGameX(end_sx));
+						const auto new_gy = static_cast<int>(my_game->getMap().convertToGameY(end_sy));
 						this->end_gx = math::get_max(new_gx, this->start_gx);
 						this->end_gy = math::get_max(new_gy, this->start_gy);
 						this->start_gx = math::get_min(this->start_gx, new_gx);
 						this->start_gy = math::get_min(this->start_gy, new_gy);
-						if (game::g_my_game->getMap().getTerrainGraph(false).verifyCoordinates(this->start_gx, this->start_gy)
-							&& game::g_my_game->getMap().getTerrainGraph(false).verifyCoordinates(this->end_gx, this->end_gy)) {
-							if (game::g_my_game->getSelectedTower() == ID_MM_TOWERS_MARK_TILES - ID_MM_TOWERS_NONE - 1) {
+						if (my_game->getMap().getTerrainGraph(false)
+							.verifyCoordinates(this->start_gx, this->start_gy)
+							&& my_game->getMap().getTerrainGraph(false)
+							.verifyCoordinates(this->end_gx, this->end_gy)) {
+							if (my_game->getSelectedTower()
+								== ID_MM_TOWERS_MARK_TILES - ID_MM_TOWERS_NONE - 1) {
 								// Mark tiles
 								for (int gx = this->start_gx; gx <= this->end_gx; ++gx) {
 									for (int gy = this->start_gy; gy <= this->end_gy; ++gy) {
-										game::g_my_game->getMap().getHighlightGraph().getNode(gx, gy).setBlockage(true);
+										my_game->getMap().getHighlightGraph()
+											.getNode(gx, gy).setBlockage(true);
 									}
 								}
 							}
-							else if (game::g_my_game->getSelectedTower() == ID_MM_TOWERS_UNMARK_TILES - ID_MM_TOWERS_NONE - 1) {
+							else if (my_game->getSelectedTower()
+								== ID_MM_TOWERS_UNMARK_TILES - ID_MM_TOWERS_NONE - 1) {
 								// Unmark tiles
 								for (int gx = this->start_gx; gx <= this->end_gx; ++gx) {
 									for (int gy = this->start_gy; gy <= this->end_gy; ++gy) {
-										game::g_my_game->getMap().getHighlightGraph().getNode(gx, gy).setBlockage(false);
+										my_game->getMap().getHighlightGraph()
+											.getNode(gx, gy).setBlockage(false);
 									}
 								}
 							}
-							else if (game::g_my_game->getSelectedTower() == ID_MM_TOWERS_NONE - ID_MM_TOWERS_NONE - 1) {
+							else if (my_game->getSelectedTower()
+								== ID_MM_TOWERS_NONE - ID_MM_TOWERS_NONE - 1) {
 								// Invert coverage showing.
 								for (int gx = this->start_gx; gx <= this->end_gx; ++gx) {
 									for (int gy = this->start_gy; gy <= this->end_gy; ++gy) {
@@ -457,11 +419,11 @@ namespace hoffman_isaiah {
 									}
 								}
 							}
-							else if (game::g_my_game->getSelectedTower() == 0) {
+							else if (my_game->getSelectedTower() == 0) {
 								// Wall...
 								for (int gx = this->start_gx; gx <= this->end_gx; ++gx) {
 									for (int gy = this->start_gy; gy <= this->end_gy; ++gy) {
-										game::g_my_game->buyTower(gx, gy);
+										my_game->buyTower(gx, gy);
 									}
 								}
 							}
@@ -470,23 +432,22 @@ namespace hoffman_isaiah {
 								handle_update_wm_command(my_game, ID_MM_TOWERS_BUY_TOWER, my_new_lparam);
 							}
 						}
-						if (game::g_my_game->isInLevel()) {
-							const bool pause_state = game::g_my_game->isPaused();
+						if (my_game->isInLevel()) {
+							const bool pause_state = my_game->isPaused();
 							if (!pause_state) {
-								game::g_my_game->togglePause();
+								my_game->togglePause();
 							}
-							// And no wonder this crashed.... We do indeed have a race
-							// condition (but not for long!)
 							// Check if the user clicked on an enemy.
-							const auto& enemy_list = game::g_my_game->getEnemies();
+							const auto& enemy_list = my_game->getEnemies();
 							for (const auto& e : enemy_list) {
 								if (e->checkHit(end_sx, end_sy)) {
-									const winapi::EnemyInfoDialog my_dialog {hwnd, this->h_instance, e->getBaseType()};
+									const winapi::EnemyInfoDialog my_dialog
+									{hwnd, this->h_instance, e->getBaseType()};
 									break;
 								}
 							}
-							if (pause_state != game::g_my_game->isPaused()) {
-								game::g_my_game->togglePause();
+							if (pause_state != my_game->isPaused()) {
+								my_game->togglePause();
 							}
 						}
 						// Reset coordinates
@@ -499,8 +460,10 @@ namespace hoffman_isaiah {
 					case WM_RBUTTONUP:
 					{
 						// Get coordinates
-						const auto my_gx = static_cast<int>(game::g_my_game->getMap().convertToGameX(GET_X_LPARAM(msg.lParam)));
-						const auto my_gy = static_cast<int>(game::g_my_game->getMap().convertToGameY(GET_Y_LPARAM(msg.lParam)));
+						const auto my_gx = static_cast<int>(my_game->getMap()
+							.convertToGameX(GET_X_LPARAM(msg.lParam)));
+						const auto my_gy = static_cast<int>(my_game->getMap()
+							.convertToGameY(GET_Y_LPARAM(msg.lParam)));
 						if (my_gx == start_gx && my_gy == start_gy) {
 							const auto my_new_lparam = MAKELPARAM(my_gx, my_gy);
 							handle_update_wm_command(my_game, ID_MM_TOWERS_SELL_TOWER, my_new_lparam);
@@ -521,12 +484,12 @@ namespace hoffman_isaiah {
 				}
 				else {
 					// Render scene
-					const HRESULT hr = my_renderer->render(game::g_my_game, this->start_gx, this->start_gy,
+					const HRESULT hr = my_renderer->render(my_game, this->start_gx, this->start_gy,
 						this->end_gx, this->end_gy);
-					if (!game::g_my_game->isInLevel()) {
-						my_renderer->createEnemyMenu(hwnd, game::g_my_game->getAllEnemyTypes(),
-							game::g_my_game->getSeenEnemies());
-						if (game::g_my_game->canStartCustomGames()) {
+					if (!my_game->isInLevel()) {
+						my_renderer->createEnemyMenu(hwnd, my_game->getAllEnemyTypes(),
+							my_game->getSeenEnemies());
+						if (my_game->canStartCustomGames()) {
 							winapi::enableMenuItem(hwnd, 0, ID_MM_FILE_START_CUSTOM_GAME);
 						}
 					}
@@ -669,14 +632,15 @@ namespace hoffman_isaiah {
 				const auto& my_clevel_dialog = *reinterpret_cast<const ChallengeLevelDialog*>(lparam);
 				if (my_clevel_dialog.getChallengeLevel() != IDCANCEL) {
 					const auto new_clevel = my_clevel_dialog.getChallengeLevel() - ID_CHALLENGE_LEVEL_EASY;
-					my_game->resetState(new_clevel, my_game->getDefaultMapName(my_clevel_dialog.getChallengeLevel()));
+					my_game->resetState(new_clevel,
+						my_game->getDefaultMapName(my_clevel_dialog.getChallengeLevel()));
 				}
 				}
 				break;
 			}
 			case ID_MM_FILE_SAVE_GAME:
 			{
-				std::wofstream save_file {game::g_my_game->getUserDataPath() + game::default_save_file_name};
+				std::wofstream save_file {my_game->getUserDataPath() + game::default_save_file_name};
 				if (save_file.fail() || save_file.bad()) {
 					MessageBox(nullptr, L"Could not save game.", L"Save failed!", MB_ICONEXCLAMATION | MB_OK);
 				}

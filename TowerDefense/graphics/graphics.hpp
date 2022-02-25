@@ -121,13 +121,13 @@ namespace hoffman_isaiah {
 			void drawSmallText(std::wstring text, Color t_color, D2D_RECT_F my_rect, bool draw_rect = true) const noexcept;
 			
 			/// <summary>Draws the current scene based on the game state.</summary>
-			/// <param name="my_game">Shared pointer to object that contains the current game state.</param>
+			/// <param name="my_game">Non-owning pointer to the current game state.</param>
 			/// <param name="mouse_gx">The starting game x-coordinate of the mouse.</param>
 			/// <param name="mouse_gy">The starting game y-coordinate of the mouse.</param>
 			/// <param name="mouse_end_gx">The ending game x-coordinate of the mouse.</param>
 			/// <param name="mouse_end_gy">The ending game y-coordinate of the mouse.</param>
 			/// <param name="in_editor">Are we in the terrain editor?</param>
-			HRESULT render(const std::shared_ptr<game::MyGame> my_game, int mouse_gx, int mouse_gy,
+			HRESULT render(const game::MyGame* my_game, int mouse_gx, int mouse_gy,
 				int mouse_end_gx, int mouse_end_gy, bool in_editor = false) const;
 			/// <summary>Draws the current scene based on the editor's state.</summary>
 			/// <param name="my_editor">Reference to the editor being drawn.</param>
