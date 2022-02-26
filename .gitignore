@@ -57,6 +57,7 @@ documentation/*.*
 *.dll
 *.lib
 *.ilk
+*.smproj
 
 StyleCop.Cache
 style_guide.html
