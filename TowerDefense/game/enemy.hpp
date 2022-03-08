@@ -255,17 +255,31 @@ namespace hoffman_isaiah {
 
 		protected:
 			// Functions that help construction
-			/// <returns>The enemy's starting health adjusted for the level, difficulty, and challenge level.</returns>
-			static double getAdjustedHealth(double base_hp, int level, double difficulty, int challenge_level) noexcept {
-				return base_hp + math::get_max(0.0, 0.05 * (level - 1.0) * challenge_level + 0.001 * (difficulty - 1.0));
+			/// <returns>The enemy's starting health adjusted for the level, difficulty, and
+			/// challenge level.</returns>
+			static double getAdjustedHealth(double base_hp, int level, double difficulty,
+				int challenge_level) noexcept {
+				if (level < 100) {
+					return base_hp + math::get_max(0.0,
+						0.05 * (level - 1.0) * challenge_level + 0.001 * (difficulty - 1.0));
+				}
+				return base_hp + math::get_max(0.0,
+					0.25 * (level - 1.0) * challenge_level + 0.005 * (difficulty - 1.0));
 			}
-			/// <returns>The enemy's starting armor health adjusted for the level, difficulty, and challenge level.</returns>
-			static double getAdjustedArmorHealth(double base_ahp, int level, double difficulty, int challenge_level) noexcept {
-				return base_ahp > 0 ? math::get_min(base_ahp * (challenge_level + 1.5) + level * (challenge_level + 0.5),
-					base_ahp + ((level - 1.0) * 0.05) * ((difficulty + challenge_level) / 13.0 + 11.0 / 13.0)) : 0;
+			/// <returns>The enemy's starting armor health adjusted for the level, difficulty, and
+			/// challenge level.</returns>
+			static double getAdjustedArmorHealth(double base_ahp, int level, double difficulty,
+				int challenge_level) noexcept {
+				return base_ahp > 0
+					? math::get_min(base_ahp * (challenge_level + 1.5) + level * (challenge_level + 0.5),
+						base_ahp + ((level - 1.0) * 0.05) * ((difficulty + challenge_level)
+							/ 13.0 + 11.0 / 13.0))
+					: 0;
 			}
-			/// <returns>The enemy's starting speed adjusted for the level, difficulty, and challenge level.</returns>
-			static double getAdjustedSpeed(double base_speed, int level, double difficulty, int challenge_level) noexcept {
+			/// <returns>The enemy's starting speed adjusted for the level, difficulty, and
+			/// challenge level.</returns>
+			static double getAdjustedSpeed(double base_speed, int level, double difficulty,
+				int challenge_level) noexcept {
 				return base_speed + math::get_min(base_speed * 0.375, static_cast<double>(level - 1) * challenge_level * 0.0007)
 					+ math::get_max(0.0, math::get_min(base_speed * 0.375, (difficulty - 1.0) * 0.0025));
 			}
