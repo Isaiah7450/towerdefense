@@ -12,6 +12,7 @@
 #include "./info_dialogs.hpp"
 #include "./../globals.hpp"
 #include "./../game/enemy_type.hpp"
+#include "./../game/enemy.hpp"
 #include "./../game/game_formulas.hpp"
 #include "./../game/my_game.hpp"
 #include "./../game/shot_types.hpp"
@@ -201,6 +202,16 @@ namespace hoffman_isaiah::winapi {
 		SetDlgItemText(hwnd, IDC_INFO_ENEMY_MOVE_DIAGONAL, this->diag_string.c_str());
 		SetDlgItemText(hwnd, IDC_INFO_ENEMY_BUFF_RATING, this->buff_rating_string.c_str());
 		SetDlgItemText(hwnd, IDC_INFO_ENEMY_RATING, this->rating_string.c_str());
+	}
+
+	EnemyMapInfoDialog::EnemyMapInfoDialog(HWND owner, HINSTANCE h_inst, const game::Enemy& e) :
+		InfoDialogBase {h_inst, e.getBaseType()} {
+		DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_ENEMY),
+			owner, InfoDialogBase::infoDialogProc, reinterpret_cast<LPARAM>(this));
+	}
+
+	void EnemyMapInfoDialog::initDialog(HWND hwnd) {
+		this->setCommonControls(hwnd);
 	}
 
 	ShotBaseInfoDialog::ShotBaseInfoDialog(HWND owner, HINSTANCE h_inst, const game::ShotBaseType& stype) :

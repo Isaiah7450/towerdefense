@@ -11,6 +11,7 @@
 namespace hoffman_isaiah::game {
 	// Forward declarations.
 	class EnemyType;
+	class Enemy;
 	class ShotBaseType;
 	class StunShotType;
 	class SlowShotType;
@@ -90,6 +91,19 @@ namespace hoffman_isaiah::winapi {
 		std::wstring diag_string {};
 		std::wstring buff_rating_string {};
 		std::wstring rating_string {};
+	};
+
+	/// <summary>Displays information about an enemy on the current map.</summary>
+	class EnemyMapInfoDialog : public InfoDialogBase {
+	public:
+		/// <param name="owner">Handle to the window that owns this dialog box.</param>
+		/// <param name="h_inst">The hInstance parameter given by the WinMain function.</param>
+		/// <param name="e">The enemy to display information for.</param>
+		EnemyMapInfoDialog(HWND owner, HINSTANCE h_inst, const game::Enemy& e);
+	protected:
+		// Implements InfoDialogBase::initDialog().
+		void initDialog(HWND hwnd) override;
+	private:
 	};
 
 	class ShotBaseInfoDialog : public InfoDialogBase {

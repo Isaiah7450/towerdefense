@@ -441,8 +441,7 @@ namespace hoffman_isaiah {
 							const auto& enemy_list = my_game->getEnemies();
 							for (const auto& e : enemy_list) {
 								if (e->checkHit(end_sx, end_sy)) {
-									const winapi::EnemyInfoDialog my_dialog
-									{hwnd, this->h_instance, e->getBaseType()};
+									const winapi::EnemyMapInfoDialog my_dialog {hwnd, this->h_instance, *e};
 									break;
 								}
 							}
