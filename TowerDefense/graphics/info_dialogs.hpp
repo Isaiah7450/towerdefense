@@ -104,6 +104,7 @@ namespace hoffman_isaiah::winapi {
 		// Implements InfoDialogBase::initDialog().
 		void initDialog(HWND hwnd) override;
 	private:
+		const game::Enemy& my_enemy;
 	};
 
 	class ShotBaseInfoDialog : public InfoDialogBase {

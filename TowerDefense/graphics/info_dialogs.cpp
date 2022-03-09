@@ -205,13 +205,62 @@ namespace hoffman_isaiah::winapi {
 	}
 
 	EnemyMapInfoDialog::EnemyMapInfoDialog(HWND owner, HINSTANCE h_inst, const game::Enemy& e) :
-		InfoDialogBase {h_inst, e.getBaseType()} {
+		InfoDialogBase {h_inst, e.getBaseType()},
+		my_enemy {e} {
 		DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_ENEMY),
 			owner, InfoDialogBase::infoDialogProc, reinterpret_cast<LPARAM>(this));
 	}
 
 	void EnemyMapInfoDialog::initDialog(HWND hwnd) {
 		this->setCommonControls(hwnd);
+		// Unlike the menu dialog, this box shows the enemy's current health, armor, and speed.
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_HEALTH,
+			std::to_wstring(static_cast<int>(this->my_enemy.getHealth())).c_str());
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_ARMOR_HP,
+			std::to_wstring(static_cast<int>(this->my_enemy.getArmorHealth())).c_str());
+		std::wstringstream my_stream {};
+		const auto prime_stream_for_float = [&my_stream](int prec) {
+			my_stream.str(L"");
+			my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(prec);
+		};
+		prime_stream_for_float(1);
+		my_stream << this->my_enemy.getBaseType().getArmorReduce() * 100 << L"%";
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_ARMOR_REDUCE,
+			my_stream.str().c_str());
+		prime_stream_for_float(1);
+		my_stream << this->my_enemy.getBaseType().getPainTolerance() * 100 << L"%";
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_PAIN_TOLERANCE,
+			my_stream.str().c_str());
+		prime_stream_for_float(1);
+		my_stream << this->my_enemy.getCurrentWalkingSpeed() << L" cs / s";
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_WALK_SPEED,
+			my_stream.str().c_str());
+		prime_stream_for_float(1);
+		my_stream << this->my_enemy.getCurrentRunningSpeed() << L" cs / s";
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_RUN_SPEED,
+			my_stream.str().c_str());
+		prime_stream_for_float(1);
+		my_stream << this->my_enemy.getCurrentInjuredSpeed() << L" cs / s";
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_INJURED_SPEED,
+			my_stream.str().c_str());
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_IS_FLYING,
+			this->my_enemy.getBaseType().isFlying() ? L"Yes" : L"No");
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_DAMAGE,
+			std::to_wstring(this->my_enemy.getBaseType().getDamage()).c_str());
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_NUM_BUFFS,
+			std::to_wstring(this->my_enemy.getBaseType().getBuffTypesCount()).c_str());
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_STRATEGY,
+			(*this->my_enemy.getCurrentStrategy()).c_str());
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_MOVE_DIAGONAL,
+			this->my_enemy.canMoveDiagonally() ? L"Yes" : L"No");
+		prime_stream_for_float(0);
+		my_stream << this->my_enemy.getBaseType().getExtraRating();
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_BUFF_RATING,
+			my_stream.str().c_str());
+		prime_stream_for_float(0);
+		my_stream << this->my_enemy.getBaseType().getRating();
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_RATING,
+			my_stream.str().c_str());
 	}
 
 	ShotBaseInfoDialog::ShotBaseInfoDialog(HWND owner, HINSTANCE h_inst, const game::ShotBaseType& stype) :
