@@ -159,7 +159,46 @@ namespace hoffman_isaiah::winapi {
 		SetDlgItemText(hwnd, IDC_GLOBAL_STATS_EXPERT, std::to_wstring(this->getHighestLevels().at(ID_CHALLENGE_LEVEL_EXPERT)).c_str());
 	}
 
-	TerrainEditorNewMapDialog::TerrainEditorNewMapDialog(HWND owner, HINSTANCE h_inst, std::wstring default_name) :
+	HelpAboutDialog::HelpAboutDialog(HWND owner, HINSTANCE h_inst) {
+		DialogBoxParam(h_inst, MAKEINTRESOURCE(IDD_HELP_ABOUT), owner,
+			HelpAboutDialog::dialogProc, reinterpret_cast<LPARAM>(this));
+	}
+
+	INT_PTR CALLBACK HelpAboutDialog::dialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+		switch (msg) {
+		case WM_INITDIALOG:
+		{
+			// (No need to save the lparam because all the needed text is already in the resource file.)
+			const auto my_dialog_class = reinterpret_cast<HelpAboutDialog*>(lparam);
+			my_dialog_class->initDialog(hwnd);
+			return TRUE;
+		}
+		case WM_COMMAND:
+			switch (LOWORD(wparam)) {
+			case IDOK:
+			{
+				EndDialog(hwnd, IDOK);
+				break;
+			}
+			case IDCANCEL:
+				EndDialog(hwnd, IDCANCEL);
+				break;
+			default:
+				break;
+			}
+			break;
+		default:
+			return FALSE;
+		}
+		return TRUE;
+	}
+
+	void HelpAboutDialog::initDialog(HWND hwnd) {
+		UNREFERENCED_PARAMETER(hwnd);
+	}
+
+	TerrainEditorNewMapDialog::TerrainEditorNewMapDialog(HWND owner, HINSTANCE h_inst,
+		std::wstring default_name) :
 		map_name {default_name} {
 		this->create_new_map = DialogBoxParam(h_inst, MAKEINTRESOURCE(IDD_TERRAIN_NEW_MAP),
 			owner, TerrainEditorNewMapDialog::dialogProc, reinterpret_cast<LPARAM>(this)) == IDOK;
