@@ -17,9 +17,10 @@
 #define IDD_CHALLENGE_LEVEL                     4001
 #define IDD_START_CUSTOM_GAME                   4002
 #define IDD_GLOBAL_STATS                        4003
-#define IDD_TERRAIN_NEW_MAP                     4101
-#define IDD_TERRAIN_OPEN_MAP                    4102
-#define IDD_TERRAIN_SAVE_MAP_AS                 4103
+#define IDD_HELP_ABOUT                          4101
+#define IDD_TERRAIN_NEW_MAP                     4201
+#define IDD_TERRAIN_OPEN_MAP                    4202
+#define IDD_TERRAIN_SAVE_MAP_AS                 4203
 
 #define IDC_INFO_BASE_NAME                      10001
 #define IDC_INFO_BASE_DESC                      10002
@@ -138,6 +139,7 @@
 #define ID_MM_TOWERS_SELL_TOWER                 40399
 #define ID_MM_SHOTS_PLACEHOLDER                 40401
 #define ID_MM_ENEMIES_PLACEHOLDER               40501
+#define ID_MM_HELP_ABOUT                        40601
 #define ID_MM_DEVELOP_TERRAIN_EDITOR            40801
 #define ID_MM_DEVELOP_SHOW_TEST_PATHS           40802
 #define ID_TE_FILE_NEW_MAP                      41101
@@ -167,7 +169,8 @@ constexpr const auto id_mm_actions_offset = 1;
 constexpr const auto id_mm_towers_offset = 2;
 constexpr const auto id_mm_shots_offset = 3;
 constexpr const auto id_mm_enemies_offset = 4;
-constexpr const auto id_mm_develop_offset = 5;
+constexpr const auto id_mm_help_offset = 5;
+constexpr const auto id_mm_develop_offset = 6;
 
 // Next default values for new objects
 // 

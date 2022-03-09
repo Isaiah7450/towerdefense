@@ -599,6 +599,11 @@ namespace hoffman_isaiah {
 				}
 				break;
 			}
+			case ID_MM_HELP_ABOUT:
+			{
+				const HelpAboutDialog my_dialog {hwnd, this->h_instance};
+				break;
+			}
 			case ID_MM_DEVELOP_TERRAIN_EDITOR:
 			{
 				[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.

@@ -85,6 +85,16 @@ namespace hoffman_isaiah::winapi {
 		std::map<int, int> highest_levels;
 	};
 
+	/// <summary>This dialog box provides general information about the program and its maker.</summary>
+	class HelpAboutDialog : public IDialog {
+	public:
+		HelpAboutDialog(HWND owner, HINSTANCE h_inst);
+		// Dialog box procedure.
+		static INT_PTR CALLBACK dialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	protected:
+		void initDialog(HWND hwnd);
+	};
+
 	/// <summary>Represents a dialog used to make a new map in the terrain editor.</summary>
 	class TerrainEditorNewMapDialog : public IDialog {
 	public:
