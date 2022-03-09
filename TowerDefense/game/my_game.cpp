@@ -349,7 +349,15 @@ namespace hoffman_isaiah {
 				return;
 			}
 			if (this->getMap().getFiterGraph(false).getNode(gx, gy).isBlocked()
-				|| this->getMap().getTerrainGraph(false).getNode(gx, gy).isBlocked()) {
+				|| this->getMap().getTerrainGraph(false).getNode(gx, gy).isBlocked()
+				|| (this->getMap().getTerrainGraph(false).getStartNode()->getGameX() == gx
+				&& this->getMap().getTerrainGraph(false).getStartNode()->getGameY() == gy)
+				|| (this->getMap().getTerrainGraph(true).getStartNode()->getGameX() == gx
+				&& this->getMap().getTerrainGraph(true).getStartNode()->getGameY() == gy)
+				|| (this->getMap().getTerrainGraph(false).getGoalNode()->getGameX() == gx
+				&& this->getMap().getTerrainGraph(false).getGoalNode()->getGameY() == gy)
+				|| (this->getMap().getTerrainGraph(true).getGoalNode()->getGameX() == gx
+				&& this->getMap().getTerrainGraph(true).getGoalNode()->getGameY() == gy)) {
 				// Cannot build on this space...
 				return;
 			}
