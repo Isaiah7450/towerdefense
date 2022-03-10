@@ -2,7 +2,7 @@ System Requirements:
 
 Minimum:
 
-Operating System: Microsoft Windows 7 or later.
+Operating System: Microsoft Windows 8 or later.
 Screen Resolution: 1024x768 or higher.
 RAM: 256 MB (of free memory)
 CPU: Anything made sinc 2015 should work.
