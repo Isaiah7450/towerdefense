@@ -15,6 +15,7 @@
 #include "./ih_math.hpp"
 #include "./file_util.hpp"
 #include "./main.hpp"
+#include "./audio/audio.hpp"
 #include "./graphics/graphics_DX.hpp"
 #include "./graphics/graphics.hpp"
 #include "./graphics/info_dialogs.hpp"
@@ -113,7 +114,7 @@ namespace hoffman_isaiah {
 				winapi::handleWindowsError(L"Registration of window class");
 			}
 			}
-				// Keep reference to menu
+			// Keep reference to menu
 			this->h_menu = LoadMenu(this->h_instance, MAKEINTRESOURCE(IDR_MAIN_MENU));
 			// Determine window size and viewport
 			SetRect(&this->rc, 0, 0, graphics::screen_width, graphics::screen_height);
@@ -149,6 +150,19 @@ namespace hoffman_isaiah {
 			// Show window
 			ShowWindow(this->hwnd, n_cmd_show);
 			UpdateWindow(this->hwnd);
+			// Initialize audio.
+			try {
+				audio::g_my_audio = std::make_unique<audio::AudioResources>();
+				audio::g_my_audio->loadSong(game::g_my_game->getResourcesPath() + L"music/Music_100.wav");
+				audio::g_my_audio->loadSong(game::g_my_game->getResourcesPath() + L"music/Music_110.wav");
+				audio::g_my_audio->loadSong(game::g_my_game->getResourcesPath() + L"music/Music_114.wav");
+				audio::g_my_audio->loadSong(game::g_my_game->getResourcesPath() + L"music/Music_115.wav");
+				audio::g_my_audio->loadSong(game::g_my_game->getResourcesPath() + L"music/Music_124.wav");
+				audio::g_my_audio->playSong(audio::town_index);
+			}
+			catch (...) {
+				MessageBox(this->hwnd, L"Failed to load audio.", L"Audio Load Fail", MB_OK | MB_ICONERROR);
+			}
 			// Disable loading custom maps for now.
 			winapi::disableMenuItem(hwnd, id_mm_file_offset, ID_MM_FILE_START_CUSTOM_GAME);
 #if !defined(DEBUG) && !defined(_DEBUG)

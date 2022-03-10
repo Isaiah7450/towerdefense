@@ -2,8 +2,9 @@ System Requirements:
 
 Minimum:
 
-Operating System: Microsoft Windows 7 or later.
+Operating System: Microsoft Windows 8 or later.
 Screen Resolution: 1024x768 or higher.
+Disk Space: About 256 MB
 RAM: 256 MB (of free memory)
 CPU: Anything made sinc 2015 should work.
 Graphics Card: Anything made since 2015 should work.
@@ -13,6 +14,7 @@ Recommended:
 
 Operating System: Microsoft Windows 7 or later.
 Screen Resolution: 1440x900 or higher.
+Disk Space: About 256 MB
 RAM: 512 MB (of free memory)
 CPU: Intel(R) Core(TM) i5-6200 CPU @ 2.30 GHz 2.40 GHz or better.
 Graphics Card: Anything made since 2015 should work.

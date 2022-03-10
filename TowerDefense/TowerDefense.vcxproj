@@ -254,6 +254,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="audio\audio.hpp" />
     <ClInclude Include="file_util.hpp" />
     <ClInclude Include="game\enemy.hpp" />
     <ClInclude Include="game\enemy_type.hpp" />
@@ -272,6 +273,7 @@
     <ClInclude Include="graphics\file_dialogs.hpp" />
     <ClInclude Include="graphics\graphics.hpp" />
     <ClInclude Include="graphics\graphics_DX.hpp" />
+    <ClCompile Include="audio\audio.cpp" />
     <ClCompile Include="game\enemy_type.cpp" />
     <ClCompile Include="game\game_formulas.cpp" />
     <ClCompile Include="graphics\info_dialogs.cpp" />

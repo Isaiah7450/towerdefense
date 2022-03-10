@@ -15,6 +15,7 @@
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 #include "./../main.hpp"
+#include "./../audio/audio.hpp"
 #include "./../graphics/graphics.hpp"
 #include "./../graphics/graphics_DX.hpp"
 #include "./../pathfinding/grid.hpp"
@@ -143,6 +144,7 @@ namespace hoffman_isaiah {
 					}
 				}
 				this->saveGlobalData();
+				audio::g_my_audio->playSong(audio::gameover_index);
 			}
 			// Do processing...
 			for (int k = 0; k < this->update_speed && this->in_level; ++k) {
@@ -266,6 +268,12 @@ namespace hoffman_isaiah {
 					}
 					this->did_lose_life = false;
 					this->in_level = false;
+					if (level < 100) {
+						audio::g_my_audio->playSong(audio::town_index);
+					}
+					else {
+						audio::g_my_audio->playSong(audio::victory_index);
+					}
 				}
 			}
 		}
@@ -303,10 +311,17 @@ namespace hoffman_isaiah {
 				}
 				catch ([[maybe_unused]] const util::file::DataFileException& e) {
 					MessageBox(nullptr, e.what(), L"Level Loading Error", MB_OK);
-					// Though it is not really meant to be used for levels under the threshold, it should still work despite such.
+					// Though it is not really meant to be used for levels under the threshold,
+					// it should still work despite such.
 					this->my_level = this->my_level_generator->generateLevel(this->getLevelNumber(), *this);
 				}
 				this->my_level_enemy_count = this->my_level->getEnemyCount();
+				if (level != 99 && level % 5 != 0 || level == 100) {
+					audio::g_my_audio->playSong(audio::level_index);
+				}
+				else {
+					audio::g_my_audio->playSong(audio::boss_index);
+				}
 			}
 		}
 
