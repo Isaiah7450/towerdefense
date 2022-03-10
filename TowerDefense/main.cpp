@@ -15,6 +15,7 @@
 #include "./ih_math.hpp"
 #include "./file_util.hpp"
 #include "./main.hpp"
+#include "./audio/audio.hpp"
 #include "./graphics/graphics_DX.hpp"
 #include "./graphics/graphics.hpp"
 #include "./graphics/info_dialogs.hpp"
@@ -149,6 +150,14 @@ namespace hoffman_isaiah {
 			// Show window
 			ShowWindow(this->hwnd, n_cmd_show);
 			UpdateWindow(this->hwnd);
+			// Initialize audio.
+			auto my_audio_resources = std::make_unique<audio::AudioResources>();
+			try {
+				my_audio_resources->playMusic(game::g_my_game->getResourcesPath() + L"music/music02.wav");
+			}
+			catch (...) {
+				MessageBox(this->hwnd, L"Failed to load audio.", L"Audio Load Fail", MB_OK | MB_ICONERROR);
+			}
 			// Disable loading custom maps for now.
 			winapi::disableMenuItem(hwnd, id_mm_file_offset, ID_MM_FILE_START_CUSTOM_GAME);
 #if !defined(DEBUG) && !defined(_DEBUG)
