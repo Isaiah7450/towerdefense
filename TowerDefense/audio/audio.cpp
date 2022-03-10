@@ -9,6 +9,8 @@
 #include <string>
 
 namespace hoffman_isaiah::audio {
+	std::unique_ptr<AudioResources> g_my_audio {nullptr};
+
 // Following preprocessor code adapted from official docs.
 #ifdef _XBOX // Big Endian
 	constexpr const auto fourccRIFF = 'RIFF';

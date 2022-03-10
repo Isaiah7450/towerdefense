@@ -27,6 +27,8 @@ namespace hoffman_isaiah {
 			}
 		};
 
+		// It probably shouldn't be a template as it was specifically made
+		// for deleting XAUDIO2_BUFFERs.
 		template <typename T>
 		struct DeleteBuffer {
 			void operator()(T* pT) {
@@ -92,5 +94,18 @@ namespace hoffman_isaiah {
 			/// <summary>Stores the current song being played (so it can be stopped later.)</summary>
 			int current_song;
 		};
+
+
+		// Global variables
+		// It would be a pain to have to pass this as a parameter everywhere I go.
+		/// <summary>Global pointer to the audio player.</summary>
+		extern std::unique_ptr<AudioResources> g_my_audio;
+		// Global constants; I should update these whenever I change the music selection.
+		// Actually, these ought to be an enumeration but this is slightly more convenient.
+		constexpr const auto town_index = 0;
+		constexpr const auto boss_index = 1;
+		constexpr const auto level_index = 2;
+		constexpr const auto gameover_index = 3;
+		constexpr const auto victory_index = 4;
 	}
 }
