@@ -3,7 +3,9 @@
 #include "./../targetver.hpp"
 #include <xaudio2.h>
 #include <memory>
+#include <stdexcept>
 #include <string>
+#include <vector>
 
 // Created by: Isaiah Hoffman
 // Created on: March 10, 2022
@@ -25,19 +27,38 @@ namespace hoffman_isaiah {
 			}
 		};
 
+		template <typename T>
+		struct DeleteBuffer {
+			void operator()(T* pT) {
+				delete[] pT->pAudioData;
+				delete pT;
+			}
+		};
+
 		/// <summary>This class stores and manages all audio resources.</summary>
 		class AudioResources {
 		public:
 			AudioResources() :
 				xaudio2 {nullptr},
-				master_voice {nullptr} {
+				master_voice {nullptr},
+				song_voices {},
+				song_buffers {},
+				current_song {-1} {
 				// Probably throw an exception for failure...
-				this->initAudio();
+				if (!this->initAudio()) {
+					throw std::runtime_error {"Initialization of audio failed."};
+				}
 			}
 
-			/// <summary>Plays music from the given file.</summary>
+			/// <summary>Loads a song from the given file into a buffer. This method throws
+			/// an exception if the loading fails.</summary>
 			/// <param name="file_name">The name of the file to load.</param>
-			void playMusic(std::wstring file_name);
+			void loadSong(std::wstring file_name);
+
+			/// <summary>Plays music from the preloaded songs. This method throws an
+			/// exception if the playing fails.</summary>
+			/// <param name="index">The index of the song based on the order the songs were loaded.</param>
+			void playSong(int index);
 		private:
 			/// <summary>Initializes the audio engine.</summary>
 			/// <returns>True if the action succeeded otherwise false.</returns>
@@ -64,6 +85,12 @@ namespace hoffman_isaiah {
 			std::unique_ptr<IXAudio2, ReleaseCOM<IXAudio2>> xaudio2;
 			/// <summary>Pointer to the XAudio2 master voice.</summary>
 			std::unique_ptr<IXAudio2MasteringVoice, DestroyVoice<IXAudio2MasteringVoice>> master_voice;
+			/// <summary>Pointer to the XAudio2 source voice used to play songs.</summary>
+			std::vector<std::unique_ptr<IXAudio2SourceVoice, DestroyVoice<IXAudio2SourceVoice>>> song_voices;
+			/// <summary>Stores the buffers containing the information of loaded songs.</summary>
+			std::vector<std::unique_ptr<XAUDIO2_BUFFER, DeleteBuffer<XAUDIO2_BUFFER>>> song_buffers;
+			/// <summary>Stores the current song being played (so it can be stopped later.)</summary>
+			int current_song;
 		};
 	}
 }

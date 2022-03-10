@@ -37,10 +37,11 @@ namespace hoffman_isaiah::audio {
 			return false;
 		}
 		this->master_voice.reset(raw_master_voice);
+		this->master_voice->SetVolume(0.1f);
 		return true;
 	}
 
-	void AudioResources::playMusic(std::wstring file_name) {
+	void AudioResources::loadSong(std::wstring file_name) {
 		// Open file.
 		HANDLE my_file = CreateFile(file_name.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr,
 			OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
@@ -71,10 +72,21 @@ namespace hoffman_isaiah::audio {
 			auto data_buffer = std::make_unique<BYTE[]>(dw_chunk_size);
 			this->readChunk(my_file, data_buffer.get(), dw_chunk_size, dw_chunk_position);
 			// Populate XAUDIO2_BUFFER
-			XAUDIO2_BUFFER buffer {0};
-			buffer.AudioBytes = dw_chunk_size;
-			buffer.pAudioData = data_buffer.get();
-			buffer.Flags = XAUDIO2_END_OF_STREAM;
+			// (I couldn't get this to work directly with std::make_unique<>... It's probably
+			// simple; I just need to look it up later.)
+			std::unique_ptr<XAUDIO2_BUFFER, DeleteBuffer<XAUDIO2_BUFFER>> buffer {nullptr};
+			auto raw_buffer = new XAUDIO2_BUFFER;
+			buffer.reset(raw_buffer);
+			buffer->LoopBegin = 0;
+			buffer->LoopCount = 0;
+			buffer->LoopLength = 0;
+			buffer->PlayBegin = 0;
+			buffer->PlayLength = 0;
+			buffer->pContext = nullptr;
+			buffer->AudioBytes = dw_chunk_size;
+			// The custom deleter will make sure this is deleted properly.
+			buffer->pAudioData = data_buffer.release();
+			buffer->Flags = XAUDIO2_END_OF_STREAM;
 			// Rest is adapted from XAudio2 documentation (How to: Play a Sound with XAudio2)
 			// Create source voice.
 			IXAudio2SourceVoice* raw_source_voice;
@@ -84,13 +96,15 @@ namespace hoffman_isaiah::audio {
 				throw std::runtime_error {"Could not create source voice."};
 			}
 			std::unique_ptr<IXAudio2SourceVoice, DestroyVoice<IXAudio2SourceVoice>> source_voice
-				{raw_source_voice};
+			{raw_source_voice};
 			// Submit audio buffer.
-			if (FAILED(hr = source_voice->SubmitSourceBuffer(&buffer))) {
+			if (FAILED(hr = source_voice->SubmitSourceBuffer(buffer.get()))) {
 				throw std::runtime_error {"Could not provide buffer to source voice."};
 			}
-			// Start the voice.
-			source_voice->Start();
+			// Transfer ownership.
+			this->song_buffers.push_back(std::move(buffer));
+			this->song_voices.push_back(std::move(source_voice));
+
 		}
 		catch (const std::runtime_error&) {
 			if (INVALID_HANDLE_VALUE == my_file || !my_file) {
@@ -99,6 +113,16 @@ namespace hoffman_isaiah::audio {
 			throw;
 		}
 		CloseHandle(my_file);
+	}
+
+	void AudioResources::playSong(int index) {
+		if (this->current_song >= 0 && index != this->current_song) {
+			if (FAILED(this->song_voices.at(this->current_song)->Stop(0U))) {
+				throw std::runtime_error {"Failed to stop playing current song."};
+			}
+		}
+		this->current_song = index;
+		this->song_voices.at(index)->Start(0U);
 	}
 
 	void AudioResources::findChunk(HANDLE my_file, DWORD fourcc, DWORD& chunk_size,

@@ -153,7 +153,8 @@ namespace hoffman_isaiah {
 			// Initialize audio.
 			auto my_audio_resources = std::make_unique<audio::AudioResources>();
 			try {
-				my_audio_resources->playMusic(game::g_my_game->getResourcesPath() + L"music/music02.wav");
+				my_audio_resources->loadSong(game::g_my_game->getResourcesPath() + L"music/Music_124.wav");
+				my_audio_resources->playSong(0);
 			}
 			catch (...) {
 				MessageBox(this->hwnd, L"Failed to load audio.", L"Audio Load Fail", MB_OK | MB_ICONERROR);
