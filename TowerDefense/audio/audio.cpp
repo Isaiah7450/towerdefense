@@ -63,7 +63,7 @@ namespace hoffman_isaiah::audio {
 			// Locate FORMAT chunk and and copy into structure.
 			WAVEFORMATEXTENSIBLE wfx {0};
 			wfx.Format.nSamplesPerSec = 44100;
-			wfx.Format.nChannels = 8;
+			wfx.Format.nChannels = 1;
 			wfx.Format.wFormatTag = WAVE_FORMAT_PCM;
 			this->findChunk(my_file, audio::fourccFMT, dw_chunk_size, dw_chunk_position);
 			this->readChunk(my_file, &wfx, dw_chunk_size, dw_chunk_position);
@@ -78,7 +78,7 @@ namespace hoffman_isaiah::audio {
 			auto raw_buffer = new XAUDIO2_BUFFER;
 			buffer.reset(raw_buffer);
 			buffer->LoopBegin = 0;
-			buffer->LoopCount = 0;
+			buffer->LoopCount = XAUDIO2_LOOP_INFINITE;
 			buffer->LoopLength = 0;
 			buffer->PlayBegin = 0;
 			buffer->PlayLength = 0;
