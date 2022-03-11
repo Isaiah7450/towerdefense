@@ -113,6 +113,49 @@ namespace hoffman_isaiah::winapi {
 		}
 	}
 
+	SettingsDialog::SettingsDialog(HWND owner, HINSTANCE h_inst) {
+		DialogBoxParam(h_inst, MAKEINTRESOURCE(IDD_SETTINGS), owner,
+			SettingsDialog::dialogProc, reinterpret_cast<LPARAM>(this));
+	}
+
+	INT_PTR CALLBACK SettingsDialog::dialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+		switch (msg) {
+		case WM_INITDIALOG:
+		{
+			const auto my_dialog_class = reinterpret_cast<SettingsDialog*>(lparam);
+			my_dialog_class->initDialog(hwnd);
+			return TRUE;
+		}
+		case WM_COMMAND:
+			switch (LOWORD(wparam)) {
+			case IDOK:
+			{
+				EndDialog(hwnd, IDOK);
+				break;
+			}
+			case IDCANCEL:
+				EndDialog(hwnd, IDCANCEL);
+				break;
+			default:
+				break;
+			}
+			break;
+		default:
+			return FALSE;
+		}
+		return TRUE;
+	}
+
+	void SettingsDialog::initDialog(HWND hwnd) {
+		const auto* my_game = game::g_my_game.get();
+		// Probably should find a way to convert this to a string.
+		// Might have to change to enumeration constants; I will need to check how difficult that
+		// will prove.
+		SetDlgItemText(hwnd, IDC_SETTINGS_CHALLENGE_LEVEL,
+			std::to_wstring(my_game->getChallengeLevel()).c_str());
+		SetDlgItemText(hwnd, IDC_SETTINGS_MAP_NAME, my_game->getMapBaseName().c_str());
+	}
+
 	GlobalStatsDialog::GlobalStatsDialog(HWND owner, HINSTANCE h_inst, const game::MyGame& my_game) :
 		highest_score {my_game.getHiscore()},
 		highest_levels {my_game.getHighestLevels()} {

@@ -60,6 +60,19 @@ namespace hoffman_isaiah::winapi {
 		std::wstring map_name {L"default"};
 	};
 
+	/// <summary>This dialog box stores the current map and music settings.</summary>
+	class SettingsDialog : public IDialog {
+	public:
+		/// <param name="owner">Handle to the owning window.</param>
+		/// <param name="h_inst">The hInstance parameter given by the WinMain function.</param>
+		SettingsDialog(HWND owner, HINSTANCE h_inst);
+		// Dialog box procedure.
+		static INT_PTR CALLBACK dialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	protected:
+		void initDialog(HWND hwnd) override;
+	private:
+	};
+
 	/// <summary>Represents a dialog that shows statistics for the player common across all games.</summary>
 	class GlobalStatsDialog : public IDialog {
 	public:
