@@ -148,12 +148,7 @@ namespace hoffman_isaiah::winapi {
 			}
 			case TB_THUMBTRACK:
 			case TB_THUMBPOSITION:
-				if (pos <= 6) {
-					audio::g_my_audio->setVolume(0.1f * static_cast<float>(pos) / 7.f);
-				}
-				else {
-					audio::g_my_audio->setVolume(0.1f * static_cast<float>(pos - 6));
-				}
+				audio::g_my_audio->setVolume(pos);
 				break;
 			default:
 				break;
@@ -245,7 +240,7 @@ namespace hoffman_isaiah::winapi {
 			GetModuleHandle(nullptr), nullptr);
 		SendMessage(this->hwnd_music_vol, TBM_SETRANGE, FALSE, MAKELONG(0, 9));
 		SendMessage(this->hwnd_music_vol, TBM_SETPAGESIZE, 0, 4);
-		SendMessage(this->hwnd_music_vol, TBM_SETPOS, TRUE, 6);
+		SendMessage(this->hwnd_music_vol, TBM_SETPOS, TRUE, audio::g_my_audio->getMusicVolume());
 	}
 
 	GlobalStatsDialog::GlobalStatsDialog(HWND owner, HINSTANCE h_inst, const game::MyGame& my_game) :

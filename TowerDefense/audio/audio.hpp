@@ -47,7 +47,7 @@ namespace hoffman_isaiah {
 				song_voices {},
 				song_buffers {},
 				current_song {-1},
-				music_volume {0.1f},
+				music_volume {6},
 				mute_music {false} {
 				// Probably throw an exception for failure...
 				if (!this->initAudio()) {
@@ -61,6 +61,11 @@ namespace hoffman_isaiah {
 					voice->FlushSourceBuffers();
 				}
 			}
+			// Rule of 5.
+			AudioResources(const AudioResources&) = delete;
+			AudioResources(AudioResources&&) = delete;
+			AudioResources& operator=(const AudioResources&) = delete;
+			AudioResources& operator=(AudioResources&&) = delete;
 
 			/// <summary>Loads a song from the given file into a buffer. This method throws
 			/// an exception if the loading fails.</summary>
@@ -71,16 +76,14 @@ namespace hoffman_isaiah {
 			/// <param name="index">The index of the song based on the order the songs were loaded.</param>
 			void playSong(int index);
 			/// <summary>Sets the volume of music.</summary>
-			/// <param name="new_volume">The new volume of music to use. A 1.0 means
-			/// that the original audio file is played at its normal volume. A 0.0 means
-			/// that the audio is muted.</param>
-			void setVolume(float new_volume);
+			/// <param name="new_volume">The position of the slider.</param>
+			void setVolume(int slider_pos);
 			/// <summary>Starts the playback of music.</summary>
 			void startMusic();
 			/// <summary>Stops the playback of music.</summary>
 			void stopMusic();
 			// Getters
-			float getMusicVolume() const noexcept {
+			int getMusicVolume() const noexcept {
 				return this->music_volume;
 			}
 			bool isMusicMuted() const noexcept {
@@ -118,7 +121,10 @@ namespace hoffman_isaiah {
 			std::vector<std::unique_ptr<XAUDIO2_BUFFER, DeleteBuffer<XAUDIO2_BUFFER>>> song_buffers;
 			/// <summary>Stores the current song being played (so it can be stopped later.)</summary>
 			int current_song;
-			float music_volume;
+			/// <summary>The current volume of music based on the slider's position
+			/// (in the settings menu).</summary>
+			int music_volume;
+			/// <summary>This is true if music should be muted.</summary>
 			bool mute_music;
 		};
 

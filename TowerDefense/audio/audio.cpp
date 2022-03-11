@@ -39,7 +39,7 @@ namespace hoffman_isaiah::audio {
 			return false;
 		}
 		this->master_voice.reset(raw_master_voice);
-		this->setVolume(0.1f);
+		this->setVolume(6);
 		return true;
 	}
 
@@ -127,15 +127,18 @@ namespace hoffman_isaiah::audio {
 		this->song_voices.at(index)->Start(0U);
 	}
 
-	void AudioResources::setVolume(float new_volume) {
+	void AudioResources::setVolume(int slider_pos) {
+		float new_volume = slider_pos <= 6
+			? 0.1f * static_cast<float>(slider_pos) / 7.f
+			: 0.1f * static_cast<float>(slider_pos - 6);
 		// If I ever do sound effects with a separate volume, I will need
 		// to change this code.
 		this->master_voice->SetVolume(new_volume);
-		this->music_volume = new_volume;
+		this->music_volume = slider_pos;
 	}
 
 	void AudioResources::startMusic() {
-		this->master_voice->SetVolume(this->getMusicVolume());
+		this->setVolume(this->getMusicVolume());
 		this->mute_music = false;
 	}
 

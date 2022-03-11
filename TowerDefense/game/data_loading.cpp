@@ -18,6 +18,7 @@
 #include <vector>
 #include "./../file_util.hpp"
 #include "./../globals.hpp"
+#include "./../audio/audio.hpp"
 #include "./../graphics/graphics.hpp"
 #include "./../graphics/shapes.hpp"
 #include "./enemy_type.hpp"
@@ -1356,14 +1357,17 @@ namespace hoffman_isaiah {
 			if (global_data_file.bad() || global_data_file.fail()) {
 				throw util::file::DataFileException {L"Could not open global save file for reading.", 0};
 			}
-			global_data_file << L"V: " << 1 << L"\n";
+			global_data_file << L"V: " << 2 << L"\n";
 			global_data_file << L"CG: " << this->start_custom_games << L"\n";
-			global_data_file << L"HS: " << std::oct << this->highest_score << L" " << std::hex << this->highest_score
+			global_data_file << L"HS: " << std::oct << this->highest_score
+				<< L" " << std::hex << this->highest_score
 				<< L"333 " << std::dec << this->highest_score << L"048" << "\n" << std::dec;
 			for (const auto& high_level_pair : this->highest_levels) {
 				global_data_file << L"H: " << std::hex << high_level_pair.first << L" " << std::hex << high_level_pair.second << L"\n" << std::dec;
 			}
 			global_data_file << L"X: 1233\t85\t518\t112\nE: 421\nZYD: 2909\n";
+			global_data_file << L"AA: " << audio::g_my_audio->getMusicVolume()
+				<< L" " << (audio::g_my_audio->isMusicMuted() ? L"N" : L"Y");
 		}
 
 		void MyGame::loadGlobalData() {
@@ -1398,6 +1402,21 @@ namespace hoffman_isaiah {
 					global_data_file >> std::hex >> difficulty_number >> std::hex >> difficulty_highest >> std::dec >> buffer;
 					// Invalid first values are simply handled silently.
 					this->highest_levels[difficulty_number] = difficulty_highest;
+				}
+				// Read past junk.
+				global_data_file >> buffer >> buffer >> buffer >> buffer >> buffer
+					>> buffer >> buffer >> buffer;
+				if (version >= 2) {
+					// Read settings stuff.
+					global_data_file >> buffer >> buffer;
+					audio::g_my_audio->setVolume(std::stoi(buffer));
+					global_data_file >> buffer;
+					if (buffer[0] == L'Y') {
+						audio::g_my_audio->startMusic();
+					}
+					else {
+						audio::g_my_audio->stopMusic();
+					}
 				}
 			}
 			else {

@@ -158,7 +158,6 @@ namespace hoffman_isaiah {
 				audio::g_my_audio->loadSong(game::g_my_game->getResourcesPath() + L"music/Music_114.wav");
 				audio::g_my_audio->loadSong(game::g_my_game->getResourcesPath() + L"music/Music_115.wav");
 				audio::g_my_audio->loadSong(game::g_my_game->getResourcesPath() + L"music/Music_124.wav");
-				audio::g_my_audio->playSong(audio::town_index);
 			}
 			catch (...) {
 				MessageBox(this->hwnd, L"Failed to load audio.", L"Audio Load Fail", MB_OK | MB_ICONERROR);
@@ -228,6 +227,7 @@ namespace hoffman_isaiah {
 			if (my_game->canStartCustomGames()) {
 				winapi::enableMenuItem(hwnd, 0, ID_MM_FILE_START_CUSTOM_GAME);
 			}
+			audio::g_my_audio->playSong(audio::town_index);
 			// Message Loop
 #pragma warning(push)
 #pragma warning(disable: 26494) // Code Analysis: type.5 --> Always initialize.
@@ -556,6 +556,8 @@ namespace hoffman_isaiah {
 			case ID_MM_FILE_SETTINGS:
 			{
 				const auto my_dialog = winapi::SettingsDialog {hwnd, this->h_instance};
+				// Save any changes to settings.
+				my_game->saveGlobalData();
 				break;
 			}
 			case ID_MM_FILE_QUIT:
