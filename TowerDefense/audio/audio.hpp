@@ -33,6 +33,7 @@ namespace hoffman_isaiah {
 		struct DeleteBuffer {
 			void operator()(T* pT) {
 				delete[] pT->pAudioData;
+				pT->pAudioData = nullptr;
 				delete pT;
 			}
 		};
@@ -51,6 +52,13 @@ namespace hoffman_isaiah {
 				// Probably throw an exception for failure...
 				if (!this->initAudio()) {
 					throw std::runtime_error {"Initialization of audio failed."};
+				}
+			}
+			// Make sure to stop playing any active music.
+			~AudioResources() {
+				for (auto& voice : this->song_voices) {
+					voice->Stop();
+					voice->FlushSourceBuffers();
 				}
 			}
 

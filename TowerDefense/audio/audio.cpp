@@ -79,6 +79,8 @@ namespace hoffman_isaiah::audio {
 			std::unique_ptr<XAUDIO2_BUFFER, DeleteBuffer<XAUDIO2_BUFFER>> buffer {nullptr};
 			auto raw_buffer = new XAUDIO2_BUFFER;
 			buffer.reset(raw_buffer);
+			// The custom deleter will make sure this is deleted properly.
+			buffer->pAudioData = data_buffer.release();
 			buffer->LoopBegin = 0;
 			buffer->LoopCount = XAUDIO2_LOOP_INFINITE;
 			buffer->LoopLength = 0;
@@ -86,8 +88,6 @@ namespace hoffman_isaiah::audio {
 			buffer->PlayLength = 0;
 			buffer->pContext = nullptr;
 			buffer->AudioBytes = dw_chunk_size;
-			// The custom deleter will make sure this is deleted properly.
-			buffer->pAudioData = data_buffer.release();
 			buffer->Flags = XAUDIO2_END_OF_STREAM;
 			// Rest is adapted from XAudio2 documentation (How to: Play a Sound with XAudio2)
 			// Create source voice.
