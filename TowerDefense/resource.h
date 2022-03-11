@@ -112,8 +112,8 @@
 #define IDC_SETTINGS_CHALLENGE_LEVEL            22001
 #define IDC_SETTINGS_MAP_NAME                   22002
 #define IDC_SETTINGS_MUSIC_VOLUME               22003
-#define IDC_SETTINGS_MUSIC_MUTE_YES             22004
-#define IDC_SETTINGS_MUSIC_MUTE_NO              22005
+#define IDC_SETTINGS_MUSIC_PLAY_YES             22004
+#define IDC_SETTINGS_MUSIC_PLAY_NO              22005
 
 #define IDC_GLOBAL_STATS_HISCORE                23001
 #define IDC_GLOBAL_STATS_EASY                   23051

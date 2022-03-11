@@ -39,7 +39,7 @@ namespace hoffman_isaiah::audio {
 			return false;
 		}
 		this->master_voice.reset(raw_master_voice);
-		this->master_voice->SetVolume(0.1f);
+		this->setVolume(0.1f);
 		return true;
 	}
 
@@ -125,6 +125,23 @@ namespace hoffman_isaiah::audio {
 		}
 		this->current_song = index;
 		this->song_voices.at(index)->Start(0U);
+	}
+
+	void AudioResources::setVolume(float new_volume) {
+		// If I ever do sound effects with a separate volume, I will need
+		// to change this code.
+		this->master_voice->SetVolume(new_volume);
+		this->music_volume = new_volume;
+	}
+
+	void AudioResources::startMusic() {
+		this->master_voice->SetVolume(this->getMusicVolume());
+		this->mute_music = false;
+	}
+
+	void AudioResources::stopMusic() {
+		this->master_voice->SetVolume(0.f);
+		this->mute_music = true;
 	}
 
 	void AudioResources::findChunk(HANDLE my_file, DWORD fourcc, DWORD& chunk_size,

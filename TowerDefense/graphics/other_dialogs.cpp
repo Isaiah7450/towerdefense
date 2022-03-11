@@ -10,6 +10,7 @@
 #include "./../resource.h"
 #include "./other_dialogs.hpp"
 #include "./../globals.hpp"
+#include "./../audio/audio.hpp"
 #include "./../game/my_game.hpp"
 namespace hoffman_isaiah::winapi {
 	ChallengeLevelDialog::ChallengeLevelDialog(HWND owner, HINSTANCE h_inst) {
@@ -136,6 +137,32 @@ namespace hoffman_isaiah::winapi {
 			case IDCANCEL:
 				EndDialog(hwnd, IDCANCEL);
 				break;
+			case IDC_SETTINGS_MUSIC_PLAY_YES:
+				if (audio::g_my_audio->isMusicMuted()) {
+					switch (HIWORD(wparam)) {
+					case BN_CLICKED:
+						audio::g_my_audio->startMusic();
+						CheckRadioButton(hwnd, IDC_SETTINGS_MUSIC_PLAY_YES, IDC_SETTINGS_MUSIC_PLAY_NO,
+							IDC_SETTINGS_MUSIC_PLAY_YES);
+						break;
+					default:
+						break;
+					}
+				}
+				break;
+			case IDC_SETTINGS_MUSIC_PLAY_NO:
+				if (!audio::g_my_audio->isMusicMuted()) {
+					switch (HIWORD(wparam)) {
+					case BN_CLICKED:
+						audio::g_my_audio->stopMusic();
+						CheckRadioButton(hwnd, IDC_SETTINGS_MUSIC_PLAY_YES, IDC_SETTINGS_MUSIC_PLAY_NO,
+							IDC_SETTINGS_MUSIC_PLAY_NO);
+						break;
+					default:
+						break;
+					}
+				}
+				break;
 			default:
 				break;
 			}
@@ -154,6 +181,9 @@ namespace hoffman_isaiah::winapi {
 		SetDlgItemText(hwnd, IDC_SETTINGS_CHALLENGE_LEVEL,
 			std::to_wstring(my_game->getChallengeLevel()).c_str());
 		SetDlgItemText(hwnd, IDC_SETTINGS_MAP_NAME, my_game->getMapBaseName().c_str());
+		CheckRadioButton(hwnd, IDC_SETTINGS_MUSIC_PLAY_YES, IDC_SETTINGS_MUSIC_PLAY_NO,
+			audio::g_my_audio->isMusicMuted()
+			? IDC_SETTINGS_MUSIC_PLAY_NO : IDC_SETTINGS_MUSIC_PLAY_YES);
 	}
 
 	GlobalStatsDialog::GlobalStatsDialog(HWND owner, HINSTANCE h_inst, const game::MyGame& my_game) :
