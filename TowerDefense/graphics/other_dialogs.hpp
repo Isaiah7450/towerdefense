@@ -71,6 +71,8 @@ namespace hoffman_isaiah::winapi {
 	protected:
 		void initDialog(HWND hwnd) override;
 	private:
+		/// <summary>Handle to the music volume control.</summary>
+		HWND hwnd_music_vol;
 	};
 
 	/// <summary>Represents a dialog that shows statistics for the player common across all games.</summary>

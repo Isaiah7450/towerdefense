@@ -123,9 +123,44 @@ namespace hoffman_isaiah::winapi {
 		switch (msg) {
 		case WM_INITDIALOG:
 		{
+			SetWindowLongPtr(hwnd, GWLP_USERDATA, lparam);
 			const auto my_dialog_class = reinterpret_cast<SettingsDialog*>(lparam);
 			my_dialog_class->initDialog(hwnd);
 			return TRUE;
+		}
+		case WM_HSCROLL: {
+			int pos = static_cast<int>(HIWORD(wparam));
+			switch (LOWORD(wparam)) {
+			case TB_LINEUP:
+			case TB_LINEDOWN:
+			case TB_TOP:
+			case TB_BOTTOM:
+			case TB_ENDTRACK:
+			case TB_PAGEUP:
+			case TB_PAGEDOWN:
+			{
+				auto& my_dialog_class = *reinterpret_cast<SettingsDialog*>(
+					GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				pos = static_cast<int>(SendMessage(my_dialog_class.hwnd_music_vol,
+					TBM_GETPOS, 0, 0));
+				[[fallthrough]];
+			}
+			case TB_THUMBTRACK:
+			case TB_THUMBPOSITION:
+				if (pos <= 6) {
+					audio::g_my_audio->setVolume(0.1f * static_cast<float>(pos) / 7.f);
+				}
+				else {
+					audio::g_my_audio->setVolume(0.1f * static_cast<float>(pos - 6));
+				}
+				break;
+			default:
+				break;
+			}
+			if (audio::g_my_audio->isMusicMuted()) {
+				audio::g_my_audio->stopMusic();
+			}
+			break;
 		}
 		case WM_COMMAND:
 			switch (LOWORD(wparam)) {
@@ -184,6 +219,18 @@ namespace hoffman_isaiah::winapi {
 		CheckRadioButton(hwnd, IDC_SETTINGS_MUSIC_PLAY_YES, IDC_SETTINGS_MUSIC_PLAY_NO,
 			audio::g_my_audio->isMusicMuted()
 			? IDC_SETTINGS_MUSIC_PLAY_NO : IDC_SETTINGS_MUSIC_PLAY_YES);
+		// There's apparently no way to set this in the resource file, so I have to make it manually...
+		RECT rect {82, 34, 100 + 82, 15 + 34};
+		MapDialogRect(hwnd, &rect);
+		this->hwnd_music_vol = CreateWindowEx(
+			0, TRACKBAR_CLASS, L"Music Volume",
+			WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS | TBS_ENABLESELRANGE,
+			rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top,
+			hwnd, reinterpret_cast<HMENU>(IDC_SETTINGS_MUSIC_VOLUME),
+			GetModuleHandle(nullptr), nullptr);
+		SendMessage(this->hwnd_music_vol, TBM_SETRANGE, FALSE, MAKELONG(0, 9));
+		SendMessage(this->hwnd_music_vol, TBM_SETPAGESIZE, 0, 4);
+		SendMessage(this->hwnd_music_vol, TBM_SETPOS, TRUE, 6);
 	}
 
 	GlobalStatsDialog::GlobalStatsDialog(HWND owner, HINSTANCE h_inst, const game::MyGame& my_game) :
