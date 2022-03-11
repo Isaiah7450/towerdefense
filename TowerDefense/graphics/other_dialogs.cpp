@@ -5,6 +5,7 @@
 #include <commctrl.h>
 #include <map>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include "./../resource.h"
@@ -210,11 +211,25 @@ namespace hoffman_isaiah::winapi {
 
 	void SettingsDialog::initDialog(HWND hwnd) {
 		const auto* my_game = game::g_my_game.get();
-		// Probably should find a way to convert this to a string.
-		// Might have to change to enumeration constants; I will need to check how difficult that
-		// will prove.
-		SetDlgItemText(hwnd, IDC_SETTINGS_CHALLENGE_LEVEL,
-			std::to_wstring(my_game->getChallengeLevel()).c_str());
+		// This should become a function if I use it anywhere else.
+		std::wstring challenge_string {};
+		switch (my_game->getChallengeLevel() + ID_CHALLENGE_LEVEL_EASY) {
+		case ID_CHALLENGE_LEVEL_EASY:
+			challenge_string = L"Beginner";
+			break;
+		case ID_CHALLENGE_LEVEL_NORMAL:
+			challenge_string = L"Intermediate";
+			break;
+		case ID_CHALLENGE_LEVEL_HARD:
+			challenge_string = L"Experienced";
+			break;
+		case ID_CHALLENGE_LEVEL_EXPERT:
+			challenge_string = L"Expert";
+			break;
+		default:
+			throw std::runtime_error {"Internal error: please implement challenge level descriptor."};
+		}
+		SetDlgItemText(hwnd, IDC_SETTINGS_CHALLENGE_LEVEL, challenge_string.c_str());
 		SetDlgItemText(hwnd, IDC_SETTINGS_MAP_NAME, my_game->getMapBaseName().c_str());
 		CheckRadioButton(hwnd, IDC_SETTINGS_MUSIC_PLAY_YES, IDC_SETTINGS_MUSIC_PLAY_NO,
 			audio::g_my_audio->isMusicMuted()
