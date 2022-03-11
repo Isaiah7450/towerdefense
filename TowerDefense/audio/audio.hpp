@@ -45,7 +45,9 @@ namespace hoffman_isaiah {
 				master_voice {nullptr},
 				song_voices {},
 				song_buffers {},
-				current_song {-1} {
+				current_song {-1},
+				music_volume {0.1f},
+				mute_music {false} {
 				// Probably throw an exception for failure...
 				if (!this->initAudio()) {
 					throw std::runtime_error {"Initialization of audio failed."};
@@ -56,11 +58,26 @@ namespace hoffman_isaiah {
 			/// an exception if the loading fails.</summary>
 			/// <param name="file_name">The name of the file to load.</param>
 			void loadSong(std::wstring file_name);
-
 			/// <summary>Plays music from the preloaded songs. This method throws an
 			/// exception if the playing fails.</summary>
 			/// <param name="index">The index of the song based on the order the songs were loaded.</param>
 			void playSong(int index);
+			/// <summary>Sets the volume of music.</summary>
+			/// <param name="new_volume">The new volume of music to use. A 1.0 means
+			/// that the original audio file is played at its normal volume. A 0.0 means
+			/// that the audio is muted.</param>
+			void setVolume(float new_volume);
+			/// <summary>Starts the playback of music.</summary>
+			void startMusic();
+			/// <summary>Stops the playback of music.</summary>
+			void stopMusic();
+			// Getters
+			float getMusicVolume() const noexcept {
+				return this->music_volume;
+			}
+			bool isMusicMuted() const noexcept {
+				return this->mute_music;
+			}
 		private:
 			/// <summary>Initializes the audio engine.</summary>
 			/// <returns>True if the action succeeded otherwise false.</returns>
@@ -93,6 +110,8 @@ namespace hoffman_isaiah {
 			std::vector<std::unique_ptr<XAUDIO2_BUFFER, DeleteBuffer<XAUDIO2_BUFFER>>> song_buffers;
 			/// <summary>Stores the current song being played (so it can be stopped later.)</summary>
 			int current_song;
+			float music_volume;
+			bool mute_music;
 		};
 
 

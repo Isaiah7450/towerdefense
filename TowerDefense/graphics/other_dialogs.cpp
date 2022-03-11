@@ -5,11 +5,13 @@
 #include <commctrl.h>
 #include <map>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include "./../resource.h"
 #include "./other_dialogs.hpp"
 #include "./../globals.hpp"
+#include "./../audio/audio.hpp"
 #include "./../game/my_game.hpp"
 namespace hoffman_isaiah::winapi {
 	ChallengeLevelDialog::ChallengeLevelDialog(HWND owner, HINSTANCE h_inst) {
@@ -111,6 +113,139 @@ namespace hoffman_isaiah::winapi {
 		SendMessage(dlg_clevel, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Expert"));
 		SendMessage(dlg_clevel, CB_SETCURSEL, 1, 0);
 		}
+	}
+
+	SettingsDialog::SettingsDialog(HWND owner, HINSTANCE h_inst) {
+		DialogBoxParam(h_inst, MAKEINTRESOURCE(IDD_SETTINGS), owner,
+			SettingsDialog::dialogProc, reinterpret_cast<LPARAM>(this));
+	}
+
+	INT_PTR CALLBACK SettingsDialog::dialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+		switch (msg) {
+		case WM_INITDIALOG:
+		{
+			SetWindowLongPtr(hwnd, GWLP_USERDATA, lparam);
+			const auto my_dialog_class = reinterpret_cast<SettingsDialog*>(lparam);
+			my_dialog_class->initDialog(hwnd);
+			return TRUE;
+		}
+		case WM_HSCROLL: {
+			int pos = static_cast<int>(HIWORD(wparam));
+			switch (LOWORD(wparam)) {
+			case TB_LINEUP:
+			case TB_LINEDOWN:
+			case TB_TOP:
+			case TB_BOTTOM:
+			case TB_ENDTRACK:
+			case TB_PAGEUP:
+			case TB_PAGEDOWN:
+			{
+				auto& my_dialog_class = *reinterpret_cast<SettingsDialog*>(
+					GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				pos = static_cast<int>(SendMessage(my_dialog_class.hwnd_music_vol,
+					TBM_GETPOS, 0, 0));
+				[[fallthrough]];
+			}
+			case TB_THUMBTRACK:
+			case TB_THUMBPOSITION:
+				if (pos <= 6) {
+					audio::g_my_audio->setVolume(0.1f * static_cast<float>(pos) / 7.f);
+				}
+				else {
+					audio::g_my_audio->setVolume(0.1f * static_cast<float>(pos - 6));
+				}
+				break;
+			default:
+				break;
+			}
+			if (audio::g_my_audio->isMusicMuted()) {
+				audio::g_my_audio->stopMusic();
+			}
+			break;
+		}
+		case WM_COMMAND:
+			switch (LOWORD(wparam)) {
+			case IDOK:
+			{
+				EndDialog(hwnd, IDOK);
+				break;
+			}
+			case IDCANCEL:
+				EndDialog(hwnd, IDCANCEL);
+				break;
+			case IDC_SETTINGS_MUSIC_PLAY_YES:
+				if (audio::g_my_audio->isMusicMuted()) {
+					switch (HIWORD(wparam)) {
+					case BN_CLICKED:
+						audio::g_my_audio->startMusic();
+						CheckRadioButton(hwnd, IDC_SETTINGS_MUSIC_PLAY_YES, IDC_SETTINGS_MUSIC_PLAY_NO,
+							IDC_SETTINGS_MUSIC_PLAY_YES);
+						break;
+					default:
+						break;
+					}
+				}
+				break;
+			case IDC_SETTINGS_MUSIC_PLAY_NO:
+				if (!audio::g_my_audio->isMusicMuted()) {
+					switch (HIWORD(wparam)) {
+					case BN_CLICKED:
+						audio::g_my_audio->stopMusic();
+						CheckRadioButton(hwnd, IDC_SETTINGS_MUSIC_PLAY_YES, IDC_SETTINGS_MUSIC_PLAY_NO,
+							IDC_SETTINGS_MUSIC_PLAY_NO);
+						break;
+					default:
+						break;
+					}
+				}
+				break;
+			default:
+				break;
+			}
+			break;
+		default:
+			return FALSE;
+		}
+		return TRUE;
+	}
+
+	void SettingsDialog::initDialog(HWND hwnd) {
+		const auto* my_game = game::g_my_game.get();
+		// This should become a function if I use it anywhere else.
+		std::wstring challenge_string {};
+		switch (my_game->getChallengeLevel() + ID_CHALLENGE_LEVEL_EASY) {
+		case ID_CHALLENGE_LEVEL_EASY:
+			challenge_string = L"Beginner";
+			break;
+		case ID_CHALLENGE_LEVEL_NORMAL:
+			challenge_string = L"Intermediate";
+			break;
+		case ID_CHALLENGE_LEVEL_HARD:
+			challenge_string = L"Experienced";
+			break;
+		case ID_CHALLENGE_LEVEL_EXPERT:
+			challenge_string = L"Expert";
+			break;
+		default:
+			throw std::runtime_error {"Internal error: please implement challenge level descriptor."};
+		}
+		SetDlgItemText(hwnd, IDC_SETTINGS_CHALLENGE_LEVEL, challenge_string.c_str());
+		SetDlgItemText(hwnd, IDC_SETTINGS_MAP_NAME, my_game->getMapBaseName().c_str());
+		CheckRadioButton(hwnd, IDC_SETTINGS_MUSIC_PLAY_YES, IDC_SETTINGS_MUSIC_PLAY_NO,
+			audio::g_my_audio->isMusicMuted()
+			? IDC_SETTINGS_MUSIC_PLAY_NO : IDC_SETTINGS_MUSIC_PLAY_YES);
+		// There's apparently no way to set this in the resource file, so I have to make it manually...
+		RECT rect {82, 34, 100 + 82, 15 + 34};
+		MapDialogRect(hwnd, &rect);
+		this->hwnd_music_vol = CreateWindowEx(
+			0, TRACKBAR_CLASS, L"Music Volume",
+			WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS | TBS_ENABLESELRANGE,
+			rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top,
+			hwnd, reinterpret_cast<HMENU>(IDC_SETTINGS_MUSIC_VOLUME),
+			GetModuleHandle(nullptr), nullptr);
+		SendMessage(this->hwnd_music_vol, TBM_SETRANGE, FALSE, MAKELONG(0, 9));
+		SendMessage(this->hwnd_music_vol, TBM_SETPAGESIZE, 0, 4);
+		SendMessage(this->hwnd_music_vol, TBM_SETPOS, TRUE, 6);
 	}
 
 	GlobalStatsDialog::GlobalStatsDialog(HWND owner, HINSTANCE h_inst, const game::MyGame& my_game) :

@@ -553,6 +553,11 @@ namespace hoffman_isaiah {
 				handle_update_wm_command(my_game, wparam, lparam);
 				break;
 			}
+			case ID_MM_FILE_SETTINGS:
+			{
+				const auto my_dialog = winapi::SettingsDialog {hwnd, this->h_instance};
+				break;
+			}
 			case ID_MM_FILE_QUIT:
 			{
 				handle_update_wm_command(my_game, ID_MM_FILE_SAVE_GAME, 0);
