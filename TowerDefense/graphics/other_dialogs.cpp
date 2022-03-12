@@ -3,8 +3,10 @@
 #include "./../targetver.hpp"
 #include <Windows.h>
 #include <commctrl.h>
+#include <iomanip>
 #include <map>
 #include <memory>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -284,7 +286,45 @@ namespace hoffman_isaiah::winapi {
 	}
 
 	void PreviewLevelDialog::initDialog(HWND hwnd) {
-		UNREFERENCED_PARAMETER(hwnd);
+		using namespace std::literals::string_literals;
+		SetDlgItemText(hwnd, IDC_PREVIEW_WAVE_LEVEL_NUMBER,
+			(L"Level "s + std::to_wstring(this->my_level.level)).c_str());
+		if (this->my_level.level < 100) {
+			SetDlgItemText(hwnd, IDC_PREVIEW_WAVE_NUM_WAVES,
+				std::to_wstring(this->my_level.waves.size()).c_str());
+			SetDlgItemText(hwnd, IDC_PREVIEW_WAVE_ENEMY_COUNT,
+				std::to_wstring(this->my_level.getEnemyCount()).c_str());
+			// Determine enemy types in the next wave.
+			int total_groups = 0;
+			std::map<std::wstring, int> enemy_types {};
+			for (const auto& w : this->my_level.waves) {
+				for (const auto& g : w->groups) {
+					// (This is guaranteed to start with the right value.)
+					++enemy_types[g->enemies.front()->getBaseType().getName()];
+					++total_groups;
+				}
+			}
+			std::wstringstream my_stream {};
+			const auto prime_stream_for_float = [&my_stream](int prec) {
+				my_stream.str(L"");
+				my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(prec);
+			};
+			const auto hdlg_enames = GetDlgItem(hwnd, IDC_PREVIEW_WAVE_ENEMY_NAMES);
+
+			for (const auto& etype_pair : enemy_types) {
+				prime_stream_for_float(0);
+				my_stream << etype_pair.first << L" ("
+					<< (etype_pair.second * 100.0 / total_groups) << L"%)";
+				SendMessage(hdlg_enames, CB_ADDSTRING, 0,
+					reinterpret_cast<LPARAM>(my_stream.str().c_str()));
+			}
+		}
+		else {
+			SetDlgItemText(hwnd, IDC_PREVIEW_WAVE_DESCRIPTION,
+				L"Congratulations on your victory against the Four Colors!"
+				L" Unfortunately, the information for the next level remains a mystery"
+				L" to all.");
+		}
 	}
 
 	GlobalStatsDialog::GlobalStatsDialog(HWND owner, HINSTANCE h_inst, const game::MyGame& my_game) :
