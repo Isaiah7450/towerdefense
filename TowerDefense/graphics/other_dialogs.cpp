@@ -12,6 +12,7 @@
 #include "./other_dialogs.hpp"
 #include "./../globals.hpp"
 #include "./../audio/audio.hpp"
+#include "./../game/game_level.hpp"
 #include "./../game/my_game.hpp"
 namespace hoffman_isaiah::winapi {
 	ChallengeLevelDialog::ChallengeLevelDialog(HWND owner, HINSTANCE h_inst) {
@@ -241,6 +242,49 @@ namespace hoffman_isaiah::winapi {
 		SendMessage(this->hwnd_music_vol, TBM_SETRANGE, FALSE, MAKELONG(0, 9));
 		SendMessage(this->hwnd_music_vol, TBM_SETPAGESIZE, 0, 4);
 		SendMessage(this->hwnd_music_vol, TBM_SETPOS, TRUE, audio::g_my_audio->getMusicVolume());
+	}
+
+	PreviewLevelDialog::PreviewLevelDialog(HWND owner, HINSTANCE h_inst,
+		const game::GameLevel& my_level_param) :
+		my_level {my_level_param} {
+		DialogBoxParam(h_inst, MAKEINTRESOURCE(IDD_PREVIEW_LEVEL), owner,
+			PreviewLevelDialog::dialogProc, reinterpret_cast<LPARAM>(this));
+	}
+
+	INT_PTR CALLBACK PreviewLevelDialog::dialogProc(HWND hwnd, UINT msg, WPARAM wparam,
+		LPARAM lparam) {
+		switch (msg) {
+		case WM_INITDIALOG:
+		{
+			SetWindowLongPtr(hwnd, GWLP_USERDATA, lparam);
+			[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
+			const auto my_dialog_class = reinterpret_cast<PreviewLevelDialog*>(lparam);
+			my_dialog_class->initDialog(hwnd);
+			}
+			return TRUE;
+		}
+		case WM_COMMAND:
+			switch (LOWORD(wparam)) {
+			case IDOK:
+			{
+				EndDialog(hwnd, IDOK);
+				break;
+			}
+			case IDCANCEL:
+				EndDialog(hwnd, IDCANCEL);
+				break;
+			default:
+				break;
+			}
+			break;
+		default:
+			return FALSE;
+		}
+		return TRUE;
+	}
+
+	void PreviewLevelDialog::initDialog(HWND hwnd) {
+		UNREFERENCED_PARAMETER(hwnd);
 	}
 
 	GlobalStatsDialog::GlobalStatsDialog(HWND owner, HINSTANCE h_inst, const game::MyGame& my_game) :

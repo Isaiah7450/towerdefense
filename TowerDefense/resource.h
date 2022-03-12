@@ -17,7 +17,8 @@
 #define IDD_CHALLENGE_LEVEL                     4001
 #define IDD_START_CUSTOM_GAME                   4002
 #define IDD_SETTINGS                            4003
-#define IDD_GLOBAL_STATS                        4004
+#define IDD_PREVIEW_LEVEL                       4004
+#define IDD_GLOBAL_STATS                        4005
 #define IDD_HELP_ABOUT                          4101
 #define IDD_TERRAIN_NEW_MAP                     4201
 #define IDD_TERRAIN_OPEN_MAP                    4202
@@ -115,16 +116,21 @@
 #define IDC_SETTINGS_MUSIC_PLAY_YES             22004
 #define IDC_SETTINGS_MUSIC_PLAY_NO              22005
 
-#define IDC_GLOBAL_STATS_HISCORE                23001
-#define IDC_GLOBAL_STATS_EASY                   23051
-#define IDC_GLOBAL_STATS_NORMAL                 23052
-#define IDC_GLOBAL_STATS_HARD                   23053
-#define IDC_GLOBAL_STATS_EXPERT                 23054
+#define IDC_PREVIEW_WAVE_LEVEL_NUMBER           23001
+#define IDC_PREVIEW_WAVE_LEVEL_WAVES            23002
+#define IDC_PREVIEW_WAVE_ENEMY_COUNT            23003
+#define IDC_PREVIEW_WAVE_ENEMY_NAMES            23004
 
-#define IDC_TERRAIN_MAP_NAME                    23001
-#define IDC_TERRAIN_NEW_MAP_ROWS                23101
-#define IDC_TERRAIN_NEW_MAP_COLS                23102
-#define IDC_TERRAIN_SAVE_MAP_AS_SHOW_CONFIRM    23202
+#define IDC_GLOBAL_STATS_HISCORE                24001
+#define IDC_GLOBAL_STATS_EASY                   24051
+#define IDC_GLOBAL_STATS_NORMAL                 24052
+#define IDC_GLOBAL_STATS_HARD                   24053
+#define IDC_GLOBAL_STATS_EXPERT                 24054
+
+#define IDC_TERRAIN_MAP_NAME                    25001
+#define IDC_TERRAIN_NEW_MAP_ROWS                25101
+#define IDC_TERRAIN_NEW_MAP_COLS                25102
+#define IDC_TERRAIN_SAVE_MAP_AS_SHOW_CONFIRM    25202
 
 #define ID_MM_FILE_NEW_GAME                     40101
 #define ID_MM_FILE_START_CUSTOM_GAME            40102
