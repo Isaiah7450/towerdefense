@@ -136,8 +136,10 @@ namespace hoffman_isaiah {
 			/// <param name="e">The tower to add.</param>
 			void addTower(std::unique_ptr<Tower>&& t);
 			// Player Actions:
-			/// <summary>Starts the next wave.</summary>
+			/// <summary>Starts the next level.</summary>
 			void startWave();
+			/// <summary>Previews the composition of the next level.</summary>
+			void previewWave();
 			/// <summary>Toggles the pause state of the game.</summary>
 			void togglePause() noexcept {
 				this->is_paused = !this->is_paused;

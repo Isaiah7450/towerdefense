@@ -18,6 +18,7 @@
 #include "./../audio/audio.hpp"
 #include "./../graphics/graphics.hpp"
 #include "./../graphics/graphics_DX.hpp"
+#include "./../graphics/other_dialogs.hpp"
 #include "./../pathfinding/grid.hpp"
 #include "./../pathfinding/pathfinder.hpp"
 #include "./enemy_type.hpp"
@@ -323,6 +324,17 @@ namespace hoffman_isaiah {
 					audio::g_my_audio->playSong(audio::boss_index);
 				}
 			}
+		}
+
+		void MyGame::previewWave() {
+			if (this->isInLevel() || !this->player.isAlive()) {
+				// Can only preview while not in a level.
+				return;
+			}
+			this->load_level_data();
+			const winapi::PreviewLevelDialog preview_dialog {GetActiveWindow(),
+				GetModuleHandle(nullptr), *this->my_level};
+			this->my_level = nullptr;
 		}
 
 		void MyGame::buyHealth() {

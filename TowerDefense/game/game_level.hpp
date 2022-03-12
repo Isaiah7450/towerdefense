@@ -9,6 +9,11 @@
 #include "./enemy.hpp"
 #include "./game_util.hpp"
 
+namespace hoffman_isaiah::winapi {
+	// Forward declarations.
+	class PreviewLevelDialog;
+}
+
 namespace hoffman_isaiah::game {
 	// Forward declarations.
 	class MyGame;
@@ -16,6 +21,7 @@ namespace hoffman_isaiah::game {
 
 	/// <summary>Class that represents a group of homogeneous enemies.</summary>
 	class EnemyGroup {
+		friend class winapi::PreviewLevelDialog;
 	public:
 		/// <param name="group_enemies">The queue of enemies to spawn.</param>
 		/// <param name="spawn_ms_delay">The delay in milliseconds between enemies.</param>
@@ -47,6 +53,7 @@ namespace hoffman_isaiah::game {
 
 	/// <summary>Class that represents a group of smaller groups of enemies.</summary>
 	class EnemyWave {
+		friend class winapi::PreviewLevelDialog;
 	public:
 		/// <param name="wave_groups">The queue of groups to spawn.</param>
 		/// <param name="spawn_ms_delay">The delay in milliseconds between groups.</param>
@@ -89,6 +96,7 @@ namespace hoffman_isaiah::game {
 
 	/// <summary>Class that represents a level in the game.</summary>
 	class GameLevel {
+		friend class winapi::PreviewLevelDialog;
 	public:
 		/// <param name="level_no">The current level number.</param>
 		/// <param name="level_waves">The queue of waves to spawn.</param>
