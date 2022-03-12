@@ -88,6 +88,9 @@ namespace hoffman_isaiah::winapi {
 		void initDialog(HWND hwnd) override;
 	private:
 		const game::GameLevel& my_level;
+		/// <summary>This field is used for quick reference; it stores the list of
+		/// enemy names relevant to the current level in order.</summary>
+		std::vector<std::wstring> names;
 	};
 
 	/// <summary>Represents a dialog that shows statistics for the player common across all games.</summary>

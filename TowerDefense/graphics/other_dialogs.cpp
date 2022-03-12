@@ -13,6 +13,7 @@
 #include "./../resource.h"
 #include "./other_dialogs.hpp"
 #include "./../globals.hpp"
+#include "./../ih_math.hpp"
 #include "./../audio/audio.hpp"
 #include "./../game/game_level.hpp"
 #include "./../game/my_game.hpp"
@@ -278,6 +279,45 @@ namespace hoffman_isaiah::winapi {
 			default:
 				break;
 			}
+			switch (HIWORD(wparam)) {
+			case CBN_SELCHANGE:
+			{
+				const auto my_dialog_class = reinterpret_cast<PreviewLevelDialog*>(
+					GetWindowLongPtr(hwnd, GWLP_USERDATA));
+				int item_index = SendMessage(reinterpret_cast<HWND>(lparam),
+					CB_GETCURSEL, 0, 0);
+				// Update remaining fields to reflect the relevant statistics.
+				// Using global here is unnecessary, but it's faster than making the needed changes.
+				const auto* etype = game::g_my_game->getEnemyType(
+					my_dialog_class->names.at(item_index));
+				std::wstringstream my_stream {};
+				// @TODO: Promote this lambda to an actual function.
+				const auto prime_stream_for_float = [&my_stream](int prec) {
+					my_stream.str(L"");
+					my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(prec);
+				};
+				prime_stream_for_float(0);
+				my_stream << etype->getBaseHealth();
+				SetDlgItemText(hwnd, IDC_INFO_ENEMY_HEALTH, my_stream.str().c_str());
+				prime_stream_for_float(0);
+				my_stream << etype->getBaseArmorHP();
+				SetDlgItemText(hwnd, IDC_INFO_ENEMY_ARMOR_HP, my_stream.str().c_str());
+				prime_stream_for_float(1);
+				my_stream << etype->getBaseWalkingSpeed() << L" cs / s";
+				SetDlgItemText(hwnd, IDC_INFO_ENEMY_WALK_SPEED, my_stream.str().c_str());
+				prime_stream_for_float(1);
+				my_stream << etype->getBaseRunningSpeed() << L" cs / s";
+				SetDlgItemText(hwnd, IDC_INFO_ENEMY_RUN_SPEED, my_stream.str().c_str());
+				prime_stream_for_float(1);
+				my_stream << etype->getBaseInjuredSpeed() << L" cs / s";
+				SetDlgItemText(hwnd, IDC_INFO_ENEMY_INJURED_SPEED, my_stream.str().c_str());
+				SetDlgItemText(hwnd, IDC_INFO_ENEMY_IS_FLYING,
+					etype->isFlying() ? L"Yes" : L"No");
+				break;
+			}
+			default:
+				break;
+			}
 			break;
 		default:
 			return FALSE;
@@ -294,30 +334,45 @@ namespace hoffman_isaiah::winapi {
 				std::to_wstring(this->my_level.waves.size()).c_str());
 			SetDlgItemText(hwnd, IDC_PREVIEW_WAVE_ENEMY_COUNT,
 				std::to_wstring(this->my_level.getEnemyCount()).c_str());
+			std::wstringstream my_stream {};
+			const auto prime_stream_for_float = [&my_stream](int prec) {
+				my_stream.str(L"");
+				my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(prec);
+			};
+			prime_stream_for_float(0);
+			my_stream << (this->my_level.spawn_frame_delay * math::get_milliseconds_per_frame())
+				<< L" ms";
+			SetDlgItemText(hwnd, IDC_PREVIEW_WAVE_WAVE_DELAY,
+				my_stream.str().c_str());
 			// Determine enemy types in the next wave.
 			int total_groups = 0;
+			double total_enemy_frames = 0;
 			std::map<std::wstring, int> enemy_types {};
 			for (const auto& w : this->my_level.waves) {
 				for (const auto& g : w->groups) {
 					// (This is guaranteed to start with the right value.)
 					++enemy_types[g->enemies.front()->getBaseType().getName()];
 					++total_groups;
+					total_enemy_frames += g->spawn_frame_delay;
 				}
 			}
-			std::wstringstream my_stream {};
-			const auto prime_stream_for_float = [&my_stream](int prec) {
-				my_stream.str(L"");
-				my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(prec);
-			};
 			const auto hdlg_enames = GetDlgItem(hwnd, IDC_PREVIEW_WAVE_ENEMY_NAMES);
-
 			for (const auto& etype_pair : enemy_types) {
 				prime_stream_for_float(0);
 				my_stream << etype_pair.first << L" ("
 					<< (etype_pair.second * 100.0 / total_groups) << L"%)";
 				SendMessage(hdlg_enames, CB_ADDSTRING, 0,
 					reinterpret_cast<LPARAM>(my_stream.str().c_str()));
+				this->names.push_back(etype_pair.first);
 			}
+			SendMessage(hdlg_enames, CB_SETCURSEL, 0, 0);
+			SendMessage(hwnd, WM_COMMAND,
+				MAKEWPARAM(IDC_PREVIEW_WAVE_ENEMY_NAMES, CBN_SELCHANGE), 0);
+			prime_stream_for_float(0);
+			my_stream << ((total_enemy_frames * math::get_milliseconds_per_frame())
+				/ total_groups) << L" ms";
+			SetDlgItemText(hwnd, IDC_PREVIEW_WAVE_ENEMY_DELAY,
+				my_stream.str().c_str());
 		}
 		else {
 			SetDlgItemText(hwnd, IDC_PREVIEW_WAVE_DESCRIPTION,

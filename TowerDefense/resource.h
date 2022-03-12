@@ -120,7 +120,9 @@
 #define IDC_PREVIEW_WAVE_DESCRIPTION            23002
 #define IDC_PREVIEW_WAVE_NUM_WAVES              23003
 #define IDC_PREVIEW_WAVE_ENEMY_COUNT            23004
-#define IDC_PREVIEW_WAVE_ENEMY_NAMES            23005
+#define IDC_PREVIEW_WAVE_WAVE_DELAY             23005
+#define IDC_PREVIEW_WAVE_ENEMY_DELAY            23006
+#define IDC_PREVIEW_WAVE_ENEMY_NAMES            23007
 
 #define IDC_GLOBAL_STATS_HISCORE                24001
 #define IDC_GLOBAL_STATS_EASY                   24051
