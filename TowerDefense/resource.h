@@ -135,10 +135,11 @@
 #define ID_MM_FILE_QUIT                         40107
 #define ID_MM_ACTIONS_TOGGLE_PAUSE              40201
 #define ID_MM_ACTIONS_NEXT_WAVE                 40202
-#define ID_MM_ACTIONS_BUY_HEALTH                40203
-#define ID_MM_ACTIONS_CHANGE_SPEED              40204
-#define ID_MM_ACTIONS_TOGGLE_ALL_RADII          40205
-#define ID_MM_ACTIONS_VIEW_GLOBAL_STATS         40206
+#define ID_MM_ACTIONS_PREVIEW_WAVE              40203
+#define ID_MM_ACTIONS_BUY_HEALTH                40204
+#define ID_MM_ACTIONS_CHANGE_SPEED              40205
+#define ID_MM_ACTIONS_TOGGLE_ALL_RADII          40206
+#define ID_MM_ACTIONS_VIEW_GLOBAL_STATS         40207
 #define ID_MM_TOWERS_INFO                       40301
 #define ID_MM_TOWERS_MARK_TILES                 40302
 #define ID_MM_TOWERS_UNMARK_TILES               40303
