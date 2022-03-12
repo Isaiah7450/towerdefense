@@ -575,6 +575,9 @@ namespace hoffman_isaiah {
 				handle_update_wm_command(my_game, wparam, lparam);
 				break;
 			}
+			case ID_MM_ACTIONS_PREVIEW_WAVE:
+				handle_update_wm_command(my_game, wparam, lparam);
+				break;
 			case ID_MM_ACTIONS_TOGGLE_PAUSE:
 			{
 				my_game->togglePause();
@@ -676,6 +679,9 @@ namespace hoffman_isaiah {
 			}
 			case ID_MM_ACTIONS_NEXT_WAVE:
 				my_game->startWave();
+				break;
+			case ID_MM_ACTIONS_PREVIEW_WAVE:
+				my_game->previewWave();
 				break;
 			case ID_MM_ACTIONS_TOGGLE_ALL_RADII:
 				my_game->toggleAllRadii();

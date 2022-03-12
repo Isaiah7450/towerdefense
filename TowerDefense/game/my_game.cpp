@@ -325,6 +325,15 @@ namespace hoffman_isaiah {
 			}
 		}
 
+		void MyGame::previewWave() {
+			if (this->isInLevel() || !this->player.isAlive()) {
+				// Can only preview while not in a level.
+				return;
+			}
+			this->load_level_data();
+			this->my_level = nullptr;
+		}
+
 		void MyGame::buyHealth() {
 			if (this->isInLevel() || !this->player.isAlive()) {
 				// Can't buy health while enemies are attacking or if dead.
