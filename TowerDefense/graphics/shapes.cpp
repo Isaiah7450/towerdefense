@@ -14,27 +14,32 @@
 namespace hoffman_isaiah {
 	namespace graphics::shapes {
 		void Shape2DBase::draw(const Renderer2D& renderer) const noexcept {
-			renderer.drawGeometry(this->transformed_geometry, this->outline_color);
-			renderer.fillGeometry(this->transformed_geometry, this->fill_color);
+			renderer.drawGeometry(this->transformed_geometry.get(), this->outline_color);
+			renderer.fillGeometry(this->transformed_geometry.get(), this->fill_color);
 		}
 
 		void Shape2DBase::recreateGeometry() {
-			const auto my_translate = D2D1::Matrix3x2F::Translation({this->h_translate, this->v_translate});
-			const auto my_rotate = D2D1::Matrix3x2F::Rotation(math::convert_to_degrees<float>(this->theta),
-				D2D1::Point2F(this->center_sx, this->center_sy));
-			const auto my_scale = D2D1::Matrix3x2F::Scale({this->h_scale, this->v_scale}, {this->center_sx, this->center_sy});
+			const auto my_translate
+				= D2D1::Matrix3x2F::Translation({this->h_translate, this->v_translate});
+			const auto my_rotate
+				= D2D1::Matrix3x2F::Rotation(math::convert_to_degrees<float>(this->theta),
+					D2D1::Point2F(this->center_sx, this->center_sy));
+			const auto my_scale
+				= D2D1::Matrix3x2F::Scale({this->h_scale, this->v_scale},
+					{this->center_sx, this->center_sy});
 			const auto my_transform = my_scale * my_rotate * my_translate;
-			// Release old geometry
-			graphics::SafeRelease(&this->transformed_geometry);
-			// Create new geometry
-			this->device_resources->getFactory()->CreateTransformedGeometry(this->path_geometry,
-				my_transform, &this->transformed_geometry);
+			// Create new geometry and transfer ownership.
+			ID2D1TransformedGeometry* raw_transformed_geometry {nullptr};
+			this->device_resources->getFactory()->CreateTransformedGeometry(this->path_geometry.get(),
+				my_transform, &raw_transformed_geometry);
+			this->transformed_geometry.reset(raw_transformed_geometry);
 		}
 
 		bool Shape2DBase::intersect(const Shape2DBase& other_shape) const noexcept {
 			D2D1_GEOMETRY_RELATION relationship {};
 			const HRESULT hr = this->transformed_geometry->CompareWithGeometry(
-				other_shape.transformed_geometry, D2D1::Matrix3x2F::Identity(), &relationship);
+				other_shape.transformed_geometry.get(), D2D1::Matrix3x2F::Identity(),
+				&relationship);
 			return SUCCEEDED(hr) && relationship > D2D1_GEOMETRY_RELATION::D2D1_GEOMETRY_RELATION_DISJOINT;
 		}
 

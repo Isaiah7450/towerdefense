@@ -21,10 +21,7 @@ namespace hoffman_isaiah {
 		class Shape2DBase : public graphics::IDrawable {
 		public:
 			/// <summary>Virtual destructor that releases COM objects.</summary>
-			~Shape2DBase() noexcept {
-				SafeRelease(&this->path_geometry);
-				SafeRelease(&this->transformed_geometry);
-			}
+			~Shape2DBase() noexcept = default;
 			Shape2DBase(const Shape2DBase&) = delete;
 			Shape2DBase(Shape2DBase&&) = default;
 			Shape2DBase& operator=(const Shape2DBase&) = delete;
@@ -55,9 +52,12 @@ namespace hoffman_isaiah {
 			// Transformation Setters
 			/// <param name="dsx">The change in the horizontal translation.</param>
 			/// <param name="dsy">The change in the vertical translation.</param>
-			/// <param name="new_theta">The new rotation angle in radians from the original position.</param>
-			/// <param name="new_hscale">The new horizontal scale factor to apply (with 1.0 = original size).</param>
-			/// <param name="new_vscale">The new vertical scale factor to apply (with 1.0 = original size).</param>
+			/// <param name="new_theta">The new rotation angle in radians from the original
+			/// position.</param>
+			/// <param name="new_hscale">The new horizontal scale factor to apply
+			/// (with 1.0 = original size).</param>
+			/// <param name="new_vscale">The new vertical scale factor to apply
+			/// (with 1.0 = original size).</param>
 			void change_transform(float dsx, float dsy, float new_theta, float new_hscale, float new_vscale) {
 				this->h_translate += dsx;
 				this->v_translate += dsy;
@@ -66,7 +66,8 @@ namespace hoffman_isaiah {
 				this->v_scale = new_vscale;
 				this->recreateGeometry();
 			}
-			/// <summary>Translates the figure in the x and y coordinates from the original position.</summary>
+			/// <summary>Translates the figure in the x and y coordinates from the original
+			/// position.</summary>
 			/// <param name="dsx">The change in the horizontal translation.</param>
 			/// <param name="dsy">The change in the vertical translation.</param>
 			void change_translate(float dsx, float dsy) {
@@ -78,8 +79,10 @@ namespace hoffman_isaiah {
 				this->change_transform(this->h_translate, this->v_translate, new_theta, this->h_scale, this->v_scale);
 			}
 			/// <summary>Changes the scale of the shape.</summary>
-			/// <param name="new_hscale">The new horizontal scale factor to apply (with 1.0 = original size).</param>
-			/// <param name="new_vscale">The new vertical scale factor to apply (with 1.0 = original size).</param>
+			/// <param name="new_hscale">The new horizontal scale factor to apply
+			/// (with 1.0 = original size).</param>
+			/// <param name="new_vscale">The new vertical scale factor to apply
+			/// (with 1.0 = original size).</param>
 			void change_scale(float new_hscale, float new_vscale) {
 				this->change_transform(this->h_translate, this->v_translate, this->theta, new_hscale, new_vscale);
 			}
@@ -90,10 +93,13 @@ namespace hoffman_isaiah {
 				fill_color {f_color},
 				center_sx {csx},
 				center_sy {csy} {
-				const HRESULT hr = this->device_resources->getFactory()->CreatePathGeometry(&this->path_geometry);
+				ID2D1PathGeometry* raw_path_geometry {nullptr};
+				const HRESULT hr = this->device_resources
+					->getFactory()->CreatePathGeometry(&raw_path_geometry);
 				if (FAILED(hr)) {
 					throw std::runtime_error {"Creation of shape geometry failed!"};
 				}
+				this->path_geometry.reset(raw_path_geometry);
 			}
 			/// <summary>Recreates the geometry using the current transformation values.</summary>
 			void recreateGeometry();
@@ -106,9 +112,11 @@ namespace hoffman_isaiah {
 			/// <summary>The color to use to fill in the interior of the shape.</summary>
 			Color fill_color;
 			/// <summary>Pointer to the original path geometry.</summary>
-			ID2D1PathGeometry* path_geometry {nullptr};
+			std::unique_ptr<ID2D1PathGeometry,
+				winapi::ReleaseCOM<ID2D1PathGeometry>> path_geometry {nullptr};
 			/// <summary>Pointer to the geometry after applying transformations.</summary>
-			ID2D1TransformedGeometry* transformed_geometry {nullptr};
+			std::unique_ptr<ID2D1TransformedGeometry,
+				winapi::ReleaseCOM<ID2D1TransformedGeometry>> transformed_geometry {nullptr};
 			/// <summary>The screen x-coordinate of the approximate center of the geometry.</summary>
 			float center_sx;
 			/// <summary>The screen y-coordinate of the approximate center of the geometry.</summary>
@@ -158,8 +166,10 @@ namespace hoffman_isaiah {
 		public:
 			/// <param name="lsx">The screen x-coordinate of the left-most part of the rectangle.</param>
 			/// <param name="tsy">The screen y-coordinate of the top-most part of the rectangle.</param>
-			/// <param name="rsx">The screen x-coordinate of the right-most part of the rectangle.</param>
-			/// <param name="bsy">The screen y-coordinate of the bottom-most part of the rectangle.</param>
+			/// <param name="rsx">The screen x-coordinate of the right-most part of the
+			/// rectangle.</param>
+			/// <param name="bsy">The screen y-coordinate of the bottom-most part of the
+			/// rectangle.</param>
 			Shape2DRectangle(std::shared_ptr<DX::DeviceResources2D> dev_res, Color o_color, Color f_color,
 				float lsx, float tsy, float rsx, float bsy);
 		};
@@ -179,12 +189,13 @@ namespace hoffman_isaiah {
 		template <int N>
 		class Shape2DPolygon : public Shape2DBase {
 		public:
-			/// <param name="points">An array of points containing the screen x and screen y coordinates of
-			/// each point in the polygon.</param>
-			/// <param name="csx">The screen x-coordinate of the polygon's center. Note that invalid values
+			/// <param name="points">An array of points containing the screen x and screen y
+			/// coordinates of each point in the polygon.</param>
+			/// <param name="csx">The screen x-coordinate of the polygon's center.
+			/// Note that invalid values
 			/// could result in transformations not working properly.</param>
-			/// <param name="csy">The screen y-coordinate of the polygon's center. Note that invalid values
-			/// could result in transformations not working properly.</param>
+			/// <param name="csy">The screen y-coordinate of the polygon's center. Note that
+			/// invalid values could result in transformations not working properly.</param>
 			Shape2DPolygon(std::shared_ptr<DX::DeviceResources2D> dev_res, Color o_color, Color f_color,
 				std::array<std::array<float, 2>, N> points, float csx, float csy);
 		};
