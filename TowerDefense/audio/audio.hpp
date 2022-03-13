@@ -6,19 +6,12 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include "./../globals.hpp"
 
 // Created by: Isaiah Hoffman
 // Created on: March 10, 2022
 namespace hoffman_isaiah {
 	namespace audio {
-		// For use with COM pointers
-		template <typename T>
-		struct ReleaseCOM {
-			void operator()(T* pT) {
-				pT->Release();
-			}
-		};
-
 		// For some arcane reason, the cleanup method is different for voices.
 		template <typename T>
 		struct DestroyVoice {
@@ -112,7 +105,7 @@ namespace hoffman_isaiah {
 
 			// Order dependency note: this should be released LAST.
 			/// <summary>Pointer to the XAudio2 engine.</summary>
-			std::unique_ptr<IXAudio2, ReleaseCOM<IXAudio2>> xaudio2;
+			std::unique_ptr<IXAudio2, winapi::ReleaseCOM<IXAudio2>> xaudio2;
 			/// <summary>Pointer to the XAudio2 master voice.</summary>
 			std::unique_ptr<IXAudio2MasteringVoice, DestroyVoice<IXAudio2MasteringVoice>> master_voice;
 			/// <summary>Pointer to the XAudio2 source voice used to play songs.</summary>
