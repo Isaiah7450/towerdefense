@@ -73,24 +73,24 @@ namespace hoffman_isaiah {
 					D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_DEFAULT,
 					D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED)),
 					D2D1::HwndRenderTargetProperties(hwnd, size), &raw_render_target);
-				this->render_target.reset(raw_render_target, winapi::ReleaseCOM<ID2D1HwndRenderTarget>());
+				this->render_target.reset(raw_render_target);
 				// Create brushes
 				const D2D1::ColorF color_black {0.0f, 0.0f, 0.0f, 1.0f};
 				const D2D1::ColorF color_white {1.0f, 1.0f, 1.0f, 1.0f};
 				ID2D1SolidColorBrush* raw_brush {nullptr};
 				if (SUCCEEDED(hr)) {
 					hr = this->render_target->CreateSolidColorBrush(color_black, &raw_brush);
-					this->outline_brush.reset(raw_brush, winapi::ReleaseCOM<ID2D1SolidColorBrush>());
+					this->outline_brush.reset(raw_brush);
 				}
 				raw_brush = nullptr;
 				if (SUCCEEDED(hr)) {
 					hr = this->render_target->CreateSolidColorBrush(color_white, &raw_brush);
-					this->fill_brush.reset(raw_brush, winapi::ReleaseCOM<ID2D1SolidColorBrush>());
+					this->fill_brush.reset(raw_brush);
 				}
 				raw_brush = nullptr;
 				if (SUCCEEDED(hr)) {
 					hr = this->render_target->CreateSolidColorBrush(color_black, &raw_brush);
-					this->text_brush.reset(raw_brush, winapi::ReleaseCOM<ID2D1SolidColorBrush>());
+					this->text_brush.reset(raw_brush);
 				}
 			}
 			return hr;

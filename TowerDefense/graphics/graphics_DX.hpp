@@ -95,18 +95,18 @@ namespace hoffman_isaiah {
 			std::unique_ptr<IDWriteTextFormat, winapi::ReleaseCOM<IDWriteTextFormat>>
 				small_text_format {nullptr};
 			/// <summary>Pointer to the Direct2D rendering target.</summary>
-			std::shared_ptr<ID2D1HwndRenderTarget>
+			std::unique_ptr<ID2D1HwndRenderTarget, winapi::ReleaseCOM<ID2D1HwndRenderTarget>>
 				render_target {nullptr};
 			// ORDER DEPENDENCY: These should be after the render target
 			// so that they are released first.
 			/// <summary>Pointer to the Direct2D brush used for outlining shapes.</summary>
-			std::shared_ptr<ID2D1SolidColorBrush>
+			std::unique_ptr<ID2D1SolidColorBrush, winapi::ReleaseCOM<ID2D1SolidColorBrush>>
 				outline_brush {nullptr};
 			/// <summary>Pointer to the Direct2D brush used for filling shapes.</summary>
-			std::shared_ptr<ID2D1SolidColorBrush>
+			std::unique_ptr<ID2D1SolidColorBrush, winapi::ReleaseCOM<ID2D1SolidColorBrush>>
 				fill_brush {nullptr};
 			/// <summary>Pointer to the Direct2D brush used for text.</summary>
-			std::shared_ptr<ID2D1SolidColorBrush>
+			std::unique_ptr<ID2D1SolidColorBrush, winapi::ReleaseCOM<ID2D1SolidColorBrush>>
 				text_brush {nullptr};
 		};
 	}
