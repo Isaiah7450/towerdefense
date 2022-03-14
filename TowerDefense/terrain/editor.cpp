@@ -140,14 +140,14 @@ namespace hoffman_isaiah {
 
 		void TerrainEditor::run() {
 			// Create resource manager
-			auto my_resources = std::make_shared<graphics::DX::DeviceResources2D>();
+			auto my_resources = std::make_unique<graphics::DX::DeviceResources2D>();
 			// Create resources
 			my_resources->createDeviceIndependentResources();
 			if (FAILED(my_resources->createDeviceResources(this->hwnd))) {
 				winapi::handleWindowsError(L"Creation of Direct2D resources");
 			}
 			// Create renderer
-			auto my_renderer = std::make_unique<graphics::Renderer2D>(my_resources);
+			auto my_renderer = std::make_unique<graphics::Renderer2D>(my_resources.get());
 			// Show window
 			ShowWindow(this->hwnd, SW_SHOWNORMAL);
 			UpdateWindow(this->hwnd);

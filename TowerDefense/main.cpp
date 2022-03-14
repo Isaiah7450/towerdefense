@@ -134,14 +134,14 @@ namespace hoffman_isaiah {
 
 		void MainWindow::run(int n_cmd_show) {
 			// Create resource manager
-			auto my_resources = std::make_shared<graphics::DX::DeviceResources2D>();
+			auto my_resources = std::make_unique<graphics::DX::DeviceResources2D>();
 			// Create resources
 			my_resources->createDeviceIndependentResources();
 			if (FAILED(my_resources->createDeviceResources(this->hwnd))) {
 				winapi::handleWindowsError(L"Creation of Direct2D resources");
 			}
 			// Create renderer
-			auto my_renderer = std::make_unique<graphics::Renderer2D>(my_resources);
+			auto my_renderer = std::make_unique<graphics::Renderer2D>(my_resources.get());
 			// Store in global variable --> It's the only way!
 			// Actually, it isn't, but it's the most intuitive (and least overhead involved) way to do it.
 			// That said, there are costs (mostly management), so I should be careful with this variable.

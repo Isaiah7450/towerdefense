@@ -60,7 +60,7 @@ namespace hoffman_isaiah {
 		/// <summary>Class that handles rendering of 2D elements.</summary>
 		class Renderer2D {
 		public:
-			Renderer2D(std::shared_ptr<DX::DeviceResources2D> dev_res) :
+			Renderer2D(DX::DeviceResources2D* dev_res) :
 				device_resources {dev_res} {
 			}
 			/// <summary>Updates the text for the health option.</summary>
@@ -189,7 +189,7 @@ namespace hoffman_isaiah {
 			void paintMouseSquares(const game::GameMap& map, int mouse_gx, int mouse_gy, int mouse_end_gx, int mouse_end_gy) const noexcept;
 		private:
 			/// <summary>Shared pointer to the resources used by the renderer.</summary>
-			mutable std::shared_ptr<DX::DeviceResources2D> device_resources;
+			mutable graphics::DX::DeviceResources2D* device_resources;
 		};
 	}
 }
