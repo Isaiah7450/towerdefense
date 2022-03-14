@@ -29,10 +29,10 @@ namespace hoffman_isaiah {
 		class Tower : public GameObject {
 			friend class winapi::TowerUpgradeInfoDialog;
 		public:
-			Tower(graphics::DX::DeviceResources2D* dev_res, const GameMap& my_map,
+			Tower(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, const GameMap& my_map,
 				const TowerType* ttype, graphics::Color o_color, double build_gx, double build_gy) :
-				GameObject {dev_res, my_map, ttype->getShape(), o_color, ttype->getColor(),
-				build_gx, build_gy, 0.7f, 0.7f},
+				GameObject {dev_res, my_map, ttype->getShape(), o_color, ttype->getColor(), build_gx, build_gy,
+					0.7f, 0.7f},
 				device_resources {dev_res},
 				base_type {ttype},
 				rating {ttype->getRating()},

@@ -43,7 +43,7 @@ namespace hoffman_isaiah {
 			return SUCCEEDED(hr) && relationship > D2D1_GEOMETRY_RELATION::D2D1_GEOMETRY_RELATION_DISJOINT;
 		}
 
-		Shape2DEllipse::Shape2DEllipse(graphics::DX::DeviceResources2D* dev_res,
+		Shape2DEllipse::Shape2DEllipse(std::shared_ptr<DX::DeviceResources2D> dev_res,
 			Color o_color, Color f_color, float csx, float csy, float sw, float sh) :
 			Shape2DBase {dev_res, o_color, f_color, csx, csy} {
 			ID2D1GeometrySink* raw_geometry_sink {nullptr};
@@ -67,7 +67,7 @@ namespace hoffman_isaiah {
 			this->recreateGeometry();
 		}
 
-		Shape2DTriangle::Shape2DTriangle(graphics::DX::DeviceResources2D* dev_res,
+		Shape2DTriangle::Shape2DTriangle(std::shared_ptr<DX::DeviceResources2D> dev_res,
 			Color o_color, Color f_color,
 			float sx1, float sy1, float sx2, float sy2, float sx3, float sy3) :
 			Shape2DBase {dev_res, o_color, f_color,
@@ -91,7 +91,7 @@ namespace hoffman_isaiah {
 			this->recreateGeometry();
 		}
 
-		Shape2DRectangle::Shape2DRectangle(graphics::DX::DeviceResources2D* dev_res,
+		Shape2DRectangle::Shape2DRectangle(std::shared_ptr<DX::DeviceResources2D> dev_res,
 			Color o_color, Color f_color, float lsx, float tsy, float rsx, float bsy) :
 			Shape2DBase {dev_res, o_color, f_color, (lsx + rsx) / 2.f, (tsy + bsy) / 2.f} {
 			ID2D1GeometrySink* raw_geometry_sink {nullptr};
@@ -114,7 +114,7 @@ namespace hoffman_isaiah {
 		}
 
 
-		Shape2DDiamond::Shape2DDiamond(graphics::DX::DeviceResources2D* dev_res,
+		Shape2DDiamond::Shape2DDiamond(std::shared_ptr<DX::DeviceResources2D> dev_res,
 			Color o_color, Color f_color, float csx, float csy, float sw, float sh) :
 			Shape2DBase {dev_res, o_color, f_color, csx, csy} {
 			ID2D1GeometrySink* raw_geometry_sink {nullptr};

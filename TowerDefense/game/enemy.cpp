@@ -126,13 +126,12 @@ namespace hoffman_isaiah {
 			}
 		}
 
-		Enemy::Enemy(graphics::DX::DeviceResources2D* dev_res, const GameMap& my_map,
+		Enemy::Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, const GameMap& my_map,
 			const EnemyType* etype, graphics::Color o_color,
 			const GameMap& gmap, int level, double difficulty, int challenge_level) :
 			GameObject {dev_res, my_map, etype->getShape(), o_color, etype->getColor(),
 			gmap.getTerrainGraph(etype->isFlying()).getStartNode()->getGameX() + 0.5,
-			gmap.getTerrainGraph(etype->isFlying()).getStartNode()->getGameY() + 0.5,
-			Enemy::gwidth, Enemy::gheight},
+			gmap.getTerrainGraph(etype->isFlying()).getStartNode()->getGameY() + 0.5, Enemy::gwidth, Enemy::gheight},
 			base_type {etype},
 			my_pathfinder {gmap, etype->isFlying(), etype->canMoveDiagonally(), etype->getDefaultStrategy()},
 			my_path {},
@@ -161,12 +160,11 @@ namespace hoffman_isaiah {
 			this->addEnemyBuffs();
 		}
 
-		Enemy::Enemy(graphics::DX::DeviceResources2D* dev_res, const GameMap& my_map,
+		Enemy::Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, const GameMap& my_map,
 			const EnemyType* etype, graphics::Color o_color,
 			pathfinding::Pathfinder pf, double start_gx, double start_gy,
 			int level, double difficulty, int challenge_level) :
-			GameObject {dev_res, my_map, etype->getShape(), o_color, etype->getColor(),
-			start_gx, start_gy, Enemy::gwidth, Enemy::gheight},
+			GameObject {dev_res, my_map, etype->getShape(), o_color, etype->getColor(), start_gx, start_gy, Enemy::gwidth, Enemy::gheight},
 			base_type {etype},
 			my_pathfinder {pf},
 			my_path {pf.getPath()},
