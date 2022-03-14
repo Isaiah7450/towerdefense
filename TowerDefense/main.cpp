@@ -146,7 +146,7 @@ namespace hoffman_isaiah {
 			// Actually, it isn't, but it's the most intuitive (and least overhead involved) way to do it.
 			// That said, there are costs (mostly management), so I should be careful with this variable.
 			// (Particularly in terms of multithreading and synchronization issues.)
-			game::g_my_game = std::make_shared<game::MyGame>(my_resources.get());
+			game::g_my_game = std::make_unique<game::MyGame>(my_resources.get());
 			// Show window
 			ShowWindow(this->hwnd, n_cmd_show);
 			UpdateWindow(this->hwnd);
