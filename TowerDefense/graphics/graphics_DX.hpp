@@ -28,6 +28,7 @@ namespace hoffman_isaiah {
 		public:
 			/// <summary>Default constructor that does nothing.</summary>
 			DeviceResources2D() noexcept = default;
+			/*
 			/// <summary>Releases all COM resources owned by this class.</summary>
 			~DeviceResources2D() noexcept {
 				this->discardDeviceResources();
@@ -36,6 +37,7 @@ namespace hoffman_isaiah {
 			DeviceResources2D(DeviceResources2D&&) = default;
 			DeviceResources2D& operator=(const DeviceResources2D&) = delete;
 			DeviceResources2D& operator=(DeviceResources2D&&) = default;
+			*/
 			/// <summary>Creates resources that are independent of the underlying devices.</summary>
 			void createDeviceIndependentResources();
 			/// <summary>Create resources that are dependent upon the underlying device.</summary>
@@ -83,15 +85,6 @@ namespace hoffman_isaiah {
 			/// <summary>Pointer to the Direct2D factory.</summary>
 			std::shared_ptr<ID2D1Factory>
 				factory {nullptr};
-			/// <summary>Pointer to the Direct2D rendering target.</summary>
-			std::shared_ptr<ID2D1HwndRenderTarget>
-				render_target {nullptr};
-			/// <summary>Pointer to the Direct2D brush used for outlining shapes.</summary>
-			std::shared_ptr<ID2D1SolidColorBrush>
-				outline_brush {nullptr};
-			/// <summary>Pointer to the Direct2D brush used for filling shapes.</summary>
-			std::shared_ptr<ID2D1SolidColorBrush>
-				fill_brush {nullptr};
 			/// <summary>Pointer to the DirectWrite factory.</summary>
 			std::shared_ptr<IDWriteFactory>
 				write_factory {nullptr};
@@ -101,6 +94,17 @@ namespace hoffman_isaiah {
 			/// <summary>Pointer to the text format used for rendering smaller text.</summary>
 			std::shared_ptr<IDWriteTextFormat>
 				small_text_format {nullptr};
+			/// <summary>Pointer to the Direct2D rendering target.</summary>
+			std::shared_ptr<ID2D1HwndRenderTarget>
+				render_target {nullptr};
+			// ORDER DEPENDENCY: These should be after the render target
+			// so that they are released first.
+			/// <summary>Pointer to the Direct2D brush used for outlining shapes.</summary>
+			std::shared_ptr<ID2D1SolidColorBrush>
+				outline_brush {nullptr};
+			/// <summary>Pointer to the Direct2D brush used for filling shapes.</summary>
+			std::shared_ptr<ID2D1SolidColorBrush>
+				fill_brush {nullptr};
 			/// <summary>Pointer to the Direct2D brush used for text.</summary>
 			std::shared_ptr<ID2D1SolidColorBrush>
 				text_brush {nullptr};

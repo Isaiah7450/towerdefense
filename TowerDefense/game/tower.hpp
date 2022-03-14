@@ -187,8 +187,13 @@ namespace hoffman_isaiah {
 			/// <returns>The newly created projectile.</returns>
 			std::unique_ptr<Shot> createShot(const Enemy* target) const;
 		private:
+			// Getters
+			graphics::DX::DeviceResources2D* getDeviceResources() const noexcept {
+				return this->device_resources;
+			}
+			// Fields
 			/// <summary>Pointer to the game's device resources.</summary>
-			std::shared_ptr<graphics::DX::DeviceResources2D> device_resources;
+			graphics::DX::DeviceResources2D* device_resources;
 			/// <summary>The template type of this projectile.</summary>
 			const TowerType* base_type;
 			/// <summary>The number of shots that have been fired since reloading.</summary>
