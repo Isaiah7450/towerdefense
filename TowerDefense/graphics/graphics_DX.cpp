@@ -18,14 +18,14 @@ namespace hoffman_isaiah {
 			if (FAILED(hr)) {
 				winapi::handleWindowsError(L"Creation of Direct2D factory");
 			}
-			this->factory.reset(raw_factory);
+			this->factory.reset(raw_factory, winapi::ReleaseCOM<ID2D1Factory>());
 			IDWriteFactory* raw_write_factory {nullptr};
 			hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory),
 				reinterpret_cast<IUnknown**>(&raw_write_factory));
 			if (FAILED(hr)) {
 				winapi::handleWindowsError(L"Creation of DirectWrite factory");
 			}
-			this->write_factory.reset(raw_write_factory);
+			this->write_factory.reset(raw_write_factory, winapi::ReleaseCOM<IDWriteFactory>());
 			IDWriteTextFormat* raw_text_format {nullptr};
 			hr = this->write_factory->CreateTextFormat(L"Arial", nullptr, DWRITE_FONT_WEIGHT_REGULAR,
 				DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, 14.f,
@@ -33,7 +33,7 @@ namespace hoffman_isaiah {
 			if (FAILED(hr)) {
 				winapi::handleWindowsError(L"Creation of text format");
 			}
-			this->text_format.reset(raw_text_format);
+			this->text_format.reset(raw_text_format, winapi::ReleaseCOM<IDWriteTextFormat>());
 			hr = this->text_format->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
 			if (FAILED(hr)) {
 				winapi::handleWindowsError(L"Horizontal centering of text");
@@ -49,7 +49,7 @@ namespace hoffman_isaiah {
 			if (FAILED(hr)) {
 				winapi::handleWindowsError(L"Creation of small text format");
 			}
-			this->small_text_format.reset(raw_text_format);
+			this->small_text_format.reset(raw_text_format, winapi::ReleaseCOM<IDWriteTextFormat>());
 			hr = this->small_text_format->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
 			if (FAILED(hr)) {
 				winapi::handleWindowsError(L"Horizontal centering of small text");

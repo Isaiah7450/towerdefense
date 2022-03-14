@@ -81,7 +81,7 @@ namespace hoffman_isaiah {
 			}
 		private:
 			/// <summary>Pointer to the Direct2D factory.</summary>
-			std::unique_ptr<ID2D1Factory, winapi::ReleaseCOM<ID2D1Factory>>
+			std::shared_ptr<ID2D1Factory>
 				factory {nullptr};
 			/// <summary>Pointer to the Direct2D rendering target.</summary>
 			ID2D1HwndRenderTarget* render_target {nullptr};
@@ -90,13 +90,13 @@ namespace hoffman_isaiah {
 			/// <summary>Pointer to the Direct2D brush used for filling shapes.</summary>
 			ID2D1SolidColorBrush* fill_brush {nullptr};
 			/// <summary>Pointer to the DirectWrite factory.</summary>
-			std::unique_ptr<IDWriteFactory, winapi::ReleaseCOM<IDWriteFactory>>
+			std::shared_ptr<IDWriteFactory>
 				write_factory {nullptr};
 			/// <summary>Pointer to the text format (used with DirectWrite).</summary>
-			std::unique_ptr<IDWriteTextFormat, winapi::ReleaseCOM<IDWriteTextFormat>>
+			std::shared_ptr<IDWriteTextFormat>
 				text_format {nullptr};
 			/// <summary>Pointer to the text format used for rendering smaller text.</summary>
-			std::unique_ptr<IDWriteTextFormat, winapi::ReleaseCOM<IDWriteTextFormat>>
+			std::shared_ptr<IDWriteTextFormat>
 				small_text_format {nullptr};
 			/// <summary>Pointer to the Direct2D brush used for text.</summary>
 			ID2D1SolidColorBrush* text_brush {nullptr};
