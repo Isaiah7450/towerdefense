@@ -1409,7 +1409,12 @@ namespace hoffman_isaiah {
 				if (version >= 2) {
 					// Read settings stuff.
 					global_data_file >> buffer >> buffer;
-					audio::g_my_audio->setVolume(std::stoi(buffer));
+					try {
+						audio::g_my_audio->setVolume(std::stoi(buffer));
+					}
+					catch (...) {
+						throw util::file::DataFileException {L"Invalid data found.", 1};
+					}
 					global_data_file >> buffer;
 					if (buffer[0] == L'Y') {
 						audio::g_my_audio->startMusic();
