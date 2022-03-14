@@ -19,7 +19,7 @@ namespace hoffman_isaiah {
 		/// <summary>Represents a projectile.</summary>
 		class Shot : public GameObject {
 		public:
-			Shot(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, const GameMap& my_map,
+			Shot(graphics::DX::DeviceResources2D* dev_res, const GameMap& my_map,
 				const ShotBaseType* stype, graphics::Color o_color, const Tower& ot, double angle);
 
 			/// <summary>Advances the projectile's state by one logical frame.</summary>

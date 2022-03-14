@@ -37,7 +37,7 @@ namespace hoffman_isaiah {
 	namespace game {
 		std::shared_ptr<MyGame> g_my_game {nullptr};
 
-		MyGame::MyGame(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res) :
+		MyGame::MyGame(graphics::DX::DeviceResources2D* dev_res) :
 			device_resources {dev_res},
 			highest_levels {{ID_CHALLENGE_LEVEL_EASY, 0}, {ID_CHALLENGE_LEVEL_NORMAL, 0},
 				{ID_CHALLENGE_LEVEL_HARD, 0}, {ID_CHALLENGE_LEVEL_EXPERT, 0}} {
@@ -406,7 +406,8 @@ namespace hoffman_isaiah {
 				return;
 			}
 			this->player.changeMoney(-this->getTowerType(this->getSelectedTower())->getCost());
-			auto my_tower = std::make_unique<Tower>(this->device_resources, this->getMap(), this->getTowerType(this->getSelectedTower()),
+			auto my_tower = std::make_unique<Tower>(this->device_resources, this->getMap(),
+				this->getTowerType(this->getSelectedTower()),
 				graphics::Color {0.f, 0.f, 0.f, 1.0f}, gx + 0.5, gy + 0.5);
 			this->addTower(std::move(my_tower));
 			this->debugUpdate(DebugUpdateStates::Terrain_Changed);
