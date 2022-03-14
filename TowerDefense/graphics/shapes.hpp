@@ -17,6 +17,8 @@ namespace hoffman_isaiah {
 			Ellipse, Triangle, Rectangle, Diamond, Star
 		};
 
+		// NOTE: If I try allowing resizing, I will need to recreate the geometries
+		// to account for the new dimensions.
 		/// <summary>Abstract base class for all shapes.</summary>
 		class Shape2DBase : public graphics::IDrawable {
 		public:
