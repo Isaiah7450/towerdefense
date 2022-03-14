@@ -61,6 +61,9 @@ namespace hoffman_isaiah {
 				180.f, D2D1_SWEEP_DIRECTION_COUNTER_CLOCKWISE, D2D1_ARC_SIZE_SMALL));
 			geom_sink->EndFigure(D2D1_FIGURE_END_CLOSED);
 			hr = geom_sink->Close();
+			if (FAILED(hr)) {
+				throw std::runtime_error {"Could not close geometry sink."};
+			}
 			this->recreateGeometry();
 		}
 
@@ -82,6 +85,9 @@ namespace hoffman_isaiah {
 			geom_sink->AddLine(D2D1::Point2F(sx3, sy3));
 			geom_sink->EndFigure(D2D1_FIGURE_END_CLOSED);
 			hr = geom_sink->Close();
+			if (FAILED(hr)) {
+				throw std::runtime_error {"Could not close geometry sink."};
+			}
 			this->recreateGeometry();
 		}
 
@@ -101,6 +107,9 @@ namespace hoffman_isaiah {
 			geom_sink->AddLine(D2D1::Point2F(rsx, tsy));
 			geom_sink->EndFigure(D2D1_FIGURE_END_CLOSED);
 			hr = geom_sink->Close();
+			if (FAILED(hr)) {
+				throw std::runtime_error {"Could not close geometry sink."};
+			}
 			this->recreateGeometry();
 		}
 
@@ -121,6 +130,9 @@ namespace hoffman_isaiah {
 			geom_sink->AddLine(D2D1::Point2F(csx, csy + sh / 2.f));
 			geom_sink->EndFigure(D2D1_FIGURE_END_CLOSED);
 			hr = geom_sink->Close();
+			if (FAILED(hr)) {
+				throw std::runtime_error {"Could not close geometry sink."};
+			}
 			this->recreateGeometry();
 		}
 	}

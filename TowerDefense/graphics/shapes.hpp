@@ -20,8 +20,8 @@ namespace hoffman_isaiah {
 		/// <summary>Abstract base class for all shapes.</summary>
 		class Shape2DBase : public graphics::IDrawable {
 		public:
-			/// <summary>Virtual destructor that releases COM objects.</summary>
-			~Shape2DBase() noexcept = default;
+			// Virtual destructor and rule of 5.
+			virtual ~Shape2DBase() noexcept = default;
 			Shape2DBase(const Shape2DBase&) = delete;
 			Shape2DBase(Shape2DBase&&) = default;
 			Shape2DBase& operator=(const Shape2DBase&) = delete;
@@ -58,7 +58,8 @@ namespace hoffman_isaiah {
 			/// (with 1.0 = original size).</param>
 			/// <param name="new_vscale">The new vertical scale factor to apply
 			/// (with 1.0 = original size).</param>
-			void change_transform(float dsx, float dsy, float new_theta, float new_hscale, float new_vscale) {
+			void change_transform(float dsx, float dsy, float new_theta,
+				float new_hscale, float new_vscale) {
 				this->h_translate += dsx;
 				this->v_translate += dsy;
 				this->theta = new_theta;
@@ -76,7 +77,8 @@ namespace hoffman_isaiah {
 			/// <summary>Changes the rotation of the shape.</summary>
 			/// <param name="new_theta">The new rotation angle in radians. Note that this value is relative to the original.</param>
 			void change_rotation(float new_theta) {
-				this->change_transform(this->h_translate, this->v_translate, new_theta, this->h_scale, this->v_scale);
+				this->change_transform(this->h_translate, this->v_translate,
+					new_theta, this->h_scale, this->v_scale);
 			}
 			/// <summary>Changes the scale of the shape.</summary>
 			/// <param name="new_hscale">The new horizontal scale factor to apply
@@ -84,10 +86,12 @@ namespace hoffman_isaiah {
 			/// <param name="new_vscale">The new vertical scale factor to apply
 			/// (with 1.0 = original size).</param>
 			void change_scale(float new_hscale, float new_vscale) {
-				this->change_transform(this->h_translate, this->v_translate, this->theta, new_hscale, new_vscale);
+				this->change_transform(this->h_translate, this->v_translate,
+					this->theta, new_hscale, new_vscale);
 			}
 		protected:
-			Shape2DBase(std::shared_ptr<DX::DeviceResources2D> dev_res, Color o_color, Color f_color, float csx, float csy) :
+			Shape2DBase(std::shared_ptr<DX::DeviceResources2D> dev_res,
+				Color o_color, Color f_color, float csx, float csy) :
 				device_resources {dev_res},
 				outline_color {o_color},
 				fill_color {f_color},
@@ -145,9 +149,8 @@ namespace hoffman_isaiah {
 				float csx, float csy, float sw, float sh);
 		};
 
-		// Note that Triangle, Rectangle, Diamond, and Star
-		// exist for convenience and could be also represented using
-		// Polygon.
+		// Note that Triangle, Rectangle, and Diamond exist for
+		// convenience and could be also represented using Polygon.
 		/// <summary>Shape that represents a triangle.</summary>
 		class Shape2DTriangle : public Shape2DBase {
 		public:
@@ -170,8 +173,8 @@ namespace hoffman_isaiah {
 			/// rectangle.</param>
 			/// <param name="bsy">The screen y-coordinate of the bottom-most part of the
 			/// rectangle.</param>
-			Shape2DRectangle(std::shared_ptr<DX::DeviceResources2D> dev_res, Color o_color, Color f_color,
-				float lsx, float tsy, float rsx, float bsy);
+			Shape2DRectangle(std::shared_ptr<DX::DeviceResources2D> dev_res,
+				Color o_color, Color f_color, float lsx, float tsy, float rsx, float bsy);
 		};
 
 		/// <summary>Shape that represents a diamond.</summary>
@@ -181,8 +184,8 @@ namespace hoffman_isaiah {
 			/// <param name="tsy">The screen y-coordinate of the center of the diamond.</param>
 			/// <param name="rsx">The width in screen coordinates of the diamond.</param>
 			/// <param name="bsy">The height in screen coordinates of the diamond.</param>
-			Shape2DDiamond(std::shared_ptr<DX::DeviceResources2D> dev_res, Color o_color, Color f_color,
-				float csx, float csy, float sw, float sh);
+			Shape2DDiamond(std::shared_ptr<DX::DeviceResources2D> dev_res,
+				Color o_color, Color f_color, float csx, float csy, float sw, float sh);
 		};
 		// Represents a N-sided polygon
 		// N --> The number of sides of the polygon
@@ -191,9 +194,8 @@ namespace hoffman_isaiah {
 		public:
 			/// <param name="points">An array of points containing the screen x and screen y
 			/// coordinates of each point in the polygon.</param>
-			/// <param name="csx">The screen x-coordinate of the polygon's center.
-			/// Note that invalid values
-			/// could result in transformations not working properly.</param>
+			/// <param name="csx">The screen x-coordinate of the polygon's center. Note
+			/// that invalid values could result in transformations not working properly.</param>
 			/// <param name="csy">The screen y-coordinate of the polygon's center. Note that
 			/// invalid values could result in transformations not working properly.</param>
 			Shape2DPolygon(std::shared_ptr<DX::DeviceResources2D> dev_res, Color o_color, Color f_color,
@@ -203,8 +205,8 @@ namespace hoffman_isaiah {
 		// Templates must be defined in the same file as they are declared...
 		template <int N>
 		Shape2DPolygon<N>::Shape2DPolygon(std::shared_ptr<DX::DeviceResources2D> dev_res,
-			Color o_color, Color f_color, std::array<std::array<float, 2>, N> points,
-			float csx, float csy) :
+			Color o_color, Color f_color, 
+			std::array<std::array<float, 2>, N> points, float csx, float csy) :
 			Shape2DBase {dev_res, o_color, f_color, csx, csy} {
 			ID2D1GeometrySink* raw_geometric_sink {nullptr};
 			HRESULT hr = this->path_geometry->Open(&raw_geometric_sink);
@@ -219,6 +221,9 @@ namespace hoffman_isaiah {
 			}
 			geom_sink->EndFigure(D2D1_FIGURE_END_CLOSED);
 			hr = geom_sink->Close();
+			if (FAILED(hr)) {
+				throw std::runtime_error {"Could not close geometry sink."};
+			}
 			this->recreateGeometry();
 		}
 	}
