@@ -45,26 +45,26 @@ namespace hoffman_isaiah {
 			/// <summary>Releases the rendering target and associated brushes
 			/// that are device-dependent resources.</summary>
 			void discardDeviceResources() noexcept {
-				SafeRelease(&this->text_brush);
-				SafeRelease(&this->fill_brush);
-				SafeRelease(&this->outline_brush);
-				SafeRelease(&this->render_target);
+				this->text_brush = nullptr;
+				this->fill_brush = nullptr;
+				this->outline_brush = nullptr;
+				this->render_target = nullptr;
 			}
 
 			// Getters
 			// (I plan on performing non-constant actions on these
 			// returns, so these getters are not marked constant.)
 			ID2D1HwndRenderTarget* getRenderTarget() noexcept {
-				return this->render_target;
+				return this->render_target.get();
 			}
 			ID2D1SolidColorBrush* getOutlineBrush() noexcept {
-				return this->outline_brush;
+				return this->outline_brush.get();
 			}
 			ID2D1SolidColorBrush* getFillBrush() noexcept {
-				return this->fill_brush;
+				return this->fill_brush.get();
 			}
 			ID2D1SolidColorBrush* getTextBrush() noexcept {
-				return this->text_brush;
+				return this->text_brush.get();
 			}
 			ID2D1Factory* getFactory() noexcept {
 				return this->factory.get();
@@ -84,11 +84,14 @@ namespace hoffman_isaiah {
 			std::shared_ptr<ID2D1Factory>
 				factory {nullptr};
 			/// <summary>Pointer to the Direct2D rendering target.</summary>
-			ID2D1HwndRenderTarget* render_target {nullptr};
+			std::shared_ptr<ID2D1HwndRenderTarget>
+				render_target {nullptr};
 			/// <summary>Pointer to the Direct2D brush used for outlining shapes.</summary>
-			ID2D1SolidColorBrush* outline_brush {nullptr};
+			std::shared_ptr<ID2D1SolidColorBrush>
+				outline_brush {nullptr};
 			/// <summary>Pointer to the Direct2D brush used for filling shapes.</summary>
-			ID2D1SolidColorBrush* fill_brush {nullptr};
+			std::shared_ptr<ID2D1SolidColorBrush>
+				fill_brush {nullptr};
 			/// <summary>Pointer to the DirectWrite factory.</summary>
 			std::shared_ptr<IDWriteFactory>
 				write_factory {nullptr};
@@ -99,8 +102,8 @@ namespace hoffman_isaiah {
 			std::shared_ptr<IDWriteTextFormat>
 				small_text_format {nullptr};
 			/// <summary>Pointer to the Direct2D brush used for text.</summary>
-			ID2D1SolidColorBrush* text_brush {nullptr};
-
+			std::shared_ptr<ID2D1SolidColorBrush>
+				text_brush {nullptr};
 		};
 	}
 }
