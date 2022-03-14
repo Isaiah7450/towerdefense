@@ -90,7 +90,7 @@ namespace hoffman_isaiah {
 					this->theta, new_hscale, new_vscale);
 			}
 		protected:
-			Shape2DBase(std::shared_ptr<DX::DeviceResources2D> dev_res,
+			Shape2DBase(graphics::DX::DeviceResources2D* dev_res,
 				Color o_color, Color f_color, float csx, float csy) :
 				device_resources {dev_res},
 				outline_color {o_color},
@@ -110,7 +110,7 @@ namespace hoffman_isaiah {
 
 			// (Really no reason to keep this all private.)
 			/// <summary>Pointer to the device resources in use.</summary>
-			std::shared_ptr<DX::DeviceResources2D> device_resources;
+			DX::DeviceResources2D* device_resources;
 			/// <summary>The color to use to outline the shape.</summary>
 			Color outline_color;
 			/// <summary>The color to use to fill in the interior of the shape.</summary>
@@ -145,7 +145,7 @@ namespace hoffman_isaiah {
 			/// <param name="csy">The screen y-coordinate of the center of the ellipse.</param>
 			/// <param name="sw">The width in screen coordinates of the ellipse.</param>
 			/// <param name="sh">The height in screen coordinates of the ellipse.</param>
-			Shape2DEllipse(std::shared_ptr<DX::DeviceResources2D> dev_res, Color o_color, Color f_color,
+			Shape2DEllipse(graphics::DX::DeviceResources2D* dev_res, Color o_color, Color f_color,
 				float csx, float csy, float sw, float sh);
 		};
 
@@ -160,7 +160,7 @@ namespace hoffman_isaiah {
 			/// <param name="sy2">The screen y-coordinate of the second point.</param>
 			/// <param name="sx3">The screen x-coordinate of the third point.</param>
 			/// <param name="sy3">The screen y-coordinate of the third point.</param>
-			Shape2DTriangle(std::shared_ptr<DX::DeviceResources2D> dev_res, Color o_color, Color f_color,
+			Shape2DTriangle(graphics::DX::DeviceResources2D* dev_res, Color o_color, Color f_color,
 				float sx1, float sy1, float sx2, float sy2, float sx3, float sy3);
 		};
 
@@ -173,7 +173,7 @@ namespace hoffman_isaiah {
 			/// rectangle.</param>
 			/// <param name="bsy">The screen y-coordinate of the bottom-most part of the
 			/// rectangle.</param>
-			Shape2DRectangle(std::shared_ptr<DX::DeviceResources2D> dev_res,
+			Shape2DRectangle(graphics::DX::DeviceResources2D* dev_res,
 				Color o_color, Color f_color, float lsx, float tsy, float rsx, float bsy);
 		};
 
@@ -184,7 +184,7 @@ namespace hoffman_isaiah {
 			/// <param name="tsy">The screen y-coordinate of the center of the diamond.</param>
 			/// <param name="rsx">The width in screen coordinates of the diamond.</param>
 			/// <param name="bsy">The height in screen coordinates of the diamond.</param>
-			Shape2DDiamond(std::shared_ptr<DX::DeviceResources2D> dev_res,
+			Shape2DDiamond(graphics::DX::DeviceResources2D* dev_res,
 				Color o_color, Color f_color, float csx, float csy, float sw, float sh);
 		};
 		// Represents a N-sided polygon
@@ -198,13 +198,13 @@ namespace hoffman_isaiah {
 			/// that invalid values could result in transformations not working properly.</param>
 			/// <param name="csy">The screen y-coordinate of the polygon's center. Note that
 			/// invalid values could result in transformations not working properly.</param>
-			Shape2DPolygon(std::shared_ptr<DX::DeviceResources2D> dev_res, Color o_color, Color f_color,
+			Shape2DPolygon(graphics::DX::DeviceResources2D* dev_res, Color o_color, Color f_color,
 				std::array<std::array<float, 2>, N> points, float csx, float csy);
 		};
 
 		// Templates must be defined in the same file as they are declared...
 		template <int N>
-		Shape2DPolygon<N>::Shape2DPolygon(std::shared_ptr<DX::DeviceResources2D> dev_res,
+		Shape2DPolygon<N>::Shape2DPolygon(graphics::DX::DeviceResources2D* dev_res,
 			Color o_color, Color f_color, 
 			std::array<std::array<float, 2>, N> points, float csx, float csy) :
 			Shape2DBase {dev_res, o_color, f_color, csx, csy} {

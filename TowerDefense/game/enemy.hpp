@@ -34,7 +34,8 @@ namespace hoffman_isaiah {
 			public:
 				/// <param name="effect">The status effect type.</param>
 				/// <param name="resist">The percentage resistance.</param>
-				/// <param name="ms_until_expires">The number of milliseconds until the resistance expires.</param>
+				/// <param name="ms_until_expires">The number of milliseconds until
+				/// the resistance expires.</param>
 				StatusResistance(StatusEffects effect, double resist, int ms_until_expire) noexcept;
 				/// <summary>Updates the status resistance.</summary>
 				void update();
@@ -50,20 +51,23 @@ namespace hoffman_isaiah {
 					return this->status_resist;
 				}
 			private:
-				/// <summary>The status effect this structure is storing resistance information about.</summary>
+				/// <summary>The status effect for which this structure is storing resistance
+				/// information.</summary>
 				StatusEffects status_effect;
 				/// <summary>The enemy's current resistance to the status affliction.</summary>
 				double status_resist;
-				/// <summary>The number of frames until the enemy's resistance to the status affliction expires.</summary>
+				/// <summary>The number of frames until the enemy's resistance
+				/// to the status affliction expires.</summary>
 				double frames_until_expire;
-				/// <summary>The number of times the enemy has been inflicted by this status affliction.</summary>
+				/// <summary>The number of times the enemy has been inflicted by this
+				/// status affliction.</summary>
 				int num_times {1};
 			};
 
-			Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, const GameMap& my_map,
+			Enemy(graphics::DX::DeviceResources2D* dev_res, const GameMap& my_map,
 				const EnemyType* etype, graphics::Color o_color,
 				const GameMap& gmap, int level, double difficulty, int challenge_level);
-			Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, const GameMap& my_map,
+			Enemy(graphics::DX::DeviceResources2D* dev_res, const GameMap& my_map,
 				const EnemyType* etype, graphics::Color o_color,
 				pathfinding::Pathfinder pf, double start_gx, double start_gy,
 				int level, double difficulty, int challenge_level);

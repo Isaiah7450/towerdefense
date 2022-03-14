@@ -38,8 +38,8 @@ namespace hoffman_isaiah::game {
 		int extra_count, const MyGame& my_game) {
 		const int enemy_count = etype->isUnique()
 			? 1 + extra_count : my_game.getChallengeLevel() + extra_count + 2;
-		pathfinding::Pathfinder my_pathfinder {my_game.getMap(), etype->isFlying(), etype->canMoveDiagonally(),
-			etype->getDefaultStrategy()};
+		pathfinding::Pathfinder my_pathfinder {my_game.getMap(), etype->isFlying(),
+			etype->canMoveDiagonally(), etype->getDefaultStrategy()};
 		my_pathfinder.findPath(my_game.getChallengeLevel() / 10.0);
 		std::queue<std::unique_ptr<Enemy>> my_enemy_spawns {};
 		std::vector<std::future<std::unique_ptr<Enemy>>> enemy_asyncs {};
@@ -159,7 +159,8 @@ namespace hoffman_isaiah::game {
 		const int wave_groups_overflow = num_groups % num_waves;
 		std::deque<std::unique_ptr<EnemyWave>> my_level_waves {};
 		for (int w = 0; w < num_waves; ++w) {
-			if ((level_number - this->getStartLevel()) % this->boss_level_mod == 0 && level_number > start_level
+			if ((level_number - this->getStartLevel()) % this->boss_level_mod == 0
+				&& level_number > start_level
 				&& w == num_waves / 2) {
 				// Boss level; add boss enemies.
 				const int groups_in_this_wave = this->rollNumBosses(levels_above_start);
@@ -177,7 +178,8 @@ namespace hoffman_isaiah::game {
 					}
 					std::queue<std::unique_ptr<Enemy>> group_enemies {
 						EnemyGroup::createEnemies(my_etype, extra_count, my_game)};
-					auto my_enemy_group = std::make_unique<EnemyGroup>(std::move(group_enemies), enemy_delay);
+					auto my_enemy_group = std::make_unique<EnemyGroup>(
+						std::move(group_enemies), enemy_delay);
 					my_wave_groups.emplace_back(std::move(my_enemy_group));
 				}
 				auto my_enemy_wave = std::make_unique<EnemyWave>(std::move(my_wave_groups),
@@ -222,7 +224,8 @@ namespace hoffman_isaiah::game {
 				auto my_enemy_group = std::make_unique<EnemyGroup>(std::move(group_enemies), enemy_delay);
 				my_wave_groups.emplace_back(std::move(my_enemy_group));
 			}
-			auto my_enemy_wave = std::make_unique<EnemyWave>(std::move(my_wave_groups), this->getGroupDelay());
+			auto my_enemy_wave = std::make_unique<EnemyWave>(
+				std::move(my_wave_groups), this->getGroupDelay());
 			my_level_waves.emplace_back(std::move(my_enemy_wave));
 		}
 		auto my_level = std::make_unique<GameLevel>(level_number,
