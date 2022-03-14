@@ -259,13 +259,14 @@ namespace hoffman_isaiah {
 				const double gdx = target->getGameX() - this->getGameX();
 				const double gdy = target->getGameY() - this->getGameY();
 				const double theta = std::atan2(gdy, gdx);
-				return std::make_unique<Shot>(this->device_resources, this->getGameMap(), stype, graphics::Color {1.f, 0.f, 1.f, 1.f},
-					*this, theta);
+				return std::make_unique<Shot>(this->device_resources.get(), this->getGameMap(),
+					stype, graphics::Color {1.f, 0.f, 1.f, 1.f}, *this, theta);
 			}
 			++this->angle_index;
 			this->angle_index %= this->getBaseType()->getFiringMethod().getAngles().size();
 			// Note that the y-axis is inverted, so we need to correct the angle used here.
-			return std::make_unique<Shot>(this->device_resources, this->getGameMap(), stype, graphics::Color {1.f, 0.f, 1.f, 1.f},
+			return std::make_unique<Shot>(this->device_resources.get(), this->getGameMap(),
+				stype, graphics::Color {1.f, 0.f, 1.f, 1.f},
 				*this, -this->getBaseType()->getFiringMethod().getAngles().at(this->angle_index));
 		}
 	}

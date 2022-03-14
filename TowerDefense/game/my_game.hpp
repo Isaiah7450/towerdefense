@@ -83,7 +83,7 @@ namespace hoffman_isaiah {
 			friend class graphics::Renderer2D;
 		public:
 			// Other stuff
-			MyGame(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res);
+			MyGame(graphics::DX::DeviceResources2D* dev_res);
 			~MyGame() noexcept;
 			// Rule of 5:
 			MyGame(const MyGame&) = delete;
@@ -183,7 +183,7 @@ namespace hoffman_isaiah {
 				this->in_custom_game = is_custom;
 			}
 			// Getters
-			std::shared_ptr<graphics::DX::DeviceResources2D> getDeviceResources() const noexcept {
+			graphics::DX::DeviceResources2D* getDeviceResources() const noexcept {
 				return this->device_resources;
 			}
 			GameMap& getMap() noexcept {
@@ -351,7 +351,7 @@ namespace hoffman_isaiah {
 			}
 		private:
 			/// <summary>Shared pointer to the device resources.</summary>
-			std::shared_ptr<graphics::DX::DeviceResources2D> device_resources;
+			graphics::DX::DeviceResources2D* device_resources;
 			/// <summary>The base name of the current map.</summary>
 			std::wstring map_base_name {L"intermediate"};
 			/// <summary>The game map being used by the program.</summary>

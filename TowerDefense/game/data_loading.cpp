@@ -1316,8 +1316,9 @@ namespace hoffman_isaiah {
 					if (!my_type) {
 						throw std::runtime_error {"Error: Tower does not exist!"};
 					}
-					auto my_tower = std::make_unique<Tower>(this->getDeviceResources(), this->getMap(), my_type,
-						graphics::Color {0.f, 0.f, 0.f, 1.f}, tower_gx, tower_gy);
+					auto my_tower = std::make_unique<Tower>(this->getDeviceResources(),
+						this->getMap(), my_type, graphics::Color {0.f, 0.f, 0.f, 1.f},
+						tower_gx, tower_gy);
 					if (version >= 2) {
 						// Special code to handle upgrades (while not breaking old files.)
 						int tower_lv;
