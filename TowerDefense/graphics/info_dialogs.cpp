@@ -338,21 +338,30 @@ namespace hoffman_isaiah::winapi {
 	void TowerInfoDialog::initDialog(HWND hwnd) {
 		this->setCommonControls(hwnd);
 		const auto& my_ttype = dynamic_cast<const game::TowerType&>(this->getType());
-		SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_METHOD, my_ttype.getFiringMethod().getReferenceName().c_str());
-		SetDlgItemText(hwnd, IDC_INFO_TOWER_TARGETING_STRATEGY, my_ttype.getTargetingStrategy().getReferenceName().c_str());
 		std::wstringstream my_stream {};
-		// Add ammo types.
-		const auto hdlg_ammo = GetDlgItem(hwnd, IDC_INFO_TOWER_AMMO_TYPES);
-		for (const auto& st_pair : my_ttype.getShotTypes()) {
-			my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(0)
-				<< (st_pair.second * 100) << L"%";
-			const std::wstring ammo_string = st_pair.first->getName() + L": " + my_stream.str();
-			my_stream.str(L"");
-			[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
-			SendMessage(hdlg_ammo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(ammo_string.c_str()));
-			}
+		if (my_ttype.isWall()) {
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_METHOD, L"N/A");
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_TARGETING_STRATEGY, L"N/A");
+			const auto hdlg_ammo = GetDlgItem(hwnd, IDC_INFO_TOWER_AMMO_TYPES);
+			SendMessage(hdlg_ammo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Not Applicable"));
+			SendMessage(hdlg_ammo, CB_SETCURSEL, 0, 0);
 		}
-		SendMessage(hdlg_ammo, CB_SETCURSEL, 0, 0);
+		else {
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_METHOD, my_ttype.getFiringMethod().getReferenceName().c_str());
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_TARGETING_STRATEGY, my_ttype.getTargetingStrategy().getReferenceName().c_str());
+			// Add ammo types.
+			const auto hdlg_ammo = GetDlgItem(hwnd, IDC_INFO_TOWER_AMMO_TYPES);
+			for (const auto& st_pair : my_ttype.getShotTypes()) {
+				my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(0)
+					<< (st_pair.second * 100) << L"%";
+				const std::wstring ammo_string = st_pair.first->getName() + L": " + my_stream.str();
+				my_stream.str(L"");
+				[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
+				SendMessage(hdlg_ammo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(ammo_string.c_str()));
+				}
+			}
+			SendMessage(hdlg_ammo, CB_SETCURSEL, 0, 0);
+		}
 		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
 			<< my_ttype.getFiringSpeed() << L" / s";
 		SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_SPEED, my_stream.str().c_str());
@@ -421,8 +430,8 @@ namespace hoffman_isaiah::winapi {
 				this->my_tower.getBaseType()->getTargetingStrategy().getReferenceName().c_str());
 		}
 		else {
-			SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_METHOD, L"Not Applicable");
-			SetDlgItemText(hwnd, IDC_INFO_TOWER_TARGETING_STRATEGY, L"Not Applicable");
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_METHOD, L"N/A");
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_TARGETING_STRATEGY, L"N/A");
 			[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
 			SendMessage(hdlg_ammo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Not Applicable"));
 			}

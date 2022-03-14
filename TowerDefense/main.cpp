@@ -607,8 +607,7 @@ namespace hoffman_isaiah {
 			}
 			case ID_MM_TOWERS_INFO:
 			{
-				// (Yes, walls are explicitly excluded heree.)
-				if (my_game->getSelectedTower() >= 1
+				if (my_game->getSelectedTower() >= 0
 					&& static_cast<size_t>(my_game->getSelectedTower())
 					< my_game->getAllTowerTypes().size()) {
 					const auto pause_state = my_game->isPaused();
