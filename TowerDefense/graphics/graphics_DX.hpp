@@ -83,16 +83,16 @@ namespace hoffman_isaiah {
 			}
 		private:
 			/// <summary>Pointer to the Direct2D factory.</summary>
-			std::shared_ptr<ID2D1Factory>
+			std::unique_ptr<ID2D1Factory, winapi::ReleaseCOM<ID2D1Factory>>
 				factory {nullptr};
 			/// <summary>Pointer to the DirectWrite factory.</summary>
-			std::shared_ptr<IDWriteFactory>
+			std::unique_ptr<IDWriteFactory, winapi::ReleaseCOM<IDWriteFactory>>
 				write_factory {nullptr};
 			/// <summary>Pointer to the text format (used with DirectWrite).</summary>
-			std::shared_ptr<IDWriteTextFormat>
+			std::unique_ptr<IDWriteTextFormat, winapi::ReleaseCOM<IDWriteTextFormat>>
 				text_format {nullptr};
 			/// <summary>Pointer to the text format used for rendering smaller text.</summary>
-			std::shared_ptr<IDWriteTextFormat>
+			std::unique_ptr<IDWriteTextFormat, winapi::ReleaseCOM<IDWriteTextFormat>>
 				small_text_format {nullptr};
 			/// <summary>Pointer to the Direct2D rendering target.</summary>
 			std::shared_ptr<ID2D1HwndRenderTarget>
