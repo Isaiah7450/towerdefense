@@ -202,21 +202,23 @@ namespace hoffman_isaiah {
 
 		// Templates must be defined in the same file as they are declared...
 		template <int N>
-		Shape2DPolygon<N>::Shape2DPolygon(std::shared_ptr<DX::DeviceResources2D> dev_res, Color o_color, Color f_color,
-			std::array<std::array<float, 2>, N> points, float csx, float csy) :
+		Shape2DPolygon<N>::Shape2DPolygon(std::shared_ptr<DX::DeviceResources2D> dev_res,
+			Color o_color, Color f_color, std::array<std::array<float, 2>, N> points,
+			float csx, float csy) :
 			Shape2DBase {dev_res, o_color, f_color, csx, csy} {
-			ID2D1GeometrySink* geom_sink {nullptr};
-			HRESULT hr = this->path_geometry->Open(&geom_sink);
+			ID2D1GeometrySink* raw_geometric_sink {nullptr};
+			HRESULT hr = this->path_geometry->Open(&raw_geometric_sink);
 			if (FAILED(hr)) {
 				throw std::runtime_error {"Could not open geometry sink to define shape."};
 			}
+			std::unique_ptr<ID2D1GeometrySink, winapi::ReleaseCOM<ID2D1GeometrySink>>
+				geom_sink {raw_geometric_sink};
 			geom_sink->BeginFigure(D2D1::Point2F(points[0][0], points[0][1]), D2D1_FIGURE_BEGIN_FILLED);
 			for (unsigned int i = 1; i < points.size(); ++i) {
 				geom_sink->AddLine(D2D1::Point2F(points[i][0], points[i][1]));
 			}
 			geom_sink->EndFigure(D2D1_FIGURE_END_CLOSED);
 			hr = geom_sink->Close();
-			SafeRelease(&geom_sink);
 			this->recreateGeometry();
 		}
 	}
