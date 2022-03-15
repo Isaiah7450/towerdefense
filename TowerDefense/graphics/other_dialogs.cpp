@@ -284,8 +284,8 @@ namespace hoffman_isaiah::winapi {
 			{
 				const auto my_dialog_class = reinterpret_cast<PreviewLevelDialog*>(
 					GetWindowLongPtr(hwnd, GWLP_USERDATA));
-				int item_index = SendMessage(reinterpret_cast<HWND>(lparam),
-					CB_GETCURSEL, 0, 0);
+				int item_index = static_cast<int>(SendMessage(reinterpret_cast<HWND>(lparam),
+					CB_GETCURSEL, 0, 0));
 				// Update remaining fields to reflect the relevant statistics.
 				// Using global here is unnecessary, but it's faster than making the needed changes.
 				const auto* etype = game::g_my_game->getEnemyType(
