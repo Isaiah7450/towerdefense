@@ -329,6 +329,8 @@ namespace hoffman_isaiah::winapi {
 		using namespace std::literals::string_literals;
 		SetDlgItemText(hwnd, IDC_PREVIEW_WAVE_LEVEL_NUMBER,
 			(L"Level "s + std::to_wstring(this->my_level.level)).c_str());
+		SetDlgItemText(hwnd, IDC_PREVIEW_WAVE_DESCRIPTION,
+			this->my_level.getDesc().c_str());
 		if (this->my_level.level < 100) {
 			SetDlgItemText(hwnd, IDC_PREVIEW_WAVE_NUM_WAVES,
 				std::to_wstring(this->my_level.waves.size()).c_str());
