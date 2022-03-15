@@ -680,7 +680,13 @@ namespace hoffman_isaiah {
 				my_game->startWave();
 				break;
 			case ID_MM_ACTIONS_PREVIEW_WAVE:
-				my_game->previewWave();
+				try {
+					my_game->previewWave();
+				}
+				catch (const util::file::DataFileException& e) {
+					MessageBox(hwnd, (L"Error: Level loading failed:\n"s + e.what()).c_str(),
+						L"Preview Level Failed", MB_OK | MB_ICONWARNING);
+				}
 				break;
 			case ID_MM_ACTIONS_TOGGLE_ALL_RADII:
 				my_game->toggleAllRadii();
