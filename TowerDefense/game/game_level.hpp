@@ -99,9 +99,11 @@ namespace hoffman_isaiah::game {
 		friend class winapi::PreviewLevelDialog;
 	public:
 		/// <param name="level_no">The current level number.</param>
+		/// <param name="level_desc">The description for the level.</param>
 		/// <param name="level_waves">The queue of waves to spawn.</param>
 		/// <param name="spawn_ms_delay">The delay in milliseconds between waves.</param>
-		GameLevel(int level_no, std::deque<std::unique_ptr<EnemyWave>>&& level_waves, int spawn_ms_delay);
+		GameLevel(int level_no, std::wstring level_desc,
+			std::deque<std::unique_ptr<EnemyWave>>&& level_waves, int spawn_ms_delay);
 		/// <summary>Updates the state of the game level by one logical frame.</summary>
 		void update() noexcept;
 		/// <returns>The number of enemies left to spawn in the level.</returns>
@@ -127,12 +129,20 @@ namespace hoffman_isaiah::game {
 			}
 			return true;
 		}
+		// Getters
+		std::wstring getDesc() const noexcept {
+			return this->desc;
+		}
 	private:
 		/// <summary>The level number of this level.</summary>
 		int level;
+		/// <summary>A description for the level. This can be used for flavor or to
+		/// alert the player to special threats on the upcoming level.</summary>
+		std::wstring desc;
 		/// <summary>The waves of enemies in this level left to spawn.</summary>
 		std::deque<std::unique_ptr<EnemyWave>> waves;
-		/// <summary>The list of waves for this level that are currently (or have finished) spawning enemies.</summary>
+		/// <summary>The list of waves for this level that are currently (or have finished)
+		/// spawning enemies.</summary>
 		std::vector<std::unique_ptr<EnemyWave>> active_waves;
 		/// <summary>The number of logical frames between when waves start to spawn enemies.</summary>
 		double spawn_frame_delay;

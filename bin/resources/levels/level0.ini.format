@@ -7,8 +7,13 @@
 [global]
 # This number is the format version of the data file (so that backwards
 # compatibility can be maintained if I update the format.)
-# You should set this number to 1 for now.
-version = 1
+# You should set this number to 2. Version 2 introduced a description field.
+version = 2
+# This field allows you to add a description. This can be used for general
+# flavor. It can also be used to warn the player about upcoming threats.
+# Try to keep descriptions to about 300 characters or less; more may not
+# fit on-screen.
+description = "Enter description."
 # The is the amount of time (in milliseconds) between the spawning of waves
 # in the level. Generally speaking, you don't want all the waves spawning
 # at once, so values in the range of 5'000ms to 15'000ms are generally

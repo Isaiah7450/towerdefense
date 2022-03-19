@@ -99,8 +99,13 @@ namespace hoffman_isaiah {
 					return false;
 				}
 				if (prev == L'\\') {
-					if (this->lookahead == L'\\' || this->lookahead == L'"') {
+					if (this->lookahead == L'\\' || this->lookahead == L'"'
+						|| this->lookahead == L'n') {
 						this->token.erase(this->token.end() - 1);
+					}
+					if (this->lookahead == L'n') {
+						this->token += L'\n';
+						continue;
 					}
 				}
 				else if (this->lookahead == L'"') {

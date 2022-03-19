@@ -83,9 +83,10 @@ namespace hoffman_isaiah::game {
 		this->groups.pop_back();
 	}
 
-	GameLevel::GameLevel(int level_no, std::deque<std::unique_ptr<EnemyWave>>&& level_waves,
-		int spawn_ms_delay) :
+	GameLevel::GameLevel(int level_no, std::wstring level_desc,
+		std::deque<std::unique_ptr<EnemyWave>>&& level_waves, int spawn_ms_delay) :
 		level {level_no},
+		desc {level_desc},
 		waves {std::move(level_waves)},
 		active_waves {},
 		spawn_frame_delay {math::convertMillisecondsToFrames(spawn_ms_delay)},
@@ -228,7 +229,7 @@ namespace hoffman_isaiah::game {
 				std::move(my_wave_groups), this->getGroupDelay());
 			my_level_waves.emplace_back(std::move(my_enemy_wave));
 		}
-		auto my_level = std::make_unique<GameLevel>(level_number,
+		auto my_level = std::make_unique<GameLevel>(level_number, L"",
 			std::move(my_level_waves), this->getWaveDelay());
 		return my_level;
 	}

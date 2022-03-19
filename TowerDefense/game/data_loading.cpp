@@ -1080,7 +1080,16 @@ namespace hoffman_isaiah {
 			// Global section
 			my_parser.expectToken(util::file::TokenTypes::Section, L"global"s);
 			my_parser.readKeyValue(L"version"s);
-			my_parser.expectToken(util::file::TokenTypes::Number, L"1"s);
+			const int version = my_parser.parseNumber<int>();
+			if (version < 1 || version > 2) {
+				throw util::file::DataFileException {L"Version field should be 2.",
+					my_parser.getLine()};
+			}
+			std::wstring desc = L"No description available.";
+			if (version == 2) {
+				my_parser.readKeyValue(L"description");
+				desc = my_parser.parseString();
+			}
 			my_parser.readKeyValue(L"wave_spawn_delay"s);
 			const int wave_spawn_delay = static_cast<int>(my_parser.parseNumber());
 			util::file::DataFileParser::validateNumber(wave_spawn_delay, 500, 60'000,
@@ -1129,7 +1138,7 @@ namespace hoffman_isaiah {
 				auto my_wave = std::make_unique<EnemyWave>(std::move(my_wave_groups), group_spawn_delay);
 				my_level_waves.emplace_front(std::move(my_wave));
 			} while (my_parser.getNext());
-			this->my_level = std::make_unique<GameLevel>(this->level, std::move(my_level_waves), wave_spawn_delay);
+			this->my_level = std::make_unique<GameLevel>(this->level, desc, std::move(my_level_waves), wave_spawn_delay);
 		}
 
 		void MyGame::saveGame(std::wostream& save_file) const {
