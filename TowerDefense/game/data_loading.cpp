@@ -1166,7 +1166,7 @@ namespace hoffman_isaiah {
 				0x1 : HP Buy Cost
 				0x2 : Player money
 			 */
-			save_file << L"HEADER\n" << 5 << L"\n";
+			save_file << L"HEADER\n" << 6 << L"\n";
 			save_file << std::hex << 0x0 << L" " << 0x0 << L" " << 0x1 << L" "
 				<< 0x0 << L" " << this->getChallengeLevel() << L" "
 				<< 0x3 << L" " << 0x1 << L" "
@@ -1187,6 +1187,17 @@ namespace hoffman_isaiah {
 			// Output influence map
 			save_file << this->getMap().getInfluenceGraph(false) << L"\n";
 			save_file << this->getMap().getInfluenceGraph(true) << L"\n";
+			// Output highlight graph data.
+			const auto highlight_rows = this->getMap().getHighlightGraph().getRows();
+			const auto highlight_cols = this->getMap().getHighlightGraph().getColumns();
+			save_file << highlight_rows << L" " << highlight_cols << L"\n";
+			for (int i = 0; i < highlight_rows; ++i) {
+				for (int j = 0; j < highlight_cols; ++j) {
+					// Converting from row-column to x-y means reversing the order.
+					save_file << this->getMap().getHighlightGraph().getNode(j, i).isBlocked() << L" ";
+				}
+			}
+			save_file << L"\n";
 			// Output towers as well.
 			for (const auto& t : this->towers) {
 				save_file << L"T: " << t->getBaseType()->getName() << L"\n\tT: " << t->getGameX() << L" "
@@ -1302,6 +1313,21 @@ namespace hoffman_isaiah {
 			pathfinding::Grid air_influence_map {};
 			save_file >> ground_influence_map >> air_influence_map;
 			this->map->setInfluenceGraphs(ground_influence_map, air_influence_map);
+			// Marked tiles.
+			if (version >= 6) {
+				int highlight_rows;
+				int highlight_cols;
+				save_file >> highlight_rows >> highlight_cols;
+				for (int i = 0; i < highlight_rows; ++i) {
+					for (int j = 0; j < highlight_cols; ++j) {
+						// ith row, jth col corresponds to x = j, y = i
+						save_file >> buffer;
+						if (buffer == L"1") {
+							this->map->getHighlightGraph().getNode(j, i).setBlockage(true);
+						}
+					}
+				}
+			}
 			while (save_file >> buffer) {
 				if (buffer == L"T:") {
 					// Towers
