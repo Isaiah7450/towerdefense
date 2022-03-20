@@ -600,6 +600,9 @@ namespace hoffman_isaiah {
 				handle_update_wm_command(my_game, wparam, lparam);
 				break;
 			}
+			case ID_MM_ACTIONS_UNMARK_ALL_TILES:
+				handle_update_wm_command(my_game, wparam, lparam);
+				break;
 			case ID_MM_ACTIONS_VIEW_GLOBAL_STATS:
 			{
 				const winapi::GlobalStatsDialog my_dialog {this->getHWND(), this->h_instance, *my_game};
@@ -691,6 +694,16 @@ namespace hoffman_isaiah {
 			case ID_MM_ACTIONS_TOGGLE_ALL_RADII:
 				my_game->toggleAllRadii();
 				break;
+			case ID_MM_ACTIONS_UNMARK_ALL_TILES:
+			{
+				for (int i = 0; i < my_game->getMap().getRows(); ++i) {
+					for (int j = 0; j < my_game->getMap().getColumns(); ++j) {
+						// ith row, jth column becomes (j, i) in Cartesian coordinates.
+						my_game->getMap().getHighlightGraph().getNode(j, i).setBlockage(false);
+					}
+				}
+				break;
+			}
 			case ID_MM_TOWERS_BUY_TOWER:
 			{
 				const auto my_gx = static_cast<int>(GET_X_LPARAM(lparam));

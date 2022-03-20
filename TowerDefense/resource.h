@@ -148,7 +148,8 @@
 #define ID_MM_ACTIONS_BUY_HEALTH                40204
 #define ID_MM_ACTIONS_CHANGE_SPEED              40205
 #define ID_MM_ACTIONS_TOGGLE_ALL_RADII          40206
-#define ID_MM_ACTIONS_VIEW_GLOBAL_STATS         40207
+#define ID_MM_ACTIONS_UNMARK_ALL_TILES          40207
+#define ID_MM_ACTIONS_VIEW_GLOBAL_STATS         40208
 #define ID_MM_TOWERS_INFO                       40301
 #define ID_MM_TOWERS_MARK_TILES                 40302
 #define ID_MM_TOWERS_UNMARK_TILES               40303
