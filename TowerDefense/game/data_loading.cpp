@@ -13,6 +13,7 @@
 #include <set>
 #include <stdexcept>
 #include <string>
+#include <thread>
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -59,6 +60,7 @@ namespace hoffman_isaiah {
 					CreateDirectory(this->resources_folder_path.c_str(), nullptr);
 					CreateDirectory((this->resources_folder_path + L"levels/").c_str(), nullptr);
 					CreateDirectory((this->resources_folder_path + L"graphs/").c_str(), nullptr);
+					CreateDirectory((this->resources_folder_path + L"music/").c_str(), nullptr);
 					this->userdata_folder_path = my_path + L"userdata/"s;
 					CreateDirectory(this->userdata_folder_path.c_str(), nullptr);
 					// Reload the correct file.
@@ -69,16 +71,44 @@ namespace hoffman_isaiah {
 					}
 					my_parser.readKeyValue(L"do_copy");
 					if (my_parser.parseBoolean()) {
+						std::vector<std::thread> my_threads {};
+						my_threads.emplace_back([]() {
+							MessageBox(GetActiveWindow(), L"Copying files... Please be patient.",
+								L"First Time Startup Notice", MB_ICONINFORMATION | MB_OK);
+						});
 						// Copy needed files.
 						// This is really lazy code, but no real harm done.
 						for (int i = 1; i < 9999; ++i) {
-							const std::wstring level_str = L"levels/level" + std::to_wstring(i) + L".ini";
-							CopyFile((L"./resources/" + level_str).c_str(), (this->resources_folder_path + level_str).c_str(), FALSE);
+							my_threads.emplace_back([&, i]() {
+								const std::wstring level_str = L"levels/level"
+									+ std::to_wstring(i) + L".ini";
+								CopyFile((L"./resources/" + level_str).c_str(),
+									(this->resources_folder_path + level_str).c_str(), FALSE);
+							});
+						}
+						for (int i = 100; i < 1000; ++i) {
+							my_threads.emplace_back([&, i]() {
+								const std::wstring music_str1 = L"music/Music_"
+									+ std::to_wstring(i) + L".wav";
+								CopyFile((L"./resources/" + music_str1).c_str(),
+									(this->resources_folder_path + music_str1).c_str(), FALSE);
+							});
+						}
+						for (int i = 1; i < 10; ++i) {
+							my_threads.emplace_back([&, i]() {
+								const std::wstring music_str2 = L"music/music0"
+									+ std::to_wstring(i) + L".wav";
+								CopyFile((L"./resources/" + music_str2).c_str(),
+									(this->resources_folder_path + music_str2).c_str(), FALSE);
+							});
 						}
 						const std::wstring my_resources[] = {
-							L"enemies.ini", L"enemies.ini.format", L"shots.ini", L"shots.ini.format", L"towers.ini",
-							L"towers.ini.format", L"tower_upgrades.ini", L"tower_upgrades.ini.format", L"other.ini",
-							L"levels/global.ini", L"levels/global.ini.format", L"levels/level0.ini.format", L"levels/levels.xlsx",
+							L"enemies.ini", L"enemies.ini.format", L"shots.ini", L"shots.ini.format",
+							L"towers.ini", L"towers.ini.format",
+							L"tower_upgrades.ini", L"tower_upgrades.ini.format", L"other.ini",
+							L"levels/global.ini", L"levels/global.ini.format",
+							L"levels/level0.ini.format",
+							// L"levels/levels.xlsx",
 							L"graphs/air_graph_beginner.txt", L"graphs/air_graph_intermediate.txt",
 							L"graphs/air_graph_experienced.txt", L"graphs/air_graph_expert.txt",
 							L"graphs/ground_graph_beginner.txt", L"graphs/ground_graph_intermediate.txt",
@@ -86,6 +116,10 @@ namespace hoffman_isaiah {
 						};
 						for (const auto& res_str : my_resources) {
 							CopyFile((L"./resources/" + res_str).c_str(), (this->resources_folder_path + res_str).c_str(), FALSE);
+						}
+						// Wait for everything to finish copying.
+						for (auto& t : my_threads) {
+							t.join();
 						}
 						std::filesystem::create_directory(this->userdata_folder_path + L"../config/");
 						config_file.close();
