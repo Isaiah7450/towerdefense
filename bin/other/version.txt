@@ -812,3 +812,68 @@ Version 3.3.1: (Released February 8, 2020)
    chapter is finally finished.)
  + Updated readme file.
 
+Version 3.4.0: (Released March 20, 2022)
+- Bug Fixes:
+ + Fixed a bug where the player's data wasn't always saved when they lost.
+ + Disabled the "Show Paths" option on release builds.
+ + Fixed a few minor bugs relating to the data file parser and its handling of
+   end of file.
+ + The data file parser now recognizes \n as an escape sequence for newlines.
+ + Prevented the player from placing walls and towers on the starting nodes.
+- Balance Changes:
+ + Levels 1-50 have been rebalanced.
+ + Enemy health of Red troops increased by 133% (except for Red King).
+ + Enemy health of Green troops increased by 40% (except for Green Queen).
+ + Enemy health of Purple troops increased by 75% (except for Purple Queen and
+   Purple General).
+ + Enemy health of Blue troops increased by 45% (except for Blue King).
+ + Red King: Health increased from 156 to 207.
+ + Red King: Armor health increased from 60 to 75.
+ + Green Majestic Queen: Armor health decreased from 350 to 300.
+ + Green Majestic Queen: Added Forcefield buff (affects Green Berserker Group).
+ + Purple General: Health increased from 337 to 472.
+ + Blue Guardian: Armor health decreased from 139 to 135.
+ + Blue Guardian: "Blue Guardian Group" (Forcefield 1) delay increased from
+                  2500ms to 3000ms.
+ + Blue Guardian: "Blue Guardian Group" (Forcefield 1) duration increased from
+                  1500ms to 1750ms.
+ + Blue Guardian: "Blue Guardian Group" (Forcefield 1) shield health decreased
+                  from 91 to 50.
+ + Blue Tyrant King: "Blue King Group" (Forcefield 1) shield health decreased
+                     from 499 to 324.
+- New Stuff:
+ + Clicking on an enemy on the field will show the enemy's current statistics
+   rather than its base stats as shown in the menu.
+ + Added an "About This Program" option in the menu that provides a dialog
+   box with some basic information about the game.
+ + Added some background music.
+ + Add a menu item for settings. This brings up a dialog box that shows the
+   current challenge level and map name. It also allows you to change the
+   music volume and to mute the music.
+ + Added a "preview next level" feature accessible by the menu under Actions.
+   This feature provides information on the number of waves, number of enemies,
+   and the stats of enemies that will appear in the next level. Some levels
+   also have descriptions that provide help, hints, or additional flavor to the
+   game.
+ + Added the ability to unmark all tiles at once.
+- Misc Changes:
+ + Updated license.
+ + Added chapter 4: the terrain editor to the playing guide.
+ + Updated chapter 97 (hints and tips) of the playing guide.
+ + Updated chapter 98 (challenges and achievements) of the playing guide.
+ + Updated the enemies.ini.format file to correct some omissions.
+ + Adjusted formattting of pages in the Playing Guide to look better when
+   zooming in.
+ + New save file format (to make it harder to cheat.) Old saves are not
+   compatible. Saves made with this new version are version 6.
+ + Marked tiles are now saved; it is no longer necessary to re-mark them.
+ + Most of the code is now single-threaded. Multi-threading is used in the
+   select places where it is worth the overhead.
+ + Added 13x and 21x speeds.
+ + Some changes to constraints for level data.
+ + Some wording changes to descriptions of enemies, towers, and projectiles.
+ + Show Info now works for walls as it does for other towers.
+ + During the first-time load file copy, a message box is displayed notifying
+   the user of the wait.
+ + First-time loading of the game should be faster.
+ 
