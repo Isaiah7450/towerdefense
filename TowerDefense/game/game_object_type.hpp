@@ -5,7 +5,7 @@
 #include "./../graphics/graphics.hpp"
 #include "./../graphics/shapes.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		/// <summary>Base class from which all game object template types are derived.</summary>
 		class GameObjectType {

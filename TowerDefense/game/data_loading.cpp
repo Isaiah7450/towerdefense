@@ -13,10 +13,13 @@
 #include <set>
 #include <stdexcept>
 #include <string>
+#include <thread>
+#include <tuple>
 #include <utility>
 #include <vector>
 #include "./../file_util.hpp"
 #include "./../globals.hpp"
+#include "./../audio/audio.hpp"
 #include "./../graphics/graphics.hpp"
 #include "./../graphics/shapes.hpp"
 #include "./enemy_type.hpp"
@@ -28,7 +31,7 @@
 #include "./tower.hpp"
 using namespace std::literals::string_literals;
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 
 		void MyGame::load_config_data(bool ran_once) {
@@ -57,6 +60,7 @@ namespace hoffman::isaiah {
 					CreateDirectory(this->resources_folder_path.c_str(), nullptr);
 					CreateDirectory((this->resources_folder_path + L"levels/").c_str(), nullptr);
 					CreateDirectory((this->resources_folder_path + L"graphs/").c_str(), nullptr);
+					CreateDirectory((this->resources_folder_path + L"music/").c_str(), nullptr);
 					this->userdata_folder_path = my_path + L"userdata/"s;
 					CreateDirectory(this->userdata_folder_path.c_str(), nullptr);
 					// Reload the correct file.
@@ -67,23 +71,55 @@ namespace hoffman::isaiah {
 					}
 					my_parser.readKeyValue(L"do_copy");
 					if (my_parser.parseBoolean()) {
+						std::vector<std::thread> my_threads {};
+						my_threads.emplace_back([]() {
+							MessageBox(GetActiveWindow(), L"Copying files... Please be patient.",
+								L"First Time Startup Notice", MB_ICONINFORMATION | MB_OK);
+						});
 						// Copy needed files.
 						// This is really lazy code, but no real harm done.
 						for (int i = 1; i < 9999; ++i) {
-							const std::wstring level_str = L"levels/level" + std::to_wstring(i) + L".ini";
-							CopyFile((L"./resources/" + level_str).c_str(), (this->resources_folder_path + level_str).c_str(), FALSE);
+							my_threads.emplace_back([&, i]() {
+								const std::wstring level_str = L"levels/level"
+									+ std::to_wstring(i) + L".ini";
+								CopyFile((L"./resources/" + level_str).c_str(),
+									(this->resources_folder_path + level_str).c_str(), FALSE);
+							});
+						}
+						for (int i = 100; i < 1000; ++i) {
+							my_threads.emplace_back([&, i]() {
+								const std::wstring music_str1 = L"music/Music_"
+									+ std::to_wstring(i) + L".wav";
+								CopyFile((L"./resources/" + music_str1).c_str(),
+									(this->resources_folder_path + music_str1).c_str(), FALSE);
+							});
+						}
+						for (int i = 1; i < 10; ++i) {
+							my_threads.emplace_back([&, i]() {
+								const std::wstring music_str2 = L"music/music0"
+									+ std::to_wstring(i) + L".wav";
+								CopyFile((L"./resources/" + music_str2).c_str(),
+									(this->resources_folder_path + music_str2).c_str(), FALSE);
+							});
 						}
 						const std::wstring my_resources[] = {
-							L"enemies.ini", L"enemies.ini.format", L"shots.ini", L"shots.ini.format", L"towers.ini",
-							L"towers.ini.format", L"tower_upgrades.ini", L"tower_upgrades.ini.format", L"other.ini",
-							L"levels/global.ini", L"levels/global.ini.format", L"levels/level0.ini.format", L"levels/levels.xlsx",
+							L"enemies.ini", L"enemies.ini.format", L"shots.ini", L"shots.ini.format",
+							L"towers.ini", L"towers.ini.format",
+							L"tower_upgrades.ini", L"tower_upgrades.ini.format", L"other.ini",
+							L"levels/global.ini", L"levels/global.ini.format",
+							L"levels/level0.ini.format",
+							// L"levels/levels.xlsx",
 							L"graphs/air_graph_beginner.txt", L"graphs/air_graph_intermediate.txt",
 							L"graphs/air_graph_experienced.txt", L"graphs/air_graph_expert.txt",
 							L"graphs/ground_graph_beginner.txt", L"graphs/ground_graph_intermediate.txt",
 							L"graphs/ground_graph_experienced.txt", L"graphs/ground_graph_expert.txt"
 						};
-						for (const auto res_str : my_resources) {
+						for (const auto& res_str : my_resources) {
 							CopyFile((L"./resources/" + res_str).c_str(), (this->resources_folder_path + res_str).c_str(), FALSE);
+						}
+						// Wait for everything to finish copying.
+						for (auto& t : my_threads) {
+							t.join();
 						}
 						std::filesystem::create_directory(this->userdata_folder_path + L"../config/");
 						config_file.close();
@@ -905,7 +941,7 @@ namespace hoffman::isaiah {
 					my_parser.readKeyValue(L"name");
 					const std::wstring ename = my_parser.parseString();
 					try {
-						(void)this->getEnemyType(ename);
+						std::ignore = this->getEnemyType(ename);
 						for (const auto& edata : my_edata) {
 							if (edata.getType()->getName() == ename) {
 								throw util::file::DataFileException {L"Repeat enemy type: `"s + ename + L"`"s, my_parser.getLine()};
@@ -967,7 +1003,7 @@ namespace hoffman::isaiah {
 					my_parser.readKeyValue(L"name");
 					const std::wstring ename = my_parser.parseString();
 					try {
-						(void)this->getEnemyType(ename);
+						std::ignore = this->getEnemyType(ename);
 						for (const auto& edata : my_edata) {
 							if (edata.getType()->getName() == ename) {
 								throw util::file::DataFileException {L"`" + ename + L"` is already defined as a regular enemy.", my_parser.getLine()};
@@ -1058,7 +1094,8 @@ namespace hoffman::isaiah {
 		}
 
 		void MyGame::load_level_data() {
-			std::wifstream data_file {this->resources_folder_path + L"levels/level"s + std::to_wstring(this->level) + L".ini"s};
+			std::wifstream data_file {this->resources_folder_path + L"levels/level"s
+				+ std::to_wstring(this->level) + L".ini"s};
 			if (data_file.bad() || data_file.fail()) {
 				if (this->getLevelNumber() >= this->my_level_generator->getStartLevel()) {
 					this->my_level = this->my_level_generator->generateLevel(this->getLevelNumber(), *this);
@@ -1068,7 +1105,8 @@ namespace hoffman::isaiah {
 					data_file.open(this->resources_folder_path + L"levels/level"s + std::to_wstring(this->my_level_backup_number) + L".ini"s);
 					if (data_file.bad() || data_file.fail()) {
 						throw util::file::DataFileException {L"Could not open resources/levels/level"s
-							+ std::to_wstring(this->level) + L".ini for reading. Automatically generating a level instead..."s, 0};
+							+ std::to_wstring(this->level)
+							+ L".ini for reading. Automatically generating a level instead..."s, 0};
 					}
 				}
 			}
@@ -1076,10 +1114,20 @@ namespace hoffman::isaiah {
 			// Global section
 			my_parser.expectToken(util::file::TokenTypes::Section, L"global"s);
 			my_parser.readKeyValue(L"version"s);
-			my_parser.expectToken(util::file::TokenTypes::Number, L"1"s);
+			const int version = my_parser.parseNumber<int>();
+			if (version < 1 || version > 2) {
+				throw util::file::DataFileException {L"Version field should be 2.",
+					my_parser.getLine()};
+			}
+			std::wstring desc = L"No description available.";
+			if (version == 2) {
+				my_parser.readKeyValue(L"description");
+				desc = my_parser.parseString();
+			}
 			my_parser.readKeyValue(L"wave_spawn_delay"s);
 			const int wave_spawn_delay = static_cast<int>(my_parser.parseNumber());
-			util::file::DataFileParser::validateNumber(wave_spawn_delay, 200, 30'000, L"Wave spawn delay (ms)", my_parser.getLine(), true, true);
+			util::file::DataFileParser::validateNumber(wave_spawn_delay, 500, 60'000,
+				L"Wave spawn delay (ms)", my_parser.getLine(), true, true);
 			my_parser.getNext();
 			std::deque<std::unique_ptr<EnemyWave>> my_level_waves {};
 			do {
@@ -1087,7 +1135,8 @@ namespace hoffman::isaiah {
 				my_parser.expectToken(util::file::TokenTypes::Section, L"wave"s);
 				my_parser.readKeyValue(L"group_spawn_delay"s);
 				const int group_spawn_delay = static_cast<int>(my_parser.parseNumber());
-				util::file::DataFileParser::validateNumber(group_spawn_delay, 100, 15'000, L"Group spawn delay (ms)", my_parser.getLine(), true, true);
+				util::file::DataFileParser::validateNumber(group_spawn_delay, 250, 20'000,
+					L"Group spawn delay (ms)", my_parser.getLine(), true, true);
 				std::deque<std::unique_ptr<EnemyGroup>> my_wave_groups {};
 				my_parser.readKeyValue(L"groups"s);
 				my_parser.expectToken(util::file::TokenTypes::Object, L"{"s);
@@ -1110,7 +1159,7 @@ namespace hoffman::isaiah {
 						L"Extra count", my_parser.getLine(), true);
 					my_parser.readKeyValue(L"enemy_spawn_delay"s);
 					const int enemy_spawn_delay = static_cast<int>(my_parser.parseNumber());
-					util::file::DataFileParser::validateNumber(enemy_spawn_delay, 10, 10'000,
+					util::file::DataFileParser::validateNumber(enemy_spawn_delay, 20, 10'000,
 						L"Enemy spawn delay (ms)", my_parser.getLine(), true, true);
 					std::queue<std::unique_ptr<Enemy>> my_enemy_spawns {EnemyGroup::createEnemies(etype, extra_count, *this)};
 					auto my_group = std::make_unique<EnemyGroup>(std::move(my_enemy_spawns), enemy_spawn_delay);
@@ -1123,20 +1172,47 @@ namespace hoffman::isaiah {
 				auto my_wave = std::make_unique<EnemyWave>(std::move(my_wave_groups), group_spawn_delay);
 				my_level_waves.emplace_front(std::move(my_wave));
 			} while (my_parser.getNext());
-			this->my_level = std::make_unique<GameLevel>(this->level, std::move(my_level_waves), wave_spawn_delay);
+			this->my_level = std::make_unique<GameLevel>(this->level, desc, std::move(my_level_waves), wave_spawn_delay);
 		}
 
 		void MyGame::saveGame(std::wostream& save_file) const {
 			if (this->isInLevel()) {
-				// Can't save now...
+				// Cannot save during levels.
+				// Maybe I should add a message of some sort.
 				return;
 			}
-			save_file << L"V: " << 4 << L"\n";
-			save_file << L"C: " << this->challenge_level << L" D: " << this->difficulty
-				<< L" L: " << this->level << L"\n";
-			save_file << L"H: " << this->player.getHealth() << L" K: " << this->hp_buy_cost
-				<< L" M: " << this->player.getMoney() << L"\n";
-			save_file << L"W: " << this->win_streak << L" L: " << this->lose_streak << L"\n";
+			/*
+				Opcode 0x0: No operation
+				Opcode 0x1: Copy integer
+				Opcode 0x2: Copy float
+				Opcode 0x3: Increment integer
+				Opcode 0x4: Decrement integer
+
+				Addresses:
+
+				0x0 : Challenge level
+				0x1 : Level
+				0x2 : Lose Streak
+				0x3 : Win Streak
+				0x4 : Player health
+
+				0x0 : Difficulty
+				0x1 : HP Buy Cost
+				0x2 : Player money
+			 */
+			save_file << L"HEADER\n" << 6 << L"\n";
+			save_file << std::hex << 0x0 << L" " << 0x0 << L" " << 0x1 << L" "
+				<< 0x0 << L" " << this->getChallengeLevel() << L" "
+				<< 0x3 << L" " << 0x1 << L" "
+				<< 0x4 << L" " << 0x1 << L" "
+				<< 0x1 << L" " << 0x1 << L" " << this->level << L" "
+				<< 0x1 << L" " << 0x2 << L" " << this->lose_streak << L" "
+				<< 0x1 << L" " << 0x3 << L" " << this->win_streak << L"\n"
+				<< 0x1 << L" " << 0x4 << L" " << this->player.getHealth() << L" "
+				<< 0x2 << L" " << 0x0 << L" " << this->difficulty << L" "
+				<< 0x2 << L" " << 0x1 << L" " << this->hp_buy_cost << L" "
+				<< 0x2 << L" " << 0x2 << L" " << this->player.getMoney() << L"\n"
+				<< std::dec << L"BODY\n";
 			// Output map name (mainly for the terrain editor rather than the game itself.)
 			save_file << L"MN: " << this->map_base_name << L"\n";
 			// Output terrain map
@@ -1145,6 +1221,17 @@ namespace hoffman::isaiah {
 			// Output influence map
 			save_file << this->getMap().getInfluenceGraph(false) << L"\n";
 			save_file << this->getMap().getInfluenceGraph(true) << L"\n";
+			// Output highlight graph data.
+			const auto highlight_rows = this->getMap().getHighlightGraph().getRows();
+			const auto highlight_cols = this->getMap().getHighlightGraph().getColumns();
+			save_file << highlight_rows << L" " << highlight_cols << L"\n";
+			for (int i = 0; i < highlight_rows; ++i) {
+				for (int j = 0; j < highlight_cols; ++j) {
+					// Converting from row-column to x-y means reversing the order.
+					save_file << this->getMap().getHighlightGraph().getNode(j, i).isBlocked() << L" ";
+				}
+			}
+			save_file << L"\n";
 			// Output towers as well.
 			for (const auto& t : this->towers) {
 				save_file << L"T: " << t->getBaseType()->getName() << L"\n\tT: " << t->getGameX() << L" "
@@ -1163,126 +1250,175 @@ namespace hoffman::isaiah {
 			std::wstring buffer {};
 			int version;
 			save_file >> buffer >> version;
-			if (version >= 1 && version <= 4) {
-				save_file >> buffer >> this->challenge_level >> buffer >> this->difficulty
-					>> buffer >> this->level;
-				int player_health;
-				double player_cash;
-				if (version <= 2) {
-					save_file >> buffer >> player_health >> buffer >> player_cash;
-				}
-				else {
-					save_file >> buffer >> player_health >> buffer >> this->hp_buy_cost
-						>> buffer >> player_cash;
-				}
-				this->player = Player {player_cash, player_health};
-				save_file >> buffer >> this->win_streak >> buffer >> this->lose_streak;
-				// Read or determine map name.
-				if (version >= 4) {
+			if (version < 5) {
+				throw std::runtime_error {"Old save file detected. The old save is not compatible with "
+					" this version of the game. Starting a new game."};
+			}
+			int integers[16] {};
+			double decimals[16] {};
+			int index {0};
+			save_file >> buffer;
+			while (buffer != L"BODY"s) {
+				switch (std::stoi(buffer, nullptr, 16)) {
+				case 0x0:
+					// No operation
+					break;
+				case 0x1:
+					// Copy integer operation.
 					save_file >> buffer;
-					std::getline(save_file, this->map_base_name);
-					// Leading space is removed...
-					this->map_base_name.erase(this->map_base_name.begin());
-					if (MyGame::getDefaultMapName(this->getChallengeLevel() + ID_CHALLENGE_LEVEL_EASY) != this->getMapBaseName()) {
-						this->setGameType(true);
-					}
+					index = std::clamp(std::stoi(buffer, nullptr, 16), 0, 15);
+					save_file >> buffer;
+					integers[index] = std::stoi(buffer, nullptr, 16);
+					break;
+				case 0x2:
+					// Copy float operation.
+					save_file >> buffer;
+					index = std::clamp(std::stoi(buffer, nullptr, 16), 0, 15);
+					save_file >> buffer;
+					decimals[index] = std::stod(buffer, nullptr);
+					break;
+				case 0x3:
+					// Increment integer operation.
+					save_file >> buffer;
+					index = std::clamp(std::stoi(buffer, nullptr, 16), 0, 15);
+					++integers[index];
+					break;
+				case 0x4:
+					// Decrement integer operation.
+					save_file >> buffer;
+					index = std::clamp(std::stoi(buffer, nullptr, 16), 0, 15);
+					--integers[index];
+					break;
+				default:
+					break;
 				}
-				else {
-					switch (this->getChallengeLevel()) {
-					case 0:
-						this->map_base_name = L"beginner";
-						break;
-					case 1:
-						this->map_base_name = L"intermediate";
-						break;
-					case 2:
-						this->map_base_name = L"experienced";
-						break;
-					case 3:
-						this->map_base_name = L"expert";
-						break;
-					default:
-						this->map_base_name = L"intermediate";
-						this->challenge_level = 1;
-					}
+				save_file >> buffer;
+			}
+			this->challenge_level = integers[0x0];
+			this->level = integers[0x1];
+			this->lose_streak = integers[0x2];
+			this->win_streak = integers[0x3];
+			this->difficulty = decimals[0x0];
+			this->hp_buy_cost = decimals[0x1];
+			this->player = Player {decimals[0x2], integers[0x4]};
+			// Read or determine map name.
+			if (version >= 4) {
+				save_file >> buffer;
+				std::getline(save_file, this->map_base_name);
+				// Leading space is removed...
+				this->map_base_name.erase(this->map_base_name.begin());
+				if (MyGame::getDefaultMapName(this->getChallengeLevel() + ID_CHALLENGE_LEVEL_EASY) != this->getMapBaseName()) {
+					this->setGameType(true);
 				}
-				// Terrain map
-				// (This is tricky --> Due to the way the start and end nodes are loaded,
-				// I need to TRANSFER the ownership of these resources TO this->map.)
-				auto my_gterrain = std::make_unique<pathfinding::Grid>();
-				auto my_aterrain = std::make_unique<pathfinding::Grid>();
-				save_file >> *my_gterrain >> *my_aterrain;
-				this->map = std::make_shared<game::GameMap>(std::move(my_gterrain), std::move(my_aterrain));
-				// Note that above move invalidates the test paths.
-				this->ground_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), false,
-					false, pathfinding::HeuristicStrategies::Manhattan);
-				this->air_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), true,
-					false, pathfinding::HeuristicStrategies::Manhattan);
-				// Influence map
-				pathfinding::Grid ground_influence_map {};
-				pathfinding::Grid air_influence_map {};
-				save_file >> ground_influence_map >> air_influence_map;
-				this->map->setInfluenceGraphs(ground_influence_map, air_influence_map);
-				while (save_file >> buffer) {
-					if (buffer == L"T:") {
-						// Towers
-#pragma warning(push)
-#pragma warning(disable: 26494) // Code Analysis: type.5 --> Always initialize.
-						std::wstring tower_name;
-						double tower_gx;
-						double tower_gy;
-#pragma warning(pop)
-						std::getline(save_file, tower_name);
-						// Leading space is removed...
-						tower_name.erase(tower_name.begin());
-						save_file >> buffer >> tower_gx >> tower_gy;
-						const TowerType* my_type {nullptr};
-						for (const auto& tt : this->getAllTowerTypes()) {
-							if (tt->getName() == tower_name) {
-								my_type = tt.get();
-								break;
-							}
-						}
-						if (!my_type) {
-							throw std::runtime_error {"Error: Tower does not exist!"};
-						}
-						auto my_tower = std::make_unique<Tower>(this->getDeviceResources(), this->getMap(), my_type,
-							graphics::Color {0.f, 0.f, 0.f, 1.f}, tower_gx, tower_gy);
-						if (version >= 2) {
-							// Special code to handle upgrades (while not breaking old files.)
-							int tower_lv;
-							int tower_path;
-							save_file >> tower_lv >> tower_path;
-							my_tower->setTowerUpgradeStatus(tower_lv, tower_path);
-						}
-						this->addTower(std::move(my_tower));
-						const auto my_floored_gx = static_cast<int>(std::floor(tower_gx));
-						const auto my_floored_gy = static_cast<int>(std::floor(tower_gy));
-						this->getMap().getFiterGraph(false).getNode(my_floored_gx, my_floored_gy).setBlockage(true);
-						this->getMap().getFiterGraph(true).getNode(my_floored_gx, my_floored_gy).setBlockage(true);
-					}
-					else if (buffer == L"E:") {
-						// Load seen enemies.
-						std::wstring enemy_name {};
-						std::getline(save_file, enemy_name);
-						// Leading space is removed...
-						enemy_name.erase(enemy_name.begin());
-						long long kill_count {0};
-						if (version >= 3) {
-							save_file >> buffer >> std::hex >> kill_count >> std::dec;
-						}
-						try {
-							this->enemies_seen.at(enemy_name) = true;
-							this->enemy_kill_count.at(enemy_name) = kill_count;
-						}
-						catch (const std::out_of_range&) {
-							// Ignore.
+			}
+			else {
+				switch (this->getChallengeLevel()) {
+				case 0:
+					this->map_base_name = L"beginner";
+					break;
+				case 1:
+					this->map_base_name = L"intermediate";
+					break;
+				case 2:
+					this->map_base_name = L"experienced";
+					break;
+				case 3:
+					this->map_base_name = L"expert";
+					break;
+				default:
+					this->map_base_name = L"intermediate";
+					this->challenge_level = 1;
+				}
+			}
+			// Terrain map
+			// (This is tricky --> Due to the way the start and end nodes are loaded,
+			// I need to TRANSFER the ownership of these resources TO this->map.)
+			auto my_gterrain = std::make_unique<pathfinding::Grid>();
+			auto my_aterrain = std::make_unique<pathfinding::Grid>();
+			save_file >> *my_gterrain >> *my_aterrain;
+			this->map = std::make_shared<game::GameMap>(std::move(my_gterrain), std::move(my_aterrain));
+			// Note that above move invalidates the test paths.
+			this->ground_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), false,
+				false, pathfinding::HeuristicStrategies::Manhattan);
+			this->air_test_pf = std::make_shared<pathfinding::Pathfinder>(this->getMap(), true,
+				false, pathfinding::HeuristicStrategies::Manhattan);
+			// Influence map
+			pathfinding::Grid ground_influence_map {};
+			pathfinding::Grid air_influence_map {};
+			save_file >> ground_influence_map >> air_influence_map;
+			this->map->setInfluenceGraphs(ground_influence_map, air_influence_map);
+			// Marked tiles.
+			if (version >= 6) {
+				int highlight_rows;
+				int highlight_cols;
+				save_file >> highlight_rows >> highlight_cols;
+				for (int i = 0; i < highlight_rows; ++i) {
+					for (int j = 0; j < highlight_cols; ++j) {
+						// ith row, jth col corresponds to x = j, y = i
+						save_file >> buffer;
+						if (buffer == L"1") {
+							this->map->getHighlightGraph().getNode(j, i).setBlockage(true);
 						}
 					}
 				}
 			}
-			else {
-				throw util::file::DataFileException {L"Unrecognized save file version."s, 1};
+			while (save_file >> buffer) {
+				if (buffer == L"T:") {
+					// Towers
+#pragma warning(push)
+#pragma warning(disable: 26494) // Code Analysis: type.5 --> Always initialize.
+					std::wstring tower_name;
+					double tower_gx;
+					double tower_gy;
+#pragma warning(pop)
+					std::getline(save_file, tower_name);
+					// Leading space is removed...
+					tower_name.erase(tower_name.begin());
+					save_file >> buffer >> tower_gx >> tower_gy;
+					const TowerType* my_type {nullptr};
+					for (const auto& tt : this->getAllTowerTypes()) {
+						if (tt->getName() == tower_name) {
+							my_type = tt.get();
+							break;
+						}
+					}
+					if (!my_type) {
+						throw std::runtime_error {"Error: Tower does not exist!"};
+					}
+					auto my_tower = std::make_unique<Tower>(this->getDeviceResources(),
+						this->getMap(), my_type, graphics::Color {0.f, 0.f, 0.f, 1.f},
+						tower_gx, tower_gy);
+					if (version >= 2) {
+						// Special code to handle upgrades (while not breaking old files.)
+						int tower_lv;
+						int tower_path;
+						save_file >> tower_lv >> tower_path;
+						my_tower->setTowerUpgradeStatus(tower_lv, tower_path);
+					}
+					this->addTower(std::move(my_tower));
+					const auto my_floored_gx = static_cast<int>(std::floor(tower_gx));
+					const auto my_floored_gy = static_cast<int>(std::floor(tower_gy));
+					this->getMap().getFiterGraph(false).getNode(my_floored_gx, my_floored_gy).setBlockage(true);
+					this->getMap().getFiterGraph(true).getNode(my_floored_gx, my_floored_gy).setBlockage(true);
+				}
+				else if (buffer == L"E:") {
+					// Load seen enemies.
+					std::wstring enemy_name {};
+					std::getline(save_file, enemy_name);
+					// Leading space is removed...
+					enemy_name.erase(enemy_name.begin());
+					long long kill_count {0};
+					if (version >= 3) {
+						save_file >> buffer >> std::hex >> kill_count >> std::dec;
+					}
+					try {
+						this->enemies_seen.at(enemy_name) = true;
+						this->enemy_kill_count.at(enemy_name) = kill_count;
+					}
+					catch (const std::out_of_range&) {
+						// Ignore.
+					}
+				}
 			}
 		}
 
@@ -1291,14 +1427,17 @@ namespace hoffman::isaiah {
 			if (global_data_file.bad() || global_data_file.fail()) {
 				throw util::file::DataFileException {L"Could not open global save file for reading.", 0};
 			}
-			global_data_file << L"V: " << 1 << L"\n";
+			global_data_file << L"V: " << 2 << L"\n";
 			global_data_file << L"CG: " << this->start_custom_games << L"\n";
-			global_data_file << L"HS: " << std::oct << this->highest_score << L" " << std::hex << this->highest_score
+			global_data_file << L"HS: " << std::oct << this->highest_score
+				<< L" " << std::hex << this->highest_score
 				<< L"333 " << std::dec << this->highest_score << L"048" << "\n" << std::dec;
 			for (const auto& high_level_pair : this->highest_levels) {
 				global_data_file << L"H: " << std::hex << high_level_pair.first << L" " << std::hex << high_level_pair.second << L"\n" << std::dec;
 			}
 			global_data_file << L"X: 1233\t85\t518\t112\nE: 421\nZYD: 2909\n";
+			global_data_file << L"AA: " << audio::g_my_audio->getMusicVolume()
+				<< L" " << (audio::g_my_audio->isMusicMuted() ? L"N" : L"Y");
 		}
 
 		void MyGame::loadGlobalData() {
@@ -1333,6 +1472,26 @@ namespace hoffman::isaiah {
 					global_data_file >> std::hex >> difficulty_number >> std::hex >> difficulty_highest >> std::dec >> buffer;
 					// Invalid first values are simply handled silently.
 					this->highest_levels[difficulty_number] = difficulty_highest;
+				}
+				// Read past junk.
+				global_data_file >> buffer >> buffer >> buffer >> buffer >> buffer
+					>> buffer >> buffer >> buffer;
+				if (version >= 2) {
+					// Read settings stuff.
+					global_data_file >> buffer >> buffer;
+					try {
+						audio::g_my_audio->setVolume(std::stoi(buffer));
+					}
+					catch (...) {
+						throw util::file::DataFileException {L"Invalid data found.", 1};
+					}
+					global_data_file >> buffer;
+					if (buffer[0] == L'Y') {
+						audio::g_my_audio->startMusic();
+					}
+					else {
+						audio::g_my_audio->stopMusic();
+					}
 				}
 			}
 			else {

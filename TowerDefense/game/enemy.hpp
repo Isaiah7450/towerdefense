@@ -14,7 +14,7 @@
 #include "./enemy_type.hpp"
 #include "./game_object.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		// Forward declaration
 		class StatusEffectBase;
@@ -34,7 +34,8 @@ namespace hoffman::isaiah {
 			public:
 				/// <param name="effect">The status effect type.</param>
 				/// <param name="resist">The percentage resistance.</param>
-				/// <param name="ms_until_expires">The number of milliseconds until the resistance expires.</param>
+				/// <param name="ms_until_expires">The number of milliseconds until
+				/// the resistance expires.</param>
 				StatusResistance(StatusEffects effect, double resist, int ms_until_expire) noexcept;
 				/// <summary>Updates the status resistance.</summary>
 				void update();
@@ -50,20 +51,23 @@ namespace hoffman::isaiah {
 					return this->status_resist;
 				}
 			private:
-				/// <summary>The status effect this structure is storing resistance information about.</summary>
+				/// <summary>The status effect for which this structure is storing resistance
+				/// information.</summary>
 				StatusEffects status_effect;
 				/// <summary>The enemy's current resistance to the status affliction.</summary>
 				double status_resist;
-				/// <summary>The number of frames until the enemy's resistance to the status affliction expires.</summary>
+				/// <summary>The number of frames until the enemy's resistance
+				/// to the status affliction expires.</summary>
 				double frames_until_expire;
-				/// <summary>The number of times the enemy has been inflicted by this status affliction.</summary>
+				/// <summary>The number of times the enemy has been inflicted by this
+				/// status affliction.</summary>
 				int num_times {1};
 			};
 
-			Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, const GameMap& my_map,
+			Enemy(graphics::DX::DeviceResources2D* dev_res, const GameMap& my_map,
 				const EnemyType* etype, graphics::Color o_color,
 				const GameMap& gmap, int level, double difficulty, int challenge_level);
-			Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, const GameMap& my_map,
+			Enemy(graphics::DX::DeviceResources2D* dev_res, const GameMap& my_map,
 				const EnemyType* etype, graphics::Color o_color,
 				pathfinding::Pathfinder pf, double start_gx, double start_gy,
 				int level, double difficulty, int challenge_level);
@@ -255,17 +259,31 @@ namespace hoffman::isaiah {
 
 		protected:
 			// Functions that help construction
-			/// <returns>The enemy's starting health adjusted for the level, difficulty, and challenge level.</returns>
-			static double getAdjustedHealth(double base_hp, int level, double difficulty, int challenge_level) noexcept {
-				return base_hp + math::get_max(0.0, 0.05 * (level - 1.0) * challenge_level + 0.001 * (difficulty - 1.0));
+			/// <returns>The enemy's starting health adjusted for the level, difficulty, and
+			/// challenge level.</returns>
+			static double getAdjustedHealth(double base_hp, int level, double difficulty,
+				int challenge_level) noexcept {
+				if (level < 100) {
+					return base_hp + math::get_max(0.0,
+						0.05 * (level - 1.0) * challenge_level + 0.001 * (difficulty - 1.0));
+				}
+				return base_hp + math::get_max(0.0,
+					0.25 * (level - 1.0) * challenge_level + 0.005 * (difficulty - 1.0));
 			}
-			/// <returns>The enemy's starting armor health adjusted for the level, difficulty, and challenge level.</returns>
-			static double getAdjustedArmorHealth(double base_ahp, int level, double difficulty, int challenge_level) noexcept {
-				return base_ahp > 0 ? math::get_min(base_ahp * (challenge_level + 1.5) + level * (challenge_level + 0.5),
-					base_ahp + ((level - 1.0) * 0.05) * ((difficulty + challenge_level) / 13.0 + 11.0 / 13.0)) : 0;
+			/// <returns>The enemy's starting armor health adjusted for the level, difficulty, and
+			/// challenge level.</returns>
+			static double getAdjustedArmorHealth(double base_ahp, int level, double difficulty,
+				int challenge_level) noexcept {
+				return base_ahp > 0
+					? math::get_min(base_ahp * (challenge_level + 1.5) + level * (challenge_level + 0.5),
+						base_ahp + ((level - 1.0) * 0.05) * ((difficulty + challenge_level)
+							/ 13.0 + 11.0 / 13.0))
+					: 0;
 			}
-			/// <returns>The enemy's starting speed adjusted for the level, difficulty, and challenge level.</returns>
-			static double getAdjustedSpeed(double base_speed, int level, double difficulty, int challenge_level) noexcept {
+			/// <returns>The enemy's starting speed adjusted for the level, difficulty, and
+			/// challenge level.</returns>
+			static double getAdjustedSpeed(double base_speed, int level, double difficulty,
+				int challenge_level) noexcept {
 				return base_speed + math::get_min(base_speed * 0.375, static_cast<double>(level - 1) * challenge_level * 0.0007)
 					+ math::get_max(0.0, math::get_min(base_speed * 0.375, (difficulty - 1.0) * 0.0025));
 			}

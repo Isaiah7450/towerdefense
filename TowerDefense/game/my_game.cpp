@@ -2,19 +2,23 @@
 // File Created: March 26, 2018
 #include "./../targetver.hpp"
 #include <Windows.h>
+#include <future>
 #include <memory>
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <vector>
+#include <thread>
 #include <utility>
+#include <vector>
 #include "./../resource.h"
 #include "./../file_util.hpp"
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 #include "./../main.hpp"
+#include "./../audio/audio.hpp"
 #include "./../graphics/graphics.hpp"
 #include "./../graphics/graphics_DX.hpp"
+#include "./../graphics/other_dialogs.hpp"
 #include "./../pathfinding/grid.hpp"
 #include "./../pathfinding/pathfinder.hpp"
 #include "./enemy_type.hpp"
@@ -29,11 +33,11 @@
 #include "./tower.hpp"
 using namespace std::literals::string_literals;
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		std::shared_ptr<MyGame> g_my_game {nullptr};
 
-		MyGame::MyGame(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res) :
+		MyGame::MyGame(graphics::DX::DeviceResources2D* dev_res) :
 			device_resources {dev_res},
 			highest_levels {{ID_CHALLENGE_LEVEL_EASY, 0}, {ID_CHALLENGE_LEVEL_NORMAL, 0},
 				{ID_CHALLENGE_LEVEL_HARD, 0}, {ID_CHALLENGE_LEVEL_EXPERT, 0}} {
@@ -45,12 +49,6 @@ namespace hoffman::isaiah {
 
 		void MyGame::debugUpdate(DebugUpdateStates cause) {
 #if defined(DEBUG) || defined(_DEBUG)
-			// Set lock
-			auto draw_event = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT("can_draw"));
-			if (!draw_event) {
-				return;
-			}
-			ResetEvent(draw_event);
 			// Do processing...
 			switch (cause) {
 			case DebugUpdateStates::Terrain_Changed:
@@ -64,9 +62,6 @@ namespace hoffman::isaiah {
 			default:
 				break;
 			}
-			// Remove lock
-			SetEvent(draw_event);
-			CloseHandle(draw_event);
 #else
 			UNREFERENCED_PARAMETER(cause);
 #endif
@@ -124,12 +119,6 @@ namespace hoffman::isaiah {
 			if (this->is_paused || !this->in_level) {
 				return;
 			}
-			// Set lock
-			auto draw_event = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT("can_draw"));
-			if (!draw_event) {
-				return;
-			}
-			ResetEvent(draw_event);
 			if (!this->player.isAlive()) {
 				this->is_paused = true;
 				this->in_level = false;
@@ -156,6 +145,7 @@ namespace hoffman::isaiah {
 					}
 				}
 				this->saveGlobalData();
+				audio::g_my_audio->playSong(audio::gameover_index);
 			}
 			// Do processing...
 			for (int k = 0; k < this->update_speed && this->in_level; ++k) {
@@ -164,9 +154,16 @@ namespace hoffman::isaiah {
 					this->my_level->update();
 				}
 				// Update enemies
+				std::vector<std::future<bool>> ret_values {};
 				std::vector<int> enemies_to_remove {};
 				for (unsigned int i = 0; i < this->enemies.size(); ++i) {
+					// Here, we want a pointer to a member since the function we want to invoke
+					// is a class method.
+					//ret_values.push_back(std::async(&Enemy::update, this->enemies[i].get()));
+				}
+				for (unsigned int i = 0; i < this->enemies.size(); ++i) {
 					if (this->enemies[i]->update()) {
+					//if (ret_values.at(i).get()) {
 						if (this->enemies[i]->isAlive()) {
 							this->did_lose_life = true;
 							this->player.changeHealth(-this->enemies[i]->getBaseType().getDamage());
@@ -248,6 +245,7 @@ namespace hoffman::isaiah {
 					this->player.changeMoney(max_reward_money * kill_percent);
 					this->my_level_enemy_count = 0;
 					this->my_level_enemy_killed = 0;
+					this->my_level = nullptr;
 					// Reset game state
 					for (auto& t : this->towers) {
 						// Also take the time to reward extra cash if appropriate.
@@ -271,11 +269,14 @@ namespace hoffman::isaiah {
 					}
 					this->did_lose_life = false;
 					this->in_level = false;
+					if (level < 100) {
+						audio::g_my_audio->playSong(audio::town_index);
+					}
+					else {
+						audio::g_my_audio->playSong(audio::victory_index);
+					}
 				}
 			}
-			// Remove lock
-			SetEvent(draw_event);
-			CloseHandle(draw_event);
 		}
 
 		void MyGame::addEnemy(std::unique_ptr<Enemy>&& e) {
@@ -311,11 +312,29 @@ namespace hoffman::isaiah {
 				}
 				catch ([[maybe_unused]] const util::file::DataFileException& e) {
 					MessageBox(nullptr, e.what(), L"Level Loading Error", MB_OK);
-					// Though it is not really meant to be used for levels under the threshold, it should still work despite such.
+					// Though it is not really meant to be used for levels under the threshold,
+					// it should still work despite such.
 					this->my_level = this->my_level_generator->generateLevel(this->getLevelNumber(), *this);
 				}
 				this->my_level_enemy_count = this->my_level->getEnemyCount();
+				if (level != 99 && level % 5 != 0 || level == 100) {
+					audio::g_my_audio->playSong(audio::level_index);
+				}
+				else {
+					audio::g_my_audio->playSong(audio::boss_index);
+				}
 			}
+		}
+
+		void MyGame::previewWave() {
+			if (this->isInLevel() || !this->player.isAlive()) {
+				// Can only preview while not in a level.
+				return;
+			}
+			this->load_level_data();
+			const winapi::PreviewLevelDialog preview_dialog {GetActiveWindow(),
+				GetModuleHandle(nullptr), *this->my_level};
+			this->my_level = nullptr;
 		}
 
 		void MyGame::buyHealth() {
@@ -357,7 +376,15 @@ namespace hoffman::isaiah {
 				return;
 			}
 			if (this->getMap().getFiterGraph(false).getNode(gx, gy).isBlocked()
-				|| this->getMap().getTerrainGraph(false).getNode(gx, gy).isBlocked()) {
+				|| this->getMap().getTerrainGraph(false).getNode(gx, gy).isBlocked()
+				|| (this->getMap().getTerrainGraph(false).getStartNode()->getGameX() == gx
+				&& this->getMap().getTerrainGraph(false).getStartNode()->getGameY() == gy)
+				|| (this->getMap().getTerrainGraph(true).getStartNode()->getGameX() == gx
+				&& this->getMap().getTerrainGraph(true).getStartNode()->getGameY() == gy)
+				|| (this->getMap().getTerrainGraph(false).getGoalNode()->getGameX() == gx
+				&& this->getMap().getTerrainGraph(false).getGoalNode()->getGameY() == gy)
+				|| (this->getMap().getTerrainGraph(true).getGoalNode()->getGameX() == gx
+				&& this->getMap().getTerrainGraph(true).getGoalNode()->getGameY() == gy)) {
 				// Cannot build on this space...
 				return;
 			}
@@ -379,7 +406,8 @@ namespace hoffman::isaiah {
 				return;
 			}
 			this->player.changeMoney(-this->getTowerType(this->getSelectedTower())->getCost());
-			auto my_tower = std::make_unique<Tower>(this->device_resources, this->getMap(), this->getTowerType(this->getSelectedTower()),
+			auto my_tower = std::make_unique<Tower>(this->device_resources, this->getMap(),
+				this->getTowerType(this->getSelectedTower()),
 				graphics::Color {0.f, 0.f, 0.f, 1.0f}, gx + 0.5, gy + 0.5);
 			this->addTower(std::move(my_tower));
 			this->debugUpdate(DebugUpdateStates::Terrain_Changed);

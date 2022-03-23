@@ -12,7 +12,7 @@
 #include "./shot_types.hpp"
 #include "./tower_types.hpp"
 
-namespace hoffman::isaiah::game {
+namespace hoffman_isaiah::game {
 	namespace towers {
 		double getFiringArea(double fr, const FiringMethod& fm, bool is_wall) noexcept {
 			return !is_wall ? (fm.getMethod() == FiringMethodTypes::Default

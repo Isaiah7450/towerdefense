@@ -1,13 +1,21 @@
 System Requirements:
 
 Minimum:
-Operating System: Microsoft Windows 7 or later.
+
+Operating System: Microsoft Windows 8 or later.
 Screen Resolution: 1024x768 or higher.
-RAM: 32 MB (of free memory)
+Disk Space: About 256 MB
+RAM: 256 MB (of free memory)
+CPU: Anything made sinc 2015 should work.
+Graphics Card: Anything made since 2015 should work.
+Peripherals: A mouse and keyboard.
 
 Recommended:
-Operating System: Microsoft Windows 7 or later.
-Screen Resolution: 1024x768 or higher.
-RAM: 64 MB (of free memory)
-CPU: My computer possesses an Intel(R) Core(TM) i5-6200 CPU @ 2.30 GHz 2.40 GHz; you could probably get by with way lower speeds though.
 
+Operating System: Microsoft Windows 7 or later.
+Screen Resolution: 1440x900 or higher.
+Disk Space: About 256 MB
+RAM: 512 MB (of free memory)
+CPU: Intel(R) Core(TM) i5-6200 CPU @ 2.30 GHz 2.40 GHz or better.
+Graphics Card: Anything made since 2015 should work.
+Peripherals: A mouse and keyboard.

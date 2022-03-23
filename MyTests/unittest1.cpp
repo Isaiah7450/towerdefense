@@ -1,15 +1,23 @@
 #include "stdafx.h"
-#include "./../TowerDefense/globals.hpp"
+#include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
 #include "./../TowerDefense/file_util.hpp"
+#include "./../TowerDefense/globals.hpp"
+#include "./../TowerDefense/resource.h"
+#include "./../TowerDefense/game/my_game.hpp"
 #include "./../TowerDefense/pathfinding/graph_node.hpp"
 #include "./../TowerDefense/pathfinding/grid.hpp"
 #include "./../TowerDefense/pathfinding/pathfinder.hpp"
 
-namespace ih = hoffman::isaiah;
+namespace ih = hoffman_isaiah;
 using namespace std::literals::string_literals;
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace tests {
 		TEST_CLASS(Pathfinding) {
 public:
@@ -223,27 +231,13 @@ public:
 		};
 
 		TEST_CLASS(Datafiles) {
-		public:
-			TEST_METHOD(Datafile_Quoted_String) {
+public:
+			TEST_METHOD(Datafile_EOF_Detection) {
 				try {
-					// TODO: Rewrite
-					/*
-					std::wistringstream my_string {L"\"My Quoted Input\""s};
-					int line_number = 1;
-					auto result = ih::util::file::getNextToken(my_string, line_number).second;
-					Assert::AreEqual(L"My Quoted Input"s, result);
-					std::wistringstream my_second_str {L"\"My \\\"Escaped\\\" Quoted Input!\""s};
-					result = ih::util::file::getNextToken(my_second_str, line_number).second;
-					Assert::AreEqual(L"My \"Escaped\" Quoted Input!"s, result);
-					std::wistringstream my_fourth_str {L"\"My hack string cut\"off by a quote.\""s};
-					result = ih::util::file::getNextToken(my_fourth_str, line_number).second;
-					Assert::AreEqual(L"My hack string cut"s, result);
-					std::wistringstream my_fifth_str {L"\"My perfectly normal string with a \\ in it.\""s};
-					result = ih::util::file::getNextToken(my_fifth_str, line_number).second;
-					Assert::AreEqual(L"My perfectly normal string with a \\ in it."s, result);
-					std::wistringstream my_sixth_str {L"\"My \\\"\\\"double quoted\\\"\\\" string\""s};
-					result = ih::util::file::getNextToken(my_sixth_str, line_number).second;
-					*/
+					std::wistringstream str_one {L"Hello 123 EOF"};
+					ih::util::file::DataFileParser p1 {str_one};
+					Assert::IsTrue(p1.getNext());
+					Assert::IsFalse(p1.getNext());
 				}
 				catch (const ih::util::file::DataFileException& e) {
 					Assert::Fail(e.what());
@@ -251,6 +245,254 @@ public:
 				catch (...) {
 					Assert::Fail(L"An exception occurred.");
 				}
+			}
+
+			TEST_METHOD(Datafile_Token_Classification) {
+				namespace ih_file = ih::util::file;
+				try {
+					std::wistringstream str_one {L"Hello [Hello] \"Hello\" 1 <abc> <\"a\", \"b\">"};
+					ih_file::DataFileParser parser_one {str_one};
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::Identifier));
+					Assert::IsTrue(parser_one.getNext());
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::Section));
+					Assert::IsTrue(parser_one.getNext());
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::String));
+					Assert::IsTrue(parser_one.getNext());
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::Number));
+					Assert::IsTrue(parser_one.getNext());
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::List));
+					Assert::IsTrue(parser_one.getNext());
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::Identifier));
+					Assert::IsTrue(parser_one.getNext());
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::List));
+					Assert::IsTrue(parser_one.getNext());
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::List));
+					Assert::IsTrue(parser_one.getNext());
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::String));
+					Assert::IsTrue(parser_one.getNext());
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::String));
+					Assert::IsFalse(parser_one.getNext());
+					Assert::IsTrue(parser_one.matchTokenType(ih_file::TokenTypes::List));
+					std::wistringstream str_two {L"{xyz = 123} {}"s};
+					ih::util::file::DataFileParser parser_two {str_two};
+					Assert::IsTrue(parser_two.matchTokenType(ih_file::TokenTypes::Object));
+					parser_two.getNext();
+					Assert::IsTrue(parser_two.matchTokenType(ih_file::TokenTypes::Identifier));
+					parser_two.getNext();
+					Assert::IsTrue(parser_two.matchTokenType(ih_file::TokenTypes::Identifier));
+					parser_two.getNext();
+					Assert::IsTrue(parser_two.matchTokenType(ih_file::TokenTypes::Number));
+					parser_two.getNext();
+					Assert::IsTrue(parser_two.matchTokenType(ih_file::TokenTypes::Object));
+					parser_two.getNext();
+					Assert::IsTrue(parser_two.matchTokenType(ih_file::TokenTypes::Object));
+					Assert::IsFalse(parser_two.getNext());
+					Assert::IsTrue(parser_two.matchTokenType(ih_file::TokenTypes::Object));
+				}
+				catch (const ih::util::file::DataFileException& e) {
+					Assert::Fail(e.what());
+				}
+				catch (...) {
+					Assert::Fail(L"An exception occurred.");
+				}
+			}
+
+			TEST_METHOD(Datafile_Quoted_String) {
+				try {
+					std::wistringstream my_string {L"\"My Quoted Input\""s};
+					ih::util::file::DataFileParser my_parser {my_string};
+					Assert::AreEqual(L"My Quoted Input"s, my_parser.getToken());
+					std::wistringstream my_second_str {L"\"My \\\"Escaped\\\" Quoted Input!\""s};
+					ih::util::file::DataFileParser my_parser2 {my_second_str};
+					Assert::AreEqual(L"My \"Escaped\" Quoted Input!"s, my_parser2.getToken());
+					std::wistringstream my_third_str {L"\"My hack string cut\"off by a quote.\""s};
+					ih::util::file::DataFileParser my_parser3 {my_third_str};
+					Assert::AreEqual(L"My hack string cut"s, my_parser3.getToken());
+					std::wistringstream my_fourth_str {L"\"My perfectly normal string with a \\ in it.\""s};
+					ih::util::file::DataFileParser my_parser4 {my_fourth_str};
+					Assert::AreEqual(L"My perfectly normal string with a \\ in it."s, my_parser4.getToken());
+					std::wistringstream my_fifth_str {L"\"My \\\"\\\"double quoted\\\"\\\" string\""s};
+					ih::util::file::DataFileParser my_parser5 {my_fifth_str};
+					Assert::AreEqual(L"My \"\"double quoted\"\" string"s, my_parser5.getToken());
+				}
+				catch (const ih::util::file::DataFileException& e) {
+					Assert::Fail(e.what());
+				}
+				catch (...) {
+					Assert::Fail(L"An exception occurred.");
+				}
+			}
+
+			TEST_METHOD(Datafile_Reading) {
+				try {
+					namespace ih_file = ih::util::file;
+					std::wistringstream s1 {L"[hello] abc = 123 <3, 17, 12, 6>"};
+					ih_file::DataFileParser p1 {s1};
+					Assert::IsTrue(p1.matchToken(ih_file::TokenTypes::Section, L"hello"));
+					const auto r1 = p1.readKeyValue(L"abc");
+					Assert::IsTrue(r1.first == ih_file::TokenTypes::Number);
+					Assert::IsTrue(r1.second == L"123"s);
+					p1.getNext();
+					const auto r2 = p1.readList<int>();
+					Assert::AreEqual(static_cast<size_t>(4), r2.size());
+					Assert::AreEqual(3, r2[0]);
+					Assert::AreEqual(17, r2[1]);
+					Assert::AreEqual(12, r2[2]);
+					Assert::AreEqual(6, r2[3]);
+				}
+				catch (const ih::util::file::DataFileException& e) {
+					Assert::Fail(e.what());
+				}
+				catch (...) {
+					Assert::Fail(L"An exception occurred.");
+				}
+			}
+
+			TEST_METHOD(Datafile_Comment_Skipping) {
+				try {
+					namespace ih_file = ih::util::file;
+					std::wistringstream s1 {L"# This is a comment.\nHello ; Another comment.\n123\t\t\t\"abc\""};
+					ih_file::DataFileParser p1 {s1};
+					Assert::IsTrue(p1.matchTokenValue(L"Hello"s));
+					Assert::IsTrue(p1.getNext());
+					Assert::IsTrue(p1.matchTokenType(ih_file::TokenTypes::Number));
+					Assert::IsFalse(p1.getNext());
+					Assert::IsTrue(p1.matchToken(ih_file::TokenTypes::String, L"abc"));
+				}
+				catch (const ih::util::file::DataFileException& e) {
+					Assert::Fail(e.what());
+				}
+				catch (...) {
+					Assert::Fail(L"An exception occurred.");
+				}
+			}
+		};
+
+		TEST_CLASS(Main_Game) {
+		public:
+			TEST_METHOD(Main_Game_Construction) {
+				try {
+					const ih::game::MyGame my_game {nullptr};
+				}
+				catch (...) {
+					Assert::Fail(L"An exception occurred.");
+				}
+			}
+
+			TEST_METHOD(Main_Game_Initialization) {
+				// Note that it is very possible for this to fail simply because the data files
+				// have some issue. Perhaps not great for a unit test, but it should work.
+				try {
+					ih::game::MyGame my_game {nullptr};
+					initGame(my_game);
+					Assert::IsTrue(my_game.getAllTowerTypes().size() > 0);
+					Assert::IsTrue(my_game.getAllShotTypes().size() > 0);
+					Assert::IsTrue(my_game.getAllEnemyTypes().size() > 0);
+				}
+				catch (const ih::util::file::DataFileException& e) {
+					Assert::Fail(e.what());
+				}
+				catch (...) {
+					Assert::Fail(L"An exception occurred.");
+				}
+			}
+			
+			TEST_METHOD(Main_Game_Save_Load) {
+				try {
+					ih::game::MyGame my_game {nullptr};
+					this->initGame(my_game);
+					this->initGame2(my_game);
+					my_game.buyHealth();
+					const double old_cash = my_game.getPlayerCash();
+					const double old_diffi = my_game.getDifficulty();
+					const int old_health_buy_cost = my_game.getHealthBuyCost();
+					std::wstringstream save_file {};
+					my_game.saveGame(save_file);
+					my_game.changePlayerCash(100);
+					my_game.buyHealth();
+					my_game.loadGame(save_file);
+					Assert::AreEqual(old_cash, my_game.getPlayerCash());
+					Assert::AreEqual(old_diffi, my_game.getDifficulty());
+					Assert::AreEqual(old_health_buy_cost, my_game.getHealthBuyCost());
+					// @TODO: Add second test case. Probably going to be by some kind
+					// of external file (although that's liable to break with a save
+					// format update.)
+				}
+				catch (const ih::util::file::DataFileException& e) {
+					Assert::Fail(e.what());
+				}
+				catch (...) {
+					Assert::Fail(L"An exception occurred.");
+				}
+			}
+
+			TEST_METHOD(Main_Game_Reset_State) {
+				try {
+					constexpr const auto tol = 0.0000005;
+					ih::game::MyGame my_game {nullptr};
+					initGame(my_game);
+					initGame2(my_game);
+					Assert::AreEqual(1, my_game.getChallengeLevel());
+					Assert::AreEqual(1, my_game.getLevelNumber());
+					Assert::IsTrue(std::abs(my_game.getDifficulty() - 1.0) <= tol);
+					Assert::IsTrue(my_game.getEnemies().size() == 0);
+					Assert::IsTrue(my_game.getTowers().size() == 0);
+					const auto is_seen = [](const auto& e) {
+						return e.second;
+					};
+					const auto& seen_enemies = my_game.getSeenEnemies();
+					Assert::IsFalse(std::any_of(seen_enemies.cbegin(), seen_enemies.cend(),
+						is_seen));
+					Assert::IsFalse(my_game.isPaused());
+					Assert::IsFalse(my_game.isInLevel());
+					Assert::AreEqual(L"intermediate"s, my_game.getMapBaseName());
+					my_game.resetState(2, L"expert"s);
+					my_game.setEnemyTypeAsSeen(L"Red Scout");
+					// @TODO: Figure out how to make enemies without needing graphics.
+					// It's probably an easy fix, but I will have to investigate.
+					// my_game.startWave();
+					while (my_game.isInLevel()) {
+						my_game.update();
+					}
+					// my_game.startWave();
+					my_game.update();
+					my_game.update();
+					my_game.togglePause();
+					// One missing piece is adding towers...
+					this->initGame2(my_game);
+					Assert::AreEqual(1, my_game.getChallengeLevel());
+					Assert::AreEqual(1, my_game.getLevelNumber());
+					Assert::IsTrue(std::abs(my_game.getDifficulty() - 1.0) <= tol);
+					Assert::IsTrue(my_game.getEnemies().size() == 0);
+					Assert::IsTrue(my_game.getTowers().size() == 0);
+					Assert::IsFalse(std::any_of(seen_enemies.cbegin(), seen_enemies.cend(),
+						is_seen));
+					Assert::IsFalse(my_game.isPaused());
+					Assert::IsFalse(my_game.isInLevel());
+					Assert::AreEqual(L"intermediate"s, my_game.getMapBaseName());
+				}
+				catch (const ih::util::file::DataFileException& e) {
+					Assert::Fail(e.what());
+				}
+				catch (...) {
+					Assert::Fail(L"An exception occurred.");
+				}
+			}
+		protected:
+		private:
+			void initGame(ih::game::MyGame& my_game) {
+				my_game.load_config_data();
+				my_game.init_enemy_types();
+				my_game.init_shot_types();
+				my_game.init_tower_types();
+				my_game.load_tower_upgrades_data();
+				my_game.load_global_level_data();
+				my_game.load_global_misc_data();
+			}
+
+			void initGame2(ih::game::MyGame& my_game) {
+				const std::wstring map_name = my_game.getDefaultMapName(ID_CHALLENGE_LEVEL_NORMAL);
+				my_game.resetState(ID_CHALLENGE_LEVEL_NORMAL - ID_CHALLENGE_LEVEL_EASY, map_name);
 			}
 		};
 	}

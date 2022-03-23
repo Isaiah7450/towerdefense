@@ -10,7 +10,7 @@
 #include "./shot_types.hpp"
 #include "./status_effects.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		void ShotBaseType::doHit(Enemy& e, double tower_dmg_multiplier) const {
 			e.takeDamage(this->getActualDamage(e.getBaseType().isFlying())

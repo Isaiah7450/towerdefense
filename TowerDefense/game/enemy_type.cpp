@@ -4,7 +4,7 @@
 #include "./enemy_type.hpp"
 #include "./game_formulas.hpp"
 #include "./my_game.hpp"
-namespace hoffman::isaiah::game {
+namespace hoffman_isaiah::game {
 
 	double BuffBase::getAverageInfluenceRating() const noexcept {
 		// Maybe not the wisest use of global state but definitely convenient.

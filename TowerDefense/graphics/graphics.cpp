@@ -34,7 +34,7 @@
 #include "./graphics.hpp"
 #include "./shapes.hpp"
 using namespace std::literals::string_literals;
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace graphics {
 		void Renderer2D::updateHealthOption(HWND hwnd, int new_price) const noexcept {
 			auto my_menu = GetSubMenu(GetMenu(hwnd), id_mm_actions_offset);
@@ -165,7 +165,7 @@ namespace hoffman::isaiah {
 			}
 		}
 
-		HRESULT Renderer2D::render(const std::shared_ptr<game::MyGame> my_game, int mouse_gx, int mouse_gy,
+		HRESULT Renderer2D::render(const game::MyGame* my_game, int mouse_gx, int mouse_gy,
 			int mouse_end_gx, int mouse_end_gy, bool in_editor) const {
 			// Check time before rendering
 			static LARGE_INTEGER last_update_time {0};
@@ -178,18 +178,12 @@ namespace hoffman::isaiah {
 				return S_OK;
 			}
 			last_update_time = my_times.first;
-			// Obtain lock
-			auto update_event = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT("can_update"));
-			if (!update_event) {
-				return S_FALSE;
-			}
-			ResetEvent(update_event);
 			// Do drawing
 			auto render_target = this->device_resources->getRenderTarget();
 			render_target->BeginDraw();
 			render_target->Clear(Color {1.f, 1.f, 1.f, 1.f});
 			// Draw terrain
-			my_game->getMap().draw(*this, in_editor);
+			my_game->getMap().draw(*this, nullptr);
 			// Draw shots, towers, and enemies.
 			if (!in_editor) {
 				for (const auto& s : my_game->shots) {
@@ -273,9 +267,6 @@ namespace hoffman::isaiah {
 			}
 #endif // DEBUG | _DEBUG -> Path Debugging
 			this->paintMouseSquares(my_game->getMap(), mouse_gx, mouse_gy, mouse_end_gx, mouse_end_gy);
-			// Release lock
-			SetEvent(update_event);
-			CloseHandle(update_event);
 			return render_target->EndDraw();
 		}
 
@@ -292,22 +283,13 @@ namespace hoffman::isaiah {
 				return S_OK;
 			}
 			last_update_time = my_times.first;
-			// Obtain lock
-			auto update_event = OpenEvent(SYNCHRONIZE | EVENT_MODIFY_STATE, false, TEXT("can_update"));
-			if (!update_event) {
-				return S_FALSE;
-			}
-			ResetEvent(update_event);
 			// Do drawing
 			auto render_target = this->device_resources->getRenderTarget();
 			render_target->BeginDraw();
 			render_target->Clear(Color {1.f, 1.f, 1.f, 1.f});
 			// Draw terrain
-			my_editor.getMap().draw(*this, true);
+			my_editor.getMap().draw(*this, &my_editor);
 			this->paintMouseSquares(my_editor.getMap(), mouse_gx, mouse_gy, mouse_end_gx, mouse_end_gy);
-			// Release lock
-			SetEvent(update_event);
-			CloseHandle(update_event);
 			return render_target->EndDraw();
 		}
 

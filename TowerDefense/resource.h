@@ -16,10 +16,13 @@
 
 #define IDD_CHALLENGE_LEVEL                     4001
 #define IDD_START_CUSTOM_GAME                   4002
-#define IDD_GLOBAL_STATS                        4003
-#define IDD_TERRAIN_NEW_MAP                     4101
-#define IDD_TERRAIN_OPEN_MAP                    4102
-#define IDD_TERRAIN_SAVE_MAP_AS                 4103
+#define IDD_SETTINGS                            4003
+#define IDD_PREVIEW_LEVEL                       4004
+#define IDD_GLOBAL_STATS                        4005
+#define IDD_HELP_ABOUT                          4101
+#define IDD_TERRAIN_NEW_MAP                     4201
+#define IDD_TERRAIN_OPEN_MAP                    4202
+#define IDD_TERRAIN_SAVE_MAP_AS                 4203
 
 #define IDC_INFO_BASE_NAME                      10001
 #define IDC_INFO_BASE_DESC                      10002
@@ -107,29 +110,46 @@
 
 #define IDC_CUSTOM_GAME_MAP_NAME                21001
 
-#define IDC_GLOBAL_STATS_HISCORE                22001
-#define IDC_GLOBAL_STATS_EASY                   22051
-#define IDC_GLOBAL_STATS_NORMAL                 22052
-#define IDC_GLOBAL_STATS_HARD                   22053
-#define IDC_GLOBAL_STATS_EXPERT                 22054
+#define IDC_SETTINGS_CHALLENGE_LEVEL            22001
+#define IDC_SETTINGS_MAP_NAME                   22002
+#define IDC_SETTINGS_MUSIC_VOLUME               22003
+#define IDC_SETTINGS_MUSIC_PLAY_YES             22004
+#define IDC_SETTINGS_MUSIC_PLAY_NO              22005
 
-#define IDC_TERRAIN_MAP_NAME                    23001
-#define IDC_TERRAIN_NEW_MAP_ROWS                23101
-#define IDC_TERRAIN_NEW_MAP_COLS                23102
-#define IDC_TERRAIN_SAVE_MAP_AS_SHOW_CONFIRM    23202
+#define IDC_PREVIEW_WAVE_LEVEL_NUMBER           23001
+#define IDC_PREVIEW_WAVE_DESCRIPTION            23002
+#define IDC_PREVIEW_WAVE_NUM_WAVES              23003
+#define IDC_PREVIEW_WAVE_ENEMY_COUNT            23004
+#define IDC_PREVIEW_WAVE_WAVE_DELAY             23005
+#define IDC_PREVIEW_WAVE_ENEMY_DELAY            23006
+#define IDC_PREVIEW_WAVE_ENEMY_NAMES            23007
+
+#define IDC_GLOBAL_STATS_HISCORE                24001
+#define IDC_GLOBAL_STATS_EASY                   24051
+#define IDC_GLOBAL_STATS_NORMAL                 24052
+#define IDC_GLOBAL_STATS_HARD                   24053
+#define IDC_GLOBAL_STATS_EXPERT                 24054
+
+#define IDC_TERRAIN_MAP_NAME                    25001
+#define IDC_TERRAIN_NEW_MAP_ROWS                25101
+#define IDC_TERRAIN_NEW_MAP_COLS                25102
+#define IDC_TERRAIN_SAVE_MAP_AS_SHOW_CONFIRM    25202
 
 #define ID_MM_FILE_NEW_GAME                     40101
 #define ID_MM_FILE_START_CUSTOM_GAME            40102
 #define ID_MM_FILE_LOAD_GAME                    40103
 #define ID_MM_FILE_SAVE_GAME                    40104
 #define ID_MM_FILE_SAVE_GAME_AS                 40105
-#define ID_MM_FILE_QUIT                         40106
+#define ID_MM_FILE_SETTINGS                     40106
+#define ID_MM_FILE_QUIT                         40107
 #define ID_MM_ACTIONS_TOGGLE_PAUSE              40201
 #define ID_MM_ACTIONS_NEXT_WAVE                 40202
-#define ID_MM_ACTIONS_BUY_HEALTH                40203
-#define ID_MM_ACTIONS_CHANGE_SPEED              40204
-#define ID_MM_ACTIONS_TOGGLE_ALL_RADII          40205
-#define ID_MM_ACTIONS_VIEW_GLOBAL_STATS         40206
+#define ID_MM_ACTIONS_PREVIEW_WAVE              40203
+#define ID_MM_ACTIONS_BUY_HEALTH                40204
+#define ID_MM_ACTIONS_CHANGE_SPEED              40205
+#define ID_MM_ACTIONS_TOGGLE_ALL_RADII          40206
+#define ID_MM_ACTIONS_UNMARK_ALL_TILES          40207
+#define ID_MM_ACTIONS_VIEW_GLOBAL_STATS         40208
 #define ID_MM_TOWERS_INFO                       40301
 #define ID_MM_TOWERS_MARK_TILES                 40302
 #define ID_MM_TOWERS_UNMARK_TILES               40303
@@ -138,6 +158,7 @@
 #define ID_MM_TOWERS_SELL_TOWER                 40399
 #define ID_MM_SHOTS_PLACEHOLDER                 40401
 #define ID_MM_ENEMIES_PLACEHOLDER               40501
+#define ID_MM_HELP_ABOUT                        40601
 #define ID_MM_DEVELOP_TERRAIN_EDITOR            40801
 #define ID_MM_DEVELOP_SHOW_TEST_PATHS           40802
 #define ID_TE_FILE_NEW_MAP                      41101
@@ -167,7 +188,8 @@ constexpr const auto id_mm_actions_offset = 1;
 constexpr const auto id_mm_towers_offset = 2;
 constexpr const auto id_mm_shots_offset = 3;
 constexpr const auto id_mm_enemies_offset = 4;
-constexpr const auto id_mm_develop_offset = 5;
+constexpr const auto id_mm_help_offset = 5;
+constexpr const auto id_mm_develop_offset = 6;
 
 // Next default values for new objects
 // 

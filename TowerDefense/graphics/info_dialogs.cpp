@@ -12,6 +12,7 @@
 #include "./info_dialogs.hpp"
 #include "./../globals.hpp"
 #include "./../game/enemy_type.hpp"
+#include "./../game/enemy.hpp"
 #include "./../game/game_formulas.hpp"
 #include "./../game/my_game.hpp"
 #include "./../game/shot_types.hpp"
@@ -19,7 +20,7 @@
 #include "./../game/tower_types.hpp"
 #include "./../game/tower.hpp"
 using namespace std::literals::string_literals;
-namespace hoffman::isaiah::winapi {
+namespace hoffman_isaiah::winapi {
 	InfoDialogBase::InfoDialogBase(HINSTANCE h_inst, const game::GameObjectType& object_type) :
 		h_instance {h_inst},
 		my_type {object_type} {
@@ -110,6 +111,8 @@ namespace hoffman::isaiah::winapi {
 				EndDialog(hwnd, IDOK);
 				break;
 			}
+			default:
+				break;
 			}
 			break;
 		case WM_CTLCOLORSTATIC:
@@ -201,6 +204,65 @@ namespace hoffman::isaiah::winapi {
 		SetDlgItemText(hwnd, IDC_INFO_ENEMY_RATING, this->rating_string.c_str());
 	}
 
+	EnemyMapInfoDialog::EnemyMapInfoDialog(HWND owner, HINSTANCE h_inst, const game::Enemy& e) :
+		InfoDialogBase {h_inst, e.getBaseType()},
+		my_enemy {e} {
+		DialogBoxParam(this->getApplicationHandle(), MAKEINTRESOURCE(IDD_INFO_ENEMY),
+			owner, InfoDialogBase::infoDialogProc, reinterpret_cast<LPARAM>(this));
+	}
+
+	void EnemyMapInfoDialog::initDialog(HWND hwnd) {
+		this->setCommonControls(hwnd);
+		// Unlike the menu dialog, this box shows the enemy's current health, armor, and speed.
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_HEALTH,
+			std::to_wstring(static_cast<int>(this->my_enemy.getHealth())).c_str());
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_ARMOR_HP,
+			std::to_wstring(static_cast<int>(this->my_enemy.getArmorHealth())).c_str());
+		std::wstringstream my_stream {};
+		const auto prime_stream_for_float = [&my_stream](int prec) {
+			my_stream.str(L"");
+			my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(prec);
+		};
+		prime_stream_for_float(1);
+		my_stream << this->my_enemy.getBaseType().getArmorReduce() * 100 << L"%";
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_ARMOR_REDUCE,
+			my_stream.str().c_str());
+		prime_stream_for_float(1);
+		my_stream << this->my_enemy.getBaseType().getPainTolerance() * 100 << L"%";
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_PAIN_TOLERANCE,
+			my_stream.str().c_str());
+		prime_stream_for_float(1);
+		my_stream << this->my_enemy.getCurrentWalkingSpeed() << L" cs / s";
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_WALK_SPEED,
+			my_stream.str().c_str());
+		prime_stream_for_float(1);
+		my_stream << this->my_enemy.getCurrentRunningSpeed() << L" cs / s";
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_RUN_SPEED,
+			my_stream.str().c_str());
+		prime_stream_for_float(1);
+		my_stream << this->my_enemy.getCurrentInjuredSpeed() << L" cs / s";
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_INJURED_SPEED,
+			my_stream.str().c_str());
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_IS_FLYING,
+			this->my_enemy.getBaseType().isFlying() ? L"Yes" : L"No");
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_DAMAGE,
+			std::to_wstring(this->my_enemy.getBaseType().getDamage()).c_str());
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_NUM_BUFFS,
+			std::to_wstring(this->my_enemy.getBaseType().getBuffTypesCount()).c_str());
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_STRATEGY,
+			(*this->my_enemy.getCurrentStrategy()).c_str());
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_MOVE_DIAGONAL,
+			this->my_enemy.canMoveDiagonally() ? L"Yes" : L"No");
+		prime_stream_for_float(0);
+		my_stream << this->my_enemy.getBaseType().getExtraRating();
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_BUFF_RATING,
+			my_stream.str().c_str());
+		prime_stream_for_float(0);
+		my_stream << this->my_enemy.getBaseType().getRating();
+		SetDlgItemText(hwnd, IDC_INFO_ENEMY_RATING,
+			my_stream.str().c_str());
+	}
+
 	ShotBaseInfoDialog::ShotBaseInfoDialog(HWND owner, HINSTANCE h_inst, const game::ShotBaseType& stype) :
 		InfoDialogBase {h_inst, stype} {
 		[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret cast.
@@ -276,21 +338,30 @@ namespace hoffman::isaiah::winapi {
 	void TowerInfoDialog::initDialog(HWND hwnd) {
 		this->setCommonControls(hwnd);
 		const auto& my_ttype = dynamic_cast<const game::TowerType&>(this->getType());
-		SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_METHOD, my_ttype.getFiringMethod().getReferenceName().c_str());
-		SetDlgItemText(hwnd, IDC_INFO_TOWER_TARGETING_STRATEGY, my_ttype.getTargetingStrategy().getReferenceName().c_str());
 		std::wstringstream my_stream {};
-		// Add ammo types.
-		const auto hdlg_ammo = GetDlgItem(hwnd, IDC_INFO_TOWER_AMMO_TYPES);
-		for (const auto& st_pair : my_ttype.getShotTypes()) {
-			my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(0)
-				<< (st_pair.second * 100) << L"%";
-			const std::wstring ammo_string = st_pair.first->getName() + L": " + my_stream.str();
-			my_stream.str(L"");
-			[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
-			SendMessage(hdlg_ammo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(ammo_string.c_str()));
-			}
+		if (my_ttype.isWall()) {
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_METHOD, L"N/A");
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_TARGETING_STRATEGY, L"N/A");
+			const auto hdlg_ammo = GetDlgItem(hwnd, IDC_INFO_TOWER_AMMO_TYPES);
+			SendMessage(hdlg_ammo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Not Applicable"));
+			SendMessage(hdlg_ammo, CB_SETCURSEL, 0, 0);
 		}
-		SendMessage(hdlg_ammo, CB_SETCURSEL, 0, 0);
+		else {
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_METHOD, my_ttype.getFiringMethod().getReferenceName().c_str());
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_TARGETING_STRATEGY, my_ttype.getTargetingStrategy().getReferenceName().c_str());
+			// Add ammo types.
+			const auto hdlg_ammo = GetDlgItem(hwnd, IDC_INFO_TOWER_AMMO_TYPES);
+			for (const auto& st_pair : my_ttype.getShotTypes()) {
+				my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(0)
+					<< (st_pair.second * 100) << L"%";
+				const std::wstring ammo_string = st_pair.first->getName() + L": " + my_stream.str();
+				my_stream.str(L"");
+				[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
+				SendMessage(hdlg_ammo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(ammo_string.c_str()));
+				}
+			}
+			SendMessage(hdlg_ammo, CB_SETCURSEL, 0, 0);
+		}
 		my_stream << std::setiosflags(std::ios::fixed) << std::setprecision(1)
 			<< my_ttype.getFiringSpeed() << L" / s";
 		SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_SPEED, my_stream.str().c_str());
@@ -359,8 +430,8 @@ namespace hoffman::isaiah::winapi {
 				this->my_tower.getBaseType()->getTargetingStrategy().getReferenceName().c_str());
 		}
 		else {
-			SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_METHOD, L"Not Applicable");
-			SetDlgItemText(hwnd, IDC_INFO_TOWER_TARGETING_STRATEGY, L"Not Applicable");
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_FIRING_METHOD, L"N/A");
+			SetDlgItemText(hwnd, IDC_INFO_TOWER_TARGETING_STRATEGY, L"N/A");
 			[[gsl::suppress(26490)]] { // C26490 => Do not use reinterpret_cast.
 			SendMessage(hdlg_ammo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"Not Applicable"));
 			}
@@ -608,9 +679,9 @@ namespace hoffman::isaiah::winapi {
 		my_stream << L"$" << std::setiosflags(std::ios_base::fixed) << std::setprecision(2) << this->upgrade_cost;
 		SetDlgItemText(hwnd, IDC_INFO_TOWER_UPGRADE_COST, my_stream.str().c_str());
 		my_stream.str(L"");
-		static const COLORREF red_color {RGB(128, 0, 0)};
-		static const COLORREF blue_color {RGB(0, 0, 128)};
-		static const COLORREF green_color {RGB(0, 128, 0)};
+		static const constexpr COLORREF red_color {RGB(128, 0, 0)};
+		static const constexpr COLORREF blue_color {RGB(0, 0, 128)};
+		static const constexpr COLORREF green_color {RGB(0, 128, 0)};
 		const auto my_change_field_lambda = [this, &my_stream, &hwnd](int resource_id, double new_value) noexcept {
 			my_stream << std::setiosflags(std::ios_base::fixed) << std::setprecision(1)
 				<< (new_value * 100.0) << L"%";

@@ -6,7 +6,7 @@
 #include <array>
 #include <string>
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace winapi {
 		// Interfaces/enums:
 		/// <summary>Interface for dialog boxes.</summary>
@@ -29,6 +29,14 @@ namespace hoffman::isaiah {
 		/// if an error occurs while trying to initialize the program.</summary>
 		/// <param name="lpszFunction">The source of the error message.</param>
 		[[noreturn]] void handleWindowsError(std::wstring lpszFunction);
+
+		// For use with COM pointers
+		template <typename T>
+		struct ReleaseCOM {
+			void operator()(T* pT) {
+				pT->Release();
+			}
+		};
 	}
 	namespace graphics {
 		// Forward declarations

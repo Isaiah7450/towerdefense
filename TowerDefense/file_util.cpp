@@ -10,14 +10,15 @@
 #include "./graphics/shapes.hpp"
 using namespace std::literals::string_literals;
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace util::file {
 		DataFileParser::DataFileParser(std::wistream& is) :
 			data_file {is} {
 			this->lookahead = this->data_file.get();
-			if (!this->isValid() || !this->getNext()) {
+			if (!this->isValid()) {
 				throw DataFileException {L"Could not read data file."s, 0};
 			}
+			this->getNext();
 		}
 
 		bool DataFileParser::getNext() {
@@ -98,8 +99,13 @@ namespace hoffman::isaiah {
 					return false;
 				}
 				if (prev == L'\\') {
-					if (this->lookahead == L'\\' || this->lookahead == L'"') {
+					if (this->lookahead == L'\\' || this->lookahead == L'"'
+						|| this->lookahead == L'n') {
 						this->token.erase(this->token.end() - 1);
+					}
+					if (this->lookahead == L'n') {
+						this->token += L'\n';
+						continue;
 					}
 				}
 				else if (this->lookahead == L'"') {
@@ -120,6 +126,7 @@ namespace hoffman::isaiah {
 					return false;
 				}
 				if (this->lookahead != L'_' && !((this->lookahead >= L'a' && this->lookahead <= L'z')
+					|| (this->lookahead >= L'A' && this->lookahead <= L'Z')
 					|| (this->lookahead >= L'0' && this->lookahead <= L'9'))) {
 					throw DataFileException {L"Invalid character encountered: "s + this->lookahead
 						+ L" in section header!"s, this->getLine()};

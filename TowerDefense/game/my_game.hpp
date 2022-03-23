@@ -11,7 +11,7 @@
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace pathfinding {
 		// Forward declaration
 		class Pathfinder;
@@ -83,7 +83,7 @@ namespace hoffman::isaiah {
 			friend class graphics::Renderer2D;
 		public:
 			// Other stuff
-			MyGame(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res);
+			MyGame(graphics::DX::DeviceResources2D* dev_res);
 			~MyGame() noexcept;
 			// Rule of 5:
 			MyGame(const MyGame&) = delete;
@@ -136,8 +136,10 @@ namespace hoffman::isaiah {
 			/// <param name="e">The tower to add.</param>
 			void addTower(std::unique_ptr<Tower>&& t);
 			// Player Actions:
-			/// <summary>Starts the next wave.</summary>
+			/// <summary>Starts the next level.</summary>
 			void startWave();
+			/// <summary>Previews the composition of the next level.</summary>
+			void previewWave();
 			/// <summary>Toggles the pause state of the game.</summary>
 			void togglePause() noexcept {
 				this->is_paused = !this->is_paused;
@@ -181,7 +183,7 @@ namespace hoffman::isaiah {
 				this->in_custom_game = is_custom;
 			}
 			// Getters
-			std::shared_ptr<graphics::DX::DeviceResources2D> getDeviceResources() const noexcept {
+			graphics::DX::DeviceResources2D* getDeviceResources() const noexcept {
 				return this->device_resources;
 			}
 			GameMap& getMap() noexcept {
@@ -270,6 +272,10 @@ namespace hoffman::isaiah {
 					return 5;
 				case 5:
 					return 8;
+				case 8:
+					return 13;
+				case 13:
+					return 21;
 				default:
 					return 1;
 				}
@@ -345,7 +351,7 @@ namespace hoffman::isaiah {
 			}
 		private:
 			/// <summary>Shared pointer to the device resources.</summary>
-			std::shared_ptr<graphics::DX::DeviceResources2D> device_resources;
+			graphics::DX::DeviceResources2D* device_resources;
 			/// <summary>The base name of the current map.</summary>
 			std::wstring map_base_name {L"intermediate"};
 			/// <summary>The game map being used by the program.</summary>

@@ -15,7 +15,7 @@
 #include "./tower_types.hpp"
 #include "./game_formulas.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace winapi {
 		class TowerUpgradeInfoDialog;
 	}
@@ -29,10 +29,10 @@ namespace hoffman::isaiah {
 		class Tower : public GameObject {
 			friend class winapi::TowerUpgradeInfoDialog;
 		public:
-			Tower(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, const GameMap& my_map,
+			Tower(graphics::DX::DeviceResources2D* dev_res, const GameMap& my_map,
 				const TowerType* ttype, graphics::Color o_color, double build_gx, double build_gy) :
-				GameObject {dev_res, my_map, ttype->getShape(), o_color, ttype->getColor(), build_gx, build_gy,
-					0.7f, 0.7f},
+				GameObject {dev_res, my_map, ttype->getShape(), o_color, ttype->getColor(),
+				build_gx, build_gy, 0.7f, 0.7f},
 				device_resources {dev_res},
 				base_type {ttype},
 				rating {ttype->getRating()},
@@ -187,8 +187,13 @@ namespace hoffman::isaiah {
 			/// <returns>The newly created projectile.</returns>
 			std::unique_ptr<Shot> createShot(const Enemy* target) const;
 		private:
+			// Getters
+			graphics::DX::DeviceResources2D* getDeviceResources() const noexcept {
+				return this->device_resources;
+			}
+			// Fields
 			/// <summary>Pointer to the game's device resources.</summary>
-			std::shared_ptr<graphics::DX::DeviceResources2D> device_resources;
+			graphics::DX::DeviceResources2D* device_resources;
 			/// <summary>The template type of this projectile.</summary>
 			const TowerType* base_type;
 			/// <summary>The number of shots that have been fired since reloading.</summary>

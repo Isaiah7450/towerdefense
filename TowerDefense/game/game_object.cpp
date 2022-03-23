@@ -9,10 +9,11 @@
 #include "./../graphics/shapes.hpp"
 #include "./game_object.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
-		GameObject::GameObject(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, const GameMap& game_map, graphics::shapes::ShapeTypes st,
-			graphics::Color o_color, graphics::Color f_color, double cgx, double cgy, double gw, double gh) :
+		GameObject::GameObject(graphics::DX::DeviceResources2D* dev_res, const GameMap& game_map,
+			graphics::shapes::ShapeTypes st, graphics::Color o_color, graphics::Color f_color,
+			double cgx, double cgy, double gw, double gh) :
 			sprite {nullptr},
 			my_map {game_map},
 			gx {cgx},
@@ -46,8 +47,8 @@ namespace hoffman::isaiah {
 					{csx + sw / 4.f * std::cos(2.3f * math::calculate_pi<float>()),
 					csy + sh / 4.f * std::sin(2.3f * math::calculate_pi<float>())}
 				}};
-				this->sprite = std::make_unique<graphics::shapes::Shape2DPolygon<10>>(dev_res, o_color, f_color,
-					points, csx, csy);
+				this->sprite = std::make_unique<graphics::shapes::Shape2DPolygon<10>>(
+					dev_res, o_color, f_color, points, csx, csy);
 				break;
 			}
 			case graphics::shapes::ShapeTypes::Diamond:

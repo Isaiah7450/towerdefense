@@ -8,7 +8,7 @@
 #include "./../pathfinding/grid.hpp"
 #include "./../pathfinding/pathfinder.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace terrain_editor {
 		unsigned __stdcall terrain_editor_thread_init(void* data);
 
@@ -86,8 +86,5 @@ namespace hoffman::isaiah {
 			// The window's name
 			static constexpr auto window_name {L"A Shaping War: Isaiah's tower defense game (Terrain Editor)"};
 		};
-
-		// Global state is not the best, but it tends to be the most trivial solution.
-		extern std::shared_ptr<TerrainEditor> g_my_editor;
 	}
 }

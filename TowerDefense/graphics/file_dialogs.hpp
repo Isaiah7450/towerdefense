@@ -15,11 +15,12 @@
 #include <memory>
 #include "graphics_DX.hpp"
 
-namespace hoffman::isaiah::winapi {
+namespace hoffman_isaiah::winapi {
 	// This is a stupidly high amount of extra code to implement just to be able to
 	// create file dialogs...
 	class MyFileDialogHandler : public IFileDialogEvents, public IFileDialogControlEvents {
 	public:
+		virtual ~MyFileDialogHandler() noexcept = default;
 		// Most of this code is more or less copied from the github src of the
 		// sample for the common item dialog box.
 		IFACEMETHODIMP QueryInterface(REFIID riid, void** ppv) override {
@@ -91,7 +92,6 @@ namespace hoffman::isaiah::winapi {
 			return S_OK;
 		}
 	protected:
-		virtual ~MyFileDialogHandler() noexcept = default;
 	private:
 		/// <summary>The current reference count for the interface.</summary>
 		long cref;

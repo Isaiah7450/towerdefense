@@ -7,12 +7,13 @@
 #include <string>
 #include "./../globals.hpp"
 
-namespace hoffman::isaiah::game {
+namespace hoffman_isaiah::game {
 	// Forward declarations
 	class MyGame;
+	class GameLevel;
 }
 
-namespace hoffman::isaiah::winapi {
+namespace hoffman_isaiah::winapi {
 	/// <summary>Represents a dialog used to select the challenge level of the game.</summary>
 	class ChallengeLevelDialog : public IDialog {
 	public:
@@ -60,6 +61,38 @@ namespace hoffman::isaiah::winapi {
 		std::wstring map_name {L"default"};
 	};
 
+	/// <summary>This dialog box stores the current map and music settings.</summary>
+	class SettingsDialog : public IDialog {
+	public:
+		/// <param name="owner">Handle to the owning window.</param>
+		/// <param name="h_inst">The hInstance parameter given by the WinMain function.</param>
+		SettingsDialog(HWND owner, HINSTANCE h_inst);
+		// Dialog box procedure.
+		static INT_PTR CALLBACK dialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	protected:
+		void initDialog(HWND hwnd) override;
+	private:
+		/// <summary>Handle to the music volume control.</summary>
+		HWND hwnd_music_vol;
+	};
+
+	class PreviewLevelDialog : public IDialog {
+	public:
+		/// <param name="owner">Handle to the window that owns this dialog box.</param>
+		/// <param name="h_inst">The hInstance parameter given by the WinMain function.</param>
+		/// <param name="my_level_param">Reference to the details of the upcoming level.</param>
+		PreviewLevelDialog(HWND owner, HINSTANCE h_inst, const game::GameLevel& my_level_param);
+		// Dialog box procedure.
+		static INT_PTR CALLBACK dialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	protected:
+		void initDialog(HWND hwnd) override;
+	private:
+		const game::GameLevel& my_level;
+		/// <summary>This field is used for quick reference; it stores the list of
+		/// enemy names relevant to the current level in order.</summary>
+		std::vector<std::wstring> names;
+	};
+
 	/// <summary>Represents a dialog that shows statistics for the player common across all games.</summary>
 	class GlobalStatsDialog : public IDialog {
 	public:
@@ -83,6 +116,16 @@ namespace hoffman::isaiah::winapi {
 		long long highest_score;
 		/// <summary>The highest levels the player has reached on a particular difficulty.</summary>
 		std::map<int, int> highest_levels;
+	};
+
+	/// <summary>This dialog box provides general information about the program and its maker.</summary>
+	class HelpAboutDialog : public IDialog {
+	public:
+		HelpAboutDialog(HWND owner, HINSTANCE h_inst);
+		// Dialog box procedure.
+		static INT_PTR CALLBACK dialogProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	protected:
+		void initDialog(HWND hwnd);
 	};
 
 	/// <summary>Represents a dialog used to make a new map in the terrain editor.</summary>

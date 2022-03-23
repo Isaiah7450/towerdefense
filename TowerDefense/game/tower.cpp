@@ -19,7 +19,7 @@
 #include "./tower.hpp"
 #include "./my_game.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		void Tower::draw(const graphics::Renderer2D& renderer) const noexcept {
 			GameObject::draw(renderer);
@@ -259,13 +259,14 @@ namespace hoffman::isaiah {
 				const double gdx = target->getGameX() - this->getGameX();
 				const double gdy = target->getGameY() - this->getGameY();
 				const double theta = std::atan2(gdy, gdx);
-				return std::make_unique<Shot>(this->device_resources, this->getGameMap(), stype, graphics::Color {1.f, 0.f, 1.f, 1.f},
-					*this, theta);
+				return std::make_unique<Shot>(this->getDeviceResources(), this->getGameMap(),
+					stype, graphics::Color {1.f, 0.f, 1.f, 1.f}, *this, theta);
 			}
 			++this->angle_index;
 			this->angle_index %= this->getBaseType()->getFiringMethod().getAngles().size();
 			// Note that the y-axis is inverted, so we need to correct the angle used here.
-			return std::make_unique<Shot>(this->device_resources, this->getGameMap(), stype, graphics::Color {1.f, 0.f, 1.f, 1.f},
+			return std::make_unique<Shot>(this->getDeviceResources(), this->getGameMap(),
+				stype, graphics::Color {1.f, 0.f, 1.f, 1.f},
 				*this, -this->getBaseType()->getFiringMethod().getAngles().at(this->angle_index));
 		}
 	}

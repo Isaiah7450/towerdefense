@@ -19,7 +19,7 @@
 #include "./my_game.hpp"
 #include "./status_effects.hpp"
 using namespace std::literals::string_literals;
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		// enemy_type.hpp
 		void BuffBase::update(const Enemy& caller, std::vector<std::unique_ptr<Enemy>>& targets) {
@@ -126,12 +126,13 @@ namespace hoffman::isaiah {
 			}
 		}
 
-		Enemy::Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, const GameMap& my_map,
+		Enemy::Enemy(graphics::DX::DeviceResources2D* dev_res, const GameMap& my_map,
 			const EnemyType* etype, graphics::Color o_color,
 			const GameMap& gmap, int level, double difficulty, int challenge_level) :
 			GameObject {dev_res, my_map, etype->getShape(), o_color, etype->getColor(),
 			gmap.getTerrainGraph(etype->isFlying()).getStartNode()->getGameX() + 0.5,
-			gmap.getTerrainGraph(etype->isFlying()).getStartNode()->getGameY() + 0.5, Enemy::gwidth, Enemy::gheight},
+			gmap.getTerrainGraph(etype->isFlying()).getStartNode()->getGameY() + 0.5,
+			Enemy::gwidth, Enemy::gheight},
 			base_type {etype},
 			my_pathfinder {gmap, etype->isFlying(), etype->canMoveDiagonally(), etype->getDefaultStrategy()},
 			my_path {},
@@ -160,11 +161,12 @@ namespace hoffman::isaiah {
 			this->addEnemyBuffs();
 		}
 
-		Enemy::Enemy(std::shared_ptr<graphics::DX::DeviceResources2D> dev_res, const GameMap& my_map,
+		Enemy::Enemy(graphics::DX::DeviceResources2D* dev_res, const GameMap& my_map,
 			const EnemyType* etype, graphics::Color o_color,
 			pathfinding::Pathfinder pf, double start_gx, double start_gy,
 			int level, double difficulty, int challenge_level) :
-			GameObject {dev_res, my_map, etype->getShape(), o_color, etype->getColor(), start_gx, start_gy, Enemy::gwidth, Enemy::gheight},
+			GameObject {dev_res, my_map, etype->getShape(), o_color, etype->getColor(),
+			start_gx, start_gy, Enemy::gwidth, Enemy::gheight},
 			base_type {etype},
 			my_pathfinder {pf},
 			my_path {pf.getPath()},

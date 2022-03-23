@@ -13,7 +13,7 @@ Unicode true
 
 ; General Settings
 ; Name and file
-Name "A Shaping War: Isaiah's tower defense game"
+Name "A Shaping War"
 OutFile "tower_defense_setup.exe"
 
 function .onInit
@@ -66,16 +66,16 @@ InstType /NOCUSTOM
 ; Languages
 !insertmacro MUI_LANGUAGE "English"
 ; Version Information
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "A Shaping War: Isaiah's tower defense game installer"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "3.3.2.0"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "A Shaping War Installer"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "3.4.0.0"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "Isaiah Hoffman"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© Isaiah Hoffman 2018-2019"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "1.3.2.0"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "An installer program for Isaiah Hoffman's tower defense game."
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© Isaiah Hoffman 2018-2022"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "1.4.0.0"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "An installer program for A Shaping War."
 VIAddVersionKey /LANG=${LANG_ENGLISH} "InternalName" "tower_defense_setup.exe"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "OriginalFilename" "tower_defense_setup.exe"
-VIProductVersion 3.3.2.0
-VIFileVersion 1.3.2.0
+VIProductVersion 3.4.0.0
+VIFileVersion 1.4.0.0
 
 ; Installer Sections
 Section "Required Files" SectionRequired
@@ -99,6 +99,7 @@ Section "Required Files" SectionRequired
   CreateDirectory "$R0\resources"
   CreateDirectory "$R0\resources\levels"
   CreateDirectory "$R0\resources\graphs"
+  CreateDirectory "$R0\resources\music"
   CreateDirectory "$R0\userdata"
   CreateDirectory "$R0\screenshots"
   CreateDirectory "$R0\Playing Guide"
@@ -137,12 +138,14 @@ Section "Resource Files" SectionResources
   SetOutPath $R0\resources\levels
   File /a /r "..\resources\levels\level*.ini"
   File ".\..\resources\levels\level0.ini.format"
-  File ".\..\resources\levels\levels.xlsx"
+  ; File ".\..\resources\levels\levels.xlsx"
   File ".\..\resources\levels\global.ini"
   File ".\..\resources\levels\global.ini.format"
   SetOutPath $R0\resources\graphs
   File ".\..\resources\graphs\air_graph_*.txt"
   File ".\..\resources\graphs\ground_graph_*.txt"
+  SetOutPath $R0\resources\music
+  File /a /r "..\resources\music\*.wav"
 SectionEnd
 SectionGroupEnd
 

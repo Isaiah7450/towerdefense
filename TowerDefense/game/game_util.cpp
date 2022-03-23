@@ -2,7 +2,7 @@
 // File Created: April 14, 2018
 #include <random>
 #include "./game_util.hpp"
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		namespace rng {
 			thread_local std::random_device rd {};

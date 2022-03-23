@@ -5,7 +5,7 @@
 #include <array>
 #include <string>
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		// Forward declarations:
 		class Enemy;

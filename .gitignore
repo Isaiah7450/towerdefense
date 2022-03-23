@@ -16,6 +16,8 @@ TowerDefense2D/**/Backup/
 install/**/
 frequencies/*
 frequencies/**/
+notes/*
+notes/**/
 
 # Directory Files
 */doc/**/*.*
@@ -57,6 +59,7 @@ documentation/*.*
 *.dll
 *.lib
 *.ilk
+*.smproj
 
 StyleCop.Cache
 style_guide.html

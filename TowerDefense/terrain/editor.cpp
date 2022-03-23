@@ -6,11 +6,13 @@
 #include <Shobjidl.h>
 #include "./../resource.h"
 #include <process.h>
-#include <string>
-#include <utility>
-#include <iostream>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <utility>
+
 #include "./../globals.hpp"
 #include "./../ih_math.hpp"
 #include "./../main.hpp"
@@ -25,10 +27,8 @@
 
 using namespace std::literals::string_literals;
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace terrain_editor {
-		std::shared_ptr<TerrainEditor> g_my_editor {nullptr};
-
 		LRESULT CALLBACK TerrainEditor::windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 			switch (msg) {
 			case WM_DESTROY:
@@ -43,11 +43,11 @@ namespace hoffman::isaiah {
 		}
 		
 		unsigned __stdcall terrain_editor_thread_init(void* data) {
-			auto* my_game = game::g_my_game.get();
+			const auto* my_game = game::g_my_game.get();
 			// Global state stuff...
-			terrain_editor::g_my_editor = std::make_shared<TerrainEditor>(static_cast<HWND>(data),
+			const auto my_editor_ptr = std::make_unique<TerrainEditor>(static_cast<HWND>(data),
 				my_game->getMapBaseName());
-			auto& my_editor = *terrain_editor::g_my_editor;
+			auto& my_editor = *my_editor_ptr;
 			HINSTANCE my_h_inst = nullptr;
 			if (!GetModuleHandleEx(0, nullptr, &my_h_inst)) {
 				winapi::handleWindowsError(L"TE Thread: Terrain editor creation");
@@ -140,30 +140,17 @@ namespace hoffman::isaiah {
 
 		void TerrainEditor::run() {
 			// Create resource manager
-			auto my_resources = std::make_shared<graphics::DX::DeviceResources2D>();
+			auto my_resources = std::make_unique<graphics::DX::DeviceResources2D>();
 			// Create resources
 			my_resources->createDeviceIndependentResources();
 			if (FAILED(my_resources->createDeviceResources(this->hwnd))) {
 				winapi::handleWindowsError(L"Creation of Direct2D resources");
 			}
 			// Create renderer
-			auto my_renderer = std::make_unique<graphics::Renderer2D>(my_resources);
+			auto my_renderer = std::make_unique<graphics::Renderer2D>(my_resources.get());
 			// Show window
 			ShowWindow(this->hwnd, SW_SHOWNORMAL);
 			UpdateWindow(this->hwnd);
-			// Keep track of mutex
-			auto sync_mutex = OpenMutex(SYNCHRONIZE | MUTEX_MODIFY_STATE, false, TEXT("can_execute"));
-			if (!sync_mutex) {
-				winapi::handleWindowsError(L"TE Thread: Can execute mutex creation");
-				return;
-			}
-			// Keep track of draw event
-			auto draw_event = OpenEvent(SYNCHRONIZE, false, TEXT("can_draw"));
-			if (!draw_event) {
-				CloseHandle(sync_mutex);
-				winapi::handleWindowsError(L"TE Thread: Can draw event creation");
-				return;
-			}
 			// Message Loop
 #pragma warning(push)
 #pragma warning(disable: 26494) // Code Analysis: type.5 --> Always initialize.
@@ -193,7 +180,6 @@ namespace hoffman::isaiah {
 							}
 							winapi::TerrainEditorNewMapDialog my_map_dialog {this->getHWND(), GetModuleHandle(nullptr), new_map_name};
 							if (my_map_dialog.isGood()) {
-								WaitForSingleObject(sync_mutex, INFINITE);
 								this->map_name = my_map_dialog.getName();
 								// Update the window's title to include the map's name.
 								const std::wstring my_window_name = TerrainEditor::window_name + L" ["s
@@ -219,16 +205,13 @@ namespace hoffman::isaiah {
 						{
 							const winapi::TerrainEditorOpenMapDialog my_dialog {this->getHWND(), GetModuleHandle(nullptr)};
 							if (my_dialog.isGood()) {
-								const auto old_name = this->map_name;
+								const std::wstring old_name = this->map_name;
 								this->map_name = my_dialog.getName();
-								WaitForSingleObject(sync_mutex, INFINITE);
 								try {
 									this->reloadMap();
 								}
 								catch (...) {
-									ReleaseMutex(sync_mutex);
 									MessageBox(hwnd, L"Error: Could not load the requested map.", L"TE: Open Map Failed!", MB_OK | MB_ICONERROR);
-									WaitForSingleObject(sync_mutex, INFINITE);
 									this->map_name = old_name;
 									this->reloadMap();
 								}
@@ -271,7 +254,6 @@ namespace hoffman::isaiah {
 							break;
 						case ID_TE_ACTIONS_REVERT_TO_SAVE:
 						{
-							WaitForSingleObject(sync_mutex, INFINITE);
 							this->reloadMap();
 							need_to_update = true;
 							break;
@@ -314,6 +296,7 @@ namespace hoffman::isaiah {
 							break;
 						}
 						this->updateMenu();
+						break;
 					}
 					case WM_LBUTTONDOWN:
 					case WM_RBUTTONDOWN:
@@ -440,12 +423,10 @@ namespace hoffman::isaiah {
 				}
 				else {
 					// Render scene
-					WaitForSingleObject(sync_mutex, INFINITE);
 					if (need_to_update) {
 						// Note that we still have the mutex...
 						// Update first if necessary
 						// game::g_my_game->debugUpdate(game::DebugUpdateStates::Terrain_Changed);
-						ReleaseMutex(sync_mutex);
 					}
 					const HRESULT hr = my_renderer->render(*this, this->start_gx, this->start_gy,
 						this->end_gx, this->end_gy);
@@ -453,11 +434,8 @@ namespace hoffman::isaiah {
 						my_resources->discardDeviceResources();
 						my_resources->createDeviceResources(this->hwnd);
 					}
-					ReleaseMutex(sync_mutex);
 				}
 			}
-			CloseHandle(sync_mutex);
-			CloseHandle(draw_event);
 		}
 	}
 }

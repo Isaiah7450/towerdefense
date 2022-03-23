@@ -102,6 +102,9 @@
     <ClInclude Include="game\game_formulas.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="audio\audio.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc">
@@ -181,9 +184,8 @@
     <ClCompile Include="game\game_formulas.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="graphics\vertex_shader.hlsl" />
-    <FxCompile Include="graphics\pixel_shader.hlsl" />
+    <ClCompile Include="audio\audio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

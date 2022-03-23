@@ -12,7 +12,7 @@
 #include "./grid.hpp"
 #include "./pathfinder.hpp"
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace pathfinding {
 		bool Pathfinder::checkPathExists() const noexcept {
 			// This is an algorithm called Breadth_First_Search.

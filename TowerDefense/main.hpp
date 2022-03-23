@@ -6,14 +6,12 @@
 #include <string>
 #include <utility>
 
-namespace hoffman::isaiah {
+namespace hoffman_isaiah {
 	namespace game {
 		class MyGame;
 	}
 
 	namespace winapi {
-		unsigned __stdcall update_thread_init(void* data);
-
 		/// <summary>Represents the primary application window.</summary>
 		class MainWindow {
 		public:
@@ -34,6 +32,23 @@ namespace hoffman::isaiah {
 			/// <param name="n_cmd_show">Parameter inherited from WinMain that
 			/// determines the initial state of the window.</param>
 			void run(int n_cmd_show);
+
+			/// <summary>Handles WM_COMMAND messages for the main window.
+			/// (A separate method will handle the few other WM_COMMAND messages that used
+			/// to be handled by the update thread.)</summary>
+			/// <param name="my_game">A non-owning pointer to the current game state.</param>
+			/// <param name="my_renderer">A non-owning pointer to the renderer.</param>
+			/// <param name="wparam">The message code to handle.</param>
+			/// <param name="lparam">Additional parameter LPARAM as passed to Windows messages.</param>
+			void handle_wm_command(game::MyGame* my_game,
+				graphics::Renderer2D* my_renderer, WPARAM wparam, LPARAM lparam);
+			/// <summary>Handles WM_COMMAND messages that were in the past handled by
+			/// the update thread.</summary>
+			/// <param name="my_game">A non-owning pointer to the current game state.</param>
+			/// <param name="wparam">The message code to handle.</param>
+			/// <param name="lparam">Additional parameter LPARAM as passed to Windows messages.</param>
+			void handle_update_wm_command(game::MyGame* my_game, WPARAM wparam, LPARAM lparam);
+
 			/// <param name="start_time">The starting time as determined by QueryPerformanceCounter.</param>
 			/// <returns>The current time as well as the number of microseconds that have passed since
 			/// the last call.</returns>
@@ -68,7 +83,7 @@ namespace hoffman::isaiah {
 			int end_gy {-1};
 			// The class name
 			static constexpr const wchar_t* class_name {L"my_game"};
-			static constexpr const wchar_t* window_name {L"A Shaping War: Isaiah's tower defense game"};
+			static constexpr const wchar_t* window_name {L"A Shaping War"};
 			/// <summary>Stores the frequency of the high performance counter.</summary>
 			static LARGE_INTEGER qpc_frequency;
 		};
