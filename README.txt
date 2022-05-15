@@ -8,6 +8,36 @@ or later. (A Windows emulator works as well, but note it
 will require more work. Emulators are not at all supported by
 the author.)
 
+Compiling the Source Code (if you downloaded the GitHub repo)
+-----------------------------------------------------------------
+If you downloaded this program from GitHub, you will need to
+compile the program. You do not need to follow the instructions
+on how to install the program if you take this approach. To
+compile the program, follow the following steps:
+
+1. Download the main branch of the source repo from GitHub.
+Extract the .zip file to some location on your computer.
+2. Download Microsoft Visual Studio 2019 (just search for it)
+and install it. Make sure to select the package titled
+Desktop development with C++ and the package titled Game
+development with C++ during installation.
+3. Go to the directory where you extracted the repository. In
+the root directory, there should be a file called
+TowerDefense.sln. If you installed Visual Studio correct, you
+should be able to double-click the file to open the project.
+4. Towards the top, you will see two combo boxes. Make sure
+the first combo box has Release selected, and for the second
+one, choose x86 only if you have a 32-bit operating system.
+Otherwise, select x64 from the dropdown.
+5. From the menu bar, select Build and then select Build
+Solution from the submenu.
+6. The program should compile without any errors.
+7. To run the program, go to the directory where you stored
+the code repository. You should see a folder named bin. Open
+that folder. You will see a bunch of files and folders. Double-
+click the .exe file to run the program. (The filename should
+look something like x64_Release_TowerDefense.exe.)
+
 Installing the Program (if applicable)
 -----------------------------------------------------------------
 Double-click on the installer and simply follow the directions
