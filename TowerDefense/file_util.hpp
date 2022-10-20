@@ -1,4 +1,4 @@
-#pragma once
+ #pragma once
 // File Author: Isaiah Hoffman
 // File Created: May 24, 2018
 #include <string>
@@ -145,7 +145,8 @@ namespace hoffman_isaiah {
 					return std::stoll(this->getToken());
 				}
 				else {
-					static_assert(false, "An invalid type was specified for parseNumber().");
+					// Strange rule doesn't allow me to just use "false" here...
+					static_assert(std::is_same_v<T, int>, "An invalid type was specified for parseNumber().");
 				}
 			}
 			/// <summary>Attempts to parse the current input as a boolean constant. (Throws an exception
@@ -196,7 +197,8 @@ namespace hoffman_isaiah {
 						list_items.emplace_back(this->parseNumber<T>());
 					}
 					else {
-						static_assert(false, "An invalid type was specified for readList.");
+						// Strange rule doesn't allow me to just use "false" here...
+						static_assert(std::is_same_v<T, int>, "An invalid type was specified for readList.");
 					}
 				}
 			}
@@ -296,7 +298,7 @@ namespace hoffman_isaiah {
 				}
 			}
 
-			// Validates a number that only has a minimum bound.
+			// Validates a number that only has a maximum bound.
 			// value -> Value to check.
 			// max_bound -> Maximum valid value.
 			// prompt -> What is being validated.
